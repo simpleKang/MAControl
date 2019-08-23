@@ -4,10 +4,6 @@
 # import controls
 import argparse
 import time
-import logging
-
-logging.basicConfig(filename='/home/samantha/_train_/logs/execute.log', level=logging.INFO)
-logging.info('\n')
 
 
 def parse_args():
@@ -36,12 +32,14 @@ if __name__ == '__main__':
 
     # Create environment
     env, world = make_env(arglist)
+    control = L1.L1control(env, world, arglist)
+
+
     obs_n = env.reset()
     episode_step = 0
 
     # Start iteration
     print('Starting iterations...')
-    logging.info('Starting iterations...')
     global tt, ss, pointA, pointB
     tt = [0 for i in range(env.n)]
     ss = [0 for i in range(env.n)]
