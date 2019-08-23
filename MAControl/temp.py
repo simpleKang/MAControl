@@ -96,4 +96,13 @@ def get_action(obs, border, k):
     return action
 
 
+    obs_n = env.reset()
+    step = 0
 
+    # Start iteration
+    print('Starting iterations...')
+    global tt, ss, pointA, pointB
+    tt = [0 for i in range(env.n)]
+    ss = [0 for i in range(env.n)]
+    pointA = [(0, 0) for i in range(env.n)]
+    pointB = [(0, 0) for i in range(env.n)]
