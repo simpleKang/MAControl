@@ -3,7 +3,7 @@ from sympy import *
 import os
 
 
-class L1control:
+class PathPlanner:
     def __init__(self, env, world, arglist):
         print("L1 control init")
         self.env = env

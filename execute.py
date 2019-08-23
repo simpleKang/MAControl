@@ -4,6 +4,8 @@
 # import controls
 import argparse
 import time
+import MAControl.PathPlanner as PP
+import MAControl.MotionController as MC
 
 
 def parse_args():
@@ -32,7 +34,7 @@ if __name__ == '__main__':
 
     # Create environment
     env, world = make_env(arglist)
-    control = L1.L1control(env, world, arglist)
+    controller = L1.L1control(env, world, arglist)
 
 
     obs_n = env.reset()
