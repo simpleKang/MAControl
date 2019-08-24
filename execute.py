@@ -39,26 +39,24 @@ if __name__ == '__main__':
     obs_n = env.reset()
     start = time.time()
 
+    for step in range(arglist.step_max):
+        for agent_index in range(env.n):
+            Control.
+
+            pointA_n, PointB_n = TC.PathPlanner(obs_n)
+            action_n = TC.MotionController(pointA_n, pointB_n)
+
     while True:
 
+        # get action
+        action_n = rule1(obs_n, 0.9, -0.9, 0.2, 4, env.n)
 
-    # for step in range(arglist.step_max):
-    #
-    #
-    #         pointA_n, PointB_n = TC.PathPlanner(obs_n)
-    #         action_n = TC.MotionController(pointA_n, pointB_n)
-    #
-    # while True:
-    #
-    #     # get action
-    #     action_n = rule1(obs_n, 0.9, -0.9, 0.2, 4, env.n)
-    #
-    #     # environment step
-    #     new_obs_n, rew_n, done_n, info_n = env.step(action_n)
-    #     step += 1
-    #     done = all(done_n)
-    #     obs_n = new_obs_n
-    #
-    #     # for displaying
-    #     time.sleep(0.05)
-    #     env.render()
+        # environment step
+        new_obs_n, rew_n, done_n, info_n = env.step(action_n)
+        step += 1
+        done = all(done_n)
+        obs_n = new_obs_n
+
+        # for displaying
+        time.sleep(0.05)
+        env.render()
