@@ -34,13 +34,16 @@ if __name__ == '__main__':
     # Create Controllers
     Control = []
     for i in range(env.n):
-        Control.append(TESTC.TESTControl(
-            "agent_%d" % i, env.observation_space, env.action_space, i, arglist))
+        Control.append(TESTC.TESTControl("agent_%d" % i, env, world, i, arglist))
+
+    obs_n = env.reset()
+    start = time.time()
+
+    while True:
 
 
     # for step in range(arglist.step_max):
-    #         obs_n = env.reset()
-    #         start = time.time()
+    #
     #
     #         pointA_n, PointB_n = TC.PathPlanner(obs_n)
     #         action_n = TC.MotionController(pointA_n, pointB_n)
