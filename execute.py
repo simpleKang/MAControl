@@ -37,26 +37,27 @@ if __name__ == '__main__':
         Control.append(TESTC.TESTControl("agent_%d" % i, env, world, i, arglist))
 
     obs_n = env.reset()
+    step = 0
     start = time.time()
-
-    for step in range(arglist.step_max):
-        for agent_index in range(env.n):
-            Control.
-
-            pointA_n, PointB_n = TC.PathPlanner(obs_n)
-            action_n = TC.MotionController(pointA_n, pointB_n)
 
     while True:
 
         # get action
-        action_n = rule1(obs_n, 0.9, -0.9, 0.2, 4, env.n)
+        action_n = []
+        for i in range(env.n):
+            (pointA, pointB) = Control[i].PathPlanner(obs_n[i])
+            action = Control[i].MotionController(obs_n[i], pointA, pointB)
+            action_n.append(action)
 
         # environment step
         new_obs_n, rew_n, done_n, info_n = env.step(action_n)
         step += 1
-        done = all(done_n)
         obs_n = new_obs_n
 
         # for displaying
         time.sleep(0.05)
         env.render()
+        print('step', step)
+        print('obs_n', obs_n)
+        print('action_n', action_n)
+

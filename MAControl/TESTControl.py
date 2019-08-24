@@ -37,5 +37,6 @@ class TESTControl():
         print("path plan")
         self.pointA = (0, 0)
         self.pointB = (0, 0)
+        return self.pointA, self.pointB
 
 
