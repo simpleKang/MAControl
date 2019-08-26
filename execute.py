@@ -30,6 +30,12 @@ def make_env(arglist):
 if __name__ == '__main__':
     arglist = parse_args()
 
+# xin
+    init_waypoint = [[-0.9, -0.9, 1],
+                     [-0.9, 0.9, 1],
+                     [0.9, 0.9, 1],
+                     [0.9, -0.9, 1]]
+
     # Create environment
     env, world = make_env(arglist)
 
@@ -37,6 +43,7 @@ if __name__ == '__main__':
     Control = []
     for i in range(env.n):
         Control.append(TESTC.TESTControl("agent_%d" % i, env, world, i, arglist))
+        Control[i].waypoint_list[0:len(init_waypoint)] = init_waypoint
 
     obs_n = env.reset()
     step = 0
