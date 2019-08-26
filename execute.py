@@ -1,6 +1,8 @@
 # coding=utf-8
+# This is the main file
 import argparse
 import time
+# import controller
 import MAControl.TESTControl as TESTC
 
 
