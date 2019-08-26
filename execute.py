@@ -66,7 +66,7 @@ if __name__ == '__main__':
         # for displaying
         time.sleep(0.05)
         env.render()
-        print('step', step)
-        print('obs_n', obs_n)
-        print('action_n', action_n)
+        # print('step', step)
+        # print('obs_n', obs_n)
+        # print('action_n', action_n)
 
