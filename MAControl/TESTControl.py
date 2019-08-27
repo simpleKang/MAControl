@@ -12,19 +12,23 @@ class TESTControl():
         self.index = agent_index
         self.arglist = arglist
 
-        self.state = 0
-        self.vel = np.array([0, 0])
-        self.pos = np.array([0, 0])
-        self.pointAi = np.array([0, 0])
-        self.pointBi = np.array([0, 0])
+        self.vel = (0, 0)
+        self.pos = (0, 0)
+        self.pointAi = (0, 0)
+        self.pointBi = (0, 0)
 
         self.L1_distance = 0
         self.nav_bearing = 0
         self.eta = 0
         self.lateral_accel = 0
 
-        self.waypoint_list = [[0 for i in range(3)] for j in range(256)]
         self.action = [0, 0, 0, 0, 0]
+
+        self.waypoint_finished = False
+        self.arrive_flag = True
+        self.pointB_index = 0
+        # 256×3的航点列表，第3列为航点状态 [0: 无航点] [1: 未飞] [2: pointA] [3: pointB] [4: 已到达]
+        self.waypoint_list = [[0 for i in range(3)] for j in range(256)]
 
     def PathPlanner(self, obs):
         print("path plan")
