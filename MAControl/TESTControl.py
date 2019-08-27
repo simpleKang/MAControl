@@ -60,7 +60,7 @@ class TESTControl():
         vector_AP = self.pos-pointAi
         crosstrack_error = vector_AB % vector_AP
         distance_AP = np.sqrt(np.square(vector_AP[0]) + np.square(vector_AP[1]))
-        alongTrackDist = vector_AP * vector_AB
+        alongTrackDist = np.dot(vector_AP, vector_AB)
 
         vector_BP = self.pos - pointBi
         length_BP = np.sqrt(np.square(vector_BP[0]) + np.square(vector_BP[1]))
@@ -80,16 +80,25 @@ class TESTControl():
             nav_bearing = math.atan2(vector_BP[1], vector_BP[0])
 
         else:
-            # calculate eta to fly along between A and B
-            a
+            # calculate eta to fly along the line between A and B
+            eta2 = math.acos(np.dot(vector_AB, self.vel)/groundspeed)
+            xtrackErr = vector_AP % vector_AB
+            sin_eta1 = xtrackErr / max(L1_distance, 0.1)
+            #  TODO: (c++): sin_eta1 = math::constrain(sin_eta1,-0.7071f,0.7071f)
+            eta1 = math.asin(sin_eta1)
+            eta = eta1 + eta2
+            nav_bearing = math.atan2(vector_AB(1), vector_AB(0)) + eta1
 
+        #  TODO: (c++): eta = math::constrain(eta,-pi/2,pi/2)
+        KL1 = 0.02
+        self.lateral_accel = KL1 * groundspeed * groundspeed / L1_distance * math.sin(eta)
+        circle_mode = false
+        bearing_error = eta
 
-
-
-
-
-
-
+        accel_unit = np.array([self.vel[1], -1*self.vel[0]])
+        accel_command = accel_unit * self.lateral_accel
+        self.action[2] = accel_command[0]
+        self.action[4] = accel_command[1]
         return self.action
 
 
