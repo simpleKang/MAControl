@@ -26,10 +26,34 @@ class TESTControl():
         self.waypoint_list = [[0 for i in range(3)] for j in range(256)]
 
     def PathPlanner(self, obs):
-        print("path plan")
-        self.pointAi = (0, 0)
-        self.pointBi = (0.9, 0)
-        return self.pointAi, self.pointBi
+        # print("path plan")
+
+        # TODO:根据obs进行判断是否修改航点列表
+        # if True:
+        #     self.WaypointUpdater(obs)
+
+        # 初始时刻输出A、B坐标
+        if self.pointB_index == 0:
+            self.pointA = (obs[2], obs[3])
+            self.pointB = (self.waypoint_list[self.pointB_index][0], self.waypoint_list[self.pointB_index][1])
+
+        # 更改航点状态并输出A、B坐标
+        if self.arrive_flag:
+            if self.waypoint_list[self.pointB_index+1][2] != 0 and self.pointB_index < 255:
+                if self.pointB_index > 0:
+                    self.waypoint_list[self.pointB_index-1][2] = 4
+                self.waypoint_list[self.pointB_index][2] = 2
+                self.waypoint_list[self.pointB_index+1][2] = 3
+                self.pointA = (self.waypoint_list[self.pointB_index][0], self.waypoint_list[self.pointB_index][1])
+                self.pointB = (self.waypoint_list[self.pointB_index+1][0], self.waypoint_list[self.pointB_index+1][1])
+                self.arrive_flag = True
+                self.pointB_index += 1
+            else:
+                self.waypoint_list[self.pointB_index-1][2] = 4
+                self.waypoint_finished = True
+
+        print(self.waypoint_list[0:5])
+        return self.pointA, self.pointB, self.waypoint_finished
 
     def MotionController(self, obs, pointAi, pointBi):
         print("motion control")

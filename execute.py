@@ -2,6 +2,8 @@
 import argparse
 import time
 import MAControl.TESTControl as TESTC
+import Test
+
 
 def parse_args():
     parser = argparse.ArgumentParser("Control Experiments for Multi-Agent Environments")
@@ -34,6 +36,7 @@ if __name__ == '__main__':
     Control = []
     for i in range(env.n):
         Control.append(TESTC.TESTControl("agent_%d" % i, env, world, i, arglist))
+        Control[i].waypoint_list[0:len(Test.init_waypoint[i])] = Test.init_waypoint[i]
 
     obs_n = env.reset()
     step = 0
@@ -44,7 +47,7 @@ if __name__ == '__main__':
         # get action
         action_n = []
         for i in range(env.n):
-            pointAi, pointBi = Control[i].PathPlanner(obs_n[i])
+            pointAi, pointBi, finishedi = Control[i].PathPlanner(obs_n[i])
             actioni = Control[i].MotionController(obs_n[i], pointAi, pointBi)
             action_n.append(actioni)
 
