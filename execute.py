@@ -3,21 +3,6 @@ import argparse
 import time
 import MAControl.TESTControl as TESTC
 
-# copy from Test.py
-init_waypoint = []
-init_waypoint.append([[-0.9, -0.9, 1],
-                      [-0.9, 0.9, 1],
-                      [0.9, 0.9, 1],
-                      [0.9, -0.9, 1]])
-init_waypoint.append([[-0.7, -0.7, 1],
-                      [-0.7, 0.7, 1],
-                      [0.7, 0.7, 1],
-                      [0.7, -0.7, 1]])
-init_waypoint.append([[-0.5, -0.5, 1],
-                      [-0.5, 0.5, 1],
-                      [0.5, 0.5, 1],
-                      [0.5, -0.5, 1]])
-
 def parse_args():
     parser = argparse.ArgumentParser("Control Experiments for Multi-Agent Environments")
     parser.add_argument("--scenario", type=str, default="scenario_DIY", help="name of the scenario script")
@@ -49,7 +34,6 @@ if __name__ == '__main__':
     Control = []
     for i in range(env.n):
         Control.append(TESTC.TESTControl("agent_%d" % i, env, world, i, arglist))
-        Control[i].waypoint_list[0:len(init_waypoint[i])] = init_waypoint[i]
 
     obs_n = env.reset()
     step = 0

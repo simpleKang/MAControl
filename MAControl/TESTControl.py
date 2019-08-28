@@ -32,17 +32,8 @@ class TESTControl():
 
     def PathPlanner(self, obs):
         print("path plan")
-
-        # TODO:判断是否修改当前航点状态
-
-        # TODO:根据obs进行判断是否修改航点列表
-        if():
-            # TODO:按需求修改航点列表
-            self.waypoint_listint
-
-        # TODO:从航点列表中取出A点和B点
-        # self.pointAi = [0, 0]
-        # self.pointBi = [0, 0]
+        self.pointAi = (0, 0)
+        self.pointBi = (0.9, 0)
         return self.pointAi, self.pointBi
 
     def MotionController(self, obs, pointAi, pointBi):
