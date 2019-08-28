@@ -20,13 +20,13 @@ class TESTControl():
         self.action = [0, 0, 0, 0, 0]
 
         self.waypoint_finished = False
-        self.arrive_flag = True
+        self.arrive_flag = False
         self.pointB_index = 0
         # 256×3的航点列表，第3列为航点状态 [0: 无航点] [1: 未飞] [2: pointA] [3: pointB] [4: 已到达]
         self.waypoint_list = [[0 for i in range(3)] for j in range(256)]
 
     def PathPlanner(self, obs):
-        # print("path plan")
+        print("path plan")
 
         # TODO:根据obs进行判断是否修改航点列表
         # if True:
@@ -46,13 +46,12 @@ class TESTControl():
                 self.waypoint_list[self.pointB_index+1][2] = 3
                 self.pointA = (self.waypoint_list[self.pointB_index][0], self.waypoint_list[self.pointB_index][1])
                 self.pointB = (self.waypoint_list[self.pointB_index+1][0], self.waypoint_list[self.pointB_index+1][1])
-                self.arrive_flag = True
+                self.arrive_flag = False
                 self.pointB_index += 1
             else:
                 self.waypoint_list[self.pointB_index-1][2] = 4
                 self.waypoint_finished = True
 
-        print(self.waypoint_list[0:5])
         return self.pointA, self.pointB, self.waypoint_finished
 
     def MotionController(self, obs, pointAi, pointBi):
@@ -76,6 +75,7 @@ class TESTControl():
 
         vector_BP = self.pos - pointBi
         dist_BP = np.sqrt(np.square(vector_BP[0]) + np.square(vector_BP[1]))
+        self.arrive_flag = True if dist_BP < 0.5 else False
         vector_BP_unit = vector_BP/dist_BP
 
         alongTrackDist = np.dot(vector_AP, vector_AB_unit)

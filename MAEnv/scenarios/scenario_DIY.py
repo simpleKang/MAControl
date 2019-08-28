@@ -8,7 +8,7 @@ class Scenario(BaseScenario):
         world = World()
         # set any world properties first
         num_agents = 1
-        num_landmarks = 2
+        num_landmarks = 4
         # add agents
         world.agents = [Agent() for i in range(num_agents)]
         for i, agent in enumerate(world.agents):
@@ -38,12 +38,14 @@ class Scenario(BaseScenario):
         for i, agent in enumerate(world.agents):
             # agent.state.p_pos = np.array([0.2*i-0.9, -0.9])
             agent.state.p_vel = np.array([0, 1])
-        world.agents[0].state.p_pos = np.array([-0.5, -0.5])
+            agent.state.p_pos = np.array([-0.95, -0.95])
         for i, landmark in enumerate(world.landmarks):
             # landmark.state.p_pos = np.random.uniform(-0.9, +0.9, world.dim_p)
             landmark.state.p_vel = np.zeros(world.dim_p)
-        world.landmarks[0].state.p_pos = np.array([0, 0])
-        world.landmarks[1].state.p_pos = np.array([0.9, 0])
+        world.landmarks[0].state.p_pos = np.array([-0.9, -0.9])
+        world.landmarks[1].state.p_pos = np.array([-0.9, 0.9])
+        world.landmarks[2].state.p_pos = np.array([0.9, 0.9])
+        world.landmarks[3].state.p_pos = np.array([0.9, -0.9])
 
     def benchmark_data(self, agent, world):
         # returns data for benchmarking purposes
