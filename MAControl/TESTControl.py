@@ -17,11 +17,6 @@ class TESTControl():
         self.pointAi = (0, 0)
         self.pointBi = (0, 0)
 
-        self.L1_distance = 0
-        self.nav_bearing = 0
-        self.eta = 0
-        self.lateral_acc = 0
-
         self.action = [0, 0, 0, 0, 0]
 
         self.waypoint_finished = False
@@ -93,11 +88,17 @@ class TESTControl():
 
         #  TODO: (c++): eta = math::constrain(eta,-pi/2,pi/2)
         print('eta', eta)
-        self.lateral_acc = speed * speed / L1_distance * math.sin(eta) * 0.2  # K_L1
+        lateral_acc_size = speed * speed / L1_distance * math.sin(eta) * 0.2  # K_L1
 
-        lateral = np.array([self.vel[1], -1*self.vel[0]])/speed
-        acc = lateral * self.lateral_acc
-        self.action = [0, 0, 0, 0, 0]
+        lateral_acc_unit = np.array([self.vel[1], -1*self.vel[0]])/speed
+        if np.dot(lateral_acc_unit, vector_AB_unit) < 0 or \
+                np.dot(lateral_acc_unit, vector_AB_unit) == 0 > np.dot(lateral_acc_unit, -1 * vector_AP_unit):
+            lateral_acc_unit = np.array([-1*self.vel[1], self.vel[0]])/speed
+
+        lateral_acc = lateral_acc_unit * lateral_acc_size
+        tangent_acc = self.vel * 0.2
+        acc = lateral_acc + tangent_acc
+
         self.action[2] = acc[0]
         self.action[4] = acc[1]
         return self.action
