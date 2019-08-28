@@ -41,8 +41,8 @@ class TESTControl():
             self.waypoint_listint
 
         # TODO:从航点列表中取出A点和B点
-        self.pointAi = [0, 0]
-        self.pointBi = [0, 0]
+        # self.pointAi = [0, 0]
+        # self.pointBi = [0, 0]
         return self.pointAi, self.pointBi
 
     def MotionController(self, obs, pointAi, pointBi):
@@ -56,17 +56,17 @@ class TESTControl():
         speed = max(0.001, speed)
         L1_distance = speed * 0.1  # L1 ratio
 
-        vector_AB = pointBi-pointAi  # TODO: check AB点是否太近
+        vector_AB = pointBi-pointAi
         dist_AB = np.sqrt(np.square(vector_AB[0]) + np.square(vector_AB[1]))
-        vector_AB_unit = vector_AB/dist_AB
+        vector_AB_unit = vector_AB/max(dist_AB, 0.001)
 
         vector_AP = self.pos-pointAi
         dist_AP = np.sqrt(np.square(vector_AP[0]) + np.square(vector_AP[1]))
-        vector_AP_unit = vector_AP/dist_AP
+        vector_AP_unit = vector_AP/max(dist_AP, 0.001)
 
         vector_BP = self.pos - pointBi
         dist_BP = np.sqrt(np.square(vector_BP[0]) + np.square(vector_BP[1]))
-        vector_BP_unit = vector_BP/dist_BP
+        vector_BP_unit = vector_BP/max(dist_BP, 0.001)
 
         alongTrackDist = np.dot(vector_AP, vector_AB_unit)
         AB_to_BP_bearing = math.acos(np.dot(vector_AB_unit, vector_BP_unit))
