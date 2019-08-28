@@ -50,7 +50,11 @@ class TESTControl():
                 self.pointB_index += 1
             else:
                 self.waypoint_list[self.pointB_index-1][2] = 4
-                self.waypoint_finished = True
+                self.waypoint_list[self.pointB_index][2] = 4
+                self.pointB_index = 0
+                self.pointA = (self.waypoint_list[self.pointB_index][0], self.waypoint_list[self.pointB_index][1])
+                self.pointB = (self.waypoint_list[self.pointB_index + 1][0], self.waypoint_list[self.pointB_index + 1][1])
+                # self.waypoint_finished = True
 
         return self.pointA, self.pointB, self.waypoint_finished
 

@@ -30,11 +30,11 @@ class Scenario(BaseScenario):
     def reset_world(self, world):
 
         for i, agent in enumerate(world.agents):
-            agent.state.p_pos = np.random.uniform(-0.9, -0.7, world.dim_p)
+            agent.state.p_pos = np.random.uniform(-0.9, -0.6, world.dim_p)
             agent.state.p_vel = np.array([0, 1])
 
-        world.agents[0].color = np.array([0.25, 0.25, 0.75])
-        world.agents[1].color = np.array([0.25, 0.75, 0.25])
+        world.agents[0].color = np.array([0.47, 0.79, 0.79])
+        world.agents[1].color = np.array([0.10, 0.20, 0.17])
         world.agents[2].color = np.array([0.75, 0.25, 0.25])
 
         for i, landmark in enumerate(world.landmarks):
@@ -44,14 +44,14 @@ class Scenario(BaseScenario):
         world.landmarks[1].state.p_pos = np.array([-0.9, 0.9])
         world.landmarks[2].state.p_pos = np.array([0.9, 0.9])
         world.landmarks[3].state.p_pos = np.array([0.9, -0.9])
-        world.landmarks[4].state.p_pos = np.array([-0.7, -0.7])
-        world.landmarks[5].state.p_pos = np.array([-0.7, 0.7])
-        world.landmarks[6].state.p_pos = np.array([0.7, 0.7])
-        world.landmarks[7].state.p_pos = np.array([0.7, -0.7])
-        world.landmarks[8].state.p_pos = np.array([-0.5, -0.5])
-        world.landmarks[9].state.p_pos = np.array([-0.5, 0.5])
-        world.landmarks[10].state.p_pos = np.array([0.5, 0.5])
-        world.landmarks[11].state.p_pos = np.array([0.5, -0.5])
+        world.landmarks[4].state.p_pos = np.array([-0.6, -0.6])
+        world.landmarks[5].state.p_pos = np.array([-0.6, 0.6])
+        world.landmarks[6].state.p_pos = np.array([0.6, 0.6])
+        world.landmarks[7].state.p_pos = np.array([0.6, -0.6])
+        world.landmarks[8].state.p_pos = np.array([-0.3, -0.3])
+        world.landmarks[9].state.p_pos = np.array([-0.3, 0.3])
+        world.landmarks[10].state.p_pos = np.array([0.3, 0.3])
+        world.landmarks[11].state.p_pos = np.array([0.3, -0.3])
         world.landmarks[0].color = world.agents[0].color
         world.landmarks[1].color = world.agents[0].color
         world.landmarks[2].color = world.agents[0].color
