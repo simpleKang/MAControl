@@ -49,45 +49,46 @@ class TESTControl():
         print("motion control")
         self.vel = np.array(obs[0:2])
         self.pos = np.array(obs[2:4])
-        pointAi=np.array(pointAi)
-        pointBi=np.array(pointBi)
-        target_bearing = pointAi-self.pos
+        pointAi = np.array(pointAi)
+        pointBi = np.array(pointBi)
 
-        groundspeed = np.sqrt(np.square(self.vel[0]) + np.square(self.vel[1]))
-        groundspeed = max(0.1, groundspeed)
-        L1_distance = groundspeed * 0.1  # L1 ratio
+        speed = np.sqrt(np.square(self.vel[0]) + np.square(self.vel[1]))
+        speed = max(0.001, speed)
+        L1_distance = speed * 0.1  # L1 ratio
 
         vector_AB = pointBi-pointAi  # TODO: check AB点是否太近
-        length_AB = np.sqrt(np.square(vector_AB[0]) + np.square(vector_AB[1]))
-        vector_AB = vector_AB/length_AB
+        dist_AB = np.sqrt(np.square(vector_AB[0]) + np.square(vector_AB[1]))
+        vector_AB_unit = vector_AB/dist_AB
 
         vector_AP = self.pos-pointAi
-        crosstrack_error = vector_AB % vector_AP
-        distance_AP = np.sqrt(np.square(vector_AP[0]) + np.square(vector_AP[1]))
-        alongTrackDist = np.dot(vector_AP, vector_AB)
+        dist_AP = np.sqrt(np.square(vector_AP[0]) + np.square(vector_AP[1]))
+        vector_AP_unit = vector_AP/dist_AP
 
         vector_BP = self.pos - pointBi
-        length_BP = np.sqrt(np.square(vector_BP[0]) + np.square(vector_BP[1]))
-        vector_BP_unit = vector_BP/length_BP
+        dist_BP = np.sqrt(np.square(vector_BP[0]) + np.square(vector_BP[1]))
+        vector_BP_unit = vector_BP/dist_BP
 
-        AB_to_BP_bearing = math.acos(np.dot(vector_AB, vector_BP_unit))
+        alongTrackDist = np.dot(vector_AP, vector_AB_unit)
+        AB_to_BP_bearing = math.acos(np.dot(vector_AB_unit, vector_BP_unit))
 
-        if distance_AP > L1_distance and alongTrackDist/max(distance_AP, 0.1) < -0.707:
+        if dist_AP > L1_distance and alongTrackDist/max(dist_AP, 0.001) < -0.707:
             # calculate eta to fly to waypoint A
-            vector_AP = vector_AP/distance_AP
-            eta = math.acos(np.dot(-1 * vector_AP, self.vel)/groundspeed)
+            eta = math.acos(np.dot(-1 * vector_AP_unit, self.vel/speed))
             nav_bearing = math.atan2(vector_AP[1], vector_AP[0])
 
         elif abs(AB_to_BP_bearing) < math.radians(100):
             # calculate eta to fly to waypoint B
-            eta = math.acos(np.dot(-1 * vector_BP_unit, self.vel)/groundspeed)
+            eta = math.acos(np.dot(-1 * vector_BP_unit, self.vel/speed))
             nav_bearing = math.atan2(vector_BP[1], vector_BP[0])
 
         else:
             # calculate eta to fly along the line between A and B
-            eta2 = math.acos(np.dot(vector_AB, self.vel)/groundspeed)
-            xtrackErr = vector_AP % vector_AB
-            sin_eta1 = xtrackErr / max(L1_distance, 0.1)
+            eta2 = math.acos(np.dot(vector_AB, self.vel/speed))
+            beta = math.acos(np.dot(vector_AP_unit, vector_AB_unit))
+            xtrackErr = dist_AP * math.sin(beta)
+            eta1 =
+            vector_AP =
+            sin_eta1 = xtrackErr / max(L1_distance, 0.001)
             #  TODO: (c++): sin_eta1 = math::constrain(sin_eta1,-0.7071f,0.7071f)
             eta1 = math.asin(sin_eta1)
             eta = eta1 + eta2
