@@ -40,7 +40,7 @@ class TESTControl():
 
         speed = np.sqrt(np.square(self.vel[0]) + np.square(self.vel[1]))
         speed = speed
-        L1_distance = speed * 20  # L1 ratio
+        L1_distance = speed * 0.1  # L1 ratio
 
         vector_AB = pointBi-pointAi
         dist_AB = np.sqrt(np.square(vector_AB[0]) + np.square(vector_AB[1]))
@@ -82,23 +82,26 @@ class TESTControl():
             xtrackErr = dist_AP * math.sin(beta)
             sine_eta1 = xtrackErr / L1_distance
             #  TODO: (c++): sine_eta1 = math::constrain(sine_eta1,-0.7071,0.7071)
+            sine_eta1 = np.piecewise(sine_eta1, [sine_eta1 < -1, -1 <= sine_eta1 <= 1, sine_eta1 >= 1],
+                                     [-1, lambda sine_eta1: sine_eta1, 1])
             eta1 = math.asin(sine_eta1)
             eta = eta1 + eta2
             print('scene3')
 
         #  TODO: (c++): eta = math::constrain(eta,-pi/2,pi/2)
-        print('eta', eta)
-        lateral_acc_size = speed * speed / L1_distance * math.sin(eta) * 0.2  # K_L1
+        lateral_acc_size = speed * speed / L1_distance * math.sin(eta) * 0.02  # K_L1
 
         lateral_acc_unit = np.array([self.vel[1], -1*self.vel[0]])/speed
-        if np.dot(lateral_acc_unit, vector_AB_unit) < 0 or \
-                np.dot(lateral_acc_unit, vector_AB_unit) == 0 > np.dot(lateral_acc_unit, -1 * vector_AP_unit):
+        if np.dot(lateral_acc_unit, vector_AB_unit) > 0 or \
+                np.dot(lateral_acc_unit, vector_AB_unit) == 0 < np.dot(lateral_acc_unit, -1 * vector_AP_unit):
             lateral_acc_unit = np.array([-1*self.vel[1], self.vel[0]])/speed
 
+        tangent_acc_unit = self.vel/speed
+        tangent_acc_size = (speed - 7) * 0.02
+        tangent_acc = tangent_acc_unit * tangent_acc_size
         lateral_acc = lateral_acc_unit * lateral_acc_size
-        tangent_acc = self.vel * 0.2
-        acc = lateral_acc + tangent_acc
 
+        acc = lateral_acc + tangent_acc
         self.action[2] = acc[0]
         self.action[4] = acc[1]
         return self.action
