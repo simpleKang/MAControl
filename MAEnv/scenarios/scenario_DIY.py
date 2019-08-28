@@ -7,8 +7,8 @@ class Scenario(BaseScenario):
     def make_world(self):
         world = World()
         # set any world properties first
-        num_agents = 1
-        num_landmarks = 4
+        num_agents = 3
+        num_landmarks = 12
         # add agents
         world.agents = [Agent() for i in range(num_agents)]
         for i, agent in enumerate(world.agents):
@@ -28,24 +28,42 @@ class Scenario(BaseScenario):
         return world
 
     def reset_world(self, world):
-        # random properties for agents
+
         for i, agent in enumerate(world.agents):
-            agent.color = np.random.uniform(0, 1, 3)
-        # random properties for landmarks
-        for i, landmark in enumerate(world.landmarks):
-            landmark.color = np.array([0.25, 0.25, 0.25])
-        # set random initial states
-        for i, agent in enumerate(world.agents):
-            # agent.state.p_pos = np.array([0.2*i-0.9, -0.9])
+            agent.state.p_pos = np.random.uniform(-0.9, -0.7, world.dim_p)
             agent.state.p_vel = np.array([0, 1])
-            agent.state.p_pos = np.array([-0.95, -0.95])
+
+        world.agents[0].color = np.array([0.25, 0.25, 0.75])
+        world.agents[1].color = np.array([0.25, 0.75, 0.25])
+        world.agents[2].color = np.array([0.75, 0.25, 0.25])
+
         for i, landmark in enumerate(world.landmarks):
-            # landmark.state.p_pos = np.random.uniform(-0.9, +0.9, world.dim_p)
             landmark.state.p_vel = np.zeros(world.dim_p)
+
         world.landmarks[0].state.p_pos = np.array([-0.9, -0.9])
         world.landmarks[1].state.p_pos = np.array([-0.9, 0.9])
         world.landmarks[2].state.p_pos = np.array([0.9, 0.9])
         world.landmarks[3].state.p_pos = np.array([0.9, -0.9])
+        world.landmarks[4].state.p_pos = np.array([-0.7, -0.7])
+        world.landmarks[5].state.p_pos = np.array([-0.7, 0.7])
+        world.landmarks[6].state.p_pos = np.array([0.7, 0.7])
+        world.landmarks[7].state.p_pos = np.array([0.7, -0.7])
+        world.landmarks[8].state.p_pos = np.array([-0.5, -0.5])
+        world.landmarks[9].state.p_pos = np.array([-0.5, 0.5])
+        world.landmarks[10].state.p_pos = np.array([0.5, 0.5])
+        world.landmarks[11].state.p_pos = np.array([0.5, -0.5])
+        world.landmarks[0].color = world.agents[0].color
+        world.landmarks[1].color = world.agents[0].color
+        world.landmarks[2].color = world.agents[0].color
+        world.landmarks[3].color = world.agents[0].color
+        world.landmarks[4].color = world.agents[1].color
+        world.landmarks[5].color = world.agents[1].color
+        world.landmarks[6].color = world.agents[1].color
+        world.landmarks[7].color = world.agents[1].color
+        world.landmarks[8].color = world.agents[2].color
+        world.landmarks[9].color = world.agents[2].color
+        world.landmarks[10].color = world.agents[2].color
+        world.landmarks[11].color = world.agents[2].color
 
     def benchmark_data(self, agent, world):
         # returns data for benchmarking purposes
