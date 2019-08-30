@@ -2,7 +2,7 @@
 import argparse
 import time
 import MAControl.TESTControl as TESTC
-import Test
+import MAControl.util as U
 
 
 def parse_args():
@@ -36,7 +36,7 @@ if __name__ == '__main__':
     Control = []
     for i in range(env.n):
         Control.append(TESTC.TESTControl("agent_%d" % i, env, world, i, arglist))
-        Control[i].waypoint_list[0:len(Test.init_waypoint[i])] = Test.init_waypoint[i]
+        Control[i].waypoint_list[0:len(U.init_waypoint[i])] = U.init_waypoint[i]
 
     obs_n = env.reset()
     step = 0
