@@ -75,6 +75,8 @@ class TESTControl():
         speed = np.sqrt(np.square(self.vel[0]) + np.square(self.vel[1]))
         speed = speed
         L1_distance = speed * L1_ratio
+        print('speed', speed)
+        print('L1_distance', L1_distance)
 
         vector_AB = pointBi-pointAi
         dist_AB = np.sqrt(np.square(vector_AB[0]) + np.square(vector_AB[1]))
@@ -86,6 +88,7 @@ class TESTControl():
 
         vector_BP = self.pos - pointBi
         dist_BP = np.sqrt(np.square(vector_BP[0]) + np.square(vector_BP[1]))
+        print('dist_BP', dist_BP)
         self.arrive_flag = True if dist_BP < BP_range else False
         vector_BP_unit = vector_BP/dist_BP
 
@@ -125,6 +128,7 @@ class TESTControl():
 
         #  TODO: (c++): eta = math::constrain(eta,-pi/2,pi/2)
         lateral_acc_size = speed * speed / L1_distance * math.sin(eta) * K_L1
+        print('lateral_acc_size', lateral_acc_size)
 
         lateral_acc_unit = np.array([self.vel[1], -1*self.vel[0]])/speed
         if np.dot(lateral_acc_unit, vector_AB_unit) > 0 or \
@@ -133,6 +137,8 @@ class TESTControl():
 
         tangent_acc_unit = self.vel/speed
         tangent_acc_size = (speed - Ex_speed) * K_acct
+        print('tangent_acc_size', tangent_acc_size)
+        #  TODO： size>=0
         tangent_acc = tangent_acc_unit * tangent_acc_size
         lateral_acc = lateral_acc_unit * lateral_acc_size
 
