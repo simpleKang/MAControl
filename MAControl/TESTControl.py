@@ -72,10 +72,10 @@ class TESTControl():
         L1_ratio = 0.1
         BP_range = 0.3
         K_L1 = 0.02
-        K_acct = 0.02
+        K_acct = 0.002
 
         # set tecs params
-        TAS_setpoint = 0.4
+        TAS_setpoint = 10
         speed_error_gain = 0.02
         STE_rate_max = 0.01
         STE_rate_min = -0.01
@@ -139,12 +139,12 @@ class TESTControl():
         if dist_AP > L1_distance and alongTrackDist/dist_AP < -0.707:
             # calculate eta to fly to waypoint A
             eta = math.acos(U.constrain(np.dot(-1 * vector_AP_unit, self.vel/speed), -1, 1))
-            print('scene1')
+            # print('scene1')
 
         elif abs(AB_to_BP_bearing) < math.radians(100):
             # calculate eta to fly to waypoint B
             eta = math.acos(np.dot(-1 * vector_BP_unit, self.vel/speed))
-            print('scene2')
+            # print('scene2')
 
         else:
             # calculate eta to fly along the line between A and B
@@ -153,7 +153,7 @@ class TESTControl():
             xtrackErr = dist_AP * math.sin(beta)
             eta1 = math.asin(U.constrain(xtrackErr / L1_distance, -0.7071, 0.7071))
             eta = eta1 + eta2
-            print('scene3')
+            # print('scene3')
 
         # eta
         eta = U.constrain(eta, -1.5708, 1.5708)
@@ -161,8 +161,8 @@ class TESTControl():
 
         # lateral_acc
         lateral_acc_unit = np.array([self.vel[1], -1*self.vel[0]])/speed
-        if np.dot(lateral_acc_unit, vector_AB_unit) > 0 or \
-                np.dot(lateral_acc_unit, vector_AB_unit) == 0 < np.dot(lateral_acc_unit, -1 * vector_AP_unit):
+        if np.dot(lateral_acc_unit, vector_AB_unit) < 0 or \
+                np.dot(lateral_acc_unit, vector_AB_unit) == 0 > np.dot(lateral_acc_unit, -1 * vector_AP_unit):
             lateral_acc_unit = np.array([-1*self.vel[1], self.vel[0]])/speed
         lateral_acc = lateral_acc_unit * lateral_acc_size
         print('lateral_acc', lateral_acc)
@@ -175,8 +175,8 @@ class TESTControl():
 
         # action
         acc = lateral_acc + tangent_acc
-        self.action[2] = acc[0]
-        self.action[4] = acc[1]
+        self.action[1] = acc[0]
+        self.action[3] = acc[1]
         return self.action
 
 
