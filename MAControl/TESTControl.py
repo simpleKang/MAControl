@@ -71,18 +71,19 @@ class TESTControl():
         # set L1 params
         L1_ratio = 0.1
         BP_range = 0.3
-        K_L1 = 0.02
-        K_acct = 0.002
+        K_L1 = 0.01
 
         # set tecs params
-        TAS_setpoint = 10
-        speed_error_gain = 0.02
-        STE_rate_max = 0.01
-        STE_rate_min = -0.01
-        throttle_cruise = 50
+        K_acct = 0.01
+        TAS_setpoint = 0.05
+        throttle_cruise = 20
+
+        speed_error_gain = 1
+        STE_rate_max = 0.025
+        STE_rate_min = -0.025
         throttle_setpoint_max = 100
         throttle_setpoint_min = 0
-        throttle_damping_gain = 0.04
+        throttle_damping_gain = 0.1
         throttle_time_constant = 25
         STE_to_throttle = 1 / throttle_time_constant / (STE_rate_max - STE_rate_min)
         throttle_slewrate = 0.05
@@ -92,7 +93,7 @@ class TESTControl():
         # update speed setpoint
         tas_state = speed = np.sqrt(np.square(self.vel[0]) + np.square(self.vel[1]))
         TAS_rate_setpoint = (TAS_setpoint - tas_state) * speed_error_gain
-        TAS_rate_setpoint = U.constrain(TAS_rate_setpoint, 0.5*STE_rate_min / tas_state, 0.5*STE_rate_max / tas_state)
+        # TAS_rate_setpoint = U.constrain(TAS_rate_setpoint, 0.5*STE_rate_min / tas_state, 0.5*STE_rate_max / tas_state)
 
         # update energy estimates
         STE_error = 0.5 * (TAS_setpoint * TAS_setpoint - tas_state * tas_state)
@@ -159,11 +160,23 @@ class TESTControl():
         eta = U.constrain(eta, -1.5708, 1.5708)
         lateral_acc_size = speed * speed / L1_distance * math.sin(eta) * K_L1
 
+        # pointC
+        vector_AC = np.dot(vector_AP, vector_AB_unit)
+        pointCi = pointAi + vector_AC
+        vector_PC = pointCi - self.pos
+        dist_PC = np.sqrt(np.square(vector_PC[0]) + np.square(vector_PC[1]))
+        dist_PC = max(dist_PC, 0.000000001)
+        vector_PC_unit = vector_PC / dist_PC
+
         # lateral_acc
         lateral_acc_unit = np.array([self.vel[1], -1*self.vel[0]])/speed
-        if np.dot(lateral_acc_unit, vector_AB_unit) < 0 or \
-                np.dot(lateral_acc_unit, vector_AB_unit) == 0 > np.dot(lateral_acc_unit, -1 * vector_AP_unit):
+        if np.dot(lateral_acc_unit, vector_PC) < 0:
             lateral_acc_unit = np.array([-1*self.vel[1], self.vel[0]])/speed
+            print('here1')
+        elif np.dot(lateral_acc_unit, vector_PC) == 0:
+            lateral_acc_unit = vector_PC_unit
+            print('here2')
+
         lateral_acc = lateral_acc_unit * lateral_acc_size
         print('lateral_acc', lateral_acc)
 
