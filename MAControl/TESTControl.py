@@ -82,7 +82,7 @@ class TESTControl():
         throttle_cruise = 50
         throttle_setpoint_max = 100
         throttle_setpoint_min = 0
-        throttle_damping_gain = 20
+        throttle_damping_gain = 0.04
         throttle_time_constant = 25
         STE_to_throttle = 1 / throttle_time_constant / (STE_rate_max - STE_rate_min)
         throttle_slewrate = 0.05
@@ -91,15 +91,12 @@ class TESTControl():
         # # # # # tecs # # # # #
         # update speed setpoint
         tas_state = speed = np.sqrt(np.square(self.vel[0]) + np.square(self.vel[1]))
-        print('speed', speed)
         TAS_rate_setpoint = (TAS_setpoint - tas_state) * speed_error_gain
-        print('TAS_rate_setpoint', TAS_rate_setpoint)
         TAS_rate_setpoint = U.constrain(TAS_rate_setpoint, 0.5*STE_rate_min / tas_state, 0.5*STE_rate_max / tas_state)
 
         # update energy estimates
         STE_error = 0.5 * (TAS_setpoint * TAS_setpoint - tas_state * tas_state)
         STE_rate_error = STE_rate_setpoint = U.constrain(tas_state * TAS_rate_setpoint, STE_rate_min, STE_rate_max)
-        print('STE_rate_error', STE_rate_error)
 
         # update throttle setpoint
         if STE_rate_setpoint >= 0:
@@ -107,7 +104,6 @@ class TESTControl():
         else:
             throttle_p = throttle_cruise + STE_rate_setpoint / STE_rate_min * (throttle_setpoint_min - throttle_cruise)
         throttle_setpoint = throttle_p + (STE_error + STE_rate_error * throttle_damping_gain) * STE_to_throttle
-        print('throttle_setpoint', throttle_setpoint)
         throttle_setpoint = U.constrain(throttle_setpoint, throttle_setpoint_min, throttle_setpoint_max)
         throttle_setpoint = U.constrain(throttle_setpoint, self.throttle_setpoint - throttle_increment_limit,
                                         self.throttle_setpoint + throttle_increment_limit)
@@ -116,11 +112,11 @@ class TESTControl():
         # # # # # L1 # # # # #
         # compute L1
         L1_distance = speed * L1_ratio
-        print('L1_distance', L1_distance)
 
         # compute AB
         vector_AB = pointBi-pointAi
         dist_AB = np.sqrt(np.square(vector_AB[0]) + np.square(vector_AB[1]))
+        dist_AB = max(dist_AB, 0.000000001)
         vector_AB_unit = vector_AB/dist_AB
 
         # compute AP
@@ -132,9 +128,8 @@ class TESTControl():
         # compute BP
         vector_BP = self.pos - pointBi
         dist_BP = np.sqrt(np.square(vector_BP[0]) + np.square(vector_BP[1]))
-        print('dist_BP', dist_BP)
+        dist_BP = max(dist_BP, 0.000000001)
         self.arrive_flag = True if dist_BP < BP_range else False
-        print('arrive_flag', self.arrive_flag)
         vector_BP_unit = vector_BP/dist_BP
 
         # extra computation
@@ -163,7 +158,6 @@ class TESTControl():
         # eta
         eta = U.constrain(eta, -1.5708, 1.5708)
         lateral_acc_size = speed * speed / L1_distance * math.sin(eta) * K_L1
-        print('lateral_acc_size', lateral_acc_size)
 
         # lateral_acc
         lateral_acc_unit = np.array([self.vel[1], -1*self.vel[0]])/speed
@@ -171,12 +165,13 @@ class TESTControl():
                 np.dot(lateral_acc_unit, vector_AB_unit) == 0 < np.dot(lateral_acc_unit, -1 * vector_AP_unit):
             lateral_acc_unit = np.array([-1*self.vel[1], self.vel[0]])/speed
         lateral_acc = lateral_acc_unit * lateral_acc_size
+        print('lateral_acc', lateral_acc)
 
         # tangent_acc
         tangent_acc_unit = self.vel/speed
         tangent_acc_size = self.throttle_setpoint * K_acct
-        print('tangent_acc_size', tangent_acc_size)
         tangent_acc = tangent_acc_unit * tangent_acc_size
+        print('tangent_acc', tangent_acc)
 
         # action
         acc = lateral_acc + tangent_acc
