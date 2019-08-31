@@ -161,7 +161,7 @@ class TESTControl():
         lateral_acc_size = speed * speed / L1_distance * math.sin(eta) * K_L1
 
         # pointC
-        vector_AC = np.dot(vector_AP, vector_AB_unit)
+        vector_AC = np.dot(vector_AP, vector_AB_unit) * vector_AB_unit
         pointCi = pointAi + vector_AC
         vector_PC = pointCi - self.pos
         dist_PC = np.sqrt(np.square(vector_PC[0]) + np.square(vector_PC[1]))
