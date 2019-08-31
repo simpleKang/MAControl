@@ -160,25 +160,25 @@ class TESTControl():
             eta = eta1 + eta2
             print('scene3')
 
-        # compute eta >>> lateral_acc_size
+        # eta
         eta = U.constrain(eta, -1.5708, 1.5708)
         lateral_acc_size = speed * speed / L1_distance * math.sin(eta) * K_L1
         print('lateral_acc_size', lateral_acc_size)
 
-        # compute lateral_acc_unit >>> lateral_acc
+        # lateral_acc
         lateral_acc_unit = np.array([self.vel[1], -1*self.vel[0]])/speed
         if np.dot(lateral_acc_unit, vector_AB_unit) > 0 or \
                 np.dot(lateral_acc_unit, vector_AB_unit) == 0 < np.dot(lateral_acc_unit, -1 * vector_AP_unit):
             lateral_acc_unit = np.array([-1*self.vel[1], self.vel[0]])/speed
         lateral_acc = lateral_acc_unit * lateral_acc_size
 
-        # TODO: replaced by tecs
+        # tangent_acc
         tangent_acc_unit = self.vel/speed
         tangent_acc_size = self.throttle_setpoint * K_acct
         print('tangent_acc_size', tangent_acc_size)
         tangent_acc = tangent_acc_unit * tangent_acc_size
 
-        # compute acc >>> action
+        # action
         acc = lateral_acc + tangent_acc
         self.action[2] = acc[0]
         self.action[4] = acc[1]
