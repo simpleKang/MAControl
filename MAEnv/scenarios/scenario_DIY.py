@@ -1,3 +1,5 @@
+# 环境长度 1 = 实际长度 1000 米 = 1 千米
+
 import numpy as np
 from MAEnv.core import World, Agent, Landmark
 from MAEnv.scenario import BaseScenario
@@ -15,14 +17,14 @@ class Scenario(BaseScenario):
             agent.name = 'agent %d' % i
             agent.collide = True
             agent.silent = True
-            agent.size = 0.05
+            agent.size = 0.01  # 10米
         # add landmarks
         world.landmarks = [Landmark() for i in range(num_landmarks)]
         for i, landmark in enumerate(world.landmarks):
             landmark.name = 'landmark %d' % i
             landmark.collide = False
             landmark.movable = False
-            landmark.size = 0.05
+            landmark.size = 0.01  # 10米
         # make initial conditions
         self.reset_world(world)
         return world
@@ -31,7 +33,7 @@ class Scenario(BaseScenario):
 
         for i, agent in enumerate(world.agents):
             agent.state.p_pos = np.random.uniform(-0.9, -0.6, world.dim_p)
-            agent.state.p_vel = np.array([0, 1])
+            agent.state.p_vel = np.array([0, 0.05])  # 50 米/秒
 
         world.agents[0].color = np.array([0.47, 0.79, 0.79])
         # world.agents[1].color = np.array([0.10, 0.20, 0.17])
