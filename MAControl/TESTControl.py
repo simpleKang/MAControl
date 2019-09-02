@@ -69,16 +69,18 @@ class TESTControl():
         self.pos = np.array(obs[2:4])
         pointAi = np.array(pointAi)
         pointBi = np.array(pointBi)
+        print('pointAi', pointAi)
+        print('pointBi', pointBi)
 
         # set L1 params
-        L1_ratio = 0.1  # (当v=0.15则L1=0.015km=150m)
-        BP_range = 0.3  # (0.3km=300m)
+        L1_ratio = 0.1  # (当v=0.05则L1=0.005km=50m)
+        BP_range = 0.2  # (0.2km=200m)
         K_L1 = 0.1  # (系数)
 
         # set tecs params
         K_acct = 0.1  # (系数)
         TAS_setpoint = 0.05  # (km/s)
-        throttle_cruise = 0
+        throttle_cruise = 10
         speed_error_gain = 1
         STE_rate_max = 0.025
         STE_rate_min = -0.025
@@ -94,6 +96,7 @@ class TESTControl():
         # update speed setpoint
         tas_state = speed = np.sqrt(np.square(self.vel[0]) + np.square(self.vel[1]))
         TAS_rate_setpoint = (TAS_setpoint - tas_state) * speed_error_gain
+        print('speed', speed)
         # TAS_rate_setpoint = U.constrain(TAS_rate_setpoint, 0.5*STE_rate_min / tas_state, 0.5*STE_rate_max / tas_state)
 
         # update energy estimates
@@ -105,6 +108,7 @@ class TESTControl():
             throttle_p = throttle_cruise + STE_rate_setpoint / STE_rate_max * (throttle_setpoint_max - throttle_cruise)
         else:
             throttle_p = throttle_cruise + STE_rate_setpoint / STE_rate_min * (throttle_setpoint_min - throttle_cruise)
+        print('throttle_p', throttle_p)
         throttle_setpoint = throttle_p + (STE_error + STE_rate_error * throttle_damping_gain) * STE_to_throttle
         throttle_setpoint = U.constrain(throttle_setpoint, throttle_setpoint_min, throttle_setpoint_max)
         throttle_setpoint = U.constrain(throttle_setpoint, self.throttle_setpoint - throttle_increment_limit,
@@ -131,7 +135,11 @@ class TESTControl():
         vector_BP = self.pos - pointBi
         dist_BP = np.sqrt(np.square(vector_BP[0]) + np.square(vector_BP[1]))
         dist_BP = max(dist_BP, 0.000000001)
-        self.arrive_flag = True if dist_BP < BP_range else False
+        if dist_BP < BP_range:
+            self.arrive_flag = True
+            print(obs)
+        else:
+            self.arrive_flag = False
         vector_BP_unit = vector_BP/dist_BP
 
         # extra computation
@@ -162,8 +170,8 @@ class TESTControl():
         lateral_acc_size = speed * speed / L1_distance * math.sin(eta) * K_L1
 
         # pointC
-        vector_AC = np.dot(vector_AP, vector_AB_unit) * vector_AB_unit
-        pointCi = pointAi + vector_AC
+        vector_CB = np.dot(-1 * vector_BP, vector_AB_unit) * vector_AB_unit
+        pointCi = pointBi - vector_CB
         vector_PC = pointCi - self.pos
         dist_PC = np.sqrt(np.square(vector_PC[0]) + np.square(vector_PC[1]))
         dist_PC = max(dist_PC, 0.000000001)
