@@ -74,13 +74,13 @@ class TESTControl():
 
         # set L1 params
         L1_ratio = 0.1  # (当v=0.05则L1=0.005km=50m)
-        BP_range = 0.2  # (0.2km=200m)
+        BP_range = 0.1  # (0.1km=100m)
         K_L1 = 0.1  # (系数)
 
         # set tecs params
         K_acct = 0.1  # (系数)
         TAS_setpoint = 0.05  # (km/s)
-        throttle_cruise = 10
+        throttle_cruise = 0
         speed_error_gain = 1
         STE_rate_max = 0.025
         STE_rate_min = -0.025
@@ -179,12 +179,17 @@ class TESTControl():
 
         # lateral_acc
         lateral_acc_unit = np.array([self.vel[1], -1*self.vel[0]])/speed
-        if np.dot(lateral_acc_unit, vector_PC) < 0:
-            lateral_acc_unit = np.array([-1*self.vel[1], self.vel[0]])/speed
+        if abs(np.dot(lateral_acc_unit, vector_AB)) > 0.99:  # acc // AB
+            lateral_acc_unit = vector_AB_unit
             print('here1')
-        elif np.dot(lateral_acc_unit, vector_PC) == 0:
+        elif abs(np.dot(lateral_acc_unit, vector_AB)) < 0.01:  # acc _|_ AB
             lateral_acc_unit = vector_PC_unit
             print('here2')
+        elif np.dot(lateral_acc_unit, vector_PC) < -0.01:
+            lateral_acc_unit = np.array([-1*self.vel[1], self.vel[0]])/speed
+            print('here3')
+        else:
+            print('here4')
 
         # chacheng = vector_AP_unit[0]*vector_AB_unit[1] - vector_AP_unit[1]*vector_AB_unit[0]
         # if chacheng<=0:
@@ -193,6 +198,7 @@ class TESTControl():
         #     lateral_acc_unit = np.array([self.vel[1], -1*self.vel[0]]) / speed
 
         lateral_acc = lateral_acc_unit * lateral_acc_size
+        # TODO: lateral_acc smoothed by pid
         print('lateral_acc', lateral_acc)
 
         # tangent_acc
