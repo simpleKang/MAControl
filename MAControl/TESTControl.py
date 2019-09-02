@@ -69,15 +69,14 @@ class TESTControl():
         pointBi = np.array(pointBi)
 
         # set L1 params
-        L1_ratio = 0.1
-        BP_range = 0.3
-        K_L1 = 0.01
+        L1_ratio = 0.1  # (当v=0.15则L1=0.015km=150m)
+        BP_range = 0.3  # (0.3km=300m)
+        K_L1 = 0.1  # (系数)
 
         # set tecs params
-        K_acct = 0.01
-        TAS_setpoint = 0.05
-        throttle_cruise = 20
-
+        K_acct = 0.1  # (系数)
+        TAS_setpoint = 0.05  # (km/s)
+        throttle_cruise = 0
         speed_error_gain = 1
         STE_rate_max = 0.025
         STE_rate_min = -0.025
