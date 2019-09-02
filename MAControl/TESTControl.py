@@ -25,6 +25,7 @@ class TESTControl():
         self.waypoint_finished = False
         self.arrive_flag = False
         self.pointB_index = 0
+        self.is_init = True
         # 256×3的航点列表，第3列为航点状态 [0: 无航点] [1: 未飞] [2: pointA] [3: pointB] [4: 已到达]
         self.waypoint_list = [[0 for i in range(3)] for j in range(256)]
 
@@ -36,9 +37,10 @@ class TESTControl():
         #     self.WaypointUpdater(obs)
 
         # 初始时刻输出A、B坐标
-        if self.pointB_index == 0:
+        if self.pointB_index == 0 and self.is_init is True:
             self.pointA = (obs[2], obs[3])
             self.pointB = (self.waypoint_list[self.pointB_index][0], self.waypoint_list[self.pointB_index][1])
+            self.is_init = False
 
         # 更改航点状态并输出A、B坐标
         if self.arrive_flag:
