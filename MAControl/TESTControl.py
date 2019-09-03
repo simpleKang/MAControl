@@ -120,6 +120,9 @@ class TESTControl():
             throttle_setpoint = throttle_p + (STE_error + self.STE_rate_error * Kd_STE) * Kp_STE + self.throttle_integ_s
             throttle_setpoint = U.constrain(throttle_setpoint, throttle_setpoint_min, throttle_setpoint_max)
 
+            # tangent_acc
+            self.tangent_acc = throttle_setpoint * K_acct
+
             # # # # # L1 # # # # #
 
             # compute L1
@@ -176,25 +179,17 @@ class TESTControl():
             vector_CB = np.dot(-1 * vector_BP, vector_AB_unit) * vector_AB_unit
             pointCi = pointBi - vector_CB
             vector_PC = pointCi - pointPi
-            dist_PC = np.sqrt(np.square(vector_PC[0]) + np.square(vector_PC[1]))
-            dist_PC = max(dist_PC, 0.000000001)
-            vector_PC_unit = vector_PC / dist_PC
 
             # lateral_acc
             lateral_acc_unit = np.array([vel_vector[1], -1*vel_vector[0]])/speed
-            if abs(np.dot(lateral_acc_unit, vector_AB)) > 0.99:  # acc // AB
-                lateral_acc_unit = vector_AB_unit
-            elif abs(np.dot(lateral_acc_unit, vector_AB)) < 0.01:  # acc _|_ AB
-                lateral_acc_unit = vector_PC_unit
-            elif np.dot(lateral_acc_unit, vector_PC) < -0.01:
-                lateral_acc_unit = np.array([-1*vel_vector[1], vel_vector[0]])/speed
+            lateral_acc_dir = 1  # clockwise
+            if np.dot(lateral_acc_unit, vector_PC) < -0.01:  # <a1,PC>钝角
+                lateral_acc_dir = -1
+            elif -0.01 < np.dot(lateral_acc_unit, vector_PC) < 0.01:  # <a1,PC>直角
+                lateral_acc_dir = np.sign(np.dot(lateral_acc_unit, vector_AB))
+            self.lateral_acc = lateral_acc_size * lateral_acc_dir
 
-            self.lateral_acc = lateral_acc_unit * lateral_acc_size
-            tangent_acc_unit = vel_vector / speed
-            tangent_acc_size = throttle_setpoint * K_acct
-            self.tangent_acc = tangent_acc_unit * tangent_acc_size
-
-        return self.lateral_acc, self.tangent_acc
+        return self.tangent_acc, self.lateral_acc
 
     def InnerController(self, obs, lateral_acc,tangent_acc, step):
 
