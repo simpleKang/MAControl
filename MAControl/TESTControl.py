@@ -196,7 +196,8 @@ class TESTControl():
 
         acc = self.lateral_acc + self.tangent_acc
         return acc
-    def InnerController(self,obs,Exp_acc,step):
+
+    def InnerController(self, obs, Exp_acc, step):
         print('innercontroller')
         _Exp_acc = Exp_acc
         _acc = np.array(obs[4:6])
