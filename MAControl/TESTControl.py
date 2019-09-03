@@ -191,38 +191,37 @@ class TESTControl():
 
         return self.tangent_acc, self.lateral_acc
 
-    def InnerController(self, obs, lateral_acc,tangent_acc, step):
+    def InnerController(self, obs, tangent_acc, lateral_acc, step):
+        print('inner control')
 
-        print('innercontroller')
-        _Exp_lateral_acc = lateral_acc
-        _Exp_tangent_acc = tangent_acc
-
-        _lateral_acc = np.array(obs[5])
-        delta_time = 0.1
+        Exp_lateral_acc = lateral_acc
+        True_lateral_acc = np.array(obs[5])
+        delta_time = self.dt
 
         P_value = 0.1
         I_value = 0.0
         D_value = 0.0
         PTerm = 0.0
         ITerm = 0.0
-        DTerm =0.0
+        DTerm = 0.0
 
         last_error = 0.0
-        windup_guard = 20.0
-        error = _Exp_lateral_acc - _lateral_acc
+        error = Exp_lateral_acc - True_lateral_acc
         delta_error = error - last_error
-        PTerm = P_value*error
-        ITerm += error*delta_time
-
+        PTerm = P_value * error
+        ITerm += error * delta_time
 
         DTerm = 0.0
-        DTerm = delta_error/delta_time
+        DTerm = delta_error / delta_time
         last_error = error
 
-        action = PTerm+I_value*ITerm+D_value*DTerm
+        acct = tangent_acc
+        accl = PTerm + I_value * ITerm + D_value * DTerm
+        vel_vector = np.array(obs[0:2])
+        speed = np.sqrt(np.square(vel_vector[0]) + np.square(vel_vector[1]))
+        vel_right_unit = np.array([vel_vector[1], -1 * vel_vector[0]]) / speed
+        acc = acct * vel_vector / speed + accl * vel_right_unit
 
-        self.action[1] = action[0]
-        self.action[3] = action[1]
-        # print(Exp_acc)
-        print(action)
+        self.action[1] = acc[0]
+        self.action[3] = acc[1]
         return self.action
