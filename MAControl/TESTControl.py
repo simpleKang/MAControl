@@ -203,8 +203,8 @@ class TESTControl():
         acc = lateral_acc + tangent_acc
         self.action[1] = acc[0]
         self.action[3] = acc[1]
+        print('acc', acc)
         return self.action
-    #123 TEST
 
 
 

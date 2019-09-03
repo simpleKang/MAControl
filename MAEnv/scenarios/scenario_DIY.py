@@ -12,7 +12,7 @@ class Scenario(BaseScenario):
         num_agents = 1
         num_landmarks = 4
         world.damping = 0  # 取消第一种阻尼计算方式
-        world.damping2 = 10  # 调整第二种阻尼计算方式的参数
+        world.damping2 = 0  # 调整第二种阻尼计算方式的参数
         # add agents
         world.agents = [Agent() for i in range(num_agents)]
         for i, agent in enumerate(world.agents):
@@ -120,4 +120,5 @@ class Scenario(BaseScenario):
         for other in world.agents:
             if other is agent: continue
             other_pos.append(other.state.p_pos - agent.state.p_pos)
+        print(agent.state.p_acc)
         return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos)
