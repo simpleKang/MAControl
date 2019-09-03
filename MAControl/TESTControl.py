@@ -22,7 +22,7 @@ class TESTControl():
         self.pointBi = (0, 0)
 
         self.STE_rate_error = 0
-        self.throttle_integ_state = 0
+        self.throttle_integ_s = 0
         self.action = [0, 0, 0, 0, 0]
 
         self.waypoint_finished = False
@@ -31,6 +31,9 @@ class TESTControl():
         self.is_init = True
         # 256×3的航点列表，第3列为航点状态 [0: 无航点] [1: 未飞] [2: pointA] [3: pointB] [4: 已到达]
         self.waypoint_list = [[0 for i in range(3)] for j in range(256)]
+
+        self.tangent_acc = 0
+        self.lateral_acc = 0
 
     def PathPlanner(self, obs, step):
         # print("path plan")
@@ -68,13 +71,10 @@ class TESTControl():
 
     def MotionController(self, obs, pointAi, pointBi, step):
         # print("motion control")
-        _step = step
         vel_vector = np.array(obs[0:2])
         pointPi = np.array(obs[2:4])
         pointAi = np.array(pointAi)
         pointBi = np.array(pointBi)
-        print('pointAi', pointAi)
-        print('pointBi', pointBi)
 
         # set L1 params
         L1_ratio = 0.1  # (当v=0.05则L1=0.005km=50m)
@@ -96,14 +96,17 @@ class TESTControl():
         Kp_STE = 0.8  # (系数)
         Kd_STE = 0.1  # (系数)
 
-        # # # # # tecs # # # # #
-        # compute rate setpoints
-        if step == 0 or step%self.motion_pace == 0:
+        # set motion_pace
+        if step == 0 or step % self.motion_pace == 0:
+            print('motion motion motion motion motion motion motion motion motion motion')
+
+            # # # # # tecs # # # # #
+
+            # compute rate setpoints
             tas_state = speed = np.sqrt(np.square(vel_vector[0]) + np.square(vel_vector[1]))
             TAS_rate_setpoint = (TAS_setpoint - tas_state) * K_V
             STE_error = 0.5 * (TAS_setpoint * TAS_setpoint - tas_state * tas_state)
             STE_rate_setpoint = U.constrain(tas_state * TAS_rate_setpoint, STE_rate_min, STE_rate_max)
-            print('speed', speed)
 
             # compute throttle_p
             if STE_rate_setpoint >= 0:
@@ -113,11 +116,12 @@ class TESTControl():
 
             # compute throttle_setpoint
             self.STE_rate_error = self.STE_rate_error * 0.8 + STE_rate_setpoint * 0.2
-            self.throttle_integ_state = self.throttle_integ_state + STE_error * Ki_STE
-            throttle_setpoint = throttle_p + (STE_error + self.STE_rate_error * Kd_STE) * Kp_STE + self.throttle_integ_state
+            self.throttle_integ_s = self.throttle_integ_s + STE_error * Ki_STE
+            throttle_setpoint = throttle_p + (STE_error + self.STE_rate_error * Kd_STE) * Kp_STE + self.throttle_integ_s
             throttle_setpoint = U.constrain(throttle_setpoint, throttle_setpoint_min, throttle_setpoint_max)
 
             # # # # # L1 # # # # #
+
             # compute L1
             L1_distance = speed * L1_ratio
 
@@ -189,12 +193,8 @@ class TESTControl():
             tangent_acc_unit = vel_vector / speed
             tangent_acc_size = throttle_setpoint * K_acct
             self.tangent_acc = tangent_acc_unit * tangent_acc_size
-            print(_step)
-        # TODO: lateral_acc smoothed by pid
 
-        # action
-
-        return self.lateral_acc,self.tangent_acc
+        return self.lateral_acc, self.tangent_acc
 
     def InnerController(self, obs, lateral_acc,tangent_acc, step):
 
