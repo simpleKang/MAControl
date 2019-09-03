@@ -47,9 +47,9 @@ if __name__ == '__main__':
         # get action
         action_n = []
         for i in range(env.n):
-            pointAi, pointBi, finishedi = Control[i].PathPlanner(obs_n[i],step)
-            lateral_acc,tangent_acc = Control[i].MotionController(obs_n[i], pointAi, pointBi,step)
-            actioni = Control[i].InnerController(obs_n[i],lateral_acc,tangent_acc,step)
+            pointAi, pointBi, finishedi = Control[i].PathPlanner(obs_n[i], step)
+            Exp_acc_i = Control[i].MotionController(obs_n[i], pointAi, pointBi, step)
+            actioni = Control[i].InnerController(obs_n[i], Exp_acc_i, step)
             action_n.append(actioni)
 
         # environment step
