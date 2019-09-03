@@ -11,7 +11,8 @@ class Scenario(BaseScenario):
         # set any world properties first
         num_agents = 1
         num_landmarks = 4
-        world.damping2 = 10
+        world.damping = 0  # 取消第一种阻尼计算方式
+        world.damping2 = 10  # 调整第二种阻尼计算方式的参数
         # add agents
         world.agents = [Agent() for i in range(num_agents)]
         for i, agent in enumerate(world.agents):

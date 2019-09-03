@@ -7,6 +7,8 @@ class EntityState(object):
         self.p_pos = None
         # physical velocity
         self.p_vel = None
+        # physical acceleration
+        self.p_acc = None
 
 # state of agents (including communication and internal/mental state)
 class AgentState(EntityState):
@@ -159,12 +161,15 @@ class World(object):
     def integrate_state(self, p_force):
         for i,entity in enumerate(self.entities):
             if not entity.movable: continue
-            # entity.state.p_vel = entity.state.p_vel * (1 - self.damping)
-            entity.state.p_vel = entity.state.p_vel
+            entity.state.p_vel = entity.state.p_vel * (1 - self.damping)
             if (p_force[i] is not None):
-                # entity.state.p_vel += (p_force[i] / entity.mass) * self.dt
-                speed = np.sqrt(np.square(entity.state.p_vel[0]) + np.square(entity.state.p_vel[1]))
-                entity.state.p_vel += (p_force[i] / entity.mass - speed * entity.state.p_vel * self.damping2) * self.dt
+                if self.damping2 is not None:
+                    speed = np.sqrt(np.square(entity.state.p_vel[0]) + np.square(entity.state.p_vel[1]))
+                    q_force_i = p_force[i] / entity.mass - speed * entity.state.p_vel * self.damping2
+                else:
+                    q_force_i = p_force[i]
+                entity.state.p_acc = q_force_i
+                entity.state.p_vel += q_force_i * self.dt
             if entity.max_speed is not None:
                 speed = np.sqrt(np.square(entity.state.p_vel[0]) + np.square(entity.state.p_vel[1]))
                 if speed > entity.max_speed:

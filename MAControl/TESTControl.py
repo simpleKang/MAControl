@@ -189,12 +189,6 @@ class TESTControl():
         else:
             print('here4')
 
-        # chacheng = vector_AP_unit[0]*vector_AB_unit[1] - vector_AP_unit[1]*vector_AB_unit[0]
-        # if chacheng<=0:
-        #     lateral_acc_unit = np.array([-1*self.vel[1], self.vel[0]]) / speed
-        # else:
-        #     lateral_acc_unit = np.array([self.vel[1], -1*self.vel[0]]) / speed
-
         lateral_acc = lateral_acc_unit * lateral_acc_size
         # TODO: lateral_acc smoothed by pid
         print('lateral_acc', lateral_acc)
