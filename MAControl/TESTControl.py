@@ -205,7 +205,7 @@ class TESTControl():
         _lateral_acc = np.array(obs[5])
         delta_time = 0.1
 
-        P_value = 0.1
+        P_value = 0.01
         I_value = 0.0
         D_value = 0.0
         PTerm = 0.0
@@ -224,7 +224,9 @@ class TESTControl():
         DTerm = delta_error/delta_time
         last_error = error
 
-        action = PTerm+I_value*ITerm+D_value*DTerm
+        action_lateral_acc = PTerm+I_value*ITerm+D_value*DTerm
+        action_tangent_acc = tangent_acc
+        action  = action_lateral_acc + action_tangent_acc
 
         self.action[1] = action[0]
         self.action[3] = action[1]
