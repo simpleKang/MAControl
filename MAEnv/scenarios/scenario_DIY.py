@@ -90,7 +90,7 @@ class Scenario(BaseScenario):
                     rew -= 1
         return rew
 
-    def observation(self, agent):
+    def observation(self, agent, world):
         a1 = agent.state.p_acc[0]
         a2 = agent.state.p_acc[1]
         vel_size = np.sqrt(np.square(agent.state.p_vel[0]) + np.square(agent.state.p_vel[1]))
