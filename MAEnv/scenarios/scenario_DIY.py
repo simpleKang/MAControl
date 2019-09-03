@@ -43,7 +43,7 @@ class Scenario(BaseScenario):
             landmark.state.p_vel = np.zeros(world.dim_p)
             landmark.color = np.random.uniform(0, 1, 3)
 
-        rangee = 1.0
+        rangee = 0.9
         world.landmarks[0].state.p_pos = np.array([-rangee, -rangee])
         world.landmarks[1].state.p_pos = np.array([-rangee, +rangee])
         world.landmarks[2].state.p_pos = np.array([+rangee, +rangee])
