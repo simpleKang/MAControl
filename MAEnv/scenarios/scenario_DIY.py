@@ -36,6 +36,7 @@ class Scenario(BaseScenario):
         for i, agent in enumerate(world.agents):
             agent.state.p_pos = np.random.uniform(-0.9, -0.8, world.dim_p)
             agent.state.p_vel = np.array([0, 0.05])  # 50 米/秒
+            agent.state.p_acc = np.array([0, 0])
 
         world.agents[0].color = np.array([0.47, 0.79, 0.79])
         # world.agents[1].color = np.array([0.10, 0.20, 0.17])
@@ -111,14 +112,4 @@ class Scenario(BaseScenario):
         return rew
 
     def observation(self, agent, world):
-        # get positions of all entities in this agent's reference frame
-        entity_pos = []
-        for entity in world.landmarks:  # world.entities:
-            entity_pos.append(entity.state.p_pos - agent.state.p_pos)
-        # communication of all other agents
-        other_pos = []
-        for other in world.agents:
-            if other is agent: continue
-            other_pos.append(other.state.p_pos - agent.state.p_pos)
-        print(agent.state.p_acc)
-        return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos)
+        return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + [agent.state.p_acc])
