@@ -14,6 +14,10 @@ class TESTControl():
         self.arglist = arglist
         self.dt = world.dt
 
+        self.path_pace = 20
+        self.motion_pace = 5
+        self.inner_pace = 1
+
         self.pointAi = (0, 0)
         self.pointBi = (0, 0)
 
