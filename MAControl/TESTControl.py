@@ -14,8 +14,6 @@ class TESTControl():
         self.arglist = arglist
         self.dt = world.dt
 
-        self.vel = (0, 0)
-        self.pos = (0, 0)
         self.pointAi = (0, 0)
         self.pointBi = (0, 0)
 
@@ -66,8 +64,8 @@ class TESTControl():
 
     def MotionController(self, obs, pointAi, pointBi):
         # print("motion control")
-        self.vel = np.array(obs[0:2])
-        self.pos = np.array(obs[2:4])
+        vel_vector = np.array(obs[0:2])
+        pointPi = np.array(obs[2:4])
         pointAi = np.array(pointAi)
         pointBi = np.array(pointBi)
         print('pointAi', pointAi)
@@ -95,7 +93,7 @@ class TESTControl():
 
         # # # # # tecs # # # # #
         # compute rate setpoints
-        tas_state = speed = np.sqrt(np.square(self.vel[0]) + np.square(self.vel[1]))
+        tas_state = speed = np.sqrt(np.square(vel_vector[0]) + np.square(vel_vector[1]))
         TAS_rate_setpoint = (TAS_setpoint - tas_state) * K_V
         STE_error = 0.5 * (TAS_setpoint * TAS_setpoint - tas_state * tas_state)
         STE_rate_setpoint = U.constrain(tas_state * TAS_rate_setpoint, STE_rate_min, STE_rate_max)
@@ -124,13 +122,13 @@ class TESTControl():
         vector_AB_unit = vector_AB/dist_AB
 
         # compute AP
-        vector_AP = self.pos-pointAi
+        vector_AP = pointPi-pointAi
         dist_AP = np.sqrt(np.square(vector_AP[0]) + np.square(vector_AP[1]))
         dist_AP = max(dist_AP, 0.000000001)
         vector_AP_unit = vector_AP/dist_AP
 
         # compute BP
-        vector_BP = self.pos - pointBi
+        vector_BP = pointPi - pointBi
         dist_BP = np.sqrt(np.square(vector_BP[0]) + np.square(vector_BP[1]))
         dist_BP = max(dist_BP, 0.000000001)
         if dist_BP < BP_range:
@@ -146,17 +144,17 @@ class TESTControl():
 
         if dist_AP > L1_distance and alongTrackDist/dist_AP < -0.707:
             # calculate eta to fly to waypoint A
-            eta = math.acos(U.constrain(np.dot(-1 * vector_AP_unit, self.vel/speed), -1, 1))
+            eta = math.acos(U.constrain(np.dot(-1 * vector_AP_unit, vel_vector/speed), -1, 1))
             # print('scene1')
 
         elif abs(AB_to_BP_bearing) < math.radians(100):
             # calculate eta to fly to waypoint B
-            eta = math.acos(np.dot(-1 * vector_BP_unit, self.vel/speed))
+            eta = math.acos(np.dot(-1 * vector_BP_unit, vel_vector/speed))
             # print('scene2')
 
         else:
             # calculate eta to fly along the line between A and B
-            eta2 = math.acos(U.constrain(np.dot(vector_AB_unit, self.vel/speed), -1, 1))
+            eta2 = math.acos(U.constrain(np.dot(vector_AB_unit, vel_vector/speed), -1, 1))
             beta = math.acos(U.constrain(np.dot(vector_AP_unit, vector_AB_unit), -1, 1))
             xtrackErr = dist_AP * math.sin(beta)
             eta1 = math.asin(U.constrain(xtrackErr / L1_distance, -0.7071, 0.7071))
@@ -170,13 +168,13 @@ class TESTControl():
         # pointC
         vector_CB = np.dot(-1 * vector_BP, vector_AB_unit) * vector_AB_unit
         pointCi = pointBi - vector_CB
-        vector_PC = pointCi - self.pos
+        vector_PC = pointCi - pointPi
         dist_PC = np.sqrt(np.square(vector_PC[0]) + np.square(vector_PC[1]))
         dist_PC = max(dist_PC, 0.000000001)
         vector_PC_unit = vector_PC / dist_PC
 
         # lateral_acc
-        lateral_acc_unit = np.array([self.vel[1], -1*self.vel[0]])/speed
+        lateral_acc_unit = np.array([vel_vector[1], -1*vel_vector[0]])/speed
         if abs(np.dot(lateral_acc_unit, vector_AB)) > 0.99:  # acc // AB
             lateral_acc_unit = vector_AB_unit
             print('here1')
@@ -184,7 +182,7 @@ class TESTControl():
             lateral_acc_unit = vector_PC_unit
             print('here2')
         elif np.dot(lateral_acc_unit, vector_PC) < -0.01:
-            lateral_acc_unit = np.array([-1*self.vel[1], self.vel[0]])/speed
+            lateral_acc_unit = np.array([-1*vel_vector[1], vel_vector[0]])/speed
             print('here3')
         else:
             print('here4')
@@ -194,7 +192,7 @@ class TESTControl():
         print('lateral_acc', lateral_acc)
 
         # tangent_acc
-        tangent_acc_unit = self.vel/speed
+        tangent_acc_unit = vel_vector/speed
         tangent_acc_size = throttle_setpoint * K_acct
         tangent_acc = tangent_acc_unit * tangent_acc_size
         print('tangent_acc', tangent_acc)
