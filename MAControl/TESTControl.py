@@ -233,7 +233,3 @@ class TESTControl():
         # print(Exp_acc)
         print(action)
         return self.action
-
-
-
-
