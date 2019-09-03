@@ -202,6 +202,9 @@ class TESTControl():
         _acc = np.array(obs[4:6])
         print(_acc)
         print(_Exp_acc)
+        P_value = 0
+        I_value = 0
+        D_value = 0
 
         self.action[1] = _Exp_acc[0]
         self.action[3] = _Exp_acc[1]
