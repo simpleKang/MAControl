@@ -6,7 +6,7 @@ import MAControl.util as U
 
 class TESTControl():
     def __init__(self, name, env, world, agent_index, arglist):
-        print("control init")
+        # print("control init")
         self.name = name
         self.env = env
         self.world = world
@@ -182,17 +182,16 @@ class TESTControl():
 
             # lateral_acc
             lateral_acc_unit = np.array([vel_vector[1], -1*vel_vector[0]])/speed
-            lateral_acc_dir = 1  # clockwise
-            if np.dot(lateral_acc_unit, vector_PC) < -0.01:  # <a1,PC>钝角
-                lateral_acc_dir = -1
-            elif -0.01 < np.dot(lateral_acc_unit, vector_PC) < 0.01:  # <a1,PC>直角
+            if -0.01 < np.dot(lateral_acc_unit, vector_PC) < 0.01:  # <a1,PC>直角
                 lateral_acc_dir = np.sign(np.dot(lateral_acc_unit, vector_AB))
+            else:
+                lateral_acc_dir = np.sign(np.dot(lateral_acc_unit, vector_PC))
             self.lateral_acc = lateral_acc_size * lateral_acc_dir
 
         return self.tangent_acc, self.lateral_acc
 
     def InnerController(self, obs, tangent_acc, lateral_acc, step):
-        print('inner control')
+        # print('inner control')
 
         Exp_lateral_acc = lateral_acc
         True_lateral_acc = np.array(obs[5])
