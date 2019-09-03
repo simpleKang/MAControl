@@ -194,16 +194,17 @@ class TESTControl():
 
         # action
 
-        acc = self.lateral_acc + self.tangent_acc
-        return acc
+        return self.lateral_acc,self.tangent_acc
 
-    def InnerController(self, obs, Exp_acc, step):
+    def InnerController(self, obs, lateral_acc,tangent_acc, step):
+
         print('innercontroller')
-        _Exp_acc = Exp_acc
-        _acc = np.array(obs[4:6])
+        _Exp_lateral_acc = lateral_acc
+        _Exp_tangent_acc = tangent_acc
+
+        _lateral_acc = np.array(obs[5])
         delta_time = 0.1
-        print(_acc)
-        print(_Exp_acc)
+
         P_value = 0.1
         I_value = 0.0
         D_value = 0.0
@@ -213,7 +214,7 @@ class TESTControl():
 
         last_error = 0.0
         windup_guard = 20.0
-        error = _Exp_acc - _acc
+        error = _Exp_lateral_acc - _lateral_acc
         delta_error = error - last_error
         PTerm = P_value*error
         ITerm += error*delta_time
