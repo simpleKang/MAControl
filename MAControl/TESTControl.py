@@ -75,22 +75,22 @@ class TESTControl():
 
         # set L1 params
         L1_ratio = 0.1  # (当v=0.05则L1=0.005km=50m)
-        BP_range = 0.2  # (0.2km=200m)
+        BP_range = 0.1  # (0.1km=100m)
         K_L1 = 0.1  # (系数)
 
         # set tecs params
         TAS_setpoint = 0.05  # (km/s)
-        throttle_c = 50  # (%)
+        throttle_c = 0  # (%)
         throttle_setpoint_max = 100  # (%)
         throttle_setpoint_min = 0  # (%)
-        STE_rate_max = 1
-        STE_rate_min = -1
-        K_V = 0.01  # (系数)
+        STE_rate_max = 0.025
+        STE_rate_min = -0.025
+        K_V = 1  # (系数)
         K_acct = 0.1  # (系数)
 
         # p-i-d
         Ki_STE = 0  # (系数)
-        Kp_STE = 0.0004  # (系数)
+        Kp_STE = 0.8  # (系数)
         Kd_STE = 0.1  # (系数)
 
         # # # # # tecs # # # # #
@@ -99,6 +99,7 @@ class TESTControl():
         TAS_rate_setpoint = (TAS_setpoint - tas_state) * K_V
         STE_error = 0.5 * (TAS_setpoint * TAS_setpoint - tas_state * tas_state)
         STE_rate_setpoint = U.constrain(tas_state * TAS_rate_setpoint, STE_rate_min, STE_rate_max)
+        print('speed', speed)
 
         # compute throttle_p
         if STE_rate_setpoint >= 0:
