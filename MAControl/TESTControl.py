@@ -32,7 +32,7 @@ class TESTControl():
         # 256×3的航点列表，第3列为航点状态 [0: 无航点] [1: 未飞] [2: pointA] [3: pointB] [4: 已到达]
         self.waypoint_list = [[0 for i in range(3)] for j in range(256)]
 
-    def PathPlanner(self, obs):
+    def PathPlanner(self, obs,step):
         # print("path plan")
 
         # TODO:根据obs进行判断是否修改航点列表
@@ -66,7 +66,7 @@ class TESTControl():
 
         return self.pointA, self.pointB, self.waypoint_finished
 
-    def MotionController(self, obs, pointAi, pointBi):
+    def MotionController(self, obs, pointAi, pointBi,step):
         # print("motion control")
         vel_vector = np.array(obs[0:2])
         pointPi = np.array(obs[2:4])
@@ -195,6 +195,10 @@ class TESTControl():
 
         # action
         acc = lateral_acc + tangent_acc
+        return acc
+    def InnerController(self,obs,Exp_acc,step):
+        print('innercontroller')
+        acc = Exp_acc
         self.action[1] = acc[0]
         self.action[3] = acc[1]
         return self.action
