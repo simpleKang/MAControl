@@ -32,7 +32,7 @@ class TESTControl():
         # 256×3的航点列表，第3列为航点状态 [0: 无航点] [1: 未飞] [2: pointA] [3: pointB] [4: 已到达]
         self.waypoint_list = [[0 for i in range(3)] for j in range(256)]
 
-    def PathPlanner(self, obs,step):
+    def PathPlanner(self, obs, step):
         # print("path plan")
 
         # TODO:根据obs进行判断是否修改航点列表
@@ -41,8 +41,8 @@ class TESTControl():
 
         # 初始时刻输出A、B坐标
         if self.pointB_index == 0 and self.is_init is True:
-            self.pointA = (obs[2], obs[3])
-            self.pointB = (self.waypoint_list[self.pointB_index][0], self.waypoint_list[self.pointB_index][1])
+            self.pointAi = (obs[2], obs[3])
+            self.pointBi = (self.waypoint_list[self.pointB_index][0], self.waypoint_list[self.pointB_index][1])
             self.is_init = False
 
         # 更改航点状态并输出A、B坐标
@@ -52,21 +52,21 @@ class TESTControl():
                     self.waypoint_list[self.pointB_index-1][2] = 4
                 self.waypoint_list[self.pointB_index][2] = 2
                 self.waypoint_list[self.pointB_index+1][2] = 3
-                self.pointA = (self.waypoint_list[self.pointB_index][0], self.waypoint_list[self.pointB_index][1])
-                self.pointB = (self.waypoint_list[self.pointB_index+1][0], self.waypoint_list[self.pointB_index+1][1])
+                self.pointAi = (self.waypoint_list[self.pointB_index][0], self.waypoint_list[self.pointB_index][1])
+                self.pointBi = (self.waypoint_list[self.pointB_index+1][0], self.waypoint_list[self.pointB_index+1][1])
                 self.arrive_flag = False
                 self.pointB_index += 1
             else:
                 for i in range(self.pointB_index+1):
                     self.waypoint_list[i][2] = 1
-                self.pointA = (self.waypoint_list[self.pointB_index][0], self.waypoint_list[self.pointB_index][1])
-                self.pointB = (self.waypoint_list[0][0], self.waypoint_list[0][1])
+                self.pointAi = (self.waypoint_list[self.pointB_index][0], self.waypoint_list[self.pointB_index][1])
+                self.pointBi = (self.waypoint_list[0][0], self.waypoint_list[0][1])
                 self.pointB_index = 0
                 # self.waypoint_finished = True
 
-        return self.pointA, self.pointB, self.waypoint_finished
+        return self.pointAi, self.pointBi, self.waypoint_finished
 
-    def MotionController(self, obs, pointAi, pointBi,step):
+    def MotionController(self, obs, pointAi, pointBi, step):
         # print("motion control")
         _step = step
         vel_vector = np.array(obs[0:2])
