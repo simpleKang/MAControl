@@ -203,21 +203,31 @@ class TESTControl():
         delta_time = 0.1
         print(_acc)
         print(_Exp_acc)
-        P_value = 0.2
+        P_value = 0.1
         I_value = 0.0
         D_value = 0.0
         PTerm = 0.0
         ITerm = 0.0
-        CTerm =0.0
+        DTerm =0.0
 
         last_error = 0.0
         windup_guard = 20.0
         error = _Exp_acc - _acc
         delta_error = error - last_error
+        PTerm = P_value*error
+        ITerm += error*delta_time
 
 
-        self.action[1] = _Exp_acc[0]
-        self.action[3] = _Exp_acc[1]
+        DTerm = 0.0
+        DTerm = delta_error/delta_time
+        last_error = error
+
+        action = PTerm+I_value*ITerm+D_value*DTerm
+
+        self.action[1] = action[0]
+        self.action[3] = action[1]
+        # print(Exp_acc)
+        print(action)
         return self.action
 
 
