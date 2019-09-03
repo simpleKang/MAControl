@@ -11,6 +11,7 @@ class Scenario(BaseScenario):
         # set any world properties first
         num_agents = 1
         num_landmarks = 4
+        world.damping2 = 10
         # add agents
         world.agents = [Agent() for i in range(num_agents)]
         for i, agent in enumerate(world.agents):
@@ -32,7 +33,7 @@ class Scenario(BaseScenario):
     def reset_world(self, world):
 
         for i, agent in enumerate(world.agents):
-            agent.state.p_pos = np.random.uniform(-0.9, -0.6, world.dim_p)
+            agent.state.p_pos = np.random.uniform(-0.9, -0.8, world.dim_p)
             agent.state.p_vel = np.array([0, 0.05])  # 50 米/秒
 
         world.agents[0].color = np.array([0.47, 0.79, 0.79])

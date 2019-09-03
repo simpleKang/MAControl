@@ -19,7 +19,8 @@ class TESTControl():
         self.pointAi = (0, 0)
         self.pointBi = (0, 0)
 
-        self.throttle_setpoint = 0
+        self.STE_rate_error = 0
+        self.throttle_integ_state = 0
         self.action = [0, 0, 0, 0, 0]
 
         self.waypoint_finished = False
@@ -78,42 +79,39 @@ class TESTControl():
         K_L1 = 0.1  # (系数)
 
         # set tecs params
-        K_acct = 0.1  # (系数)
         TAS_setpoint = 0.05  # (km/s)
-        throttle_cruise = 0
-        speed_error_gain = 1
+        throttle_c = 0  # (%)
+        throttle_setpoint_max = 100  # (%)
+        throttle_setpoint_min = 0  # (%)
         STE_rate_max = 0.025
         STE_rate_min = -0.025
-        throttle_setpoint_max = 100
-        throttle_setpoint_min = 0
-        throttle_damping_gain = 0.1
-        throttle_time_constant = 25
-        STE_to_throttle = 1 / throttle_time_constant / (STE_rate_max - STE_rate_min)
-        throttle_slewrate = 0.05
-        throttle_increment_limit = self.dt * (throttle_setpoint_max - throttle_setpoint_min) * throttle_slewrate
+        K_V = 1  # (系数)
+        K_acct = 0.1  # (系数)
+
+        # p-i-d
+        Ki_STE = 0  # (系数)
+        Kp_STE = 0.8  # (系数)
+        Kd_STE = 0.1  # (系数)
 
         # # # # # tecs # # # # #
-        # update speed setpoint
+        # compute rate setpoints
         tas_state = speed = np.sqrt(np.square(self.vel[0]) + np.square(self.vel[1]))
-        TAS_rate_setpoint = (TAS_setpoint - tas_state) * speed_error_gain
-        print('speed', speed)
-        # TAS_rate_setpoint = U.constrain(TAS_rate_setpoint, 0.5*STE_rate_min / tas_state, 0.5*STE_rate_max / tas_state)
-
-        # update energy estimates
+        TAS_rate_setpoint = (TAS_setpoint - tas_state) * K_V
         STE_error = 0.5 * (TAS_setpoint * TAS_setpoint - tas_state * tas_state)
-        STE_rate_error = STE_rate_setpoint = U.constrain(tas_state * TAS_rate_setpoint, STE_rate_min, STE_rate_max)
+        STE_rate_setpoint = U.constrain(tas_state * TAS_rate_setpoint, STE_rate_min, STE_rate_max)
+        print('speed', speed)
 
-        # update throttle setpoint
+        # compute throttle_p
         if STE_rate_setpoint >= 0:
-            throttle_p = throttle_cruise + STE_rate_setpoint / STE_rate_max * (throttle_setpoint_max - throttle_cruise)
+            throttle_p = throttle_c + STE_rate_setpoint / STE_rate_max * (throttle_setpoint_max - throttle_c)
         else:
-            throttle_p = throttle_cruise + STE_rate_setpoint / STE_rate_min * (throttle_setpoint_min - throttle_cruise)
-        print('throttle_p', throttle_p)
-        throttle_setpoint = throttle_p + (STE_error + STE_rate_error * throttle_damping_gain) * STE_to_throttle
+            throttle_p = throttle_c + STE_rate_setpoint / STE_rate_min * (throttle_setpoint_min - throttle_c)
+
+        # compute throttle_setpoint
+        self.STE_rate_error = self.STE_rate_error * 0.8 + STE_rate_setpoint * 0.2
+        self.throttle_integ_state = self.throttle_integ_state + STE_error * Ki_STE
+        throttle_setpoint = throttle_p + (STE_error + self.STE_rate_error * Kd_STE) * Kp_STE + self.throttle_integ_state
         throttle_setpoint = U.constrain(throttle_setpoint, throttle_setpoint_min, throttle_setpoint_max)
-        throttle_setpoint = U.constrain(throttle_setpoint, self.throttle_setpoint - throttle_increment_limit,
-                                        self.throttle_setpoint + throttle_increment_limit)
-        self.throttle_setpoint = throttle_setpoint
 
         # # # # # L1 # # # # #
         # compute L1
@@ -203,7 +201,7 @@ class TESTControl():
 
         # tangent_acc
         tangent_acc_unit = self.vel/speed
-        tangent_acc_size = self.throttle_setpoint * K_acct
+        tangent_acc_size = throttle_setpoint * K_acct
         tangent_acc = tangent_acc_unit * tangent_acc_size
         print('tangent_acc', tangent_acc)
 
