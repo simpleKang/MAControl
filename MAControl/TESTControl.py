@@ -15,15 +15,16 @@ class TESTControl():
         self.dt = world.dt
 
         self.path_pace = 50
-        self.motion_pace = 10
+        self.motion_pace = 5
         self.inner_pace = 1
 
         self.pointAi = (0, 0)
         self.pointBi = (0, 0)
+        self.tangent_acc = 0
+        self.lateral_acc = 0
 
         self.STE_rate_error = 0
         self.throttle_integ_s = 0
-        self.action = [0, 0, 0, 0, 0]
 
         self.waypoint_finished = False
         self.arrive_flag = False
@@ -32,8 +33,9 @@ class TESTControl():
         # 256×3的航点列表，第3列为航点状态 [0: 无航点] [1: 未飞] [2: pointA] [3: pointB] [4: 已到达]
         self.waypoint_list = [[0 for i in range(3)] for j in range(256)]
 
-        self.tangent_acc = 0
-        self.lateral_acc = 0
+        self.ITerm = 0
+        self.last_error = 0
+        self.action = [0, 0, 0, 0, 0]
 
     def PathPlanner(self, obs, step):
         # print("path plan")
@@ -197,25 +199,19 @@ class TESTControl():
         True_lateral_acc = np.array(obs[5])
         delta_time = self.dt
 
-        P_value = 0.1
-        I_value = 0.0
-        D_value = 0.0
-        PTerm = 0.0
-        ITerm = 0.0
-        DTerm = 0.0
+        P_value = 0.001
+        I_value = 0.001
+        D_value = 0.001
 
-        last_error = 0.0
         error = Exp_lateral_acc - True_lateral_acc
-        delta_error = error - last_error
-        PTerm = P_value * error
-        ITerm += error * delta_time
-
-        DTerm = 0.0
+        delta_error = error - self.last_error
+        PTerm = error
         DTerm = delta_error / delta_time
-        last_error = error
+        self.ITerm += error * delta_time
+        self.last_error = error
 
         acct = tangent_acc
-        accl = PTerm + I_value * ITerm + D_value * DTerm
+        accl = P_value * PTerm + I_value * self.ITerm + D_value * DTerm
         vel_vector = np.array(obs[0:2])
         speed = np.sqrt(np.square(vel_vector[0]) + np.square(vel_vector[1]))
         vel_right_unit = np.array([vel_vector[1], -1 * vel_vector[0]]) / speed
