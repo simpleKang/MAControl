@@ -57,7 +57,7 @@ if __name__ == '__main__':
         obs_n = new_obs_n
 
         # for displaying
-        time.sleep(0.1)
+        time.sleep(0.01)
         env.render()
         print('>>>> step', step)
         # print('obs_n', obs_n)

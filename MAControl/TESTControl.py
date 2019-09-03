@@ -133,7 +133,7 @@ class TESTControl():
         dist_BP = max(dist_BP, 0.000000001)
         if dist_BP < BP_range:
             self.arrive_flag = True
-            print(obs)
+            print('True', obs)
         else:
             self.arrive_flag = False
         vector_BP_unit = vector_BP/dist_BP
@@ -145,12 +145,10 @@ class TESTControl():
         if dist_AP > L1_distance and alongTrackDist/dist_AP < -0.707:
             # calculate eta to fly to waypoint A
             eta = math.acos(U.constrain(np.dot(-1 * vector_AP_unit, vel_vector/speed), -1, 1))
-            # print('scene1')
 
         elif abs(AB_to_BP_bearing) < math.radians(100):
             # calculate eta to fly to waypoint B
             eta = math.acos(np.dot(-1 * vector_BP_unit, vel_vector/speed))
-            # print('scene2')
 
         else:
             # calculate eta to fly along the line between A and B
@@ -159,7 +157,6 @@ class TESTControl():
             xtrackErr = dist_AP * math.sin(beta)
             eta1 = math.asin(U.constrain(xtrackErr / L1_distance, -0.7071, 0.7071))
             eta = eta1 + eta2
-            # print('scene3')
 
         # eta
         eta = U.constrain(eta, -1.5708, 1.5708)
@@ -177,15 +174,10 @@ class TESTControl():
         lateral_acc_unit = np.array([vel_vector[1], -1*vel_vector[0]])/speed
         if abs(np.dot(lateral_acc_unit, vector_AB)) > 0.99:  # acc // AB
             lateral_acc_unit = vector_AB_unit
-            print('here1')
         elif abs(np.dot(lateral_acc_unit, vector_AB)) < 0.01:  # acc _|_ AB
             lateral_acc_unit = vector_PC_unit
-            print('here2')
         elif np.dot(lateral_acc_unit, vector_PC) < -0.01:
             lateral_acc_unit = np.array([-1*vel_vector[1], vel_vector[0]])/speed
-            print('here3')
-        else:
-            print('here4')
 
         lateral_acc = lateral_acc_unit * lateral_acc_size
         # TODO: lateral_acc smoothed by pid
@@ -201,7 +193,6 @@ class TESTControl():
         acc = lateral_acc + tangent_acc
         self.action[1] = acc[0]
         self.action[3] = acc[1]
-        print('acc', acc)
         return self.action
 
 
