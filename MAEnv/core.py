@@ -52,10 +52,16 @@ class Entity(object):
     def mass(self):
         return self.initial_mass
 
+
 # properties of landmark entities
 class Landmark(Entity):
-     def __init__(self):
+    def __init__(self):
         super(Landmark, self).__init__()
+        # value
+        self.value = 0
+        # defence
+        self.defence = 0
+
 
 # properties of agent entities
 class Agent(Entity):
