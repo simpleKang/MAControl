@@ -7,7 +7,7 @@ import random
 
 class TESTControl():
     def __init__(self, name, env, world, agent_index, arglist):
-        print("control init")
+        # print("control init")
         self.name = name
         self.env = env
         self.world = world
@@ -40,6 +40,7 @@ class TESTControl():
         self.action = [0, 0, 0, 0, 0]
 
     def PolicyMaker(self, target, shared_info, auction_state, step, k):
+        # print('make policy')
 
         if auction_state[k] != 0:
             if auction_state[len(shared_info)] != step:
