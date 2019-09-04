@@ -46,6 +46,7 @@ class TESTControl(object):
         self.action = [0, 0, 0, 0, 0]
 
         self.BigCheck = 0
+        TESTControl.Shared_UAV_state.append(0)
 
     def PolicyMaker(self, target, shared_info, auction_state, step, k):
         # print('make policy')
