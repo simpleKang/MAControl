@@ -54,7 +54,7 @@ if __name__ == '__main__':
         action_n = []
         for i in range(env.n):
             shared_info[i] = obs_n[i]
-            pointAi, pointBi, finishedi = Control[i].PathPlanner(obs_n[i], step)
+            pointAi, pointBi, finishedi = Control[i].PolicyMaker(obs_n[i], step, i)
             Exp_acc = Control[i].MotionController(obs_n[i], pointAi, pointBi, step)
             actioni = Control[i].InnerController(obs_n[i], Exp_acc, step)
             action_n.append(actioni)
