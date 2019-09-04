@@ -5,7 +5,13 @@ import MAControl.util as U
 import random
 
 
-class TESTControl():
+class TESTControl(object):
+
+    Found_Target_Set = []
+    Found_Target_Info = []
+    Shared_UAV_state = []
+    Shared_Big_Check = 0
+
     def __init__(self, name, env, world, agent_index, arglist):
         # print("control init")
         self.name = name
@@ -38,6 +44,8 @@ class TESTControl():
         self.ITerm = 0
         self.last_error = 0
         self.action = [0, 0, 0, 0, 0]
+
+        self.BigCheck = 0
 
     def PolicyMaker(self, target, shared_info, auction_state, step, k):
         # print('make policy')
