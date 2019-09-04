@@ -34,24 +34,9 @@ def snake_single(Up, Down, Wide1, Wide2, Edge, W, D, i):
 
 init_waypoint = []
 
-# init_waypoint.append([[-0.9, -0.9, 1],
-#                       [-0.9, 0.9, 1],
-#                       [0.9, 0.9, 1],
-#                       [0.9, -0.9, 1]])
-#
-# init_waypoint.append([[-0.6, -0.6, 1],
-#                       [-0.6, 0.6, 1],
-#                       [0.6, 0.6, 1],
-#                       [0.6, -0.6, 1]])
-#
-# init_waypoint.append([[-0.3, -0.3, 1],
-#                       [-0.3, 0.3, 1],
-#                       [0.3, 0.3, 1],
-#                       [0.3, -0.3, 1]])
-
 N = 3
 W = 0.9
-D = 0.05
+D = 0.15
 Edge = 1
 Up = []
 Down = []
@@ -66,8 +51,13 @@ for i in range(N):
     init_waypoint.append(snake_single(Up[i], Down[i], Wide1[i], Wide2[i], Edge, W, D, i))
 
 
+abc = [[2, 2], [3, 4], [4, 1], [1, 3]]
 
+abd = sorted(abc, key=(lambda x: x[1]), reverse=True)
 
+winner = []
+for i in range(2):
+    winner.append(abd[i][0])
 
 
 

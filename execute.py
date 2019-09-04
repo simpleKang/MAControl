@@ -32,24 +32,31 @@ if __name__ == '__main__':
     # Create environment
     env, world = make_env(arglist)
 
+    Target = [0, 0, -1, 2]
+    shared_info = [[], [], []]
+    auction_state = []
+
     # Create Controllers
     Control = []
     for i in range(env.n):
         Control.append(TESTC.TESTControl("agent_%d" % i, env, world, i, arglist))
         Control[i].waypoint_list[0:len(U.init_waypoint[i])] = U.init_waypoint[i]
+        auction_state.append(0)
 
     obs_n = env.reset()
     step = 0
     start = time.time()
+    auction_state.append(0)
 
     while True:
 
         # get action
         action_n = []
         for i in range(env.n):
-            pointAi, pointBi, finishedi = Control[i].PathPlanner(obs_n[i],step)
-            Exp_acc = Control[i].MotionController(obs_n[i], pointAi, pointBi,step)
-            actioni = Control[i].InnerController(obs_n[i],Exp_acc,step)
+            shared_info[i] = obs_n[i]
+            pointAi, pointBi, finishedi = Control[i].PathPlanner(obs_n[i], step)
+            Exp_acc = Control[i].MotionController(obs_n[i], pointAi, pointBi, step)
+            actioni = Control[i].InnerController(obs_n[i], Exp_acc, step)
             action_n.append(actioni)
 
         # environment step

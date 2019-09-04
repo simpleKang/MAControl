@@ -9,7 +9,7 @@ class Scenario(BaseScenario):
     def make_world(self):
         world = World()
         # set any world properties first
-        num_agents = 1
+        num_agents = 3
         num_landmarks = 4
         world.damping = 0  # 取消第一种阻尼计算方式
         world.damping2 = 10  # 调整第二种阻尼计算方式的参数
