@@ -68,7 +68,4 @@ for i in range(N):
 
 
 
-
-
-
 z = 0

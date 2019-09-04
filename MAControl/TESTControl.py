@@ -39,31 +39,29 @@ class TESTControl():
         self.last_error = 0
         self.action = [0, 0, 0, 0, 0]
 
-    def PolicyMaker(self, obs, step, i):
+    def PolicyMaker(self, target, shared_info, auction_state, step, k):
 
-        global Target, shared_info, auction_state
-
-        if auction_state[i] != 0:
-            self.pointBi = (Target[0], Target[1])
+        if auction_state[k] != 0:
+            if auction_state[len(shared_info)] != step:
+                self.pointBi = (target[0], target[1])
+            else:
+                self.PathPlanner(shared_info[k], step)
 
         else:
-
-            dist_TC = math.sqrt((shared_info[i][2]-Target[0])**2 + (shared_info[i][3]-Target[1])**2)
-            if dist_TC <= self.detect_dis and Target[2] < 0:
-                winner = self.auction()
+            dist_TC = math.sqrt((shared_info[k][2]-target[0])**2 + (shared_info[k][3]-target[1])**2)
+            if dist_TC <= self.detect_dis and target[2] < 0:
+                winner = self.auction(shared_info, target)
                 for i in winner:
                     auction_state[i] = 1
-                Target[2] = 1
+                target[2] = 1
                 auction_state[len(shared_info)] = step
 
             else:
-                self.PathPlanner(obs, step)
+                self.PathPlanner(shared_info[k], step)
 
-        return self.pointAi, self.pointBi, self.waypoint_finished
+        return self.pointAi, self.pointBi, self.waypoint_finished, target, shared_info, auction_state
 
-    def auction(self):
-
-        global shared_info, Target
+    def auction(self, shared_info, target):
 
         price = []
         for i in range(len(shared_info)):
@@ -73,7 +71,7 @@ class TESTControl():
         price = sorted(price, key=(lambda x: x[1]), reverse=True)
 
         winner = []
-        for i in range(Target[3]):
+        for i in range(target[3]):
             winner.append(price[i][0])
 
         return winner
