@@ -119,16 +119,16 @@ class TESTControl():
         TAS_setpoint = 0.05  # (km/s)
         throttle_c = 0  # (%)
         throttle_setpoint_max = 100  # (%)
-        throttle_setpoint_min = 0  # (%)
+        throttle_setpoint_min = 1  # (%)
         STE_rate_max = 0.025
         STE_rate_min = -0.025
         K_V = 1  # (系数)
-        K_acct = 0.1  # (系数)
+        K_acct = 0.01  # (系数)
 
         # p-i-d
-        Ki_STE = 0  # (系数)
-        Kp_STE = 0.8  # (系数)
-        Kd_STE = 0.1  # (系数)
+        Ki_STE = 0.01  # (系数)
+        Kp_STE = 0.1  # (系数)
+        Kd_STE = 0.0  # (系数)
 
         # set motion_pace
         if step == 0 or step % self.motion_pace == 0:
@@ -231,19 +231,35 @@ class TESTControl():
         True_lateral_acc = np.array(obs[5])
         delta_time = self.dt
 
-        P_value = 0.001
-        I_value = 0.001
-        D_value = 0.001
+        P_value = 0.9
+        I_value = 0.01
+        D_value = 0.0
+        Iterm_window = 1
 
         error = Exp_lateral_acc - True_lateral_acc
         delta_error = error - self.last_error
         PTerm = error
         DTerm = delta_error / delta_time
         self.ITerm += error * delta_time
+        if self.ITerm < -Iterm_window:
+            self.ITerm = -Iterm_window
+        elif self.ITerm > Iterm_window:
+            self.ITerm = Iterm_window
+        else:
+            self.ITerm = self.ITerm
         self.last_error = error
 
         acct = tangent_acc
         accl = P_value * PTerm + I_value * self.ITerm + D_value * DTerm
+
+        # if abs(accl) > 0.8*abs(acct):
+        #     accl = np.sign(accl)*0.8*abs(acct)
+        # else:
+        #     accl = accl
+        print(acct)
+        print(accl)
+
+
         vel_vector = np.array(obs[0:2])
         speed = np.sqrt(np.square(vel_vector[0]) + np.square(vel_vector[1]))
         vel_right_unit = np.array([vel_vector[1], -1 * vel_vector[0]]) / speed
