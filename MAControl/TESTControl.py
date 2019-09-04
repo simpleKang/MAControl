@@ -219,15 +219,6 @@ class TESTControl():
 
         acct = tangent_acc
         accl = P_value * PTerm + I_value * self.ITerm + D_value * DTerm
-
-        # if abs(accl) > 0.8*abs(acct):
-        #     accl = np.sign(accl)*0.8*abs(acct)
-        # else:
-        #     accl = accl
-        print(acct)
-        print(accl)
-
-
         vel_vector = np.array(obs[0:2])
         speed = np.sqrt(np.square(vel_vector[0]) + np.square(vel_vector[1]))
         vel_right_unit = np.array([vel_vector[1], -1 * vel_vector[0]]) / speed
