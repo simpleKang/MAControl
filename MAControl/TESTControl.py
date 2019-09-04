@@ -10,7 +10,7 @@ class TESTControl(object):
     Found_Target_Set = []
     Found_Target_Info = []
     Shared_UAV_state = []
-    Shared_Big_Check = 0
+    Shared_Big_Check = False
 
     def __init__(self, name, env, world, agent_index, arglist):
         # print("control init")
@@ -45,11 +45,13 @@ class TESTControl(object):
         self.last_error = 0
         self.action = [0, 0, 0, 0, 0]
 
-        self.BigCheck = 0
+        self.BigCheck = False
         TESTControl.Shared_UAV_state.append(0)
 
     def PolicyMaker(self, target, shared_info, auction_state, step, k):
         # print('make policy')
+
+        self.BigCheck = True if random.random() > 0.95 else False
 
         if auction_state[k] != 0:
             if auction_state[len(shared_info)] != step:
