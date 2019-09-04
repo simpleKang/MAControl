@@ -13,9 +13,9 @@ class Scenario(BaseScenario):
         world.damping = 0  # 取消第一种阻尼计算方式
         world.damping2 = 10  # 调整第二种阻尼计算方式的参数
         # set nums
-        num_agents = 10
-        num_targets = 4
-        num_obstacles = 3
+        num_agents = 5
+        num_targets = 2
+        num_obstacles = 0
         # add agents
         world.agents = [Agent() for i in range(num_agents)]
         for i, agent in enumerate(world.agents):
@@ -51,15 +51,9 @@ class Scenario(BaseScenario):
             agent.color = np.array([0.47, 0.79, 0.79])
 
         for i, landmark in enumerate(world.landmarks):
+            landmark.state.p_pos = np.random.uniform(-0.9, 0.9, world.dim_p)
             landmark.state.p_vel = np.zeros(world.dim_p)
             landmark.color = np.random.uniform(0, 1, 3)
-
-        rangee = 0.9
-        world.landmarks[0].state.p_pos = np.array([-rangee, -rangee])
-        world.landmarks[1].state.p_pos = np.array([-rangee, +rangee])
-        world.landmarks[2].state.p_pos = np.array([+rangee, +rangee])
-        world.landmarks[3].state.p_pos = np.array([+rangee, -rangee])
-
 
     def benchmark_data(self, agent, world):
         # returns data for benchmarking purposes

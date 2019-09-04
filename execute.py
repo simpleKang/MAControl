@@ -7,7 +7,7 @@ import MAControl.util as U
 
 def parse_args():
     parser = argparse.ArgumentParser("Control Experiments for Multi-Agent Environments")
-    parser.add_argument("--scenario", type=str, default="scenario_DIY", help="name of the scenario script")
+    parser.add_argument("--scenario", type=str, default="scenario2_Target", help="name of the scenario script")
     parser.add_argument("--step-max", type=int, default=4000, help="maximum steps")
     return parser.parse_args()
 
@@ -33,7 +33,6 @@ if __name__ == '__main__':
     env, world = make_env(arglist)
 
     target = [0, 0, -1, 2]
-    shared_info = [[], [], []]
     auction_state = []
 
     # Create Controllers
@@ -53,9 +52,8 @@ if __name__ == '__main__':
         # get action
         action_n = []
         for i in range(env.n):
-            shared_info[i] = obs_n[i]
-            pointAi, pointBi, finishedi, target, shared_info, auction_state\
-                = Control[i].PolicyMaker(target, shared_info, auction_state, step, i)
+            pointAi, pointBi, finishedi, target, obs_n, auction_state\
+                = Control[i].PolicyMaker(target, obs_n, auction_state, step, i)
             acc_it, acc_il = Control[i].MotionController(obs_n[i], pointAi, pointBi, step)
             actioni = Control[i].InnerController(obs_n[i], acc_it, acc_il, step)
             action_n.append(actioni)
