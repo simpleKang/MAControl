@@ -43,10 +43,11 @@ class Scenario(BaseScenario):
             landmark.state.p_vel = np.zeros(world.dim_p)
             landmark.color = np.random.uniform(0, 1, 3)
 
-        world.landmarks[0].state.p_pos = np.array([-1.0, -1.0])
-        world.landmarks[1].state.p_pos = np.array([-1.0, +1.0])
-        world.landmarks[2].state.p_pos = np.array([+1.0, +1.0])
-        world.landmarks[3].state.p_pos = np.array([+1.0, -1.0])
+        rangee = 0.9
+        world.landmarks[0].state.p_pos = np.array([-rangee, -rangee])
+        world.landmarks[1].state.p_pos = np.array([-rangee, +rangee])
+        world.landmarks[2].state.p_pos = np.array([+rangee, +rangee])
+        world.landmarks[3].state.p_pos = np.array([+rangee, -rangee])
 
 
     def benchmark_data(self, agent, world):
@@ -98,6 +99,5 @@ class Scenario(BaseScenario):
         vel_right_unit = np.array([agent.state.p_vel[1], -1 * agent.state.p_vel[0]]) / vel_size
         a_front = np.dot(a1, vel_front_unit) + np.dot(a2, vel_front_unit)
         a_right = np.dot(a2, vel_right_unit) + np.dot(a2, vel_right_unit)
-        # return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + [agent.state.p_acc])
         return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + [a_front] + [a_right])
 
