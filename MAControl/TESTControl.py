@@ -2,11 +2,12 @@ import numpy as np
 import math
 import os
 import MAControl.util as U
+import random
 
 
 class TESTControl():
     def __init__(self, name, env, world, agent_index, arglist):
-        # print("control init")
+        print("control init")
         self.name = name
         self.env = env
         self.world = world
@@ -30,6 +31,7 @@ class TESTControl():
         self.arrive_flag = False
         self.pointB_index = 0
         self.is_init = True
+        self.detect_dis = 50
         # 256×3的航点列表，第3列为航点状态 [0: 无航点] [1: 未飞] [2: pointA] [3: pointB] [4: 已到达]
         self.waypoint_list = [[0 for i in range(3)] for j in range(256)]
 
@@ -37,12 +39,44 @@ class TESTControl():
         self.last_error = 0
         self.action = [0, 0, 0, 0, 0]
 
-    def PathPlanner(self, obs, step):
-        # print("path plan")
+    def PolicyMaker(self, target, shared_info, auction_state, step, k):
 
-        # TODO:根据obs进行判断是否修改航点列表
-        # if True:
-        #     self.WaypointUpdater(obs)
+        if auction_state[k] != 0:
+            if auction_state[len(shared_info)] != step:
+                self.pointBi = (target[0], target[1])
+            else:
+                self.PathPlanner(shared_info[k], step)
+
+        else:
+            dist_TC = math.sqrt((shared_info[k][2]-target[0])**2 + (shared_info[k][3]-target[1])**2)
+            if dist_TC <= self.detect_dis and target[2] < 0:
+                winner = self.auction(shared_info, target)
+                for i in winner:
+                    auction_state[i] = 1
+                target[2] = 1
+                auction_state[len(shared_info)] = step
+
+            else:
+                self.PathPlanner(shared_info[k], step)
+
+        return self.pointAi, self.pointBi, self.waypoint_finished, target, shared_info, auction_state
+
+    def auction(self, shared_info, target):
+
+        price = []
+        for i in range(len(shared_info)):
+            cal_price = [i]
+            cal_price.append(random.random())
+            price.append(cal_price)
+        price = sorted(price, key=(lambda x: x[1]), reverse=True)
+
+        winner = []
+        for i in range(target[3]):
+            winner.append(price[i][0])
+
+        return winner
+
+    def PathPlanner(self, obs, step):
 
         # 初始时刻输出A、B坐标
         if self.pointB_index == 0 and self.is_init is True:
@@ -68,8 +102,6 @@ class TESTControl():
                 self.pointBi = (self.waypoint_list[0][0], self.waypoint_list[0][1])
                 self.pointB_index = 0
                 # self.waypoint_finished = True
-
-        return self.pointAi, self.pointBi, self.waypoint_finished
 
     def MotionController(self, obs, pointAi, pointBi, step):
         # print("motion control")
