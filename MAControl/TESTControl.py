@@ -80,7 +80,7 @@ class TESTControl():
 
         # set L1 params
         L1_ratio = 0.1  # (当v=0.05则L1=0.005km=50m)
-        BP_range = 0.1  # (0.1km=100m)
+        BP_range = 0.15  # (0.1km=100m)
         K_L1 = 0.1  # (系数)
 
         # set tecs params
@@ -94,9 +94,9 @@ class TESTControl():
         K_acct = 0.1  # (系数)
 
         # p-i-d
-        Ki_STE = 0  # (系数)
-        Kp_STE = 0.8  # (系数)
-        Kd_STE = 0.1  # (系数)
+        Ki_STE = 0.1  # (系数)
+        Kp_STE = 0.5  # (系数)
+        Kd_STE = 0.0  # (系数)
 
         # set motion_pace
         if step == 0 or step % self.motion_pace == 0:
@@ -199,9 +199,9 @@ class TESTControl():
         True_lateral_acc = np.array(obs[5])
         delta_time = self.dt
 
-        P_value = 0.001
-        I_value = 0.001
-        D_value = 0.001
+        P_value = 0.55
+        I_value = 0.01
+        D_value = 0.0
 
         error = Exp_lateral_acc - True_lateral_acc
         delta_error = error - self.last_error
