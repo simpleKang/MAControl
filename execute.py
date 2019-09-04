@@ -55,8 +55,8 @@ if __name__ == '__main__':
         for i in range(env.n):
             shared_info[i] = obs_n[i]
             pointAi, pointBi, finishedi = Control[i].PolicyMaker(obs_n[i], step, i)
-            Exp_acc = Control[i].MotionController(obs_n[i], pointAi, pointBi, step)
-            actioni = Control[i].InnerController(obs_n[i], Exp_acc, step)
+            acc_it, acc_il = Control[i].MotionController(obs_n[i], pointAi, pointBi, step)
+            actioni = Control[i].InnerController(obs_n[i], acc_it, acc_il, step)
             action_n.append(actioni)
 
         # environment step
