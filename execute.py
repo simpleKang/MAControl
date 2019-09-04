@@ -32,6 +32,11 @@ if __name__ == '__main__':
     # Create environment
     env, world = make_env(arglist)
 
+    WorldTarget = []
+    for i, landmark in enumerate(world.targets):
+        WorldTarget.append([i, landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.state.p_vel[0],
+                            landmark.state.p_vel[1], landmark.value, landmark.defence])
+
     target = [0, 0, -1, 2]
     auction_state = []
 
