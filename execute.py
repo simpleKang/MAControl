@@ -34,8 +34,9 @@ if __name__ == '__main__':
 
     WorldTarget = []
     for i, landmark in enumerate(world.targets):
-        WorldTarget.append([i, landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.state.p_vel[0],
+        WorldTarget.append([landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.state.p_vel[0],
                             landmark.state.p_vel[1], landmark.value, landmark.defence])
+    print('WorldTarget', WorldTarget)
 
     target = [0, 0, -1, 2]
     auction_state = []
