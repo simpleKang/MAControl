@@ -7,7 +7,7 @@ import MAControl.util as U
 
 def parse_args():
     parser = argparse.ArgumentParser("Control Experiments for Multi-Agent Environments")
-    parser.add_argument("--scenario", type=str, default="scenario_DIY", help="name of the scenario script")
+    parser.add_argument("--scenario", type=str, default="scenario2_Target", help="name of the scenario script")
     parser.add_argument("--step-max", type=int, default=4000, help="maximum steps")
     return parser.parse_args()
 
@@ -29,12 +29,15 @@ def make_env(arglist):
 if __name__ == '__main__':
     arglist = parse_args()
 
-
     # Create environment
     env, world = make_env(arglist)
 
+    WorldTarget = []
+    for i, landmark in enumerate(world.targets):
+        WorldTarget.append([i, landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.state.p_vel[0],
+                            landmark.state.p_vel[1], landmark.value, landmark.defence])
+
     target = [0, 0, -1, 2]
-    shared_info = [[], [], []]
     auction_state = []
 
     # Create Controllers
@@ -52,17 +55,19 @@ if __name__ == '__main__':
     while True:
 
         # get action
+        temp = False
         action_n = []
         for i in range(env.n):
-            shared_info[i] = obs_n[i]
-            pointAi, pointBi, finishedi, target, shared_info, auction_state = Control[i].PolicyMaker(target,
-                                                                                shared_info, auction_state, step, i)
+            pointAi, pointBi, finishedi, target, auction_state = \
+                Control[i].PolicyMaker(target, obs_n, auction_state, step, i)
             acc_it, acc_il = Control[i].MotionController(obs_n[i], pointAi, pointBi, step)
             actioni = Control[i].InnerController(obs_n[i], acc_it, acc_il, step)
             action_n.append(actioni)
+            temp = temp | Control[i].BigCheck
 
         # environment step
         new_obs_n, rew_n, done_n, info_n = env.step(action_n)
+        TESTC.TESTControl.Shared_Big_Check = temp
         step += 1
         obs_n = new_obs_n
 
