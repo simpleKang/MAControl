@@ -106,6 +106,14 @@ class TESTControl(object):
                     TESTControl.Found_Target_Set.append(target1)
                     TESTControl.Found_Target_Info.append(self.close_area)
 
+        # COMMUNICATE TESTControl.Found_Target_Info
+        for info in TESTControl.Found_Target_Info:
+            check = False
+            for num in self.close_area:
+                check = check | num in info
+            if check and (self.index not in info):
+                info.append(self.index)
+
     def PolicyMaker(self, target, obs_n, auction_state, step, k):
         # print('make policy')
 
