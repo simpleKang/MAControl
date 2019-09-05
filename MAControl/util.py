@@ -35,7 +35,8 @@ def snake_single(Up, Down, Wide1, Wide2, Edge, W, D, i):
 
 
 def point_in_rec(point1, point2, point3, point4, pointk):
-    # p1 p2 p3 p4 make a rectangle (clockwise)
+    # p1 p2 p3 p4 make a convex quadrilateral, clockwise.
+    # p1 p2 p3 p4 构成一个凸四边形 # 顺时针依次取点 #
 
     p1p2 = point2 - point1
     p2p3 = point3 - point2
