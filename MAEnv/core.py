@@ -102,7 +102,7 @@ class World(object):
         self.dt = 0.1
         # physical damping
         self.damping = 0.25
-        self.damping2 = 0.4
+        self.damping2 = 0
         # contact response parameters
         self.contact_force = 1e+2
         self.contact_margin = 1e-3
@@ -169,11 +169,8 @@ class World(object):
             if not entity.movable: continue
             entity.state.p_vel = entity.state.p_vel * (1 - self.damping)
             if (p_force[i] is not None):
-                if self.damping2 is not None:
-                    speed = np.sqrt(np.square(entity.state.p_vel[0]) + np.square(entity.state.p_vel[1]))
-                    q_force_i = p_force[i] / entity.mass - speed * entity.state.p_vel * self.damping2
-                else:
-                    q_force_i = p_force[i]
+                speed = np.sqrt(np.square(entity.state.p_vel[0]) + np.square(entity.state.p_vel[1]))
+                q_force_i = p_force[i] / entity.mass - speed * entity.state.p_vel * self.damping2
                 entity.state.p_acc = q_force_i
                 entity.state.p_vel += q_force_i * self.dt
             if entity.max_speed is not None:
