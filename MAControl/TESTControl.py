@@ -11,6 +11,10 @@ class TESTControl(object):
     Found_Target_Info = []
     Shared_UAV_state = []
     Shared_Big_Check = False
+    Target_index = -1       # 当前进行拍卖的目标编号
+    Auction_list = []       # 拍卖列表，当1次拍卖完成时，向其中添加拍卖者、选出的个体编号、个体确认情况
+    Select_list = []        # 选择拍卖者的列表，存储距离
+    Auctioneer = -1         # 选出的拍卖者编号
 
     def __init__(self, name, env, world, agent_index, arglist):
         # print("control init")
@@ -38,8 +42,11 @@ class TESTControl(object):
         self.pointB_index = 0
         self.is_init = True
         self.detect_dis = 50
+        self.close_area = []
         # 256×3的航点列表，第3列为航点状态 [0: 无航点] [1: 未飞] [2: pointA] [3: pointB] [4: 已到达]
         self.waypoint_list = [[0 for i in range(3)] for j in range(256)]
+        # 小飞机状态 [0: 搜索] [1: 未分配] [2: 已分配] [3: 正在执行]
+        TESTControl.Shared_UAV_state.append(0)
 
         self.ITerm = 0
         self.last_error = 0
@@ -51,40 +58,72 @@ class TESTControl(object):
     def PolicyMaker(self, target, shared_info, auction_state, step, k):
         # print('make policy')
 
-        self.BigCheck = True if random.random() > 0.95 else False
+        # TODO 更新小飞机的邻域列表
+        self.close_area = []
 
-        if auction_state[k] != 0:
-            if auction_state[len(shared_info)] != step:
-                self.pointBi = (target[0], target[1])
+        if TESTControl.Shared_UAV_state[k] == 0:
+            if TESTControl.Shared_Big_Check is True:
+                TESTControl.Shared_UAV_state[k] = 1
+                self.PathPlanner(shared_info[k], step)
             else:
+                # TODO 进行各种条件的计算判断，输出单个小飞机的大判断计算结果
+                self.BigCheck = True if random.random() > 0.95 else False
+                # TODO 是否发现目标判断，若发现目标，添加目标信息并按重要程度排序
+                if True if random.random() > 0.95 else False:
+                    TESTControl.Found_Target_Info = []
+                # TODO 与邻域内小飞机共享目标信息
+                TESTControl.Found_Target_Set = []
+
                 self.PathPlanner(shared_info[k], step)
 
-        else:
-            dist_TC = math.sqrt((shared_info[k][2]-target[0])**2 + (shared_info[k][3]-target[1])**2)
-            if dist_TC <= self.detect_dis and target[2] < 0:
-                winner = self.auction(shared_info, target)
+        elif TESTControl.Shared_UAV_state[k] == 1:
+            # TODO 进入拍卖阶段是否继续搜索可能未发现的新目标
+            # # TODO 是否发现目标判断
+            # TESTControl.Found_Target_Info = []
+            # # TODO 与邻域内小飞机共享目标信息
+            # TESTControl.Found_Target_Set = []
+
+            # TODO 计算目前拍卖目标的距离
+            if TESTControl.Found_Target_Set[k][TESTControl.Target_index] != 0:
+                # TODO 添加
+                TESTControl.Select_list.append(0)
+
+            if TESTControl.Auctioneer == k:
+                # TODO 拍卖计算
+                winner = self.auction(k)
+                # TESTControl.Found_Target_Info[0].append(winner)
                 for i in winner:
-                    auction_state[i] = 1
-                target[2] = 1
-                auction_state[len(shared_info)] = step
+                    if TESTControl.Shared_UAV_state[i] == 2:
+                        TESTControl.Shared_UAV_state[i] = 3
+                    TESTControl.Shared_UAV_state[i] = 2
+                # TODO 向拍卖列表中添加拍卖信息
+                TESTControl.Auction_list.append(0)
+            self.PathPlanner(shared_info[k], step)
 
-            else:
-                self.PathPlanner(shared_info[k], step)
+        elif TESTControl.Shared_UAV_state[k] == 2:
+            # TODO 拍卖确认
+            TESTControl.Auction_list[k] = 1
+            TESTControl.Shared_UAV_state[k] = 3
+            self.PathPlanner(shared_info[k], step)
 
-        return self.pointAi, self.pointBi, self.waypoint_finished, target, shared_info, auction_state
+        elif TESTControl.Shared_UAV_state[k] == 3:
+            # TODO 目标坐标作为执行的B点
+            self.pointBi = (0, 0)
 
-    def auction(self, shared_info, target):
+        return self.pointAi, self.pointBi, self.waypoint_finished, target, auction_state
 
-        price = []
-        for i in range(len(shared_info)):
-            cal_price = [i]
-            cal_price.append(random.random())
-            price.append(cal_price)
-        price = sorted(price, key=(lambda x: x[1]), reverse=True)
+    def auction(self, k):
 
+        # price = []
+        # for i in range(len(shared_info)):
+        #     cal_price = [i]
+        #     cal_price.append(random.random())
+        #     price.append(cal_price)
+        # price = sorted(price, key=(lambda x: x[1]), reverse=True)
+        #
         winner = []
-        for i in range(target[3]):
-            winner.append(price[i][0])
+        # for i in range(target[3]):
+        #     winner.append(price[i][0])
 
         return winner
 

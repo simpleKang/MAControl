@@ -58,8 +58,8 @@ if __name__ == '__main__':
         temp = False
         action_n = []
         for i in range(env.n):
-            pointAi, pointBi, finishedi, target, obs_n, auction_state\
-                = Control[i].PolicyMaker(target, obs_n, auction_state, step, i)
+            pointAi, pointBi, finishedi, target, auction_state = \
+                Control[i].PolicyMaker(target, obs_n, auction_state, step, i)
             acc_it, acc_il = Control[i].MotionController(obs_n[i], pointAi, pointBi, step)
             actioni = Control[i].InnerController(obs_n[i], acc_it, acc_il, step)
             action_n.append(actioni)
