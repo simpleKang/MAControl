@@ -29,7 +29,6 @@ def make_env(arglist):
 if __name__ == '__main__':
     arglist = parse_args()
 
-    U.init()
 
     # Create environment
     env, world = make_env(arglist)
