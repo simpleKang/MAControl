@@ -38,20 +38,15 @@ if __name__ == '__main__':
                             landmark.state.p_vel[1], landmark.value, landmark.defence])
     print('WorldTarget', WorldTarget)
 
-    target = [0, 0, -1, 2]
-    auction_state = []
-
     # Create Controllers
     Control = []
     for i in range(env.n):
         Control.append(TESTC.TESTControl("agent_%d" % i, env, world, i, arglist))
         Control[i].waypoint_list[0:len(U.init_waypoint[i])] = U.init_waypoint[i]
-        auction_state.append(0)
 
     obs_n = env.reset()
     step = 0
     start = time.time()
-    auction_state.append(step)
 
     while True:
 
@@ -59,8 +54,8 @@ if __name__ == '__main__':
         temp = False
         action_n = []
         for i in range(env.n):
-            pointAi, pointBi, finishedi, target, auction_state = \
-                Control[i].PolicyMaker(target, obs_n, auction_state, step, i)
+            pointAi, pointBi, finishedi = \
+                Control[i].PolicyMaker(WorldTarget, obs_n, step, i)
             acc_it, acc_il = Control[i].MotionController(obs_n[i], pointAi, pointBi, step)
             actioni = Control[i].InnerController(obs_n[i], acc_it, acc_il, step)
             action_n.append(actioni)

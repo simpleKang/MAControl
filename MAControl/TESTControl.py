@@ -11,10 +11,14 @@ class TESTControl(object):
     Found_Target_Info = []
     Shared_UAV_state = []
     Shared_Big_Check = False
-    Target_index = -1       # 当前进行拍卖的目标编号
     Auction_list = []       # 拍卖列表，当1次拍卖完成时，向其中添加拍卖者、选出的个体编号、个体确认情况
     Select_list = []        # 选择拍卖者的列表，存储距离
     Auctioneer = -1         # 选出的拍卖者编号
+    Target_index = -1       # 当前进行拍卖的目标编号
+    is_sorted = False       # target_relist是否已进行排序
+    target_relist = []      # 拍卖目标按优先级排序列表
+    last_step = 0
+    Trans_step = []         # 拍卖者发送出目标给竞拍者的延时step列表
 
     def __init__(self, name, env, world, agent_index, arglist):
         # print("control init")
@@ -41,8 +45,11 @@ class TESTControl(object):
         self.arrive_flag = False
         self.pointB_index = 0
         self.is_init = True
-        self.detect_dis = 50
+        self.detect_dis = 0.05
+        self.comm_dis = 0.5
         self.close_area = []
+        self.wait_step = 30
+        self.trans_step = 0
         # 256×3的航点列表，第3列为航点状态 [0: 无航点] [1: 未飞] [2: pointA] [3: pointB] [4: 已到达]
         self.waypoint_list = [[0 for i in range(3)] for j in range(256)]
         # 小飞机状态 [0: 搜索] [1: 未分配] [2: 已分配] [3: 正在执行]
@@ -114,62 +121,68 @@ class TESTControl(object):
             if check and (self.index not in info):
                 info.append(self.index)
 
-    def PolicyMaker(self, target, obs_n, auction_state, step, k):
-        # print('make policy')
+    def PolicyMaker(self, target, obs_n, step, k):
 
-        # TODO 更新小飞机的邻域列表
-        self.close_area = []
+        # 更新小飞机的邻域列表
+        self.close_area = self.find_mate(obs_n, self.comm_dis)
 
         if TESTControl.Shared_UAV_state[k] == 0:
             if TESTControl.Shared_Big_Check is True:
                 TESTControl.Shared_UAV_state[k] = 1
+
+                if TESTControl.is_sorted is False:
+                    for i in range(len(TESTControl.Found_Target_Set)):
+                        TESTControl.target_relist.append([i, TESTControl.Found_Target_Set[4], 0])
+                    TESTControl.target_relist = sorted(TESTControl.target_relist, key=lambda x: x[1], reverse=True)
+                    TESTControl.Target_index = TESTControl.target_relist[0][0]
+                    TESTControl.is_sorted = True
+
                 self.PathPlanner(obs_n[k], step)
             else:
                 # TODO 进行各种条件的计算判断，输出单个小飞机的大判断计算结果
                 self.BigCheck = True if random.random() > 0.95 else False
-                # TODO 是否发现目标判断，若发现目标，添加目标信息并按重要程度排序
-                if random.random() > 0.95:
-                    TESTControl.Found_Target_Info = []
-                # TODO 与邻域内小飞机共享目标信息
-                TESTControl.Found_Target_Set = []
-
+                self.add_new_target(obs_n[k], target)
                 self.PathPlanner(obs_n[k], step)
 
         elif TESTControl.Shared_UAV_state[k] == 1:
-            # TODO 进入拍卖阶段是否继续搜索可能未发现的新目标
-            # # TODO 是否发现目标判断
-            # TESTControl.Found_Target_Info = []
-            # # TODO 与邻域内小飞机共享目标信息
-            # TESTControl.Found_Target_Set = []
 
-            # TODO 计算目前拍卖目标的距离
-            if TESTControl.Found_Target_Set[k][TESTControl.Target_index] != 0:
-                # TODO 添加
-                TESTControl.Select_list.append(0)
+            # 目标状态为0时进行拍卖者的选择，所有人都会进来
+            if TESTControl.target_relist[TESTControl.Target_index][2] == 0:
+                if k in TESTControl.Found_Target_Info[TESTControl.Target_index]:
+                    TESTControl.Select_list.append([k, math.sqrt((obs_n[k][2]-TESTControl.Found_Target_Set[TESTControl.Target_index][0])**2+(obs_n[k][3]-TESTControl.Found_Target_Set[TESTControl.Target_index][1])**2)])
+                if k == (len(obs_n)-1):
+                    TESTControl.Select_list = sorted(TESTControl.Select_list, key=lambda x: x[1])
+                    TESTControl.Auctioneer = TESTControl.Select_list[0][0]
+                    TESTControl.target_relist[TESTControl.Target_index][2] = 1
 
-            if TESTControl.Auctioneer == k:
-                # TODO 拍卖计算
-                winner = self.auction(k)
-                # TESTControl.Found_Target_Info[0].append(winner)
-                for i in winner:
-                    if TESTControl.Shared_UAV_state[i] == 2:
-                        TESTControl.Shared_UAV_state[i] = 3
-                    TESTControl.Shared_UAV_state[i] = 2
-                # TODO 向拍卖列表中添加拍卖信息
-                TESTControl.Auction_list.append(0)
+            # 目标状态为1时进行拍卖者生成要发送的step延时,所有人都会进来，看看自己是不是拍卖者，是的话进行操作，确认竞拍者
+            elif TESTControl.target_relist[TESTControl.Target_index][2] == 1:
+                if k == TESTControl.Auctioneer:
+                    for i in self.close_area:
+                        # TODO 传输延时step个数的计算优化
+                        TESTControl.Trans_step.append([i, round(math.sqrt((obs_n[k][2]-obs_n[i][2])**2+(obs_n[k][3]-obs_n[i][3])**2)/0.05)])
+                    TESTControl.last_step = step
+                    TESTControl.target_relist[TESTControl.Target_index][2] = 2
+
+            # 目标状态为2时更改竞拍者状态为2，在下一个step进行更新
+            # TODO 优化
+            elif TESTControl.target_relist[TESTControl.Target_index][2] == 2:
+                if TESTControl.last_step == step-1:
+                    for i in range(len(TESTControl.Trans_step)):
+                        if k == TESTControl.Trans_step[i]:
+                            TESTControl.Shared_UAV_state[k] = 2
+
             self.PathPlanner(obs_n[k], step)
 
         elif TESTControl.Shared_UAV_state[k] == 2:
-            # TODO 拍卖确认
-            TESTControl.Auction_list[k] = 1
-            TESTControl.Shared_UAV_state[k] = 3
-            self.PathPlanner(obs_n[k], step)
+
+
 
         elif TESTControl.Shared_UAV_state[k] == 3:
             # TODO 目标坐标作为执行的B点
             self.pointBi = (0, 0)
 
-        return self.pointAi, self.pointBi, self.waypoint_finished, target, auction_state
+        return self.pointAi, self.pointBi, self.waypoint_finished
 
     def auction(self, k):
 
