@@ -92,7 +92,7 @@ class TESTControl(object):
                 if not check:
                     TESTControl.Found_Target_Set.append(target1)
 
-    def PolicyMaker(self, target, shared_info, auction_state, step, k):
+    def PolicyMaker(self, target, obs_n, auction_state, step, k):
         # print('make policy')
 
         # TODO 更新小飞机的邻域列表
@@ -101,17 +101,17 @@ class TESTControl(object):
         if TESTControl.Shared_UAV_state[k] == 0:
             if TESTControl.Shared_Big_Check is True:
                 TESTControl.Shared_UAV_state[k] = 1
-                self.PathPlanner(shared_info[k], step)
+                self.PathPlanner(obs_n[k], step)
             else:
                 # TODO 进行各种条件的计算判断，输出单个小飞机的大判断计算结果
                 self.BigCheck = True if random.random() > 0.95 else False
                 # TODO 是否发现目标判断，若发现目标，添加目标信息并按重要程度排序
-                if True if random.random() > 0.95 else False:
+                if random.random() > 0.95:
                     TESTControl.Found_Target_Info = []
                 # TODO 与邻域内小飞机共享目标信息
                 TESTControl.Found_Target_Set = []
 
-                self.PathPlanner(shared_info[k], step)
+                self.PathPlanner(obs_n[k], step)
 
         elif TESTControl.Shared_UAV_state[k] == 1:
             # TODO 进入拍卖阶段是否继续搜索可能未发现的新目标
@@ -135,13 +135,13 @@ class TESTControl(object):
                     TESTControl.Shared_UAV_state[i] = 2
                 # TODO 向拍卖列表中添加拍卖信息
                 TESTControl.Auction_list.append(0)
-            self.PathPlanner(shared_info[k], step)
+            self.PathPlanner(obs_n[k], step)
 
         elif TESTControl.Shared_UAV_state[k] == 2:
             # TODO 拍卖确认
             TESTControl.Auction_list[k] = 1
             TESTControl.Shared_UAV_state[k] = 3
-            self.PathPlanner(shared_info[k], step)
+            self.PathPlanner(obs_n[k], step)
 
         elif TESTControl.Shared_UAV_state[k] == 3:
             # TODO 目标坐标作为执行的B点
