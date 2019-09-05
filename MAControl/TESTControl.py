@@ -48,6 +48,43 @@ class TESTControl(object):
         self.BigCheck = False
         TESTControl.Shared_UAV_state.append(0)
 
+    def add_new_target(self, obs, WorldTarget):
+        TT_range = 0.05
+
+        # COMPUTE selfview
+        selfvel = np.array(obs[0:2])
+        selfpos = np.array(obs[2:4])
+        selfvelunit = selfvel / np.sqrt(np.dot(selfvel, selfvel))
+        selfvelrightunit = np.array([selfvelunit[1], -1 * selfvelunit[0]])
+        d1 = 0.2
+        d2 = 0.4
+        d3 = 0.3
+        selfview1 = selfpos + selfvelunit * (d1+d2) - selfvelrightunit * d3/2
+        selfview2 = selfpos + selfvelunit * (d1+d2) + selfvelrightunit * d3/2
+        selfview3 = selfpos + selfvelunit * d1 + selfvelrightunit * d3/2
+        selfview4 = selfpos + selfvelunit * d1 - selfvelrightunit * d3/2
+
+        # GENERATE seen_target
+        seen_target = []
+        for target in WorldTarget:
+            targetpos = np.array(target[1:3])
+            if U.point_in_rec(selfview1, selfview2, selfview3, selfview4, targetpos):
+                seen_target.append(target)
+
+        # READ AND WRITE TESTControl.Found_Target_Set
+        if TESTControl.Found_Target_Set == []:
+            TESTControl.Found_Target_Set = seen_target
+        elif seen_target != []:
+            for target1 in seen_target:
+                check = False
+                for target2 in TESTControl.Found_Target_Set:
+                    pos1 = np.array(target1[1:3])
+                    pos2 = np.array(target2[1:3])
+                    deltapos = np.sqrt(np.dot(pos1-pos2, pos1-pos2))
+                    check = check | (deltapos <= TT_range)
+                if not check:
+                    TESTControl.Found_Target_Set.append(target1)
+
     def PolicyMaker(self, target, shared_info, auction_state, step, k):
         # print('make policy')
 
