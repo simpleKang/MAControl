@@ -148,6 +148,7 @@ class TESTControl(object):
 
             # 目标状态为0时进行拍卖者的选择，所有人都会进来
             if TESTControl.target_relist[TESTControl.Target_index][2] == 0:
+                # TODO 添加判断条件，正在执行的小飞机不能被选择
                 if k in TESTControl.Found_Target_Info[TESTControl.Target_index]:
                     TESTControl.Select_list.append([k, math.sqrt((obs_n[k][2]-TESTControl.Found_Target_Set[TESTControl.Target_index][0])**2+(obs_n[k][3]-TESTControl.Found_Target_Set[TESTControl.Target_index][1])**2)])
                 if k == (len(obs_n)-1):
@@ -158,6 +159,7 @@ class TESTControl(object):
             # 目标状态为1时进行拍卖者生成要发送的step延时,所有人都会进来，看看自己是不是拍卖者，是的话进行操作，确认竞拍者
             elif TESTControl.target_relist[TESTControl.Target_index][2] == 1:
                 if k == TESTControl.Auctioneer:
+                    # TODO 添加判断条件，邻域内正在执行的小飞机不能成为竞拍者
                     for i in self.close_area:
                         # TODO 传输延时step个数的计算优化
                         TESTControl.Trans_step.append([i, round(math.sqrt((obs_n[k][2]-obs_n[i][2])**2+(obs_n[k][3]-obs_n[i][3])**2)/0.05)])
