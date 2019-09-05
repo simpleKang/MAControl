@@ -92,6 +92,8 @@ class TESTControl(object):
         # READ AND WRITE TESTControl.Found_Target_Set
         if TESTControl.Found_Target_Set == []:
             TESTControl.Found_Target_Set = seen_target
+            for i in range(len(seen_target)):
+                TESTControl.Found_Target_Info.append(self.close_area)
         elif seen_target != []:
             for target1 in seen_target:
                 check = False
@@ -102,6 +104,7 @@ class TESTControl(object):
                     check = check | (deltapos <= TT_range)
                 if not check:
                     TESTControl.Found_Target_Set.append(target1)
+                    TESTControl.Found_Target_Info.append(self.close_area)
 
     def PolicyMaker(self, target, obs_n, auction_state, step, k):
         # print('make policy')
