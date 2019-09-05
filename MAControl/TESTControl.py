@@ -55,6 +55,17 @@ class TESTControl(object):
         self.BigCheck = False
         TESTControl.Shared_UAV_state.append(0)
 
+    def find_mate(self, obs_n, R):
+        selfpos = np.array(obs_n[self.index][2:4])
+        close_area = []
+        for i in range(len(obs_n)):
+            posi = obs_n[i][2:4]
+            deltapos = np.sqrt(np.dot(selfpos - posi, selfpos - posi))
+            if deltapos < R:
+                close_area.append(i)
+        self.close_area = close_area
+        return self.close_area
+
     def add_new_target(self, obs, WorldTarget):
         TT_range = 0.05
 
