@@ -14,7 +14,7 @@ class Scenario(BaseScenario):
         world.damping2 = 10  # 调整第二种阻尼计算方式的参数
         # set nums
         num_agents = 10
-        num_targets = 2
+        num_targets = 3
         num_obstacles = 0
         # add agents
         world.agents = [Agent() for i in range(num_agents)]
@@ -31,7 +31,7 @@ class Scenario(BaseScenario):
             landmark.movable = False
             landmark.value = np.ceil(random.random() * 10)
             landmark.size = landmark.value * 0.01
-            landmark.defence = np.ceil(random.random() * 5)
+            landmark.defence = int(np.ceil(random.random() * 5))
         world.obstacles = [Landmark() for i in range(num_obstacles)]
         for i, landmark in enumerate(world.obstacles):
             landmark.name = 'obstacle %d' % i
