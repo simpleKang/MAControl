@@ -70,8 +70,7 @@ class TESTControl(object):
             deltapos = np.sqrt(np.dot(selfpos - posi, selfpos - posi))
             if deltapos < R:
                 close_area.append(i)
-        self.close_area = close_area
-        return self.close_area
+        return close_area
 
     def add_new_target(self, obs, WorldTarget):
         TT_range = 0.05
