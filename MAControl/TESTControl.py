@@ -123,7 +123,7 @@ class TESTControl(object):
             if check and (self.index not in info):
                 info.append(self.index)
 
-    def PolicyMaker(self, target, obs_n, step, k):
+    def PolicyMaker(self, target, obs_n, step, k, world):
 
         # 更新小飞机的邻域列表
         self.close_area = self.find_mate(obs_n, self.comm_dis)
@@ -248,9 +248,10 @@ class TESTControl(object):
                         TESTControl.Shared_UAV_state[k] = 1
 
         elif TESTControl.Shared_UAV_state[k] == 3:
+            world.agents[k].attacking = True
             print('Agent_%d is attacking.' % k)
 
-        return self.pointAi, self.pointBi, self.waypoint_finished
+        return self.pointAi, self.pointBi, self.waypoint_finished, world
 
     def clearlist(self, step):
         TESTControl.Select_list.clear()

@@ -56,8 +56,8 @@ if __name__ == '__main__':
         temp = False
         action_n = []
         for i in range(env.n):
-            pointAi, pointBi, finishedi = \
-                Control[i].PolicyMaker(WorldTarget, obs_n, step, i)
+            pointAi, pointBi, finishedi, world = \
+                Control[i].PolicyMaker(WorldTarget, obs_n, step, i, world)
             print(pointAi, pointBi, i)
             acc_it, acc_il = Control[i].MotionController(obs_n[i], pointAi, pointBi, step)
             actioni = Control[i].InnerController(obs_n[i], acc_it, acc_il, step)
