@@ -132,7 +132,7 @@ class TESTControl(object):
         self.BigCheck = True if random.random() > 0.95 else False #测试用
 
         if TESTControl.Shared_UAV_state[k] == 0:
-            if TESTControl.Shared_Big_Check is True:
+            if TESTControl.Shared_Big_Check is True and TESTControl.last_step == step-1:
                 TESTControl.Shared_UAV_state[k] = 1
                 print(_step,_k)
 
@@ -143,16 +143,19 @@ class TESTControl(object):
                     TESTControl.Target_index = TESTControl.target_relist[0][0]
                     TESTControl.is_sorted = True
 
-                self.PathPlanner(obs_n[k], step)
             else:
                 # TODO 进行各种条件的计算判断，输出单个小飞机的大判断计算结果
 
+                if random.random() > 0.8:
+                    TESTControl.Shared_Big_Check = True
+                    TESTControl.last_step = step
                 self.add_new_target(obs_n[k], target)
-                self.PathPlanner(obs_n[k], step)
+
+            self.PathPlanner(obs_n[k], step)
 
         elif TESTControl.Shared_UAV_state[k] == 1:
 
-            if (TESTControl.Update_step == step-1) and (TESTControl.Update_target_relist == True):
+            if (TESTControl.Update_step == step-1) and (TESTControl.Update_target_relist is True):
                 if TESTControl.target_relist is not []:
                     TESTControl.Target_index = TESTControl.target_relist[0][0]
                     TESTControl.Update_target_relist = False
