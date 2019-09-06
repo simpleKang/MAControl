@@ -47,6 +47,8 @@ class Entity(object):
         self.state = EntityState()
         # mass
         self.initial_mass = 1.0
+        # UAV
+        self.UAV = False
 
     @property
     def mass(self):
