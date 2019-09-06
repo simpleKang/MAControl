@@ -141,7 +141,7 @@ class TESTControl(object):
 
             else:
                 # TODO 进行各种条件的计算判断，输出单个小飞机的大判断计算结果
-                if random.random() > 0.99:
+                if random.random() > 0.8:
                     TESTControl.Shared_Big_Check = True
                     TESTControl.last_step = step
                 self.add_new_target(obs_n[k], target)
@@ -151,22 +151,22 @@ class TESTControl(object):
         elif TESTControl.Shared_UAV_state[k] == 1:
 
             if (TESTControl.Update_step == step-1) and (TESTControl.Update_target_relist is True):
-                if TESTControl.target_relist is not []:
+                if len(TESTControl.target_relist) != 0:
                     TESTControl.Target_index = TESTControl.target_relist[0][0]
                     TESTControl.Update_target_relist = False
                     print('lie biao chong lai ')
 
-            if TESTControl.target_relist is not []:
+            if len(TESTControl.target_relist) != 0:
 
                 # 目标状态为0时进行拍卖者的选择，所有人都会进来
                 if TESTControl.target_relist[0][2] == 0:
                     if TESTControl.wait_step_auction > 0:
-                        if k in TESTControl.Found_Target_Info[TESTControl.Target_index] and TESTControl.Shared_UAV_state[k] != 3:
+                        if (k in TESTControl.Found_Target_Info[TESTControl.Target_index]) and (TESTControl.Shared_UAV_state[k] != 3):
                             # TODO 判断自己是否能够成为拍卖者，可以则向拍卖列表中添加自己的序号
                             # if random.random() > 0.5:
                             TESTControl.Select_list.append(k)
                         if k == TESTControl.unassigned_list[-1]:
-                            if TESTControl.Select_list is not []:
+                            if len(TESTControl.Select_list) != 0:
                                 # TODO 从列表中随机取个体作为拍卖者
                                 TESTControl.Auctioneer = random.choice(TESTControl.Select_list)
                                 TESTControl.target_relist[0][2] = 1
@@ -177,7 +177,7 @@ class TESTControl(object):
                         for i in selectlist:
                             if TESTControl.Shared_UAV_state[i] == 3:
                                 selectlist.remove(i)
-                        if selectlist is not []:
+                        if len(selectlist) != 0:
                             # TODO 从列表中随机取个体作为拍卖者
                             TESTControl.Auctioneer = random.choice(selectlist)
                             TESTControl.target_relist[0][2] = 1
@@ -213,14 +213,14 @@ class TESTControl(object):
                 if k == TESTControl.Auctioneer:
                     # 当拍卖者的等待时间完成时，根据价格选择优胜者
                     if TESTControl.wait_step == 0:
-                        if TESTControl.Price_list is not []:
+                        if len(TESTControl.Price_list) != 0:
                             TESTControl.Price_list = sorted(TESTControl.Price_list, key=lambda x: x[1], reverse=True)
                             if len(TESTControl.Price_list) > TESTControl.Found_Target_Set[TESTControl.Target_index][5]:
-                                for i in range(int(TESTControl.Found_Target_Set[TESTControl.Target_index][5])):
-                                    TESTControl.Winner.append([TESTControl.Price_list[i][0]])
+                                for i in range(TESTControl.Found_Target_Set[TESTControl.Target_index][5]):
+                                    TESTControl.Winner.append(TESTControl.Price_list[i][0])
                             else:
                                 for i in range(len(TESTControl.Price_list)):
-                                    TESTControl.Winner.append([TESTControl.Price_list[i][0]])
+                                    TESTControl.Winner.append(TESTControl.Price_list[i][0])
                             # 生成优胜者列表后目标状态置为3
                             TESTControl.target_relist[0][2] = 3
                             TESTControl.last_step = step
@@ -236,17 +236,16 @@ class TESTControl(object):
 
             if TESTControl.target_relist[0][2] == 3:
                 if TESTControl.last_step == step-1:
-                    if TESTControl.Winner is not []:
-                        if k in TESTControl.Winner:
-                            TESTControl.Shared_UAV_state[k] = 3
-                            self.pointBi = (TESTControl.Found_Target_Set[TESTControl.Target_index][0], TESTControl.Found_Target_Set[TESTControl.Target_index][1])
-                            TESTControl.Winner.remove(k)
-                            TESTControl.unassigned_list.remove(k)
-                        else:
-                            TESTControl.Shared_UAV_state[k] = 1
+                    if k in TESTControl.Winner:
+                        TESTControl.Shared_UAV_state[k] = 3
+                        self.pointBi = (TESTControl.Found_Target_Set[TESTControl.Target_index][0], TESTControl.Found_Target_Set[TESTControl.Target_index][1])
+                        TESTControl.Winner.remove(k)
+                        TESTControl.unassigned_list.remove(k)
+                        if len(TESTControl.Winner) == 0:
+                            if TESTControl.Update_target_relist is False:
+                                self.clearlist(step)
                     else:
-                        if TESTControl.Update_target_relist is False:
-                            self.clearlist(step)
+                        TESTControl.Shared_UAV_state[k] = 1
 
         elif TESTControl.Shared_UAV_state[k] == 3:
             print('Agent_%d is attacking.' % k)
@@ -258,7 +257,7 @@ class TESTControl(object):
         TESTControl.Trans_step.clear()
         TESTControl.Price_list.clear()
         TESTControl.is_sorted = False
-        TESTControl.last_step = 0
+        # TESTControl.last_step = 0
         TESTControl.Auctioneer = -1
         TESTControl.target_relist.pop(0)
         TESTControl.Update_target_relist = True
@@ -335,7 +334,7 @@ class TESTControl(object):
 
         # set motion_pace
         if step == 0 or step % self.motion_pace == 0:
-            print('motion')
+            # print('motion')
 
             # # # # # tecs # # # # #
 
