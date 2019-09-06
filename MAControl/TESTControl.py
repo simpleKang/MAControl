@@ -62,8 +62,6 @@ class TESTControl(object):
         self.last_error = 0
         self.action = [0, 0, 0, 0, 0]
 
-        self.BigCheck = False
-        TESTControl.Shared_UAV_state.append(0)
 
     def find_mate(self, obs_n, R):
         selfpos = np.array(obs_n[self.index][2:4])
@@ -129,7 +127,6 @@ class TESTControl(object):
         _k = k
         # 更新小飞机的邻域列表
         self.close_area = self.find_mate(obs_n, self.comm_dis)
-        self.BigCheck = True if random.random() > 0.95 else False #测试用
 
         if TESTControl.Shared_UAV_state[k] == 0:
             if TESTControl.Shared_Big_Check is True and TESTControl.last_step == step-1:
@@ -146,9 +143,10 @@ class TESTControl(object):
             else:
                 # TODO 进行各种条件的计算判断，输出单个小飞机的大判断计算结果
 
-                if random.random() > 0.8:
+                if random.random() > 0.999:
                     TESTControl.Shared_Big_Check = True
                     TESTControl.last_step = step
+                    print(_step, _k,"!!!!!!!!")
                 self.add_new_target(obs_n[k], target)
 
             self.PathPlanner(obs_n[k], step)
