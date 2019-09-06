@@ -38,7 +38,7 @@ if __name__ == '__main__':
                             landmark.state.p_vel[1], landmark.value, landmark.defence])
     print('WorldTarget', WorldTarget)
     TESTC.TESTControl.Found_Target_Set = WorldTarget
-    TESTC.TESTControl.Found_Target_Info = [[1,2,3,4,5,0,9],[1,2,6,7,8]]
+    TESTC.TESTControl.Found_Target_Info = [[0, 1, 2, 3, 4], [5, 6, 7, 8, 9]]
 
     # Create Controllers
     Control = []
@@ -64,13 +64,14 @@ if __name__ == '__main__':
             action_n.append(actioni)
         print(TESTC.TESTControl.Shared_UAV_state)
         print(WorldTarget)
+        print(TESTC.TESTControl.Found_Target_Info)
+        print(TESTC.TESTControl.Target_index)
         print(TESTC.TESTControl.target_relist)
+        print(TESTC.TESTControl.Select_list)
         print(TESTC.TESTControl.Auctioneer)
         print(TESTC.TESTControl.Trans_step)
         print(TESTC.TESTControl.Winner)
         print(TESTC.TESTControl.Price_list)
-
-
 
         # environment step
         new_obs_n, rew_n, done_n, info_n = env.step(action_n)

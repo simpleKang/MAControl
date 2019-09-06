@@ -74,7 +74,7 @@ init_waypoint = []
 #                       [0.3, 0.3, 1],
 #                       [0.3, -0.3, 1]])
 
-N = 20
+N = 10
 W = 0.9
 D = 0.05
 Edge = 1
@@ -94,8 +94,16 @@ a = [[0, 1, 2],
      [1, 5, 3],
      [2, 9, 4]]
 
-b = a[1][:]
+b = [2, 3, 5, 6, 8]
 
-c = random.choice(b)
+c = []
+
+for i in range(10):
+    if i in b:
+        b.remove(i)
+    else:
+        c.append(i)
+
+
 
 z = 0
