@@ -59,11 +59,9 @@ if __name__ == '__main__':
             acc_it, acc_il = Control[i].MotionController(obs_n[i], pointAi, pointBi, step)
             actioni = Control[i].InnerController(obs_n[i], acc_it, acc_il, step)
             action_n.append(actioni)
-            temp = temp | Control[i].BigCheck
 
         # environment step
         new_obs_n, rew_n, done_n, info_n = env.step(action_n)
-        TESTC.TESTControl.Shared_Big_Check = temp
         step += 1
         obs_n = new_obs_n
 
