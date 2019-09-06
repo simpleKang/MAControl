@@ -49,6 +49,8 @@ class Entity(object):
         self.initial_mass = 1.0
         # UAV
         self.UAV = False
+        # attacking
+        self.attacking = False
 
     @property
     def mass(self):
