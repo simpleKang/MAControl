@@ -249,7 +249,6 @@ class TESTControl(object):
         TESTControl.Update_target_relist = True
         TESTControl.Update_step = step
 
-
     def auction(self, obs, target):
         # TODO 计算当前竞拍价格
         # price = []
