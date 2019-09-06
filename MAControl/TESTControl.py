@@ -20,7 +20,9 @@ class TESTControl(object):
     Trans_step = []         # 拍卖者发送出目标给竞拍者的延时step列表
     Price_list = []         # 选出的竞拍者发出的竞拍价格
     wait_step = 30          # 等待的时长
+    wait_step_auction = 10  # 选拍卖者的等待时间
     Winner = []             # 最终选出来的优胜者列表
+    unassigned_list = []    # 没有分到任务的个体列表
     Update_target_relist = False
     Update_step = 0
 
@@ -57,11 +59,11 @@ class TESTControl(object):
         self.waypoint_list = [[0 for i in range(3)] for j in range(256)]
         # 小飞机状态 [0: 搜索] [1: 未分配] [2: 已分配] [3: 正在执行]
         TESTControl.Shared_UAV_state.append(0)
+        TESTControl.unassigned_list.append(self.index)
 
         self.ITerm = 0
         self.last_error = 0
         self.action = [0, 0, 0, 0, 0]
-
 
     def find_mate(self, obs_n, R):
         selfpos = np.array(obs_n[self.index][2:4])
@@ -123,15 +125,13 @@ class TESTControl(object):
                 info.append(self.index)
 
     def PolicyMaker(self, target, obs_n, step, k):
-        _step = step
-        _k = k
+
         # 更新小飞机的邻域列表
         self.close_area = self.find_mate(obs_n, self.comm_dis)
 
         if TESTControl.Shared_UAV_state[k] == 0:
             if TESTControl.Shared_Big_Check is True and TESTControl.last_step == step-1:
                 TESTControl.Shared_UAV_state[k] = 1
-                print(_step,_k)
 
                 if TESTControl.is_sorted is False:
                     for i in range(len(TESTControl.Found_Target_Set)):
@@ -142,11 +142,9 @@ class TESTControl(object):
 
             else:
                 # TODO 进行各种条件的计算判断，输出单个小飞机的大判断计算结果
-
-                if random.random() > 0.999:
+                if random.random() > 0.8:
                     TESTControl.Shared_Big_Check = True
                     TESTControl.last_step = step
-                    print(_step, _k,"!!!!!!!!")
                 self.add_new_target(obs_n[k], target)
 
             self.PathPlanner(obs_n[k], step)
@@ -161,31 +159,44 @@ class TESTControl(object):
             if TESTControl.target_relist is not []:
 
                 # 目标状态为0时进行拍卖者的选择，所有人都会进来
-                if TESTControl.target_relist[TESTControl.Target_index][2] == 0:
-                    # 正在执行的小飞机不能被选择
-                    if k in TESTControl.Found_Target_Info[TESTControl.Target_index] and TESTControl.Shared_UAV_state[k] != 3:
-                        TESTControl.Select_list.append([k,
-                            math.sqrt((obs_n[k][2]-TESTControl.Found_Target_Set[TESTControl.Target_index][0])**2 +
-                                      (obs_n[k][3]-TESTControl.Found_Target_Set[TESTControl.Target_index][1])**2)])
-                    # TODO ！！！由谁进行拍卖者选择列表的排序及选拍卖者的操作！！！
-                    if k == (len(obs_n)-1):
-                        TESTControl.Select_list = sorted(TESTControl.Select_list, key=lambda x: x[1])
-                        TESTControl.Auctioneer = TESTControl.Select_list[0][0]
-                        TESTControl.target_relist[TESTControl.Target_index][2] = 1
+                if TESTControl.target_relist[0][2] == 0:
+                    if TESTControl.wait_step_auction > 0:
+                        if k in TESTControl.Found_Target_Info[TESTControl.Target_index] and TESTControl.Shared_UAV_state[k] != 3:
+                            # TODO 判断自己是否能够成为拍卖者，可以则向拍卖列表中添加自己的序号
+                            if random.random() > 0.5:
+                                TESTControl.Select_list.append(k)
+                        if k == TESTControl.unassigned_list[-1]:
+                            if TESTControl.unassigned_list is not []:
+                                # TODO 从列表中随机取个体作为拍卖者
+                                TESTControl.Auctioneer = random.choice(TESTControl.unassigned_list)
+                                TESTControl.target_relist[0][2] = 1
+                            else:
+                                TESTControl.wait_step_auction -= 1
+                    else:
+                        selectlist = TESTControl.Found_Target_Info[TESTControl.Target_index][:]
+                        for i in selectlist:
+                            if TESTControl.Shared_UAV_state[i] == 3:
+                                selectlist.remove(i)
+                        if selectlist is not []:
+                            # TODO 从列表中随机取个体作为拍卖者
+                            TESTControl.Auctioneer = random.choice(selectlist)
+                            TESTControl.target_relist[0][2] = 1
+                        else:
+                            print('没有小飞机能打这个目标了，放弃了')
 
-                # 目标状态为1时进行拍卖者生成要发送的step延时,所有人都会进来，看看自己是不是拍卖者，是的话进行操作，确认竞拍者
-                elif TESTControl.target_relist[TESTControl.Target_index][2] == 1:
+                # 目标状态为1时所有人都会进来，看看自己是不是拍卖者，是的话进行操作，确认竞拍者及其延时step
+                elif TESTControl.target_relist[0][2] == 1:
                     if k == TESTControl.Auctioneer:
                         for i in self.close_area:
                             # TODO 传输延时step个数的计算优化
                             if TESTControl.Shared_UAV_state[i] != 3:
                                 TESTControl.Trans_step.append([i, round(math.sqrt((obs_n[k][2]-obs_n[i][2])**2+(obs_n[k][3]-obs_n[i][3])**2)/0.05)])
                         TESTControl.last_step = step
-                        TESTControl.target_relist[TESTControl.Target_index][2] = 2
+                        TESTControl.target_relist[0][2] = 2
 
                 # 目标状态为2时更改竞拍者状态为2，在下一个step进行更新
                 # TODO 优化
-                elif TESTControl.target_relist[TESTControl.Target_index][2] == 2:
+                elif TESTControl.target_relist[0][2] == 2:
                     if TESTControl.last_step == step-1:
                         for i in range(len(TESTControl.Trans_step)):
                             if k == TESTControl.Trans_step[i][0]:
@@ -197,7 +208,7 @@ class TESTControl(object):
         # 进入状态2的都是选出来的拍卖者和竞拍者
         elif TESTControl.Shared_UAV_state[k] == 2:
 
-            if TESTControl.target_relist[TESTControl.Target_index][2] == 2:
+            if TESTControl.target_relist[0][2] == 2:
                 # 拍卖者进入判断
                 if k == TESTControl.Auctioneer:
                     # 当拍卖者的等待时间完成时，根据价格选择优胜者
@@ -211,7 +222,7 @@ class TESTControl(object):
                                 for i in range(len(TESTControl.Price_list)):
                                     TESTControl.Winner.append([TESTControl.Price_list[i][0]])
                             # 生成优胜者列表后目标状态置为3
-                            TESTControl.target_relist[TESTControl.Target_index][2] = 3
+                            TESTControl.target_relist[0][2] = 3
                             TESTControl.last_step = step
                     else:
                         TESTControl.wait_step -= 1
@@ -223,13 +234,14 @@ class TESTControl(object):
                 else:
                     self.trans_step -= 1
 
-            if TESTControl.target_relist[TESTControl.Target_index][2] == 3:
+            if TESTControl.target_relist[0][2] == 3:
                 if TESTControl.last_step == step-1:
                     if TESTControl.Winner is not []:
                         if k in TESTControl.Winner:
                             TESTControl.Shared_UAV_state[k] = 3
                             self.pointBi = (TESTControl.Found_Target_Set[TESTControl.Target_index][0], TESTControl.Found_Target_Set[TESTControl.Target_index][1])
                             TESTControl.Winner.remove(k)
+                            TESTControl.unassigned_list.remove(k)
                         else:
                             TESTControl.Shared_UAV_state[k] = 1
                     else:
