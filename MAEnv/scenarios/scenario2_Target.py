@@ -14,7 +14,7 @@ class Scenario(BaseScenario):
         world.damping2 = 10  # 调整第二种阻尼计算方式的参数
         # set nums
         num_agents = 10
-        num_targets = 2
+        num_targets = 3
         num_obstacles = 0
         # add agents
         world.agents = [Agent() for i in range(num_agents)]
