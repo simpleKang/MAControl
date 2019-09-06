@@ -23,7 +23,6 @@ class TESTControl(object):
     wait_step_auction = 10  # 选拍卖者的等待时间
     Winner = []             # 最终选出来的优胜者列表
     unassigned_list = []    # 没有分到任务的个体列表
-    Update_target_relist = False
     Update_step = 0
 
     def __init__(self, name, env, world, agent_index, arglist):
@@ -150,10 +149,9 @@ class TESTControl(object):
 
         elif TESTControl.Shared_UAV_state[k] == 1:
 
-            if (TESTControl.Update_step == step-1) and (TESTControl.Update_target_relist is True):
+            if TESTControl.Update_step == step-1:
                 if len(TESTControl.target_relist) != 0:
                     TESTControl.Target_index = TESTControl.target_relist[0][0]
-                    TESTControl.Update_target_relist = False
                     print('lie biao chong lai ')
 
             if len(TESTControl.target_relist) != 0:
@@ -236,16 +234,14 @@ class TESTControl(object):
 
             if TESTControl.target_relist[0][2] == 3:
                 if TESTControl.last_step == step-1:
+                    TESTControl.Shared_UAV_state[k] = 1
                     if k in TESTControl.Winner:
                         TESTControl.Shared_UAV_state[k] = 3
                         self.pointBi = (TESTControl.Found_Target_Set[TESTControl.Target_index][0], TESTControl.Found_Target_Set[TESTControl.Target_index][1])
                         TESTControl.Winner.remove(k)
                         TESTControl.unassigned_list.remove(k)
                         if len(TESTControl.Winner) == 0:
-                            if TESTControl.Update_target_relist is False:
-                                self.clearlist(step)
-                    else:
-                        TESTControl.Shared_UAV_state[k] = 1
+                            self.clearlist(step)
 
         elif TESTControl.Shared_UAV_state[k] == 3:
             world.agents[k].attacking = True
@@ -257,12 +253,11 @@ class TESTControl(object):
         TESTControl.Select_list.clear()
         TESTControl.Trans_step.clear()
         TESTControl.Price_list.clear()
-        TESTControl.is_sorted = False
-        # TESTControl.last_step = 0
         TESTControl.Auctioneer = -1
         TESTControl.target_relist.pop(0)
-        TESTControl.Update_target_relist = True
         TESTControl.Update_step = step
+        TESTControl.wait_step = 30
+        TESTControl.wait_step_auction = 10
 
     def auction(self, obs, target):
         # TODO 计算当前竞拍价格
