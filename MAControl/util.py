@@ -90,10 +90,10 @@ for i in range(N):
     init_waypoint.append(snake_single(Up[i], Down[i], Wide1[i], Wide2[i], Edge, W, D, i))
 
 a = [[0, 1, 2],
-     [1, 3, 7, [2, 9]]]
+     [1, 5, 3],
+     [2, 9, 4]]
 
-a[1].append([1, 2])
-
+a.pop(0)
 
 
 
