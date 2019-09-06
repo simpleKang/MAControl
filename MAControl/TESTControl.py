@@ -11,7 +11,6 @@ class TESTControl(object):
     Found_Target_Info = []
     Shared_UAV_state = []
     Shared_Big_Check = False
-    Auction_list = []       # 拍卖列表，当1次拍卖完成时，向其中添加拍卖者、选出的个体编号、个体确认情况
     Select_list = []        # 选择拍卖者的列表，存储距离
     Auctioneer = -1         # 选出的拍卖者编号
     Target_index = -1       # 当前进行拍卖的目标编号
@@ -19,6 +18,11 @@ class TESTControl(object):
     target_relist = []      # 拍卖目标按优先级排序列表
     last_step = 0
     Trans_step = []         # 拍卖者发送出目标给竞拍者的延时step列表
+    Price_list = []         # 选出的竞拍者发出的竞拍价格
+    wait_step = 30          # 等待的时长
+    Winner = []             # 最终选出来的优胜者列表
+    Update_target_relist = False
+    Update_step = 0
 
     def __init__(self, name, env, world, agent_index, arglist):
         # print("control init")
@@ -48,7 +52,6 @@ class TESTControl(object):
         self.detect_dis = 0.05
         self.comm_dis = 0.5
         self.close_area = []
-        self.wait_step = 30
         self.trans_step = 0
         # 256×3的航点列表，第3列为航点状态 [0: 无航点] [1: 未飞] [2: pointA] [3: pointB] [4: 已到达]
         self.waypoint_list = [[0 for i in range(3)] for j in range(256)]
@@ -131,7 +134,7 @@ class TESTControl(object):
 
                 if TESTControl.is_sorted is False:
                     for i in range(len(TESTControl.Found_Target_Set)):
-                        TESTControl.target_relist.append([i, TESTControl.Found_Target_Set[4], 0])
+                        TESTControl.target_relist.append([i, TESTControl.Found_Target_Set[i][4], 0])
                     TESTControl.target_relist = sorted(TESTControl.target_relist, key=lambda x: x[1], reverse=True)
                     TESTControl.Target_index = TESTControl.target_relist[0][0]
                     TESTControl.is_sorted = True
@@ -145,48 +148,108 @@ class TESTControl(object):
 
         elif TESTControl.Shared_UAV_state[k] == 1:
 
-            # 目标状态为0时进行拍卖者的选择，所有人都会进来
-            if TESTControl.target_relist[TESTControl.Target_index][2] == 0:
-                # TODO 添加判断条件，正在执行的小飞机不能被选择
-                if k in TESTControl.Found_Target_Info[TESTControl.Target_index]:
-                    TESTControl.Select_list.append([k, math.sqrt((obs_n[k][2]-TESTControl.Found_Target_Set[TESTControl.Target_index][0])**2+(obs_n[k][3]-TESTControl.Found_Target_Set[TESTControl.Target_index][1])**2)])
-                if k == (len(obs_n)-1):
-                    TESTControl.Select_list = sorted(TESTControl.Select_list, key=lambda x: x[1])
-                    TESTControl.Auctioneer = TESTControl.Select_list[0][0]
-                    TESTControl.target_relist[TESTControl.Target_index][2] = 1
+            if (TESTControl.Update_step == step-1) and (TESTControl.Update_target_relist == True):
+                if TESTControl.target_relist is not []:
+                    TESTControl.Target_index = TESTControl.target_relist[0][0]
+                    TESTControl.Update_target_relist = False
 
-            # 目标状态为1时进行拍卖者生成要发送的step延时,所有人都会进来，看看自己是不是拍卖者，是的话进行操作，确认竞拍者
-            elif TESTControl.target_relist[TESTControl.Target_index][2] == 1:
-                if k == TESTControl.Auctioneer:
-                    # TODO 添加判断条件，邻域内正在执行的小飞机不能成为竞拍者
-                    for i in self.close_area:
-                        # TODO 传输延时step个数的计算优化
-                        TESTControl.Trans_step.append([i, round(math.sqrt((obs_n[k][2]-obs_n[i][2])**2+(obs_n[k][3]-obs_n[i][3])**2)/0.05)])
-                    TESTControl.last_step = step
-                    TESTControl.target_relist[TESTControl.Target_index][2] = 2
+            if TESTControl.target_relist is not []:
 
-            # 目标状态为2时更改竞拍者状态为2，在下一个step进行更新
-            # TODO 优化
-            elif TESTControl.target_relist[TESTControl.Target_index][2] == 2:
-                if TESTControl.last_step == step-1:
-                    for i in range(len(TESTControl.Trans_step)):
-                        if k == TESTControl.Trans_step[i]:
-                            TESTControl.Shared_UAV_state[k] = 2
+                # 目标状态为0时进行拍卖者的选择，所有人都会进来
+                if TESTControl.target_relist[TESTControl.Target_index][2] == 0:
+                    # 正在执行的小飞机不能被选择
+                    if k in TESTControl.Found_Target_Info[TESTControl.Target_index] and TESTControl.Shared_UAV_state[k] != 3:
+                        TESTControl.Select_list.append([k,
+                            math.sqrt((obs_n[k][2]-TESTControl.Found_Target_Set[TESTControl.Target_index][0])**2 +
+                                      (obs_n[k][3]-TESTControl.Found_Target_Set[TESTControl.Target_index][1])**2)])
+                    # TODO ！！！由谁进行拍卖者选择列表的排序及选拍卖者的操作！！！
+                    if k == (len(obs_n)-1):
+                        TESTControl.Select_list = sorted(TESTControl.Select_list, key=lambda x: x[1])
+                        TESTControl.Auctioneer = TESTControl.Select_list[0][0]
+                        TESTControl.target_relist[TESTControl.Target_index][2] = 1
+
+                # 目标状态为1时进行拍卖者生成要发送的step延时,所有人都会进来，看看自己是不是拍卖者，是的话进行操作，确认竞拍者
+                elif TESTControl.target_relist[TESTControl.Target_index][2] == 1:
+                    if k == TESTControl.Auctioneer:
+                        for i in self.close_area:
+                            # TODO 传输延时step个数的计算优化
+                            if TESTControl.Shared_UAV_state[i] != 3:
+                                TESTControl.Trans_step.append([i, round(math.sqrt((obs_n[k][2]-obs_n[i][2])**2+(obs_n[k][3]-obs_n[i][3])**2)/0.05)])
+                        TESTControl.last_step = step
+                        TESTControl.target_relist[TESTControl.Target_index][2] = 2
+
+                # 目标状态为2时更改竞拍者状态为2，在下一个step进行更新
+                # TODO 优化
+                elif TESTControl.target_relist[TESTControl.Target_index][2] == 2:
+                    if TESTControl.last_step == step-1:
+                        for i in range(len(TESTControl.Trans_step)):
+                            if k == TESTControl.Trans_step[i][0]:
+                                TESTControl.Shared_UAV_state[k] = 2
+                                self.trans_step = TESTControl.Trans_step[i][1]
 
             self.PathPlanner(obs_n[k], step)
 
+        # 进入状态2的都是选出来的拍卖者和竞拍者
         elif TESTControl.Shared_UAV_state[k] == 2:
 
+            if TESTControl.target_relist[TESTControl.Target_index][2] == 2:
+                # 拍卖者进入判断
+                if k == TESTControl.Auctioneer:
+                    # 当拍卖者的等待时间完成时，根据价格选择优胜者
+                    if TESTControl.wait_step == 0:
+                        if TESTControl.Price_list is not []:
+                            TESTControl.Price_list = sorted(TESTControl.Price_list, key=lambda x: x[1], reverse=True)
+                            if len(TESTControl.Price_list) > TESTControl.Found_Target_Set[TESTControl.Target_index][5]:
+                                for i in range(TESTControl.Found_Target_Set[TESTControl.Target_index[5]]):
+                                    TESTControl.Winner.append([TESTControl.Price_list[i][0]])
+                            else:
+                                for i in range(len(TESTControl.Price_list)):
+                                    TESTControl.Winner.append([TESTControl.Price_list[i][0]])
+                            # 生成优胜者列表后目标状态置为3
+                            TESTControl.target_relist[TESTControl.Target_index][2] = 3
+                            TESTControl.last_step = step
+                    else:
+                        TESTControl.wait_step -= 1
+                # 所有竞拍者（拍卖者也是竞拍者）进入
+                if self.trans_step == 0 and TESTControl.wait_step > 0:
+                    # TODO 目前是添加价格，为避免重复添加，添加完之后继续 -1 ，待优化
+                    TESTControl.Price_list.append([k, self.auction(obs_n[k], TESTControl.Found_Target_Set)])
+                    self.trans_step -= 1
+                else:
+                    self.trans_step -= 1
 
+            if TESTControl.target_relist[TESTControl.Target_index][2] == 3:
+                if TESTControl.last_step == step-1:
+                    if TESTControl.Winner is not []:
+                        if k in TESTControl.Winner:
+                            TESTControl.Shared_UAV_state[k] = 3
+                            self.pointBi = (TESTControl.Found_Target_Set[TESTControl.Target_index][0], TESTControl.Found_Target_Set[TESTControl.Target_index][1])
+                            TESTControl.Winner.remove(k)
+                        else:
+                            TESTControl.Shared_UAV_state[k] = 1
+                    else:
+                        if TESTControl.Update_target_relist is False:
+                            self.clearlist(step)
 
         elif TESTControl.Shared_UAV_state[k] == 3:
-            # TODO 目标坐标作为执行的B点
-            self.pointBi = (0, 0)
+            print('Agent_%d is attacking.' % k)
 
         return self.pointAi, self.pointBi, self.waypoint_finished
 
-    def auction(self, k):
+    def clearlist(self, step):
+        TESTControl.Select_list.clear()
+        TESTControl.Trans_step.clear()
+        TESTControl.Price_list.clear()
+        TESTControl.is_sorted = False
+        TESTControl.last_step = 0
+        TESTControl.Auctioneer = -1
+        TESTControl.target_relist.pop(0)
+        TESTControl.Update_target_relist = True
+        TESTControl.Update_step = step
 
+
+    def auction(self, obs, target):
+        # TODO 计算当前竞拍价格
         # price = []
         # for i in range(len(shared_info)):
         #     cal_price = [i]
@@ -194,11 +257,11 @@ class TESTControl(object):
         #     price.append(cal_price)
         # price = sorted(price, key=(lambda x: x[1]), reverse=True)
         #
-        winner = []
         # for i in range(target[3]):
         #     winner.append(price[i][0])
+        price = random.random()
 
-        return winner
+        return price
 
     def PathPlanner(self, obs, step):
 
