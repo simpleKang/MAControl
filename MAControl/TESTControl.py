@@ -142,7 +142,7 @@ class TESTControl(object):
 
             else:
                 # TODO 进行各种条件的计算判断，输出单个小飞机的大判断计算结果
-                if random.random() > 0.8:
+                if random.random() > 0.99:
                     TESTControl.Shared_Big_Check = True
                     TESTControl.last_step = step
                 self.add_new_target(obs_n[k], target)
@@ -155,6 +155,7 @@ class TESTControl(object):
                 if TESTControl.target_relist is not []:
                     TESTControl.Target_index = TESTControl.target_relist[0][0]
                     TESTControl.Update_target_relist = False
+                    print('lie biao chong lai ')
 
             if TESTControl.target_relist is not []:
 
@@ -163,12 +164,12 @@ class TESTControl(object):
                     if TESTControl.wait_step_auction > 0:
                         if k in TESTControl.Found_Target_Info[TESTControl.Target_index] and TESTControl.Shared_UAV_state[k] != 3:
                             # TODO 判断自己是否能够成为拍卖者，可以则向拍卖列表中添加自己的序号
-                            if random.random() > 0.5:
-                                TESTControl.Select_list.append(k)
+                            # if random.random() > 0.5:
+                            TESTControl.Select_list.append(k)
                         if k == TESTControl.unassigned_list[-1]:
-                            if TESTControl.unassigned_list is not []:
+                            if TESTControl.Select_list is not []:
                                 # TODO 从列表中随机取个体作为拍卖者
-                                TESTControl.Auctioneer = random.choice(TESTControl.unassigned_list)
+                                TESTControl.Auctioneer = random.choice(TESTControl.Select_list)
                                 TESTControl.target_relist[0][2] = 1
                             else:
                                 TESTControl.wait_step_auction -= 1
@@ -216,7 +217,7 @@ class TESTControl(object):
                         if TESTControl.Price_list is not []:
                             TESTControl.Price_list = sorted(TESTControl.Price_list, key=lambda x: x[1], reverse=True)
                             if len(TESTControl.Price_list) > TESTControl.Found_Target_Set[TESTControl.Target_index][5]:
-                                for i in range(TESTControl.Found_Target_Set[TESTControl.Target_index[5]]):
+                                for i in range(int(TESTControl.Found_Target_Set[TESTControl.Target_index][5])):
                                     TESTControl.Winner.append([TESTControl.Price_list[i][0]])
                             else:
                                 for i in range(len(TESTControl.Price_list)):
@@ -336,7 +337,7 @@ class TESTControl(object):
 
         # set motion_pace
         if step == 0 or step % self.motion_pace == 0:
-            print('motion motion motion motion motion motion motion motion motion motion')
+            print('motion')
 
             # # # # # tecs # # # # #
 
