@@ -125,13 +125,16 @@ class TESTControl(object):
                 info.append(self.index)
 
     def PolicyMaker(self, target, obs_n, step, k):
-
+        _step = step
+        _k = k
         # 更新小飞机的邻域列表
         self.close_area = self.find_mate(obs_n, self.comm_dis)
+        self.BigCheck = True if random.random() > 0.95 else False #测试用
 
         if TESTControl.Shared_UAV_state[k] == 0:
             if TESTControl.Shared_Big_Check is True:
                 TESTControl.Shared_UAV_state[k] = 1
+                print(_step,_k)
 
                 if TESTControl.is_sorted is False:
                     for i in range(len(TESTControl.Found_Target_Set)):
@@ -143,7 +146,7 @@ class TESTControl(object):
                 self.PathPlanner(obs_n[k], step)
             else:
                 # TODO 进行各种条件的计算判断，输出单个小飞机的大判断计算结果
-                self.BigCheck = True if random.random() > 0.95 else False
+
                 self.add_new_target(obs_n[k], target)
                 self.PathPlanner(obs_n[k], step)
 
