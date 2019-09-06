@@ -1,4 +1,5 @@
 import numpy as np
+import random
 
 def constrain(x, Min, Max):
     if x < Min:
@@ -93,8 +94,8 @@ a = [[0, 1, 2],
      [1, 5, 3],
      [2, 9, 4]]
 
-a.pop(0)
+b = a[1][:]
 
-
+c = random.choice(b)
 
 z = 0
