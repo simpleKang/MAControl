@@ -127,7 +127,7 @@ class TESTControl(object):
             if check and (self.index not in info):
                 info.append(self.index)
 
-    def PolicyMaker(self, target, obs_n, step, k, world):
+    def PolicyMaker(self, WorldTarget, obs_n, step, k, world):
 
         # 更新小飞机的邻域列表
         self.close_area = self.find_mate(obs_n, self.comm_dis)
@@ -148,7 +148,7 @@ class TESTControl(object):
                 if random.random() > 0.99 and step > 1000 and len(TESTControl.Found_Target_Set) != 0:
                     TESTControl.Shared_Big_Check = True
                     TESTControl.last_step = step
-                self.add_new_target(obs_n[k], target)
+                self.add_new_target(obs_n[k], WorldTarget)
 
         elif TESTControl.Shared_UAV_state[k] == 1:
 
@@ -265,7 +265,7 @@ class TESTControl(object):
         TESTControl.wait_step = 30
         TESTControl.wait_step_auction = 10
 
-    def auction(self, obs, target):
+    def auction(self, obs, found_targets):
         # TODO 计算当前竞拍价格
         price = random.random()
 
