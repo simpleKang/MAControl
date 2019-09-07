@@ -2,6 +2,7 @@ import numpy as np
 import math
 import os
 import MAControl.util as U
+import MAControl.WayPointListOperator as W
 import random
 
 
@@ -13,18 +14,18 @@ class TESTControl(object):
     Shared_Big_Check = False
     Selectable_UAV = []
     Target_is_sorted = False  # Resorted_Target是否已进行排序
-    Resorted_Target = []  # 按优先级排序的拍卖目标
-    Auctioneer = -1         # 选出的拍卖者编号
-    Target_index = -1       # 当前进行拍卖的目标编号
+    Resorted_Target = []      # 按优先级排序的拍卖目标
+    Auctioneer = -1           # 选出的拍卖者编号
+    Target_index = -1         # 当前进行拍卖的目标编号
 
-    Winner = []  # 最终选出来的优胜者列表
-    Price_list = []         # 选出的竞拍者发出的竞拍价格
-    unassigned_list = []    # 没有分到任务的个体列表
+    Winner = []               # 最终选出来的优胜者列表
+    Price_list = []           # 选出的竞拍者发出的竞拍价格
+    unassigned_list = []      # 没有分到任务的个体列表
 
     last_step = 0
-    Trans_step = []         # 拍卖者发送出目标给竞拍者的延时step列表
-    wait_step = 30          # 等待的时长
-    wait_step_auction = 10  # 选拍卖者的等待时间
+    Trans_step = []           # 拍卖者发送出目标给竞拍者的延时step列表
+    wait_step = 30            # 等待的时长
+    wait_step_auction = 10    # 选拍卖者的等待时间
     Update_step = 0
 
     def __init__(self, name, env, world, agent_index, arglist):
@@ -48,22 +49,24 @@ class TESTControl(object):
         self.STE_rate_error = 0
         self.throttle_integ_s = 0
 
-        self.waypoint_finished = False
-        self.arrive_flag = False
-        self.pointB_index = 0
-        self.is_init = True
         self.detect_dis = 0.05
         self.comm_dis = 0.5
         self.close_area = []
         self.trans_step = 0
-        # 256×3的航点列表，第3列为航点状态 [0: 无航点] [1: 未飞] [2: pointA] [3: pointB] [4: 已到达]
-        self.waypoint_list = [[0 for i in range(3)] for j in range(256)]
-        self.cycle_index = 1
-        self.total_cycle = 1
-        self.current_list = 0
+        
+        self.waypoint_list = []         # 256×3的航点列表，第3列为航点状态 [0: 无航点] [1: 未飞] [2: pointA] [3: pointB] [4: 已到达]
+        self.waypoint_finished = False  # 航点是否已经飞完
+        self.arrive_flag = False        # 是否到达B点
+        self.pointB_index = 0           # 当前飞向的B点的索引
+        self.is_init = True             # 是否为初始时刻
+        self.cycle_index = 1            # 航点列表循环的次数
+        self.total_cycle = 5            # 列表循环的总次数
+        self.current_wplist = 0         # 当前航点列表的索引
+
         # 小飞机状态 [0: 搜索] [1: 未分配] [2: 已分配] [3: 正在执行]
         TESTControl.Shared_UAV_state.append(0)
         TESTControl.unassigned_list.append(self.index)
+        self.waypoint_list.append([[0 for i in range(3)] for j in range(256)])
 
         self.ITerm = 0
         self.last_error = 0
@@ -237,7 +240,10 @@ class TESTControl(object):
                     TESTControl.Shared_UAV_state[k] = 1
                     if k in TESTControl.Winner:
                         TESTControl.Shared_UAV_state[k] = 3
-                        self.pointBi = (TESTControl.Found_Target_Set[TESTControl.Target_index][0], TESTControl.Found_Target_Set[TESTControl.Target_index][1])
+                        self.waypoint_list, self.cycle_index, self.pointB_index = W.attack_replace(self.waypoint_list,
+                                        TESTControl.Found_Target_Set[TESTControl.Target_index][0:2], self.current_wplist)
+                        self.arrive_flag = True
+                        # self.pointBi = (TESTControl.Found_Target_Set[TESTControl.Target_index][0], TESTControl.Found_Target_Set[TESTControl.Target_index][1])
                         TESTControl.Winner.remove(k)
                         TESTControl.unassigned_list.remove(k)
                         if len(TESTControl.Winner) == 0:
@@ -276,26 +282,31 @@ class TESTControl(object):
         # 初始时刻输出A、B坐标
         if self.pointB_index == 0 and self.is_init is True:
             self.pointAi = (obs[2], obs[3])
-            self.pointBi = (self.waypoint_list[self.pointB_index][0], self.waypoint_list[self.pointB_index][1])
+            self.pointBi = (self.waypoint_list[self.current_wplist][self.pointB_index][0],
+                            self.waypoint_list[self.current_wplist][self.pointB_index][1])
             self.is_init = False
 
         # 更改航点状态并输出A、B坐标
         if self.arrive_flag:
-            if self.waypoint_list[self.pointB_index+1][2] != 0 and self.pointB_index < 255:
+            if self.waypoint_list[self.current_wplist][self.pointB_index+1][2] != 0 and self.pointB_index < 255:
                 if self.pointB_index > 0:
-                    self.waypoint_list[self.pointB_index-1][2] = 4
-                self.waypoint_list[self.pointB_index][2] = 2
-                self.waypoint_list[self.pointB_index+1][2] = 3
-                self.pointAi = (self.waypoint_list[self.pointB_index][0], self.waypoint_list[self.pointB_index][1])
-                self.pointBi = (self.waypoint_list[self.pointB_index+1][0], self.waypoint_list[self.pointB_index+1][1])
+                    self.waypoint_list[self.current_wplist][self.pointB_index-1][2] = 4
+                self.waypoint_list[self.current_wplist][self.pointB_index][2] = 2
+                self.waypoint_list[self.current_wplist][self.pointB_index+1][2] = 3
+                self.pointAi = (self.waypoint_list[self.current_wplist][self.pointB_index][0],
+                                self.waypoint_list[self.current_wplist][self.pointB_index][1])
+                self.pointBi = (self.waypoint_list[self.current_wplist][self.pointB_index+1][0],
+                                self.waypoint_list[self.current_wplist][self.pointB_index+1][1])
                 self.arrive_flag = False
                 self.pointB_index += 1
             else:
                 if self.cycle_index < self.total_cycle:
                     for i in range(self.pointB_index+1):
-                        self.waypoint_list[i][2] = 1
-                    self.pointAi = (self.waypoint_list[self.pointB_index][0], self.waypoint_list[self.pointB_index][1])
-                    self.pointBi = (self.waypoint_list[0][0], self.waypoint_list[0][1])
+                        self.waypoint_list[self.current_wplist][i][2] = 1
+                    self.pointAi = (self.waypoint_list[self.current_wplist][self.pointB_index][0],
+                                    self.waypoint_list[self.current_wplist][self.pointB_index][1])
+                    self.pointBi = (self.waypoint_list[self.current_wplist][0][0],
+                                    self.waypoint_list[self.current_wplist][0][1])
                     self.pointB_index = 0
                     self.arrive_flag = False
                     self.cycle_index += 1

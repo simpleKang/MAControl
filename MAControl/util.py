@@ -95,9 +95,25 @@ a = [[0, 1, 2],
      [1, 5, 3],
      [2, 9, 4]]
 
-b = [1, 2, 3, 4]
+b = [1, 2]
 
-c = b[1:3]
+c = [[0, 0, 0],
+     [0, 0, 0]]
+
+x = [[0, 0], [1, 2]]
+
+
+def test(z):
+    z.append([5, 8, 9])
+    y = 2
+    return z, y
+
+
+x, y = test(x)
+
+
+g = []
+g.append([[0 for i in range(3)] for j in range(256)])
 
 
 
