@@ -149,10 +149,9 @@ class TESTControl(object):
 
         elif TESTControl.Shared_UAV_state[k] == 1:
 
-            if TESTControl.Update_step == step-1:
-                if len(TESTControl.target_relist) != 0:
-                    TESTControl.Target_index = TESTControl.target_relist[0][0]
-                    print('lie biao chong lai ')
+            if TESTControl.Update_step == step-1 and len(TESTControl.target_relist) != 0:
+                TESTControl.Target_index = TESTControl.target_relist[0][0]
+                print('deal with next target')
 
             if len(TESTControl.target_relist) != 0:
 
@@ -265,15 +264,6 @@ class TESTControl(object):
 
     def auction(self, obs, target):
         # TODO 计算当前竞拍价格
-        # price = []
-        # for i in range(len(shared_info)):
-        #     cal_price = [i]
-        #     cal_price.append(random.random())
-        #     price.append(cal_price)
-        # price = sorted(price, key=(lambda x: x[1]), reverse=True)
-        #
-        # for i in range(target[3]):
-        #     winner.append(price[i][0])
         price = random.random()
 
         return price
@@ -302,6 +292,7 @@ class TESTControl(object):
                     self.waypoint_list[i][2] = 1
                 self.pointAi = (self.waypoint_list[self.pointB_index][0], self.waypoint_list[self.pointB_index][1])
                 self.pointBi = (self.waypoint_list[0][0], self.waypoint_list[0][1])
+                self.arrive_flag = False
                 self.pointB_index = 0
                 # self.waypoint_finished = True
 
