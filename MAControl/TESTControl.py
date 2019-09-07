@@ -61,7 +61,7 @@ class TESTControl(object):
         self.is_init = True             # 是否为初始时刻
         self.is_attacking = False       # 是否为正在执行
         self.cycle_index = 1            # 航点列表循环的次数
-        self.total_cycle = 5            # 列表循环的总次数
+        self.total_cycle = 1            # 列表循环的总次数
         self.current_wplist = 0         # 当前航点列表的索引
 
         # 小飞机状态 [0: 搜索阶段] [1: 竞选拍卖者] [2: 竞价阶段] [3: 执行阶段]
@@ -149,7 +149,7 @@ class TESTControl(object):
 
             else:
                 # TODO 进行各种条件的计算判断，输出单个小飞机的大判断计算结果
-                if step > 1000 and len(TESTControl.Found_Target_Set) != 0:
+                if step > 100 and len(TESTControl.Found_Target_Set) != 0:
                     TESTControl.Shared_Big_Check = True
                     TESTControl.last_step = step
                 self.add_new_target(obs_n[k], WorldTarget)
@@ -241,9 +241,8 @@ class TESTControl(object):
                     TESTControl.Shared_UAV_state[k] = 1
                     if k in TESTControl.Winner:
                         TESTControl.Shared_UAV_state[k] = 3
-                        self.waypoint_list, self.cycle_index, self.pointB_index = W.attack_replace(self.waypoint_list,
+                        self.waypoint_list, self.current_wplist, self.pointB_index = W.attack_replace(self.waypoint_list,
                                         TESTControl.Found_Target_Set[TESTControl.Target_index][0:2], self.current_wplist)
-                        self.arrive_flag = True
                         # self.pointBi = (TESTControl.Found_Target_Set[TESTControl.Target_index][0], TESTControl.Found_Target_Set[TESTControl.Target_index][1])
                         TESTControl.Winner.remove(k)
                         TESTControl.unassigned_list.remove(k)
@@ -287,6 +286,13 @@ class TESTControl(object):
                             self.waypoint_list[self.current_wplist][self.pointB_index][1])
             self.is_init = False
 
+        if self.waypoint_list[self.current_wplist][0][2] == 5 and self.is_attacking is False:
+            self.pointAi = (obs[2], obs[3])
+            self.pointBi = (self.waypoint_list[self.current_wplist][self.pointB_index][0],
+                            self.waypoint_list[self.current_wplist][self.pointB_index][1])
+            self.is_attacking = True
+            self.arrive_flag = False
+
         # 更改航点状态并输出A、B坐标
         if self.arrive_flag:
             if self.waypoint_list[self.current_wplist][self.pointB_index+1][2] != 0 and self.pointB_index < 255:
@@ -300,13 +306,9 @@ class TESTControl(object):
                                 self.waypoint_list[self.current_wplist][self.pointB_index+1][1])
                 self.arrive_flag = False
                 self.pointB_index += 1
+
             else:
-                if len(self.waypoint_list[self.current_wplist]) == 1 and self.is_attacking is False:
-                    self.pointAi = (obs[2], obs[3])
-                    self.pointBi = (self.waypoint_list[self.current_wplist][self.pointB_index][0],
-                                    self.waypoint_list[self.current_wplist][self.pointB_index][1])
-                    self.is_attacking = True
-                elif self.cycle_index < self.total_cycle:
+                if self.is_attacking is False and self.cycle_index < self.total_cycle:
                     for i in range(self.pointB_index+1):
                         self.waypoint_list[self.current_wplist][i][2] = 1
                     self.pointAi = (self.waypoint_list[self.current_wplist][self.pointB_index][0],
@@ -318,6 +320,9 @@ class TESTControl(object):
                     self.cycle_index += 1
                 else:
                     self.waypoint_finished = True
+        else:
+            print('hai mei dao')
+            # self.waypoint_finished = False
 
     def MotionController(self, obs, pointAi, pointBi, step):
         # print("motion control")
@@ -343,12 +348,12 @@ class TESTControl(object):
 
         # p-i-d
         Ki_STE = 0.01  # (系数)
-        Kp_STE = 0.1  # (系数)
-        Kd_STE = 0.0  # (系数)
+        Kp_STE = 0.1   # (系数)
+        Kd_STE = 0.0   # (系数)
 
         # set motion_pace
         if step == 0 or step % self.motion_pace == 0:
-            # print('motion')
+            print('motion: ', pointAi, pointBi, self.arrive_flag)
 
             # # # # # tecs # # # # #
 
