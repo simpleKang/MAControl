@@ -16,13 +16,15 @@ class TESTControl(object):
     Resorted_Target = []      # 按优先级排序的拍卖目标
     Auctioneer = -1         # 选出的拍卖者编号
     Target_index = -1       # 当前进行拍卖的目标编号
+
+    Winner = []  # 最终选出来的优胜者列表
+    Price_list = []         # 选出的竞拍者发出的竞拍价格
+    unassigned_list = []    # 没有分到任务的个体列表
+
     last_step = 0
     Trans_step = []         # 拍卖者发送出目标给竞拍者的延时step列表
-    Price_list = []         # 选出的竞拍者发出的竞拍价格
     wait_step = 30          # 等待的时长
     wait_step_auction = 10  # 选拍卖者的等待时间
-    Winner = []             # 最终选出来的优胜者列表
-    unassigned_list = []    # 没有分到任务的个体列表
     Update_step = 0
 
     def __init__(self, name, env, world, agent_index, arglist):
