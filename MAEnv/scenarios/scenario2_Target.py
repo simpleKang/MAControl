@@ -21,7 +21,7 @@ class Scenario(BaseScenario):
         for i, agent in enumerate(world.agents):
             agent.name = 'agent %d' % i
             # agent.collide = True
-            agent.collide = False  # 取消各UAV之间的互斥作用
+            agent.collide = False
             agent.silent = True
             agent.size = 0.01  # 10米
             agent.UAV = True
@@ -35,8 +35,8 @@ class Scenario(BaseScenario):
             landmark.movable = False
             landmark.value = np.ceil(random.random() * 10)
             landmark.size = landmark.value * 0.01
-            # landmark.defence = int(np.ceil(random.random() * 5))
-            landmark.defence = 1
+            landmark.defence = int(np.ceil(random.random() * 5))
+            # landmark.defence = 1
             landmark.attacking = False
         world.obstacles = [Landmark() for i in range(num_obstacles)]
         for i, landmark in enumerate(world.obstacles):
