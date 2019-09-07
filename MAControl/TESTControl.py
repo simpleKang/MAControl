@@ -11,7 +11,7 @@ class TESTControl(object):
     Found_Target_Info = []
     Shared_UAV_state = []
     Shared_Big_Check = False
-    Select_list = []        # 选择拍卖者的列表，存储距离
+    Selectable_UAV = []        # 选择拍卖者的列表，存储距离
     Auctioneer = -1         # 选出的拍卖者编号
     Target_index = -1       # 当前进行拍卖的目标编号
     is_sorted = False       # target_relist是否已进行排序
@@ -161,22 +161,22 @@ class TESTControl(object):
                         if (k in TESTControl.Found_Target_Info[TESTControl.Target_index]) and (TESTControl.Shared_UAV_state[k] != 3):
                             # TODO 判断自己是否能够成为拍卖者，可以则向拍卖列表中添加自己的序号
                             # if random.random() > 0.5:
-                            TESTControl.Select_list.append(k)
+                            TESTControl.Selectable_UAV.append(k)
                         if k == TESTControl.unassigned_list[-1]:
-                            if len(TESTControl.Select_list) != 0:
+                            if len(TESTControl.Selectable_UAV) != 0:
                                 # TODO 从列表中随机取个体作为拍卖者
-                                TESTControl.Auctioneer = random.choice(TESTControl.Select_list)
+                                TESTControl.Auctioneer = random.choice(TESTControl.Selectable_UAV)
                                 TESTControl.target_relist[0][2] = 1
                             else:
                                 TESTControl.wait_step_auction -= 1
                     else:
-                        TESTControl.Select_list = TESTControl.Found_Target_Info[TESTControl.Target_index][:]
-                        for i in TESTControl.Select_list:
+                        TESTControl.Selectable_UAV = TESTControl.Found_Target_Info[TESTControl.Target_index][:]
+                        for i in TESTControl.Selectable_UAV:
                             if TESTControl.Shared_UAV_state[i] == 3:
-                                TESTControl.Select_list.remove(i)
-                        if len(TESTControl.Select_list) != 0:
+                                TESTControl.Selectable_UAV.remove(i)
+                        if len(TESTControl.Selectable_UAV) != 0:
                             # TODO 从列表中随机取个体作为拍卖者
-                            TESTControl.Auctioneer = random.choice(TESTControl.Select_list)
+                            TESTControl.Auctioneer = random.choice(TESTControl.Selectable_UAV)
                             TESTControl.target_relist[0][2] = 1
                         else:
                             print('没有小飞机能打这个目标了，放弃了')
@@ -253,7 +253,7 @@ class TESTControl(object):
         return self.pointAi, self.pointBi, self.waypoint_finished, world
 
     def clearlist(self, step):
-        TESTControl.Select_list.clear()
+        TESTControl.Selectable_UAV.clear()
         TESTControl.Trans_step.clear()
         TESTControl.Price_list.clear()
         TESTControl.Auctioneer = -1
