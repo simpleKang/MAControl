@@ -20,7 +20,8 @@ class Scenario(BaseScenario):
         world.agents = [Agent() for i in range(num_agents)]
         for i, agent in enumerate(world.agents):
             agent.name = 'agent %d' % i
-            agent.collide = True
+            # agent.collide = True
+            agent.collide = False  # 取消各UAV之间的互斥作用
             agent.silent = True
             agent.size = 0.01  # 10米
             agent.UAV = True
