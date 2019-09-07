@@ -53,7 +53,6 @@ if __name__ == '__main__':
     while True:
 
         # get action
-        temp = False
         action_n = []
         for i in range(env.n):
             pointAi, pointBi, finishedi, world = \
