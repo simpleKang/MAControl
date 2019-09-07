@@ -37,8 +37,6 @@ if __name__ == '__main__':
         WorldTarget.append([landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.state.p_vel[0],
                             landmark.state.p_vel[1], landmark.value, landmark.defence])
     print('WorldTarget', WorldTarget)
-    # TESTC.TESTControl.Found_Target_Set = WorldTarget
-    # TESTC.TESTControl.Found_Target_Info = [[0, 1, 2, 3, 4], [5, 6, 7, 8, 9]]
 
     # Create Controllers
     Control = []
