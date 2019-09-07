@@ -423,38 +423,46 @@ class TESTControl(object):
 
         return self.tangent_acc, self.lateral_acc
 
-    def InnerController(self, obs, tangent_acc, lateral_acc, step):
+    def InnerController(self, obs, tangent_acc, lateral_acc, step, finishedi):
         # print('inner control')
 
-        Exp_lateral_acc = lateral_acc
-        True_lateral_acc = np.array(obs[5])
-        delta_time = self.dt
+        if finishedi:
 
-        P_value = 0.9
-        I_value = 0.01
-        D_value = 0.0
-        Iterm_window = 1
+            self.action[1] = 0
+            self.action[3] = 0
 
-        error = Exp_lateral_acc - True_lateral_acc
-        delta_error = error - self.last_error
-        PTerm = error
-        DTerm = delta_error / delta_time
-        self.ITerm += error * delta_time
-        if self.ITerm < -Iterm_window:
-            self.ITerm = -Iterm_window
-        elif self.ITerm > Iterm_window:
-            self.ITerm = Iterm_window
         else:
-            self.ITerm = self.ITerm
-        self.last_error = error
 
-        acct = tangent_acc
-        accl = P_value * PTerm + I_value * self.ITerm + D_value * DTerm
-        vel_vector = np.array(obs[0:2])
-        speed = np.sqrt(np.square(vel_vector[0]) + np.square(vel_vector[1]))
-        vel_right_unit = np.array([vel_vector[1], -1 * vel_vector[0]]) / speed
-        acc = acct * vel_vector / speed + accl * vel_right_unit
+            Exp_lateral_acc = lateral_acc
+            True_lateral_acc = np.array(obs[5])
+            
+            delta_time = self.dt
+            P_value = 0.9
+            I_value = 0.01
+            D_value = 0.0
+            Iterm_window = 1
 
-        self.action[1] = acc[0]
-        self.action[3] = acc[1]
+            error = Exp_lateral_acc - True_lateral_acc
+            delta_error = error - self.last_error
+            PTerm = error
+            DTerm = delta_error / delta_time
+            self.ITerm += error * delta_time
+            if self.ITerm < -Iterm_window:
+                self.ITerm = -Iterm_window
+            elif self.ITerm > Iterm_window:
+                self.ITerm = Iterm_window
+            else:
+                self.ITerm = self.ITerm
+            self.last_error = error
+
+            acct = tangent_acc
+            accl = P_value * PTerm + I_value * self.ITerm + D_value * DTerm
+            vel_vector = np.array(obs[0:2])
+            speed = np.sqrt(np.square(vel_vector[0]) + np.square(vel_vector[1]))
+            vel_right_unit = np.array([vel_vector[1], -1 * vel_vector[0]]) / speed
+            acc = acct * vel_vector / speed + accl * vel_right_unit
+
+            self.action[1] = acc[0]
+            self.action[3] = acc[1]
+
         return self.action

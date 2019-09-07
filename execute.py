@@ -58,9 +58,9 @@ if __name__ == '__main__':
         for i in range(env.n):
             pointAi, pointBi, finishedi, world = \
                 Control[i].PolicyMaker(WorldTarget, obs_n, step, i, world)
-            print(pointAi, pointBi, i)
+            print(pointAi, pointBi, i, finishedi)
             acc_it, acc_il = Control[i].MotionController(obs_n[i], pointAi, pointBi, step)
-            actioni = Control[i].InnerController(obs_n[i], acc_it, acc_il, step)
+            actioni = Control[i].InnerController(obs_n[i], acc_it, acc_il, step, finishedi)
             action_n.append(actioni)
         print('Shared_UAV_state', TESTC.TESTControl.Shared_UAV_state)
         print('Found_Target_Set', TESTC.TESTControl.Found_Target_Set)
