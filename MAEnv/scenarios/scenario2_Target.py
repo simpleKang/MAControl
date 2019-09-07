@@ -35,7 +35,7 @@ class Scenario(BaseScenario):
             landmark.movable = False
             landmark.value = np.ceil(random.random() * 10)
             landmark.size = landmark.value * 0.01
-            landmark.defence = int(np.ceil(random.random() * 5))
+            landmark.defence = int(np.ceil(random.random() * 3))
             # landmark.defence = 1
             landmark.attacking = False
         world.obstacles = [Landmark() for i in range(num_obstacles)]
