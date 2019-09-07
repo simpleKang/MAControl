@@ -12,10 +12,10 @@ class TESTControl(object):
     Shared_UAV_state = []
     Shared_Big_Check = False
     Selectable_UAV = []
+    Target_is_sorted = False  # Resorted_Target是否已进行排序
+    Resorted_Target = []      # 按优先级排序的拍卖目标
     Auctioneer = -1         # 选出的拍卖者编号
     Target_index = -1       # 当前进行拍卖的目标编号
-    Target_is_sorted = False       # target_relist是否已进行排序
-    target_relist = []      # 拍卖目标按优先级排序列表
     last_step = 0
     Trans_step = []         # 拍卖者发送出目标给竞拍者的延时step列表
     Price_list = []         # 选出的竞拍者发出的竞拍价格
@@ -133,9 +133,9 @@ class TESTControl(object):
 
                 if TESTControl.Target_is_sorted is False:
                     for i in range(len(TESTControl.Found_Target_Set)):
-                        TESTControl.target_relist.append([i, TESTControl.Found_Target_Set[i][4], 0])
-                    TESTControl.target_relist = sorted(TESTControl.target_relist, key=lambda x: x[1], reverse=True)
-                    TESTControl.Target_index = TESTControl.target_relist[0][0]
+                        TESTControl.Resorted_Target.append([i, TESTControl.Found_Target_Set[i][4], 0])
+                    TESTControl.Resorted_Target = sorted(TESTControl.Resorted_Target, key=lambda x: x[1], reverse=True)
+                    TESTControl.Target_index = TESTControl.Resorted_Target[0][0]
                     TESTControl.Target_is_sorted = True
 
             else:
@@ -149,14 +149,14 @@ class TESTControl(object):
 
         elif TESTControl.Shared_UAV_state[k] == 1:
 
-            if TESTControl.Update_step == step-1 and len(TESTControl.target_relist) != 0:
-                TESTControl.Target_index = TESTControl.target_relist[0][0]
+            if TESTControl.Update_step == step-1 and len(TESTControl.Resorted_Target) != 0:
+                TESTControl.Target_index = TESTControl.Resorted_Target[0][0]
                 print('deal with next target')
 
-            if len(TESTControl.target_relist) != 0:
+            if len(TESTControl.Resorted_Target) != 0:
 
                 # 目标状态为0时进行拍卖者的选择，所有人都会进来
-                if TESTControl.target_relist[0][2] == 0:
+                if TESTControl.Resorted_Target[0][2] == 0:
                     if TESTControl.wait_step_auction > 0:
                         if (k in TESTControl.Found_Target_Info[TESTControl.Target_index]) and (TESTControl.Shared_UAV_state[k] != 3):
                             # TODO 判断自己是否能够成为拍卖者，可以则向拍卖列表中添加自己的序号
@@ -166,7 +166,7 @@ class TESTControl(object):
                             if len(TESTControl.Selectable_UAV) != 0:
                                 # TODO 从列表中随机取个体作为拍卖者
                                 TESTControl.Auctioneer = random.choice(TESTControl.Selectable_UAV)
-                                TESTControl.target_relist[0][2] = 1
+                                TESTControl.Resorted_Target[0][2] = 1
                             else:
                                 TESTControl.wait_step_auction -= 1
                     else:
@@ -177,23 +177,23 @@ class TESTControl(object):
                         if len(TESTControl.Selectable_UAV) != 0:
                             # TODO 从列表中随机取个体作为拍卖者
                             TESTControl.Auctioneer = random.choice(TESTControl.Selectable_UAV)
-                            TESTControl.target_relist[0][2] = 1
+                            TESTControl.Resorted_Target[0][2] = 1
                         else:
                             print('没有小飞机能打这个目标了，放弃了')
 
                 # 目标状态为1时所有人都会进来，看看自己是不是拍卖者，是的话进行操作，确认竞拍者及其延时step
-                elif TESTControl.target_relist[0][2] == 1:
+                elif TESTControl.Resorted_Target[0][2] == 1:
                     if k == TESTControl.Auctioneer:
                         for i in self.close_area:
                             # TODO 传输延时step个数的计算优化
                             if TESTControl.Shared_UAV_state[i] != 3:
                                 TESTControl.Trans_step.append([i, round(math.sqrt((obs_n[k][2]-obs_n[i][2])**2+(obs_n[k][3]-obs_n[i][3])**2)/0.05)])
                         TESTControl.last_step = step
-                        TESTControl.target_relist[0][2] = 2
+                        TESTControl.Resorted_Target[0][2] = 2
 
                 # 目标状态为2时更改竞拍者状态为2，在下一个step进行更新
                 # TODO 优化
-                elif TESTControl.target_relist[0][2] == 2:
+                elif TESTControl.Resorted_Target[0][2] == 2:
                     if TESTControl.last_step == step-1:
                         for i in range(len(TESTControl.Trans_step)):
                             if k == TESTControl.Trans_step[i][0]:
@@ -205,7 +205,7 @@ class TESTControl(object):
         # 进入状态2的都是选出来的拍卖者和竞拍者
         elif TESTControl.Shared_UAV_state[k] == 2:
 
-            if TESTControl.target_relist[0][2] == 2:
+            if TESTControl.Resorted_Target[0][2] == 2:
                 # 拍卖者进入判断
                 if k == TESTControl.Auctioneer:
                     # 当拍卖者的等待时间完成时，根据价格选择优胜者
@@ -219,7 +219,7 @@ class TESTControl(object):
                                 for i in range(len(TESTControl.Price_list)):
                                     TESTControl.Winner.append(TESTControl.Price_list[i][0])
                             # 生成优胜者列表后目标状态置为3
-                            TESTControl.target_relist[0][2] = 3
+                            TESTControl.Resorted_Target[0][2] = 3
                             TESTControl.last_step = step
                     else:
                         TESTControl.wait_step -= 1
@@ -231,7 +231,7 @@ class TESTControl(object):
                 else:
                     self.trans_step -= 1
 
-            if TESTControl.target_relist[0][2] == 3:
+            if TESTControl.Resorted_Target[0][2] == 3:
                 if TESTControl.last_step == step-1:
                     TESTControl.Shared_UAV_state[k] = 1
                     if k in TESTControl.Winner:
@@ -257,7 +257,7 @@ class TESTControl(object):
         TESTControl.Trans_step.clear()
         TESTControl.Price_list.clear()
         TESTControl.Auctioneer = -1
-        TESTControl.target_relist.pop(0)
+        TESTControl.Resorted_Target.pop(0)
         TESTControl.Update_step = step
         TESTControl.wait_step = 30
         TESTControl.wait_step_auction = 10

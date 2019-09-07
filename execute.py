@@ -66,7 +66,7 @@ if __name__ == '__main__':
         print('Found_Target_Set', TESTC.TESTControl.Found_Target_Set)
         print('Found_Target_Info', TESTC.TESTControl.Found_Target_Info)
         print('Target_index', TESTC.TESTControl.Target_index)
-        print('target_relist', TESTC.TESTControl.target_relist)
+        print('Resorted_Target', TESTC.TESTControl.Resorted_Target)
         print('Selectable_UAV', TESTC.TESTControl.Selectable_UAV)
         print('Auctioneer', TESTC.TESTControl.Auctioneer)
         print('Trans_step', TESTC.TESTControl.Trans_step)
