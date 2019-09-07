@@ -59,11 +59,12 @@ class TESTControl(object):
         self.arrive_flag = False        # 是否到达B点
         self.pointB_index = 0           # 当前飞向的B点的索引
         self.is_init = True             # 是否为初始时刻
+        self.is_attacking = False       # 是否为正在执行
         self.cycle_index = 1            # 航点列表循环的次数
         self.total_cycle = 5            # 列表循环的总次数
         self.current_wplist = 0         # 当前航点列表的索引
 
-        # 小飞机状态 [0: 搜索] [1: 未分配] [2: 已分配] [3: 正在执行]
+        # 小飞机状态 [0: 搜索阶段] [1: 竞选拍卖者] [2: 竞价阶段] [3: 执行阶段]
         TESTControl.Shared_UAV_state.append(0)
         TESTControl.unassigned_list.append(self.index)
         self.waypoint_list.append([[0 for i in range(3)] for j in range(256)])
@@ -148,7 +149,7 @@ class TESTControl(object):
 
             else:
                 # TODO 进行各种条件的计算判断，输出单个小飞机的大判断计算结果
-                if random.random() > 0.99 and step > 1000 and len(TESTControl.Found_Target_Set) != 0:
+                if step > 1000 and len(TESTControl.Found_Target_Set) != 0:
                     TESTControl.Shared_Big_Check = True
                     TESTControl.last_step = step
                 self.add_new_target(obs_n[k], WorldTarget)
@@ -300,7 +301,12 @@ class TESTControl(object):
                 self.arrive_flag = False
                 self.pointB_index += 1
             else:
-                if self.cycle_index < self.total_cycle:
+                if len(self.waypoint_list[self.current_wplist]) == 1 and self.is_attacking is False:
+                    self.pointAi = (obs[2], obs[3])
+                    self.pointBi = (self.waypoint_list[self.current_wplist][self.pointB_index][0],
+                                    self.waypoint_list[self.current_wplist][self.pointB_index][1])
+                    self.is_attacking = True
+                elif self.cycle_index < self.total_cycle:
                     for i in range(self.pointB_index+1):
                         self.waypoint_list[self.current_wplist][i][2] = 1
                     self.pointAi = (self.waypoint_list[self.current_wplist][self.pointB_index][0],

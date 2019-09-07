@@ -100,21 +100,6 @@ b = [1, 2]
 c = [[0, 0, 0],
      [0, 0, 0]]
 
-x = [[0, 0], [1, 2]]
-
-
-def test(z):
-    z.append([5, 8, 9])
-    y = 2
-    return z, y
-
-
-x, y = test(x)
-
-
-g = []
-g.append([[0 for i in range(3)] for j in range(256)])
-
 
 
 z = 0

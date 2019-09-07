@@ -42,7 +42,7 @@ if __name__ == '__main__':
     Control = []
     for i in range(env.n):
         Control.append(TESTC.TESTControl("agent_%d" % i, env, world, i, arglist))
-        Control[i].waypoint_list[0:len(U.init_waypoint[i])] = U.init_waypoint[i]
+        Control[i].waypoint_list[Control[i].current_wplist][0:len(U.init_waypoint[i])] = U.init_waypoint[i]
 
     obs_n = env.reset()
     step = 0
@@ -59,16 +59,16 @@ if __name__ == '__main__':
             acc_it, acc_il = Control[i].MotionController(obs_n[i], pointAi, pointBi, step)
             actioni = Control[i].InnerController(obs_n[i], acc_it, acc_il, step, finishedi)
             action_n.append(actioni)
-        print('Shared_UAV_state', TESTC.TESTControl.Shared_UAV_state)
-        print('Found_Target_Set', TESTC.TESTControl.Found_Target_Set)
-        print('Found_Target_Info', TESTC.TESTControl.Found_Target_Info)
-        print('Target_index', TESTC.TESTControl.Target_index)
-        print('Resorted_Target', TESTC.TESTControl.Resorted_Target)
-        print('Selectable_UAV', TESTC.TESTControl.Selectable_UAV)
-        print('Auctioneer', TESTC.TESTControl.Auctioneer)
-        print('Trans_step', TESTC.TESTControl.Trans_step)
-        print('Winner', TESTC.TESTControl.Winner)
-        print('Price_list', TESTC.TESTControl.Price_list)
+        print('Shared_UAV_state: ', TESTC.TESTControl.Shared_UAV_state)
+        print('Found_Target_Set: ', TESTC.TESTControl.Found_Target_Set)
+        print('Found_Target_Info: ', TESTC.TESTControl.Found_Target_Info)
+        print('Target_index: ', TESTC.TESTControl.Target_index)
+        print('Resorted_Target: ', TESTC.TESTControl.Resorted_Target)
+        print('Selectable_UAV: ', TESTC.TESTControl.Selectable_UAV)
+        print('Auctioneer: ', TESTC.TESTControl.Auctioneer)
+        print('Trans_step: ', TESTC.TESTControl.Trans_step)
+        print('Winner: ', TESTC.TESTControl.Winner)
+        print('Price_list: ', TESTC.TESTControl.Price_list)
 
         # environment step
         new_obs_n, rew_n, done_n, info_n = env.step(action_n)
