@@ -11,10 +11,10 @@ class TESTControl(object):
     Found_Target_Info = []
     Shared_UAV_state = []
     Shared_Big_Check = False
-    Selectable_UAV = []        # 选择拍卖者的列表，存储距离
+    Selectable_UAV = []
     Auctioneer = -1         # 选出的拍卖者编号
     Target_index = -1       # 当前进行拍卖的目标编号
-    is_sorted = False       # target_relist是否已进行排序
+    Target_is_sorted = False       # target_relist是否已进行排序
     target_relist = []      # 拍卖目标按优先级排序列表
     last_step = 0
     Trans_step = []         # 拍卖者发送出目标给竞拍者的延时step列表
@@ -131,12 +131,12 @@ class TESTControl(object):
             if TESTControl.Shared_Big_Check is True and TESTControl.last_step == step-1:
                 TESTControl.Shared_UAV_state[k] = 1
 
-                if TESTControl.is_sorted is False:
+                if TESTControl.Target_is_sorted is False:
                     for i in range(len(TESTControl.Found_Target_Set)):
                         TESTControl.target_relist.append([i, TESTControl.Found_Target_Set[i][4], 0])
                     TESTControl.target_relist = sorted(TESTControl.target_relist, key=lambda x: x[1], reverse=True)
                     TESTControl.Target_index = TESTControl.target_relist[0][0]
-                    TESTControl.is_sorted = True
+                    TESTControl.Target_is_sorted = True
 
             else:
                 # TODO 进行各种条件的计算判断，输出单个小飞机的大判断计算结果
