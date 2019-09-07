@@ -94,15 +94,9 @@ a = [[0, 1, 2],
      [1, 5, 3],
      [2, 9, 4]]
 
-b = [2, 3, 5, 6, 8]
+b = a[0][:]
 
-c = []
-
-for i in range(10):
-    if i in b:
-        b.remove(i)
-    else:
-        c.append(i)
+b.clear()
 
 
 

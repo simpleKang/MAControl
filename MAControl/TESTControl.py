@@ -140,7 +140,7 @@ class TESTControl(object):
 
             else:
                 # TODO 进行各种条件的计算判断，输出单个小飞机的大判断计算结果
-                if random.random() > 0.8:
+                if random.random() > 0.99:
                     TESTControl.Shared_Big_Check = True
                     TESTControl.last_step = step
                 self.add_new_target(obs_n[k], target)
@@ -171,13 +171,13 @@ class TESTControl(object):
                             else:
                                 TESTControl.wait_step_auction -= 1
                     else:
-                        selectlist = TESTControl.Found_Target_Info[TESTControl.Target_index][:]
-                        for i in selectlist:
+                        TESTControl.Select_list = TESTControl.Found_Target_Info[TESTControl.Target_index][:]
+                        for i in TESTControl.Select_list:
                             if TESTControl.Shared_UAV_state[i] == 3:
-                                selectlist.remove(i)
-                        if len(selectlist) != 0:
+                                TESTControl.Select_list.remove(i)
+                        if len(TESTControl.Select_list) != 0:
                             # TODO 从列表中随机取个体作为拍卖者
-                            TESTControl.Auctioneer = random.choice(selectlist)
+                            TESTControl.Auctioneer = random.choice(TESTControl.Select_list)
                             TESTControl.target_relist[0][2] = 1
                         else:
                             print('没有小飞机能打这个目标了，放弃了')
@@ -242,6 +242,10 @@ class TESTControl(object):
                         TESTControl.unassigned_list.remove(k)
                         if len(TESTControl.Winner) == 0:
                             self.clearlist(step)
+                            if k < len(obs_n-1):
+                                for j in range(k, len(obs_n)):
+                                    if TESTControl.Shared_UAV_state[j] != 3:
+                                        TESTControl.Shared_UAV_state[j] = 1
 
         elif TESTControl.Shared_UAV_state[k] == 3:
             world.agents[k].attacking = True
