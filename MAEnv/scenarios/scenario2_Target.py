@@ -16,7 +16,7 @@ class Scenario(BaseScenario):
         num_agents = 10
         num_targets = 2
         num_obstacles = 0
-        num_boundaries = 4
+        num_grids = 5
         # add agents
         world.agents = [Agent() for i in range(num_agents)]
         for i, agent in enumerate(world.agents):
@@ -47,15 +47,15 @@ class Scenario(BaseScenario):
             landmark.movable = False
             landmark.size = np.ceil(random.random()*10)*0.01
             landmark.attacking = False
-        world.boundaries = [Landmark() for i in range(num_boundaries)]
-        for i, landmark in enumerate(world.boundaries):
+        world.grids = [Landmark() for i in range(num_grids)]
+        for i, landmark in enumerate(world.grids):
             landmark.UAV = False
-            landmark.name = 'boundary %d' % i
+            landmark.name = 'grid %d' % i
             landmark.collide = False
             landmark.movable = False
             landmark.size = 0.03
             landmark.attacking = False
-        world.landmarks = world.targets + world.obstacles + world.boundaries
+        world.landmarks = world.targets + world.obstacles + world.grids
         # make initial conditions
         self.reset_world(world)
         return world
@@ -75,10 +75,11 @@ class Scenario(BaseScenario):
             if i >= len(world.targets):
                 landmark.color = np.array([0.25, 0.25, 0.25])
 
-        world.landmarks[len(world.targets)+0].state.p_pos = np.array([-1.0, -1.0])
+        world.landmarks[len(world.targets)+0].state.p_pos = np.array([0.0, 0.0])
         world.landmarks[len(world.targets)+1].state.p_pos = np.array([-1.0,  1.0])
-        world.landmarks[len(world.targets)+2].state.p_pos = np.array([1.0,   1.0])
-        world.landmarks[len(world.targets)+3].state.p_pos = np.array([1.0,  -1.0])
+        world.landmarks[len(world.targets)+2].state.p_pos = np.array([-1.0, -1.0])
+        world.landmarks[len(world.targets)+3].state.p_pos = np.array([1.0,   1.0])
+        world.landmarks[len(world.targets)+4].state.p_pos = np.array([1.0,  -1.0])
 
     def benchmark_data(self, agent, world):
         # returns data for benchmarking purposes
