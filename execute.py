@@ -32,14 +32,6 @@ if __name__ == '__main__':
     # Create environment
     env, world = make_env(arglist)
 
-    WorldTarget = []
-    for i, landmark in enumerate(world.targets):
-        WorldTarget.append([landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.state.p_vel[0],
-                            landmark.state.p_vel[1], landmark.value, landmark.defence])
-    print('WorldTarget', WorldTarget)
-    TESTC.TESTControl.Found_Target_Set = WorldTarget
-    TESTC.TESTControl.Found_Target_Info = [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
-
     # Create Controllers
     Control = []
     for i in range(env.n):
@@ -49,6 +41,14 @@ if __name__ == '__main__':
     obs_n = env.reset()
     step = 0
     start = time.time()
+
+    WorldTarget = []
+    for i, landmark in enumerate(world.targets):
+        WorldTarget.append([landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.state.p_vel[0],
+                            landmark.state.p_vel[1], landmark.value, landmark.defence])
+    print('WorldTarget', WorldTarget)
+    TESTC.TESTControl.Found_Target_Set = WorldTarget
+    TESTC.TESTControl.Found_Target_Info = [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
 
     while True:
 
