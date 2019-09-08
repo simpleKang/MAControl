@@ -62,6 +62,7 @@ if __name__ == '__main__':
             actioni = Control[i].InnerController(obs_n[i], acc_it, acc_il, step, finishedi)
             action_n.append(actioni)
         print('Shared_UAV_state: ', TESTC.TESTControl.Shared_UAV_state)
+        print('WorldTarget: ', WorldTarget)
         print('Found_Target_Set: ', TESTC.TESTControl.Found_Target_Set)
         print('Found_Target_Info: ', TESTC.TESTControl.Found_Target_Info)
         print('Target_index: ', TESTC.TESTControl.Target_index)
