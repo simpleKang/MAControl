@@ -256,6 +256,7 @@ class TESTControl(object):
         elif TESTControl.Shared_UAV_state[k] == 3:
             world.agents[k].attacking = True
             print('Agent_%d is attacking.' % k)
+            self.obs_n = obs_n
 
         self.PathPlanner(obs_n[k], step)
 
@@ -287,14 +288,14 @@ class TESTControl(object):
             self.is_init = False
 
         if self.waypoint_list[self.current_wplist][0][2] == 5 and self.is_attacking is False:
-            self.pointAi = (obs[2], obs[3])
-            self.pointBi = (self.waypoint_list[self.current_wplist][self.pointB_index][0],
-                            self.waypoint_list[self.current_wplist][self.pointB_index][1])
+            # self.pointAi = (obs[2], obs[3])
+            self.pointBi = (self.waypoint_list[self.current_wplist][0][0],
+                            self.waypoint_list[self.current_wplist][0][1])
             self.is_attacking = True
             self.arrive_flag = False
 
         # 更改航点状态并输出A、B坐标
-        if self.arrive_flag:
+        if self.arrive_flag and self.is_attacking is False and self.waypoint_finished is False:
             if self.waypoint_list[self.current_wplist][self.pointB_index+1][2] != 0 and self.pointB_index < 255:
                 if self.pointB_index > 0:
                     self.waypoint_list[self.current_wplist][self.pointB_index-1][2] = 4
@@ -308,7 +309,7 @@ class TESTControl(object):
                 self.pointB_index += 1
 
             else:
-                if self.is_attacking is False and self.cycle_index < self.total_cycle:
+                if self.cycle_index < self.total_cycle:
                     for i in range(self.pointB_index+1):
                         self.waypoint_list[self.current_wplist][i][2] = 1
                     self.pointAi = (self.waypoint_list[self.current_wplist][self.pointB_index][0],
@@ -320,9 +321,12 @@ class TESTControl(object):
                     self.cycle_index += 1
                 else:
                     self.waypoint_finished = True
+
+        elif self.arrive_flag and self.is_attacking is True and self.waypoint_finished is False:
+            self.waypoint_finished = True
+
         else:
             print('hai mei dao')
-            # self.waypoint_finished = False
 
     def MotionController(self, obs, pointAi, pointBi, step):
         # print("motion control")
@@ -333,7 +337,7 @@ class TESTControl(object):
 
         # set L1 params
         L1_ratio = 0.1  # (当v=0.05则L1=0.005km=50m)
-        BP_range = 0.1  # (0.1km=100m)
+        BP_range = 0.01  # (0.1km=100m)
         K_L1 = 0.1  # (系数)
 
         # set tecs params
