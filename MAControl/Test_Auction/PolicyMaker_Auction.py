@@ -2,7 +2,7 @@ from MAControl.Base.PolicyMaker import PolicyMaker
 import math
 import random
 import numpy as np
-import MAControl.Util.PointInRec as point_in_rec
+from MAControl.Util.PointInRec import point_in_rec
 
 class PolicyMaker_Auciton(PolicyMaker):
 # change TESTControl to PolicyMaker_Auciton
@@ -112,7 +112,7 @@ class PolicyMaker_Auciton(PolicyMaker):
         price = random.random()
         return price
 
-    def makepolicy(self, WorldTarget, obs_n, step):
+    def make_policy(self, WorldTarget, obs_n, step):
         self.close_area = self.find_mate(obs_n, self.comm_dis) #更新邻域个体
         # 搜索阶段
         if PolicyMaker_Auciton.Shared_UAV_state[self.index] == 0: # =0 搜索
