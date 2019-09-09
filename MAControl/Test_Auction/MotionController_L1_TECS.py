@@ -8,5 +8,6 @@ class MotionController_L1_TECS(MotionController.MotionController):
         pass
 
     def controlmotion(self):
+        print('This is a motioncontroller.')
         pass
 

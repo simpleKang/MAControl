@@ -9,4 +9,5 @@ class PolicyMaker_Auciton(PolicyMaker.PolicyMaker):
 
     def makepolicy(self):
         print('This is a policymaker.')
+        pass
 

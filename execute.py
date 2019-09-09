@@ -40,17 +40,11 @@ if __name__ == '__main__':
     NewController = []
     for i in range(env.n):
         control = []
-        control.append(PM_A)
-        control.append(PP_S)
-        control.append(MC_L)
-        control.append(IC_P)
+        control.append(PM_A.PolicyMaker_Auciton)
+        control.append(PP_S.PathPlanner_Simple)
+        control.append(MC_L.MotionController_L1_TECS)
+        control.append(IC_P.InnerController_PID)
         NewController.append(control)
-
-    # Create Controllers
-    Control = []
-    for i in range(env.n):
-        Control.append(TESTC.TESTControl("agent_%d" % i, env, world, i, arglist))
-        Control[i].waypoint_list[Control[i].current_wplist][0:len(U.init_waypoint[i])] = U.init_waypoint[i]
 
     obs_n = env.reset()
     step = 0
@@ -61,31 +55,31 @@ if __name__ == '__main__':
         WorldTarget.append([landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.state.p_vel[0],
                             landmark.state.p_vel[1], landmark.value, landmark.defence])
     print('WorldTarget', WorldTarget)
-    TESTC.TESTControl.Found_Target_Set = WorldTarget
-    TESTC.TESTControl.Found_Target_Info = [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
+    # TESTC.TESTControl.Found_Target_Set = WorldTarget
+    # TESTC.TESTControl.Found_Target_Info = [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
 
     while True:
 
         # get action
         action_n = []
         for i in range(env.n):
-            pointAi, pointBi, finishedi, world = \
-                Control[i].PolicyMaker(WorldTarget, obs_n, step, i, world)
-            print(pointAi, pointBi, i, finishedi)
-            acc_it, acc_il = Control[i].MotionController(obs_n[i], pointAi, pointBi, step)
-            actioni = Control[i].InnerController(obs_n[i], acc_it, acc_il, step, finishedi)
-            action_n.append(actioni)
-        print('Shared_UAV_state: ', TESTC.TESTControl.Shared_UAV_state)
-        print('WorldTarget: ', WorldTarget)
-        print('Found_Target_Set: ', TESTC.TESTControl.Found_Target_Set)
-        print('Found_Target_Info: ', TESTC.TESTControl.Found_Target_Info)
-        print('Target_index: ', TESTC.TESTControl.Target_index)
-        print('Resorted_Target: ', TESTC.TESTControl.Resorted_Target)
-        print('Selectable_UAV: ', TESTC.TESTControl.Selectable_UAV)
-        print('Auctioneer: ', TESTC.TESTControl.Auctioneer)
-        print('Trans_step: ', TESTC.TESTControl.Trans_step)
-        print('Winner: ', TESTC.TESTControl.Winner)
-        print('Price_list: ', TESTC.TESTControl.Price_list)
+            NewController[i][0].makepolicy()
+            NewController[i][1].planpath()
+            NewController[i][2].controlmotion()
+            NewController[i][3].controlinner()
+
+
+
+
+
+
+            # pointAi, pointBi, finishedi, world = \
+            #     Control[i].PolicyMaker(WorldTarget, obs_n, step, i, world)
+            # print(pointAi, pointBi, i, finishedi)
+            # acc_it, acc_il = Control[i].MotionController(obs_n[i], pointAi, pointBi, step)
+            # actioni = Control[i].InnerController(obs_n[i], acc_it, acc_il, step, finishedi)
+            # action_n.append(actioni)
+
 
         # environment step
         new_obs_n, rew_n, done_n, info_n = env.step(action_n)
