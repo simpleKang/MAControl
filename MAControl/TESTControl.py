@@ -2,7 +2,7 @@ import numpy as np
 import math
 import os
 import MAControl.util as U
-import MAControl.WayPointListOperator as W
+# import MAControl.WayPointListOperator as W
 import random
 
 
