@@ -337,7 +337,7 @@ class TESTControl(object):
 
         # set L1 params
         L1_ratio = 0.1  # (当v=0.05则L1=0.005km=50m)
-        BP_range = 0.01  # (0.1km=100m)
+        BP_range = 0.1  # (0.1km=100m)
         K_L1 = 0.1  # (系数)
 
         # set tecs params
