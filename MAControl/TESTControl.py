@@ -168,9 +168,9 @@ class TESTControl(object):
                 if TESTControl.Resorted_Target[0][2] == 0:
                     if TESTControl.wait_step_auction > 0:
                         if k in TESTControl.Found_Target_Info[TESTControl.Target_index]:
-                            # TODO 判断自己是否能够成为拍卖者，可以则向拍卖列表中添加自己的序号
-                            # if random.random() > 0.5:
-                            TESTControl.Selectable_UAV.append(k)
+                            # 进入到这里，说明k具备成为拍卖者的基本条件（知道这个目标，并且并不是正在攻击其他目标）
+                            if True:  # TODO 这里可以增加个性化的条件，[满足基本条件但不满足这个条件的UAV]拒绝成为拍卖者，[条件都满足的UAV]向拍卖列表中添加自己的序号
+                                TESTControl.Selectable_UAV.append(k)
                         if k == TESTControl.unassigned_list[-1]:
                             if len(TESTControl.Selectable_UAV) != 0:
                                 # TODO 从列表中随机取个体作为拍卖者
