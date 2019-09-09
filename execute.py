@@ -40,7 +40,7 @@ if __name__ == '__main__':
     NewController = []
     for i in range(env.n):
         control = []
-        control.append(PM_A.PolicyMaker_Auciton)
+        control.append(PM_A.PolicyMaker_Auciton("agent_%d" % i, env, world, i, arglist))
         control.append(PP_S.PathPlanner_Simple)
         control.append(MC_L.MotionController_L1_TECS)
         control.append(IC_P.InnerController_PID)
@@ -63,10 +63,10 @@ if __name__ == '__main__':
         # get action
         action_n = []
         for i in range(env.n):
-            NewController[i][0].makepolicy()
-            NewController[i][1].planpath()
-            NewController[i][2].controlmotion()
-            NewController[i][3].controlinner()
+            NewController[i][0].makepolicy(WorldTarget, obs_n, step)
+            NewController[i][1].planpath(2)
+            NewController[i][2].controlmotion(3)
+            NewController[i][3].controlinner(4)
 
 
 
