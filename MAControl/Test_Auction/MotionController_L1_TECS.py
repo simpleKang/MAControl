@@ -48,7 +48,7 @@ class MotionController_L1_TECS(MotionController):
 
         # set motion_pace
         if step == 0 or step % self.motion_pace == 0:
-            print('motion: ', pointAi, pointBi, self.arrive_flag)
+            # print('motion: ', pointAi, pointBi, self.arrive_flag)
 
             # # # # # tecs # # # # #
 
@@ -138,5 +138,5 @@ class MotionController_L1_TECS(MotionController):
                 lateral_acc_dir = np.sign(np.dot(lateral_acc_unit, vector_PC))
             self.lateral_acc = lateral_acc_size * lateral_acc_dir
 
-        return self.tangent_acc, self.lateral_acc
+        return self.tangent_acc, self.lateral_acc, self.arrive_flag
 

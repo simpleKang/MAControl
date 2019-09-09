@@ -86,8 +86,8 @@ class PathPlanner_Simple(PathPlanner):
         elif self.arrive_flag and self.is_attacking is True and self.waypoint_finished is False:
             self.waypoint_finished = True
 
-        else:
-            print('hai mei dao')
+        # else:
+            # print('hai mei dao')
             
         return self.pointAi, self.pointBi, self.waypoint_finished
 
