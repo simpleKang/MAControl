@@ -3,6 +3,10 @@ import argparse
 import time
 import MAControl.TESTControl as TESTC
 import MAControl.util as U
+import MAControl.Test_Auction.InnerController_PID as IC_P
+import MAControl.Test_Auction.MotionController_L1_TECS as MC_L
+import MAControl.Test_Auction.PathPlanner_Simple as PP_S
+import MAControl.Test_Auction.PolicyMaker_Auction as PM_A
 
 
 def parse_args():
@@ -31,6 +35,16 @@ if __name__ == '__main__':
 
     # Create environment
     env, world = make_env(arglist)
+
+    # >>>>>> TEST NEW CONTROLLERS >>>>>>>
+    NewController = []
+    for i in range(env.n):
+        control = []
+        control.append(PM_A)
+        control.append(PP_S)
+        control.append(MC_L)
+        control.append(IC_P)
+        NewController.append(control)
 
     # Create Controllers
     Control = []
