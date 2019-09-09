@@ -11,5 +11,5 @@ class PolicyMaker(ABC):
         self.arglist = arglist
 
     @abstractmethod
-    def makepolicy(self, WorldTarget, obs_n, step):
+    def make_policy(self, WorldTarget, obs_n, step):
         pass
