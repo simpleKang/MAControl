@@ -1,7 +1,7 @@
 from MAControl.Base.MotionController import MotionController
 import numpy as np
 import math
-import MAControl.Util.Constrain as C
+from MAControl.Util.Constrain import constrain
 
 
 class MotionController_L1_TECS(MotionController):
@@ -14,6 +14,8 @@ class MotionController_L1_TECS(MotionController):
         self.STE_rate_error = 0
         self.throttle_integ_s = 0
         self.arrive_flag = False
+        self.tangent_acc = 0
+        self.lateral_acc = 0
 
         pass
 
@@ -54,7 +56,7 @@ class MotionController_L1_TECS(MotionController):
             tas_state = speed = np.sqrt(np.square(vel_vector[0]) + np.square(vel_vector[1]))
             TAS_rate_setpoint = (TAS_setpoint - tas_state) * K_V
             STE_error = 0.5 * (TAS_setpoint * TAS_setpoint - tas_state * tas_state)
-            STE_rate_setpoint = C.Constrain(tas_state * TAS_rate_setpoint, STE_rate_min, STE_rate_max)
+            STE_rate_setpoint = constrain(tas_state * TAS_rate_setpoint, STE_rate_min, STE_rate_max)
 
             # compute throttle_p
             if STE_rate_setpoint >= 0:
@@ -66,10 +68,10 @@ class MotionController_L1_TECS(MotionController):
             self.STE_rate_error = self.STE_rate_error * 0.8 + STE_rate_setpoint * 0.2
             self.throttle_integ_s = self.throttle_integ_s + STE_error * Ki_STE
             throttle_setpoint = throttle_p + (STE_error + self.STE_rate_error * Kd_STE) * Kp_STE + self.throttle_integ_s
-            throttle_setpoint = C.Constrain(throttle_setpoint, throttle_setpoint_min, throttle_setpoint_max)
+            throttle_setpoint = constrain(throttle_setpoint, throttle_setpoint_min, throttle_setpoint_max)
 
             # tangent_acc
-            tangent_acc = throttle_setpoint * K_acct
+            self.tangent_acc = throttle_setpoint * K_acct
 
             # # # # # L1 # # # # #
 
@@ -101,11 +103,11 @@ class MotionController_L1_TECS(MotionController):
 
             # extra computation
             alongTrackDist = np.dot(vector_AP, vector_AB_unit)
-            AB_to_BP_bearing = math.acos(C.Constrain(np.dot(vector_AB_unit, vector_BP_unit), -1, 1))
+            AB_to_BP_bearing = math.acos(constrain(np.dot(vector_AB_unit, vector_BP_unit), -1, 1))
 
             if dist_AP > L1_distance and alongTrackDist/dist_AP < -0.707:
                 # calculate eta to fly to waypoint A
-                eta = math.acos(C.Constrain(np.dot(-1 * vector_AP_unit, vel_vector/speed), -1, 1))
+                eta = math.acos(constrain(np.dot(-1 * vector_AP_unit, vel_vector/speed), -1, 1))
 
             elif abs(AB_to_BP_bearing) < math.radians(100):
                 # calculate eta to fly to waypoint B
@@ -113,14 +115,14 @@ class MotionController_L1_TECS(MotionController):
 
             else:
                 # calculate eta to fly along the line between A and B
-                eta2 = math.acos(C.Constrain(np.dot(vector_AB_unit, vel_vector/speed), -1, 1))
-                beta = math.acos(C.Constrain(np.dot(vector_AP_unit, vector_AB_unit), -1, 1))
+                eta2 = math.acos(constrain(np.dot(vector_AB_unit, vel_vector/speed), -1, 1))
+                beta = math.acos(constrain(np.dot(vector_AP_unit, vector_AB_unit), -1, 1))
                 xtrackErr = dist_AP * math.sin(beta)
-                eta1 = math.asin(C.Constrain(xtrackErr / L1_distance, -0.7071, 0.7071))
+                eta1 = math.asin(constrain(xtrackErr / L1_distance, -0.7071, 0.7071))
                 eta = eta1 + eta2
 
             # eta
-            eta = C.Constrain(eta, -1.5708, 1.5708)
+            eta = constrain(eta, -1.5708, 1.5708)
             lateral_acc_size = speed * speed / L1_distance * math.sin(eta) * K_L1
 
             # pointC
@@ -134,7 +136,7 @@ class MotionController_L1_TECS(MotionController):
                 lateral_acc_dir = np.sign(np.dot(lateral_acc_unit, vector_AB))
             else:
                 lateral_acc_dir = np.sign(np.dot(lateral_acc_unit, vector_PC))
-            lateral_acc = lateral_acc_size * lateral_acc_dir
+            self.lateral_acc = lateral_acc_size * lateral_acc_dir
 
-        return tangent_acc, lateral_acc
+        return self.tangent_acc, self.lateral_acc
 

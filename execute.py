@@ -53,8 +53,6 @@ if __name__ == '__main__':
         WorldTarget.append([landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.state.p_vel[0],
                             landmark.state.p_vel[1], landmark.value, landmark.defence])
     print('WorldTarget', WorldTarget)
-    # TESTC.TESTControl.Found_Target_Set = WorldTarget
-    # TESTC.TESTControl.Found_Target_Info = [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
 
     while True:
 
@@ -62,22 +60,14 @@ if __name__ == '__main__':
         action_n = []
         for i in range(env.n):
             NewController[i][0].make_policy(WorldTarget, obs_n, step)
-            NewController[i][1].planpath(2)
-            NewController[i][2].get_expected_action(3)
-            NewController[i][3].get_action(4)
-
-
-
-
-
-
-            # pointAi, pointBi, finishedi, world = \
-            #     Control[i].PolicyMaker(WorldTarget, obs_n, step, i, world)
-            # print(pointAi, pointBi, i, finishedi)
-            # acc_it, acc_il = Control[i].MotionController(obs_n[i], pointAi, pointBi, step)
-            # actioni = Control[i].InnerController(obs_n[i], acc_it, acc_il, step, finishedi)
-            # action_n.append(actioni)
-
+            NewController[i][1].planpath()
+            # Test >>>>
+            pointAi = [-0.5, -0.5]
+            pointBi = [+0.5, +0.5]
+            finishedi = False
+            Eacct, Eaccl = NewController[i][2].get_expected_action(obs_n[i], pointAi, pointBi, step)
+            actioni = NewController[i][3].get_action(obs_n[i], Eacct, Eaccl, step, finishedi)
+            action_n.append(actioni)
 
         # environment step
         new_obs_n, rew_n, done_n, info_n = env.step(action_n)
