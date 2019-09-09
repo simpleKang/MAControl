@@ -1,10 +1,10 @@
-from MAControl.Base import PolicyMaker
+from MAControl.Base.PolicyMaker import PolicyMaker
 
 
-class PolicyMaker_Auciton(PolicyMaker.PolicyMaker):
+class PolicyMaker_Auciton(PolicyMaker):
 
     def __init__(self, name, env, world, agent_index, arglist):
-        super(PolicyMaker_Auciton, self).__init__()
+        super(PolicyMaker_Auciton, self).__init__(name, env, world, agent_index, arglist)
         self.waypoint_list = []
         self.cycle_index = 100
         pass
