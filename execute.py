@@ -36,6 +36,7 @@ if __name__ == '__main__':
     env, world = make_env(arglist)
 
     NewController = []
+    Arrive_flag = []
     for i in range(env.n):
         control = []
         control.append(PM_A.PolicyMaker_Auciton("agent_%d" % i, env, world, i, arglist))
@@ -43,6 +44,7 @@ if __name__ == '__main__':
         control.append(MC_L.MotionController_L1_TECS("agent_%d" % i, env, world, i, arglist))
         control.append(IC_P.InnerController_PID("agent_%d" % i, env, world, i, arglist))
         NewController.append(control)
+        Arrive_flag.append(False)
 
     obs_n = env.reset()
     step = 0
@@ -53,19 +55,17 @@ if __name__ == '__main__':
         WorldTarget.append([landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.state.p_vel[0],
                             landmark.state.p_vel[1], landmark.value, landmark.defence])
     print('WorldTarget', WorldTarget)
+    # TESTC.TESTControl.Found_Target_Set = WorldTarget
+    # TESTC.TESTControl.Found_Target_Info = [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
 
     while True:
 
         # get action
         action_n = []
         for i in range(env.n):
-            NewController[i][0].make_policy(WorldTarget, obs_n, step)
-            NewController[i][1].planpath()
-            # Test >>>>
-            pointAi = [-0.5, -0.5]
-            pointBi = [+0.5, +0.5]
-            finishedi = False
-            Eacct, Eaccl = NewController[i][2].get_expected_action(obs_n[i], pointAi, pointBi, step)
+            return_list = NewController[i][0].make_policy(WorldTarget, obs_n, step)
+            pointAi, pointBi, finishedi = NewController[i][1].planpath(return_list, obs_n[i], Arrive_flag[i])
+            Eacct, Eaccl, Arrive_flag[i] = NewController[i][2].get_expected_action(obs_n[i], pointAi, pointBi, step)
             actioni = NewController[i][3].get_action(obs_n[i], Eacct, Eaccl, step, finishedi)
             action_n.append(actioni)
 
