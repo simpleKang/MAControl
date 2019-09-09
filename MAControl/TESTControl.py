@@ -35,19 +35,19 @@ class TESTControl(object):
         self.world = world
         self.index = agent_index
         self.arglist = arglist
-        self.dt = world.dt
+        self.dt = world.dt  # done
 
         self.path_pace = 50
-        self.motion_pace = 5
-        self.inner_pace = 1
+        self.motion_pace = 5  # done
+        self.inner_pace = 1  # done
 
-        self.pointAi = (0, 0)
-        self.pointBi = (0, 0)
-        self.tangent_acc = 0
-        self.lateral_acc = 0
+        self.pointAi = (0, 0)  # output >>> input
+        self.pointBi = (0, 0)  # output >>> input
+        self.tangent_acc = 0   # output >>> input
+        self.lateral_acc = 0   # output >>> input
 
-        self.STE_rate_error = 0
-        self.throttle_integ_s = 0
+        self.STE_rate_error = 0  # done
+        self.throttle_integ_s = 0  # done
 
         self.detect_dis = 0.05
         self.comm_dis = 0.5
@@ -56,7 +56,7 @@ class TESTControl(object):
         
         self.waypoint_list = []         # 256×3的航点列表，第3列为航点状态 [0: 无航点] [1: 未飞] [2: pointA] [3: pointB] [4: 已到达]
         self.waypoint_finished = False  # 航点是否已经飞完
-        self.arrive_flag = False        # 是否到达B点
+        self.arrive_flag = False        # done
         self.pointB_index = 0           # 当前飞向的B点的索引
         self.is_init = True             # 是否为初始时刻
         self.is_attacking = False       # 是否为正在执行
@@ -69,9 +69,9 @@ class TESTControl(object):
         TESTControl.unassigned_list.append(self.index)
         self.waypoint_list.append([[0 for i in range(3)] for j in range(256)])
 
-        self.ITerm = 0
-        self.last_error = 0
-        self.action = [0, 0, 0, 0, 0]
+        self.ITerm = 0                   # done
+        self.last_error = 0              # done
+        self.action = [0, 0, 0, 0, 0]    # done
 
     def find_mate(self, obs_n, R):
         selfpos = np.array(obs_n[self.index][2:4])
