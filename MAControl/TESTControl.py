@@ -136,6 +136,7 @@ class TESTControl(object):
         # 更新小飞机的邻域列表
         self.close_area = self.find_mate(obs_n, self.comm_dis)
 
+        # 搜索阶段
         if TESTControl.Shared_UAV_state[k] == 0:
             if TESTControl.Shared_Big_Check is True and TESTControl.last_step == step-1:
                 TESTControl.Shared_UAV_state[k] = 1
@@ -154,6 +155,7 @@ class TESTControl(object):
                     TESTControl.last_step = step
                 self.add_new_target(obs_n[k], WorldTarget)
 
+        # 精选拍卖者
         elif TESTControl.Shared_UAV_state[k] == 1:
 
             if TESTControl.Update_step == step-1 and len(TESTControl.Resorted_Target) != 0:
@@ -165,10 +167,10 @@ class TESTControl(object):
                 # 目标状态为0时进行拍卖者的选择，所有人都会进来
                 if TESTControl.Resorted_Target[0][2] == 0:
                     if TESTControl.wait_step_auction > 0:
-                        if (k in TESTControl.Found_Target_Info[TESTControl.Target_index]) and (TESTControl.Shared_UAV_state[k] != 3):
-                            # 进入到这里，说明k具备成为拍卖者的基本条件（知道这个目标，并且并不是正在攻击其他目标）
-                            if True:  # TODO 这里可以增加个性化的条件，[满足基本条件但不满足这个条件的UAV]拒绝成为拍卖者，[条件都满足的UAV]向拍卖列表中添加自己的序号
-                                TESTControl.Selectable_UAV.append(k)
+                        if k in TESTControl.Found_Target_Info[TESTControl.Target_index]:
+                            # TODO 判断自己是否能够成为拍卖者，可以则向拍卖列表中添加自己的序号
+                            # if random.random() > 0.5:
+                            TESTControl.Selectable_UAV.append(k)
                         if k == TESTControl.unassigned_list[-1]:
                             if len(TESTControl.Selectable_UAV) != 0:
                                 # TODO 从列表中随机取个体作为拍卖者
@@ -205,9 +207,10 @@ class TESTControl(object):
                         for i in range(len(TESTControl.Trans_step)):
                             if k == TESTControl.Trans_step[i][0]:
                                 TESTControl.Shared_UAV_state[k] = 2
+                                TESTControl.Price_list.append([k])
                                 self.trans_step = TESTControl.Trans_step[i][1]
 
-        # 进入状态2的都是选出来的拍卖者和竞拍者
+        # 竞价阶段
         elif TESTControl.Shared_UAV_state[k] == 2:
 
             if TESTControl.Resorted_Target[0][2] == 2:
@@ -229,14 +232,16 @@ class TESTControl(object):
                     else:
                         TESTControl.wait_step -= 1
                 # 所有竞拍者（拍卖者也是竞拍者）进入
-                if self.trans_step == 0 and TESTControl.wait_step > 0:
-                    # TODO 目前是添加价格，为避免重复添加，添加完之后继续 -1 ，待优化
-                    TESTControl.Price_list.append([k, self.auction(obs_n[k], TESTControl.Found_Target_Set)])
-                    self.trans_step -= 1
-                else:
-                    self.trans_step -= 1
+                # TODO 已经可以重复添加价格了
+                for i in range(len(TESTControl.Price_list)):
+                    if k == TESTControl.Price_list[i][0]:
+                        if self.trans_step == 0 and TESTControl.wait_step > 0:
+                            TESTControl.Price_list[i].append(self.auction(obs_n[k], TESTControl.Found_Target_Set))
+                        else:
+                            TESTControl.Price_list[i].append(0)
+                            self.trans_step -= 1
 
-            if TESTControl.Resorted_Target[0][2] == 3:
+            elif TESTControl.Resorted_Target[0][2] == 3:
                 if TESTControl.last_step == step-1:
                     TESTControl.Shared_UAV_state[k] = 1
                     if k in TESTControl.Winner:
@@ -253,10 +258,11 @@ class TESTControl(object):
                                     if TESTControl.Shared_UAV_state[j] != 3:
                                         TESTControl.Shared_UAV_state[j] = 1
 
+        # 执行阶段
         elif TESTControl.Shared_UAV_state[k] == 3:
             world.agents[k].attacking = True
             print('Agent_%d is attacking.' % k)
-            self.obs_n = obs_n
+            # self.obs_n = obs_n
 
         self.PathPlanner(obs_n[k], step)
 
@@ -287,8 +293,9 @@ class TESTControl(object):
                             self.waypoint_list[self.current_wplist][self.pointB_index][1])
             self.is_init = False
 
+        # 变为攻击状态后更改目标
         if self.waypoint_list[self.current_wplist][0][2] == 5 and self.is_attacking is False:
-            # self.pointAi = (obs[2], obs[3])
+            self.pointAi = (obs[2], obs[3])
             self.pointBi = (self.waypoint_list[self.current_wplist][0][0],
                             self.waypoint_list[self.current_wplist][0][1])
             self.is_attacking = True
