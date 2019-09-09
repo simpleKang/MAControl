@@ -1,8 +1,7 @@
 # coding=utf-8
+
 import argparse
 import time
-import MAControl.TESTControl as TESTC
-import MAControl.util as U
 import MAControl.Test_Auction.InnerController_PID as IC_P
 import MAControl.Test_Auction.MotionController_L1_TECS as MC_L
 import MAControl.Test_Auction.PathPlanner_Simple as PP_S
@@ -36,14 +35,13 @@ if __name__ == '__main__':
     # Create environment
     env, world = make_env(arglist)
 
-    # >>>>>> TEST NEW CONTROLLERS >>>>>>>
     NewController = []
     for i in range(env.n):
         control = []
         control.append(PM_A.PolicyMaker_Auciton("agent_%d" % i, env, world, i, arglist))
         control.append(PP_S.PathPlanner_Simple("agent_%d" % i, env, world, i, arglist))
-        control.append(MC_L.MotionController_L1_TECS)
-        control.append(IC_P.InnerController_PID)
+        control.append(MC_L.MotionController_L1_TECS("agent_%d" % i, env, world, i, arglist))
+        control.append(IC_P.InnerController_PID("agent_%d" % i, env, world, i, arglist))
         NewController.append(control)
 
     obs_n = env.reset()
@@ -63,10 +61,10 @@ if __name__ == '__main__':
         # get action
         action_n = []
         for i in range(env.n):
-            NewController[i][0].makepolicy(WorldTarget, obs_n, step)
+            NewController[i][0].make_policy(WorldTarget, obs_n, step)
             NewController[i][1].planpath(2)
-            NewController[i][2].controlmotion(3)
-            NewController[i][3].controlinner(4)
+            NewController[i][2].get_expected_action(3)
+            NewController[i][3].get_action(4)
 
 
 
