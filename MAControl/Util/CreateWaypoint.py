@@ -41,3 +41,19 @@ for i in range(N):
     Wide1.append(D*(2*(N-i)-1))
     Wide2.append(D*(2*i+1))
     init_waypoint.append(snake_single(Up[i], Down[i], Wide1[i], Wide2[i], Edge, W, D, i))
+
+
+# init_waypoint.append([[-0.9, -0.9, 1],
+#                       [-0.9, 0.9, 1],
+#                       [0.9, 0.9, 1],
+#                       [0.9, -0.9, 1]])
+#
+# init_waypoint.append([[-0.6, -0.6, 1],
+#                       [-0.6, 0.6, 1],
+#                       [0.6, 0.6, 1],
+#                       [0.6, -0.6, 1]])
+#
+# init_waypoint.append([[-0.3, -0.3, 1],
+#                       [-0.3, 0.3, 1],
+#                       [0.3, 0.3, 1],
+#                       [0.3, -0.3, 1]])
