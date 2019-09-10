@@ -6,10 +6,15 @@ from MAControl.Util.PointInRec import point_in_rec
 
 class PolicyMaker_Auciton(PolicyMaker):
 
+    # 在搜索阶段(<Step0)操作，只增不减
     Found_Target_Set = []  # {target_pos, target_vel, target_value, target_defence}
     Found_Target_Info = []  # {TARGET:UAV_INDEX}
-    Remain_Target_Set = []  # {target_pos, target_vel, target_value, target_defence, TARGET_INDEX}
+
+    # 在轮换阶段(==Step5)操作，只增不减
     Attacked_Target_Index = []  # {TARGET_INDEX}
+
+    # 在轮换阶段(==Step5)重置，在决策过程赋值使用
+    Remain_Target_Set = []  # {target_pos, target_vel, target_value, target_defence, TARGET_INDEX}
     Current_Target_Index = -1  # {TARGET_INDEX}
     Remain_UAV_Set = []  # {UAV_INDEX}
     Current_Price_Set = []   # {UAV X STEP}
