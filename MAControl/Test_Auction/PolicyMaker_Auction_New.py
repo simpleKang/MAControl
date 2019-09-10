@@ -116,11 +116,12 @@ class PolicyMaker_Auciton(PolicyMaker):
 
         if self.InAttacking:
             self.opt_index = 5
+            print('UAV', self.index, 'attacking')
 
         else:
 
             if step < self.Step0:
-                print('searching')
+                print('UAV', self.index, 'searching')
                 self.close_area = self.find_mate(obs_n)
                 self.add_new_target(obs_n[self.index], WorldTarget)
 
@@ -129,7 +130,7 @@ class PolicyMaker_Auciton(PolicyMaker):
                     self.operate_step(0, step)
 
             elif step == self.Step0:
-                print('resorting')
+                print('UAV', self.index, 'resorting')
 
                 if self.index == (len(obs_n)-1):
 
@@ -142,7 +143,7 @@ class PolicyMaker_Auciton(PolicyMaker):
                     print('Remain_Target_Set: ', PolicyMaker_Auciton.Remain_Target_Set)
 
             elif step == self.Step1:
-                print('choosing')
+                print('UAV', self.index, 'choosing')
 
                 if self.index == (len(obs_n)-1):
                     PolicyMaker_Auciton.Current_Target_Index = PolicyMaker_Auciton.Remain_Target_Set[0][-1]
@@ -150,13 +151,13 @@ class PolicyMaker_Auciton(PolicyMaker):
                     PolicyMaker_Auciton.Current_Price_Set = [[0 for j in range(len(PolicyMaker_Auciton.Remain_UAV_Set))] for k in range(18)]
 
             elif self.Step2 <= step < self.Step3:
-                print('pricing')
+                print('UAV', self.index, 'pricing')
 
                 if random.random() > 0.5:
                     PolicyMaker_Auciton.Current_Price_Set[step - self.Step2][self.index] = random.random()
 
             elif step == self.Step3:
-                print('priced')
+                print('UAV', self.index, 'priced')
 
                 if self.index == (len(obs_n)-1):
 
@@ -192,7 +193,7 @@ class PolicyMaker_Auciton(PolicyMaker):
                     print('UAV', self.index, 'not to attack')
 
             elif step == self.Step5:
-                print('recycling')
+                print('UAV', self.index, 'recycling')
                 self.operate_step(1, step)
 
             else:
