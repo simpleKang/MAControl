@@ -11,7 +11,7 @@ class PolicyMaker_Auciton(PolicyMaker):
     Remain_Target_Set = []  # {target_pos, target_vel, target_value, target_defence, TARGET_INDEX}
     Attacked_Target_Index = []  # {TARGET_INDEX}
     Current_Target_Index = -1  # {TARGET_INDEX}
-    Remain_UAV_Set = []  # {UAV_STATE}
+    Remain_UAV_Set = []  # {UAV_INDEX}
     Current_Price_Set = []   # {UAV X STEP}
 
     def __init__(self, name, env, world, agent_index, arglist):
@@ -32,7 +32,7 @@ class PolicyMaker_Auciton(PolicyMaker):
 
         self.close_area = []
 
-        PolicyMaker_Auciton.Remain_UAV_Set.append(0)
+        PolicyMaker_Auciton.Remain_UAV_Set.append(i)
 
     def find_mate(self, obs_n, r=0.5):
         selfpos = np.array(obs_n[self.index][2:4])
