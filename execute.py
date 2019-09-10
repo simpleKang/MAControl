@@ -6,7 +6,7 @@ import MAControl.Test_Auction.InnerController_PID as IC_P
 import MAControl.Test_Auction.MotionController_L1_TECS as MC_L
 import MAControl.Test_Auction.PathPlanner_Simple as PP_S
 import MAControl.Test_Auction.PolicyMaker_Auction as PM_A
-import MAControl.Test_Auction.PolicyMaker_Auction_New as PM_A2  # try
+import MAControl.Test_Auction.PolicyMaker_Auction_New as PM_A2  # >>>>> try
 
 
 def parse_args():
@@ -37,16 +37,15 @@ if __name__ == '__main__':
     env, world = make_env(arglist)
 
     NewController = []
-    Arrive_flag = []
     for i in range(env.n):
         control = []
         control.append(PM_A.PolicyMaker_Auciton("agent_%d" % i, env, world, i, arglist))
         control.append(PP_S.PathPlanner_Simple("agent_%d" % i, env, world, i, arglist))
         control.append(MC_L.MotionController_L1_TECS("agent_%d" % i, env, world, i, arglist))
         control.append(IC_P.InnerController_PID("agent_%d" % i, env, world, i, arglist))
-        control.append(PM_A2.PolicyMaker_Auciton("agent_%d" % i, env, world, i, arglist))   # try
+        control.append(False)
+        control.append(PM_A2.PolicyMaker_Auciton("agent_%d" % i, env, world, i, arglist))   # >>>>> try
         NewController.append(control)
-        Arrive_flag.append(False)
 
     obs_n = env.reset()
     step = 0
@@ -59,19 +58,30 @@ if __name__ == '__main__':
     print('WorldTarget', WorldTarget)
     PM_A.PolicyMaker_Auciton.Found_Target_Set = WorldTarget
     PM_A.PolicyMaker_Auciton.Found_Target_Info = [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
+    PM_A2.PolicyMaker_Auciton.Found_Target_Set = WorldTarget  # >>>>> try
+    PM_A2.PolicyMaker_Auciton.Found_Target_Info = [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]  #try
 
     while True:
 
         # get action
         action_n = []
         for i in range(env.n):
-            return_list = NewController[i][0].make_policy(WorldTarget, obs_n, step)
-            pointAi, pointBi, finishedi = NewController[i][1].planpath(return_list, obs_n[i], Arrive_flag[i])
-            Eacct, Eaccl, Arrive_flag[i] = NewController[i][2].get_expected_action(obs_n[i], pointAi, pointBi, step, finishedi)
-            print(pointAi, pointBi, finishedi, Arrive_flag[i])
-            print(Eacct, Eaccl, Arrive_flag[i])
-            actioni = NewController[i][3].get_action(obs_n[i], Eacct, Eaccl, step, finishedi)
+
+            list_i = NewController[i][0].\
+                make_policy(WorldTarget, obs_n, step)
+
+            pointAi, pointBi, finishedi, NewController[i][4] = NewController[i][1].\
+                planpath(list_i, obs_n[i], NewController[i][4])
+
+            acctEi, acclEi, NewController[i][4] = NewController[i][2].\
+                get_expected_action(obs_n[i], pointAi, pointBi, step, finishedi)
+
+            actioni = NewController[i][3].\
+                get_action(obs_n[i], acctEi, acclEi, step, finishedi)
+
             action_n.append(actioni)
+            print("agent_%d" % i, pointAi, pointBi, 'finishedi:', finishedi)
+            print(acctEi, acclEi, 'arriveflag:', NewController[i][4])
 
         # environment step
         new_obs_n, rew_n, done_n, info_n = env.step(action_n)
