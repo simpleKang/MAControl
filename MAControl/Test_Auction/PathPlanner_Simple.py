@@ -87,7 +87,7 @@ class PathPlanner_Simple(PathPlanner):
         # else:
             # print('hai mei dao')
             
-        return self.pointAi, self.pointBi, self.waypoint_finished
+        return self.pointAi, self.pointBi, self.waypoint_finished, self.is_attacking
 
     # 操作数 = 0 不进行修改
     def no_operation(self, original):

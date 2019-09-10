@@ -61,7 +61,7 @@ def update_action(env, world, obs_n, step, NewController):
         list_i = NewController[i][0]. \
             make_policy(WorldTarget, obs_n, step)
 
-        pointAi, pointBi, finishedi = NewController[i][1]. \
+        pointAi, pointBi, finishedi, is_attacking = NewController[i][1].\
             planpath(list_i, obs_n[i], NewController[i][4])
 
         acctEi, acclEi, NewController[i][4] = NewController[i][2]. \

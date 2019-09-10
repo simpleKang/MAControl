@@ -4,8 +4,10 @@ import random
 import numpy as np
 from MAControl.Util.PointInRec import point_in_rec
 
+
 class PolicyMaker_Auciton(PolicyMaker):
-# change TESTControl to PolicyMaker_Auciton
+
+    # change TESTControl to PolicyMaker_Auciton
     Found_Target_Set = []
     Found_Target_Info = []
     Shared_UAV_state = []
