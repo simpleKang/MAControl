@@ -69,7 +69,7 @@ if __name__ == '__main__':
             pointAi, pointBi, finishedi, Arrive_flag[i] = NewController[i][1].planpath(return_list, obs_n[i], Arrive_flag[i])
             pointAi = (-1, -1)
             pointBi = (-1, 1)
-            if Arrive_flag[i] == True:
+            if Arrive_flag[i]:
                 finishedi = True
             else:
                 finishedi = False

@@ -48,7 +48,6 @@ class MotionController_L1_TECS(MotionController):
 
         # set motion_pace
         if step == 0 or step % self.motion_pace == 0:
-            # print('motion: ', pointAi, pointBi, self.arrive_flag)
 
             # # # # # tecs # # # # #
 
