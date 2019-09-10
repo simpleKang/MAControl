@@ -13,10 +13,12 @@ class PolicyMaker_Auciton(PolicyMaker):
     # 在轮换阶段(==Step5)操作，只增不减
     Attacked_Target_Index = []  # {TARGET_INDEX}
 
+    # 在分道阶段(==Step4)操作，只减不增
+    Remain_UAV_Set = []  # {UAV_INDEX}
+
     # 在轮换阶段(==Step5)重置，在决策过程赋值使用
     Remain_Target_Set = []  # {target_pos, target_vel, target_value, target_defence, TARGET_INDEX}
     Current_Target_Index = -1  # {TARGET_INDEX}
-    Remain_UAV_Set = []  # {UAV_INDEX}
     Current_Price_Set = []   # {UAV X STEP}
     Current_Price_Result = []  # {UAV_INDEX,UAV_PRICE}
 
@@ -139,7 +141,6 @@ class PolicyMaker_Auciton(PolicyMaker):
 
                 if self.index == (len(obs_n)-1):
 
-                    PolicyMaker_Auciton.Remain_Target_Set = []
                     for i in range(len(PolicyMaker_Auciton.Found_Target_Set)):
                         if i not in PolicyMaker_Auciton.Attacked_Target_Index:
                             PolicyMaker_Auciton.Remain_Target_Set.append(PolicyMaker_Auciton.Found_Target_Set[i]+[i])
@@ -194,12 +195,19 @@ class PolicyMaker_Auciton(PolicyMaker):
                     self.InAttacking = True
                     self.x = PolicyMaker_Auciton.Found_Target_Set[PolicyMaker_Auciton.Current_Target_Index][0]
                     self.y = PolicyMaker_Auciton.Found_Target_Set[PolicyMaker_Auciton.Current_Target_Index][1]
+                    PolicyMaker_Auciton.Remain_UAV_Set.remove(self.index)
                 else:
                     print('UAV', self.index, 'not to attack')
 
             elif step == self.Step5:
                 print('UAV', self.index, 'recycling')
                 self.operate_step(1, step)
+
+                if self.index == (len(obs_n)-1):
+                    PolicyMaker_Auciton.Remain_Target_Set = []
+                    PolicyMaker_Auciton.Current_Target_Index = -1
+                    PolicyMaker_Auciton.Current_Price_Set = []
+                    PolicyMaker_Auciton.Current_Price_Result = []
 
             else:
                 raise Exception('Wrong Wrong Wrong')
