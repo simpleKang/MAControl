@@ -44,8 +44,8 @@ class PathPlanner_Simple(PathPlanner):
                 self.pointBi = (self.waypoint_list[self.current_wplist][0][0],
                                 self.waypoint_list[self.current_wplist][0][1])
                 self.is_attacking = True
-            else:
-                raise Exception('Target coord is changed again! This should not happen!!!')
+            # else:
+                # raise Exception('Target coord is changed again! This should not happen!!!')
 
         # 初始时刻输出A、B坐标
         if self.pointB_index == 0 and self.is_init is True:
