@@ -8,7 +8,7 @@ class PolicyMaker_Auciton(PolicyMaker):
 
     Found_Target_Set = []  # {target_pos, target_vel, target_value, target_defence}
     Found_Target_Info = []  # {TARGET:UAV_INDEX}
-    Remain_Target_Set = []  # {target_pos, target_vel, target_value, target_defence, TARGET_STATE}
+    Remain_Target_Set = []  # {target_pos, target_vel, target_value, target_defence, TARGET_INDEX}
     Attacked_Target_Index = []  # {TARGET_INDEX}
     Remain_UAV_Set = []  # {UAV_STATE}
 
