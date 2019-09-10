@@ -8,7 +8,6 @@ class InnerController_PID(InnerController):
         super(InnerController_PID, self).__init__(name, env, world, agent_index, arglist)
 
         # extra params
-        self.dt = world.dt
         self.ITerm = 0
         self.last_error = 0
         self.action = [0, 0, 0, 0, 0]
@@ -28,7 +27,7 @@ class InnerController_PID(InnerController):
             Exp_lateral_acc = Eaccl
             True_lateral_acc = np.array(obs[5])
 
-            delta_time = self.dt
+            delta_time = self.world.dt
             P_value = 0.9
             I_value = 0.01
             D_value = 0.0
