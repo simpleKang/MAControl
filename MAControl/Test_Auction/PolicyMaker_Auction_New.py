@@ -116,7 +116,7 @@ class PolicyMaker_Auciton(PolicyMaker):
 
         if self.InAttacking:
             self.opt_index = 5
-            print('UAV', self.index, 'attacking')
+            print('UAV', self.index, 'ATTACKING ATTACKING')
 
         else:
 
