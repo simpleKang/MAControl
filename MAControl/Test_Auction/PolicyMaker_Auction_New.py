@@ -6,6 +6,15 @@ from MAControl.Util.PointInRec import point_in_rec
 
 class PolicyMaker_Auciton(PolicyMaker):
 
+    #                                       (Step2<=)&(<Step3)
+    # 搜索目标[阶段] | 排序目标[步] | 选择目标[步] | 出价[阶段] | 统计价格[步] | 分道扬镳[步] | 重置[步] >>>> 搜索目标[阶段] ....
+    #  <Step0         ==Step0       ==Step1         ^         ==Step3      ==Step4      ==Step5
+    #                                                                        |
+    #                                                                        |
+    #                                                    InAttacking == True |
+    #                                                                        |
+    #                                                                     攻击[阶段]
+
     # 在搜索阶段(<Step0)操作，只增不减
     Found_Target_Set = []  # {target_pos, target_vel, target_value, target_defence}
     Found_Target_Info = []  # {TARGET:UAV_INDEX}
