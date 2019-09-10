@@ -15,17 +15,17 @@ class PolicyMaker_Auciton(PolicyMaker):
     #                                                                        |
     #                                                                     攻击[阶段]
 
-    # 在搜索阶段(<Step0)操作，只增不减
+    # 在搜索目标阶段(<Step0)操作，只增不减
     Found_Target_Set = []  # {target_pos, target_vel, target_value, target_defence}
     Found_Target_Info = []  # {TARGET:UAV_INDEX}
 
-    # 在轮换阶段(==Step5)操作，只增不减
+    # 在重置步(==Step5)操作，只增不减
     Attacked_Target_Index = []  # {TARGET_INDEX}
 
-    # 在分道阶段(==Step4)操作，只减不增
+    # 在分道步(==Step4)操作，只减不增
     Remain_UAV_Set = []  # {UAV_INDEX}
 
-    # 在轮换阶段(==Step5)重置，在决策过程赋值使用
+    # 在重置步(==Step5)重置
     Remain_Target_Set = []  # {target_pos, target_vel, target_value, target_defence, TARGET_INDEX}
     Current_Target_Index = -1  # {TARGET_INDEX}
     Current_Price_Set = []   # {UAV X STEP}
@@ -38,17 +38,18 @@ class PolicyMaker_Auciton(PolicyMaker):
         self.y = 0
         self.InAttacking = False
 
-        # 以下为一些阶段的初始设定步数，如果某一步需要用比预设更多的时间以达成某些要求，可以直接修改步数，从而延迟进入下一步
-        self.Step0 = 500  # 进入决策过程，对目标进行排序
-        self.Step1 = 501  # 紧接上一步，选择一个目标作为打击对象
-        self.Step2 = 502  # 紧接上一步，各UAV开始出价
-        self.Step3 = 520  # 经过一段时间的出价，各UAV统计出价结果
-        self.Step4 = 521  # 紧接上一步，各UAV进入攻击状态
-        self.Step5 = 522  # 紧接上一步，统计剩余UAV数量和编号
-        # 一旦运行到Step5，就需要[重新设置Step0~Step5的数值，进行一些变量的清零/重制]，或者[反馈表明UAV已经用光] #
+        # 以下为一些阶段的初始设定步数
+        # >> 未来步数点可修改，从而可以主动停留在某一阶段/步
+        # >> 进入攻击阶段之后就跳出这部分逻辑而无所谓这些数值
+        # >> 进入重置步的时候将所有步数点推到未来避免进入 >Step5 的无定义情况
+        self.Step0 = 500
+        self.Step1 = 501
+        self.Step2 = 502
+        self.Step3 = 520
+        self.Step4 = 521
+        self.Step5 = 522
 
         self.close_area = []
-
         PolicyMaker_Auciton.Remain_UAV_Set.append(self.index)
 
     def find_mate(self, obs_n, r=0.5):
