@@ -56,10 +56,10 @@ if __name__ == '__main__':
         WorldTarget.append([landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.state.p_vel[0],
                             landmark.state.p_vel[1], landmark.value, landmark.defence])
     print('WorldTarget', WorldTarget)
-    PM_A.PolicyMaker_Auciton.Found_Target_Set = WorldTarget
-    PM_A.PolicyMaker_Auciton.Found_Target_Info = [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
-    PM_A2.PolicyMaker_Auciton.Found_Target_Set = WorldTarget  # >>>>> try
-    PM_A2.PolicyMaker_Auciton.Found_Target_Info = [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]  #try
+    # PM_A.PolicyMaker_Auciton.Found_Target_Set = WorldTarget
+    # PM_A.PolicyMaker_Auciton.Found_Target_Info = [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
+    # PM_A2.PolicyMaker_Auciton.Found_Target_Set = WorldTarget  # >>>>> try
+    # PM_A2.PolicyMaker_Auciton.Found_Target_Info = [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]  #try
 
     while True:
 
@@ -80,8 +80,8 @@ if __name__ == '__main__':
                 get_action(obs_n[i], acctEi, acclEi, step, finishedi)
 
             action_n.append(actioni)
-            print("agent_%d" % i, pointAi, pointBi, 'finishedi:', finishedi)
-            print(acctEi, acclEi, 'arriveflag:', NewController[i][4])
+            # print("agent_%d" % i, pointAi, pointBi, 'finishedi:', finishedi)
+            # print(acctEi, acclEi, 'arriveflag:', NewController[i][4])
 
         # environment step
         new_obs_n, rew_n, done_n, info_n = env.step(action_n)

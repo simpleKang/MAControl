@@ -126,8 +126,8 @@ class PolicyMaker_Auciton(PolicyMaker):
                     PolicyMaker_Auciton.Target_is_sorted = True
             else:
                 # TODO 进行各种条件的计算判断，输出单个小飞机的大判断计算结果
-                if step > 100 and len(PolicyMaker_Auciton.Found_Target_Set) != 0:
-                    PolicyMaker_Auciton.Shared_Big_Check = False
+                if step > 1500 and len(PolicyMaker_Auciton.Found_Target_Set) != 0:
+                    PolicyMaker_Auciton.Shared_Big_Check = True
                     PolicyMaker_Auciton.last_step = step
                 self.add_new_target(obs_n[self.index], WorldTarget)
         # 精选拍卖者
