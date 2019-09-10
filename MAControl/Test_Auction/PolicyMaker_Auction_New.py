@@ -149,7 +149,7 @@ class PolicyMaker_Auciton(PolicyMaker):
             elif step == self.Step0:
                 print('UAV', self.index, 'resorting')
 
-                if self.index == (len(obs_n)-1):
+                if self.index == max(PolicyMaker_Auciton.Remain_UAV_Set):
 
                     for i in range(len(PolicyMaker_Auciton.Found_Target_Set)):
                         if i not in PolicyMaker_Auciton.Attacked_Target_Index:
@@ -161,7 +161,7 @@ class PolicyMaker_Auciton(PolicyMaker):
             elif step == self.Step1:
                 print('UAV', self.index, 'choosing')
 
-                if self.index == (len(obs_n)-1):
+                if self.index == max(PolicyMaker_Auciton.Remain_UAV_Set):
                     PolicyMaker_Auciton.Current_Target_Index = PolicyMaker_Auciton.Remain_Target_Set[0][-1]
                     print('Current_Target_Index: ', PolicyMaker_Auciton.Current_Target_Index)
                     PolicyMaker_Auciton.Current_Price_Set = [[0 for j in range(len(PolicyMaker_Auciton.Remain_UAV_Set))] for k in range(18)]
@@ -175,7 +175,7 @@ class PolicyMaker_Auciton(PolicyMaker):
             elif step == self.Step3:
                 print('UAV', self.index, 'priced')
 
-                if self.index == (len(obs_n)-1):
+                if self.index == max(PolicyMaker_Auciton.Remain_UAV_Set):
 
                     results = sum(np.array(PolicyMaker_Auciton.Current_Price_Set))
                     for k in range(len(PolicyMaker_Auciton.Remain_UAV_Set)):
@@ -213,7 +213,7 @@ class PolicyMaker_Auciton(PolicyMaker):
                 print('UAV', self.index, 'recycling')
                 self.operate_step(1, step)
 
-                if self.index == (len(obs_n)-1):
+                if self.index == max(PolicyMaker_Auciton.Remain_UAV_Set):
                     PolicyMaker_Auciton.Attacked_Target_Index.append(PolicyMaker_Auciton.Current_Target_Index)
                     PolicyMaker_Auciton.Remain_Target_Set = []
                     PolicyMaker_Auciton.Current_Target_Index = -1
