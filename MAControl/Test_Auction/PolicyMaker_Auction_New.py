@@ -13,6 +13,7 @@ class PolicyMaker_Auciton(PolicyMaker):
     Current_Target_Index = -1  # {TARGET_INDEX}
     Remain_UAV_Set = []  # {UAV_INDEX}
     Current_Price_Set = []   # {UAV X STEP}
+    Current_Price_Result = []  # {UAV:PRICE}
 
     def __init__(self, name, env, world, agent_index, arglist):
         super(PolicyMaker_Auciton, self).__init__(name, env, world, agent_index, arglist)
