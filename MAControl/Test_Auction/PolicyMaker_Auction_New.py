@@ -204,6 +204,7 @@ class PolicyMaker_Auciton(PolicyMaker):
                 self.operate_step(1, step)
 
                 if self.index == (len(obs_n)-1):
+                    PolicyMaker_Auciton.Attacked_Target_Index.append(PolicyMaker_Auciton.Current_Target_Index)
                     PolicyMaker_Auciton.Remain_Target_Set = []
                     PolicyMaker_Auciton.Current_Target_Index = -1
                     PolicyMaker_Auciton.Current_Price_Set = []
