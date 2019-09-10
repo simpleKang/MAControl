@@ -123,10 +123,16 @@ class PolicyMaker_Auciton(PolicyMaker):
 
             elif step == self.Step0:
                 print('resorting')
+
                 if self.index == (len(obs_n)-1):
-                    print('Found_Target_Set:', PolicyMaker_Auciton.Found_Target_Set)
-                else:
-                    pass
+
+                    PolicyMaker_Auciton.Remain_Target_Set = []
+                    for i in range(len(PolicyMaker_Auciton.Found_Target_Set)):
+                        if i not in PolicyMaker_Auciton.Attacked_Target_Index:
+                            PolicyMaker_Auciton.Remain_Target_Set.append(PolicyMaker_Auciton.Found_Target_Set[i])
+
+                    PolicyMaker_Auciton.Remain_Target_Set = sorted(PolicyMaker_Auciton.Remain_Target_Set, key=lambda x: x[4], reverse=True)
+                    print('Remain_Target_Set: ', PolicyMaker_Auciton.Remain_Target_Set)
 
             elif step == self.Step1:
                 print('choosing')
