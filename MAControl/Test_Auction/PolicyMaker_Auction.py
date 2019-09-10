@@ -216,7 +216,7 @@ class PolicyMaker_Auciton(PolicyMaker):
                         # self.waypoint_list, self.current_wplist, self.pointB_index = W.attack_replace(
                         #     self.waypoint_list,
                         #     PolicyMaker_Auciton.Found_Target_Set[PolicyMaker_Auciton.Target_index][0:2], self.current_wplist)
-                        self.index=5
+                        self.opt_index = 5
                         self.x = PolicyMaker_Auciton.Found_Target_Set[PolicyMaker_Auciton.Target_index][0]
                         self.y = PolicyMaker_Auciton.Found_Target_Set[PolicyMaker_Auciton.Target_index][1]
                         PolicyMaker_Auciton.Winner.remove(self.index)

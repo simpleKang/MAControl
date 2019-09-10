@@ -1,4 +1,5 @@
 from MAControl.Base.PathPlanner import PathPlanner
+import MAControl.Util.CreateWaypoint as CW
 
 
 class PathPlanner_Simple(PathPlanner):
@@ -15,10 +16,11 @@ class PathPlanner_Simple(PathPlanner):
         self.path_pace = 50                 # PathPlanner的调用频率
         self.is_init = True                 # 是否为初始时刻
         self.is_attacking = False           # 是否为正在执行
-        self.arrive_flag = False            # 是否到达B点
         self.waypoint_finished = False      # 航点是否已经飞完
+        self.pointB_changed = False
 
         self.waypoint_list.append([[0 for i in range(3)] for j in range(256)])
+        self.waypoint_list[self.current_wplist][0:len(CW.init_waypoint[self.index])] = CW.init_waypoint[self.index]
 
     def planpath(self, para_list, obs, arrive_flag):
         if para_list[0] == 0:
@@ -39,6 +41,15 @@ class PathPlanner_Simple(PathPlanner):
         elif para_list[0] == 5:
             self.waypoint_list, self.current_wplist, self.pointB_index = \
                 self.attack_replace(self.waypoint_list, [para_list[1], para_list[2]], self.current_wplist)
+            if self.is_attacking is False:
+                self.pointAi = (obs[2], obs[3])
+                self.pointBi = (self.waypoint_list[self.current_wplist][0][0],
+                                self.waypoint_list[self.current_wplist][0][1])
+                self.is_attacking = True
+                self.pointB_changed = True
+                arrive_flag = False
+            else:
+                raise Exception('Target coord is changed again! This should not happen!!!')
 
         # 初始时刻输出A、B坐标
         if self.pointB_index == 0 and self.is_init is True:
@@ -47,16 +58,8 @@ class PathPlanner_Simple(PathPlanner):
                             self.waypoint_list[self.current_wplist][self.pointB_index][1])
             self.is_init = False
 
-        # 变为攻击状态后更改目标
-        if self.waypoint_list[self.current_wplist][0][2] == 5 and self.is_attacking is False:
-            self.pointAi = (obs[2], obs[3])
-            self.pointBi = (self.waypoint_list[self.current_wplist][0][0],
-                            self.waypoint_list[self.current_wplist][0][1])
-            self.is_attacking = True
-            self.arrive_flag = False
-
         # 更改航点状态并输出A、B坐标
-        if self.arrive_flag and self.is_attacking is False and self.waypoint_finished is False:
+        if arrive_flag and self.is_attacking is False and self.waypoint_finished is False:
             if self.waypoint_list[self.current_wplist][self.pointB_index + 1][2] != 0 and self.pointB_index < 255:
                 if self.pointB_index > 0:
                     self.waypoint_list[self.current_wplist][self.pointB_index - 1][2] = 4
@@ -64,9 +67,10 @@ class PathPlanner_Simple(PathPlanner):
                 self.waypoint_list[self.current_wplist][self.pointB_index + 1][2] = 3
                 self.pointAi = (self.waypoint_list[self.current_wplist][self.pointB_index][0],
                                 self.waypoint_list[self.current_wplist][self.pointB_index][1])
-                self.pointBi = (self.waypoint_list[self.current_wplist][self.pointB_index + 1][0],
-                                self.waypoint_list[self.current_wplist][self.pointB_index + 1][1])
-                self.arrive_flag = False
+                self.pointBi = (self.waypoint_list[self.current_wplist][self.pointB_index+1][0],
+                                self.waypoint_list[self.current_wplist][self.pointB_index+1][1])
+                self.pointB_changed = True
+                arrive_flag = False
                 self.pointB_index += 1
 
             else:
@@ -78,18 +82,19 @@ class PathPlanner_Simple(PathPlanner):
                     self.pointBi = (self.waypoint_list[self.current_wplist][0][0],
                                     self.waypoint_list[self.current_wplist][0][1])
                     self.pointB_index = 0
-                    self.arrive_flag = False
+                    self.pointB_changed = True
+                    arrive_flag = False
                     self.cycle_index += 1
                 else:
                     self.waypoint_finished = True
 
-        elif self.arrive_flag and self.is_attacking is True and self.waypoint_finished is False:
+        elif arrive_flag and self.is_attacking is True and self.waypoint_finished is False:
             self.waypoint_finished = True
 
         # else:
             # print('hai mei dao')
             
-        return self.pointAi, self.pointBi, self.waypoint_finished
+        return self.pointAi, self.pointBi, self.waypoint_finished, arrive_flag
 
     # TODO 不进行修改
     def no_operation(self, original):
