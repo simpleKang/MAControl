@@ -11,6 +11,6 @@ class MotionController(ABC):
         self.arglist = arglist
 
     @abstractmethod
-    def get_expected_action(self, obs, pointAi, pointBi, step):
+    def get_expected_action(self, obs, pointAi, pointBi, step, finishedi):
         pass
 

@@ -19,7 +19,7 @@ class MotionController_L1_TECS(MotionController):
 
         pass
 
-    def get_expected_action(self, obs, pointAi, pointBi, step):
+    def get_expected_action(self, obs, pointAi, pointBi, step, finishedi):
         # print("motion control")
         vel_vector = np.array(obs[0:2])
         pointPi = np.array(obs[2:4])
@@ -94,11 +94,6 @@ class MotionController_L1_TECS(MotionController):
             vector_BP = pointPi - pointBi
             dist_BP = np.sqrt(np.square(vector_BP[0]) + np.square(vector_BP[1]))
             dist_BP = max(dist_BP, 0.000000001)
-            if dist_BP < BP_range:
-                self.arrive_flag = True
-                print('True', obs)
-            else:
-                self.arrive_flag = False
             vector_BP_unit = vector_BP/dist_BP
 
             # extra computation
@@ -137,6 +132,17 @@ class MotionController_L1_TECS(MotionController):
             else:
                 lateral_acc_dir = np.sign(np.dot(lateral_acc_unit, vector_PC))
             self.lateral_acc = lateral_acc_size * lateral_acc_dir
+
+            if finishedi:
+                self.arrive_flag = False
+                self.tangent_acc = 0
+                self.lateral_acc = 0
+            else:
+                if dist_BP < BP_range:
+                    self.arrive_flag = True
+                    print('True', obs)
+                else:
+                    self.arrive_flag = False
 
         return self.tangent_acc, self.lateral_acc, self.arrive_flag
 
