@@ -25,7 +25,7 @@ class PolicyMaker_Auciton(PolicyMaker):
         self.Step2 = 502  # 紧接上一步，各UAV开始出价
         self.Step3 = 520  # 经过一段时间的出价，各UAV统计出价结果
         self.Step4 = 521  # 紧接上一步，各UAV进入攻击状态
-        self.Step5 = 522  # 紧接上一步，统计剩余目标和剩余UAV数量
+        self.Step5 = 522  # 紧接上一步，统计剩余UAV数量和编号
         # 一旦运行到Step5，就需要[重新设置Step0~Step5的数值，进行一些变量的清零/重制]，或者[反馈表明UAV已经用光] #
 
         self.close_area = []
