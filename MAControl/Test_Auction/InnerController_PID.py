@@ -8,28 +8,22 @@ class InnerController_PID(InnerController):
         super(InnerController_PID, self).__init__(name, env, world, agent_index, arglist)
 
         # extra params
-        self.dt = world.dt
-        self.inner_pace = 1
         self.ITerm = 0
         self.last_error = 0
-        self.action = [0, 0, 0, 0, 0]
-
-        pass
 
     def get_action(self, obs, Eacct, Eaccl, step, finishedi):
         # print('inner control')
 
         if finishedi:
 
-            self.action[1] = 0
-            self.action[3] = 0
+            action = [0, 0, 0, 0, 0]
 
         else:
 
             Exp_lateral_acc = Eaccl
             True_lateral_acc = np.array(obs[5])
 
-            delta_time = self.dt
+            delta_time = self.world.dt
             P_value = 0.9
             I_value = 0.01
             D_value = 0.0
@@ -55,8 +49,7 @@ class InnerController_PID(InnerController):
             vel_right_unit = np.array([vel_vector[1], -1 * vel_vector[0]]) / speed
             acc = acct * vel_vector / speed + accl * vel_right_unit
 
-            self.action[1] = acc[0]
-            self.action[3] = acc[1]
+            action = [0, acc[0], 0, acc[1], 0]
 
-        return self.action
+        return action
 
