@@ -13,7 +13,6 @@ class MotionController_L1_TECS(MotionController):
         self.motion_pace = 5
         self.STE_rate_error = 0
         self.throttle_integ_s = 0
-        self.arrive_flag = False
         self.tangent_acc = 0
         self.lateral_acc = 0
 
@@ -133,14 +132,14 @@ class MotionController_L1_TECS(MotionController):
             self.lateral_acc = lateral_acc_size * lateral_acc_dir
 
         if finishedi:
-            self.arrive_flag = True
+            arrive_flag = True
             self.tangent_acc = 0
             self.lateral_acc = 0
         else:
             if dist_BP < BP_range:
-                self.arrive_flag = True
+                arrive_flag = True
             else:
-                self.arrive_flag = False
+                arrive_flag = False
 
-        return self.tangent_acc, self.lateral_acc, self.arrive_flag
+        return self.tangent_acc, self.lateral_acc, arrive_flag
 
