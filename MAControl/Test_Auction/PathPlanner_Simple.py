@@ -17,7 +17,6 @@ class PathPlanner_Simple(PathPlanner):
         self.is_init = True                 # 是否为初始时刻
         self.is_attacking = False           # 是否为正在执行
         self.waypoint_finished = False      # 航点是否已经飞完
-        self.pointB_changed = False
 
         self.waypoint_list.append([[0 for i in range(3)] for j in range(256)])
         self.waypoint_list[self.current_wplist][0:len(CW.init_waypoint[self.index])] = CW.init_waypoint[self.index]
@@ -46,8 +45,6 @@ class PathPlanner_Simple(PathPlanner):
                 self.pointBi = (self.waypoint_list[self.current_wplist][0][0],
                                 self.waypoint_list[self.current_wplist][0][1])
                 self.is_attacking = True
-                self.pointB_changed = True
-                arrive_flag = False
             else:
                 raise Exception('Target coord is changed again! This should not happen!!!')
 
@@ -69,8 +66,6 @@ class PathPlanner_Simple(PathPlanner):
                                 self.waypoint_list[self.current_wplist][self.pointB_index][1])
                 self.pointBi = (self.waypoint_list[self.current_wplist][self.pointB_index+1][0],
                                 self.waypoint_list[self.current_wplist][self.pointB_index+1][1])
-                self.pointB_changed = True
-                arrive_flag = False
                 self.pointB_index += 1
 
             else:
@@ -82,8 +77,6 @@ class PathPlanner_Simple(PathPlanner):
                     self.pointBi = (self.waypoint_list[self.current_wplist][0][0],
                                     self.waypoint_list[self.current_wplist][0][1])
                     self.pointB_index = 0
-                    self.pointB_changed = True
-                    arrive_flag = False
                     self.cycle_index += 1
                 else:
                     self.waypoint_finished = True
@@ -94,7 +87,7 @@ class PathPlanner_Simple(PathPlanner):
         # else:
             # print('hai mei dao')
             
-        return self.pointAi, self.pointBi, self.waypoint_finished, arrive_flag
+        return self.pointAi, self.pointBi, self.waypoint_finished
 
     # 操作数 = 0 不进行修改
     def no_operation(self, original):
