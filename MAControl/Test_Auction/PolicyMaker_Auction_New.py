@@ -12,7 +12,7 @@ class PolicyMaker_Auciton(PolicyMaker):
     Shared_UAV_state = []
     Shared_Big_Check = False
     Selectable_UAV = []
-    Target_is_sorted = False  # Resorted_Target是否已进行排序
+    Shared_SortTarget_flag = False
     Resorted_Target = []      # 按优先级排序的拍卖目标
     Auctioneer = -1           # 选出的拍卖者编号
     Target_index = -1         # 当前进行拍卖的目标编号
@@ -122,12 +122,12 @@ class PolicyMaker_Auciton(PolicyMaker):
         if PolicyMaker_Auciton.Shared_UAV_state[self.index] == 0: # =0 搜索
             if PolicyMaker_Auciton.Shared_Big_Check is True and PolicyMaker_Auciton.last_step == step - 1:
                 PolicyMaker_Auciton.Shared_UAV_state[self.index] = 1 # 竞选拍卖者
-                if PolicyMaker_Auciton.Target_is_sorted is False:
+                if PolicyMaker_Auciton.Shared_SortTarget_flag is False:
                     for i in range(len(PolicyMaker_Auciton.Found_Target_Set)):
                         PolicyMaker_Auciton.Resorted_Target.append([i, PolicyMaker_Auciton.Found_Target_Set[i][4], 0])
                     PolicyMaker_Auciton.Resorted_Target = sorted(PolicyMaker_Auciton.Resorted_Target, key=lambda x: x[1], reverse=True)
                     PolicyMaker_Auciton.Target_index = PolicyMaker_Auciton.Resorted_Target[0][0]
-                    PolicyMaker_Auciton.Target_is_sorted = True
+                    PolicyMaker_Auciton.Shared_SortTarget_flag = True
             else:
                 # TODO 进行各种条件的计算判断，输出单个小飞机的大判断计算结果
                 if step > 1500 and len(PolicyMaker_Auciton.Found_Target_Set) != 0:
