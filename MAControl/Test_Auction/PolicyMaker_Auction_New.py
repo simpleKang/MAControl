@@ -115,11 +115,10 @@ class PolicyMaker_Auciton(PolicyMaker):
                 print('searching')
                 self.close_area = self.find_mate(obs_n)
                 self.add_new_target(obs_n[self.index], WorldTarget)
+
                 if (step == (self.Step0 - 1)) and (not PolicyMaker_Auciton.Found_Target_Set) \
                         and (len(PolicyMaker_Auciton.Attacked_Target_Index)!=len(PolicyMaker_Auciton.Found_Target_Set)):
                     self.operate_step(0)
-                else:
-                    pass
 
             elif step == self.Step0:
                 print('resorting')
