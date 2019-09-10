@@ -27,6 +27,8 @@ class PolicyMaker_Auciton(PolicyMaker):
         self.Step5 = 1022  # 紧接上一步，统计剩余目标和剩余UAV数量
         # 一旦运行到Step5，就需要[重新设置Step0~Step5的数值，进行一些变量的清零/重制]，或者[反馈表明UAV已经用光] #
 
+        self.close_area = []
+
     def find_mate(self, obs_n, r=0.5):
         selfpos = np.array(obs_n[self.index][2:4])
         close_area = []
@@ -95,7 +97,9 @@ class PolicyMaker_Auciton(PolicyMaker):
 
             if step < self.Step0:
                 print('searching')
-                pass
+                self.close_area = self.find_mate(obs_n)
+                self.add_new_target(obs_n[self.index], WorldTarget)
+                print('Found_Target_Set:', PolicyMaker_Auciton.Found_Target_Set)
 
             elif step == self.Step0:
                 print('resorting')
