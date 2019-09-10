@@ -45,7 +45,7 @@ def get_controller(env, world, arglist):
     return ControllerSet
 
 
-def update_action(env, world, obs_n, step):
+def update_action(env, world, obs_n, step, NewController):
 
     # WorldTarget
     WorldTarget = []
@@ -72,7 +72,7 @@ def update_action(env, world, obs_n, step):
 
         action_n.append(actioni)
 
-    return action_n
+    return action_n, NewController
 
 
 if __name__ == '__main__':
@@ -91,7 +91,7 @@ if __name__ == '__main__':
     while True:
 
         # get action
-        action_n = update_action(env, world, obs_n, step)
+        action_n, NewController = update_action(env, world, obs_n, step, NewController)
 
         # environment step
         new_obs_n, rew_n, done_n, info_n = env.step(action_n)
