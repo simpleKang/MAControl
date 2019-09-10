@@ -18,18 +18,17 @@ class PolicyMaker_Auciton(PolicyMaker):
         self.x = 0
         self.y = 0
 
-    def find_mate(self, obs_n, R):
+    def find_mate(self, obs_n, r=0.5):
         selfpos = np.array(obs_n[self.index][2:4])
         close_area = []
         for i in range(len(obs_n)):
             posi = obs_n[i][2:4]
             deltapos = np.sqrt(np.dot(selfpos - posi, selfpos - posi))
-            if deltapos < R:
+            if deltapos < r:
                 close_area.append(i)
         return close_area
 
-    def add_new_target(self, obs, WorldTarget):
-        TT_range = 0.05
+    def add_new_target(self, obs, WorldTarget, ttrange=0.05):
 
         # COMPUTE selfview
         selfvel = np.array(obs[0:2])
@@ -52,18 +51,18 @@ class PolicyMaker_Auciton(PolicyMaker):
                 seen_target.append(target)
 
         # READ AND WRITE TESTControl.Found_Target_Set
-        if PolicyMaker_Auciton.Found_Target_Set == []:
+        if not PolicyMaker_Auciton.Found_Target_Set:
             PolicyMaker_Auciton.Found_Target_Set = seen_target
             for i in range(len(seen_target)):
                 PolicyMaker_Auciton.Found_Target_Info.append(self.close_area)
-        elif seen_target != []:
+        elif seen_target:
             for target1 in seen_target:
                 check = False
                 for target2 in PolicyMaker_Auciton.Found_Target_Set:
                     pos1 = np.array(target1[1:3])
                     pos2 = np.array(target2[1:3])
                     deltapos = np.sqrt(np.dot(pos1 - pos2, pos1 - pos2))
-                    check = check | (deltapos <= TT_range)
+                    check = check | (deltapos <= ttrange)
                 if not check:
                     PolicyMaker_Auciton.Found_Target_Set.append(target1)
                     PolicyMaker_Auciton.Found_Target_Info.append(self.close_area)
