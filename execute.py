@@ -38,7 +38,8 @@ def get_controller(env, world, arglist):
         control.append(PP_S.PathPlanner_Simple("agent_%d" % i, env, world, i, arglist))
         control.append(MC_L.MotionController_L1_TECS("agent_%d" % i, env, world, i, arglist))
         control.append(IC_P.InnerController_PID("agent_%d" % i, env, world, i, arglist))
-        control.append(False)
+        control.append(False) # Arriveflag
+        control.append(False) # Isattacking
         control.append(PM_A2.PolicyMaker_Auciton("agent_%d" % i, env, world, i, arglist))   # >>>>> try
         ControllerSet.append(control)
 
@@ -61,8 +62,21 @@ def update_action(env, world, obs_n, step, NewController):
         list_i = NewController[i][0]. \
             make_policy(WorldTarget, obs_n, step)
 
-        pointAi, pointBi, finishedi, is_attacking = NewController[i][1].\
-            planpath(list_i, obs_n[i], NewController[i][4])
+        # pointAi, pointBi, finishedi, NewController[i][5] = NewController[i][1].\
+        #     planpath(list_i, obs_n[i], NewController[i][4])
+
+        pointAi = (0,  0)
+        pointBi = (-1, 1)
+        if NewController[i][4]:
+            finishedi = True
+        else:
+            finishedi = False
+
+        if step >= 50 and i == 4:
+            NewController[i][5] = True
+            print('4 is attacking at 50')
+        else:
+            NewController[i][5] = False
 
         acctEi, acclEi, NewController[i][4] = NewController[i][2]. \
             get_expected_action(obs_n[i], pointAi, pointBi, step, finishedi)
@@ -74,6 +88,11 @@ def update_action(env, world, obs_n, step, NewController):
 
     return action_n
 
+
+def augment_view(env, world, NewController):
+    for i in range(env.n):
+        if NewController[i][5]:
+            world.agents[i].attacking = True
 
 if __name__ == '__main__':
     arglist = parse_args()
@@ -100,6 +119,7 @@ if __name__ == '__main__':
 
         # for displaying
         time.sleep(0.01)
+        augment_view(env, world, NewController)
         env.render()
         print('>>>> step', step)
 

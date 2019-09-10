@@ -246,7 +246,7 @@ class MultiAgentEnv(gym.Env):
             for e, entity in enumerate(self.world.entities):
                 self.render_geoms_xform[e].set_translation(*entity.state.p_pos)
                 if 'agent' in entity.name and entity.attacking:
-                    self.render_geoms_xform[e].set_scale(10, 10)
+                    self.render_geoms_xform[e].set_scale(3, 3)
             # render to display or array
             results.append(self.viewers[i].render(return_rgb_array = mode=='rgb_array'))
 
