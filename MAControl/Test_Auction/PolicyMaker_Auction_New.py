@@ -92,7 +92,7 @@ class PolicyMaker_Auciton(PolicyMaker):
             if check and (self.index not in info):
                 info.append(self.index)
 
-    def operate_step(self, operate_index):
+    def operate_step(self, operate_index, step):
 
         if operate_index == 0:
             # wait one more step
@@ -104,15 +104,18 @@ class PolicyMaker_Auciton(PolicyMaker):
             self.Step5 += 1
 
         if operate_index == 1:
-            # something
-            pass
+            # set next cycle
+            self.Step0 = step + 10
+            self.Step1 = self.Step0 + 1
+            self.Step2 = self.Step0 + 2
+            self.Step3 = self.Step0 + 20
+            self.Step4 = self.Step0 + 21
+            self.Step5 = self.Step0 + 22
 
     def make_policy(self, WorldTarget, obs_n, step):
 
         if self.InAttacking:
-
-            print('attacking')
-            pass
+            self.opt_index = 5
 
         else:
 
@@ -123,7 +126,7 @@ class PolicyMaker_Auciton(PolicyMaker):
 
                 if (step == (self.Step0 - 1)) and (not PolicyMaker_Auciton.Found_Target_Set) \
                         and (len(PolicyMaker_Auciton.Attacked_Target_Index)!=len(PolicyMaker_Auciton.Found_Target_Set)):
-                    self.operate_step(0)
+                    self.operate_step(0, step)
 
             elif step == self.Step0:
                 print('resorting')
@@ -189,8 +192,8 @@ class PolicyMaker_Auciton(PolicyMaker):
                     print('UAV', self.index, 'not to attack')
 
             elif step == self.Step5:
-                print('evaluating')
-                pass
+                print('recycling')
+                self.operate_step(1, step)
 
             else:
                 raise Exception('Wrong Wrong Wrong')
