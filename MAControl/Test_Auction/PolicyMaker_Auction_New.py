@@ -32,6 +32,8 @@ class PolicyMaker_Auciton(PolicyMaker):
 
         self.close_area = []
 
+        PolicyMaker_Auciton.Remain_UAV_Set.append(0)
+
     def find_mate(self, obs_n, r=0.5):
         selfpos = np.array(obs_n[self.index][2:4])
         close_area = []
@@ -141,11 +143,13 @@ class PolicyMaker_Auciton(PolicyMaker):
                 if self.index == (len(obs_n)-1):
                     PolicyMaker_Auciton.Current_Target_Index = PolicyMaker_Auciton.Remain_Target_Set[0][-1]
                     print('Current_Target_Index: ', PolicyMaker_Auciton.Current_Target_Index)
-                    PolicyMaker_Auciton.Current_Price_Set = []
+                    PolicyMaker_Auciton.Current_Price_Set = [[0 for j in range(len(PolicyMaker_Auciton.Remain_UAV_Set))] for k in range(18)]
 
             elif self.Step2 <= step < self.Step3:
                 print('pricing')
-                pass
+
+                if random.random() > 0.5:
+                    PolicyMaker_Auciton.Current_Price_Set[step - self.Step2][self.index] = random.random()
 
             elif step == self.Step3:
                 print('priced')
