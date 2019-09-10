@@ -136,7 +136,10 @@ class PolicyMaker_Auciton(PolicyMaker):
 
             elif step == self.Step1:
                 print('choosing')
-                PolicyMaker_Auciton.CurrentTargetIndex = PolicyMaker_Auciton.Remain_Target_Set[0][-1]
+
+                if self.index == (len(obs_n)-1):
+                    PolicyMaker_Auciton.Current_Target_Index = PolicyMaker_Auciton.Remain_Target_Set[0][-1]
+                    print('Current_Target_Index: ', PolicyMaker_Auciton.Current_Target_Index)
 
             elif self.Step2 <= step < self.Step3:
                 print('pricing')
