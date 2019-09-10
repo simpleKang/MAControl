@@ -19,12 +19,12 @@ class PolicyMaker_Auciton(PolicyMaker):
         self.InAttacking = False
 
         # 以下为一些阶段的初始设定步数，如果某一步需要用比预设更多的时间以达成某些要求，可以直接修改步数，从而延迟进入下一步
-        self.Step0 = 1000  # 进入决策过程，对目标进行排序
-        self.Step1 = 1001  # 紧接上一步，选择一个目标作为打击对象
-        self.Step2 = 1002  # 紧接上一步，各UAV开始出价
-        self.Step3 = 1020  # 经过一段时间的出价，各UAV统计出价结果
-        self.Step4 = 1021  # 紧接上一步，各UAV进入攻击状态
-        self.Step5 = 1022  # 紧接上一步，统计剩余目标和剩余UAV数量
+        self.Step0 = 500  # 进入决策过程，对目标进行排序
+        self.Step1 = 501  # 紧接上一步，选择一个目标作为打击对象
+        self.Step2 = 502  # 紧接上一步，各UAV开始出价
+        self.Step3 = 520  # 经过一段时间的出价，各UAV统计出价结果
+        self.Step4 = 521  # 紧接上一步，各UAV进入攻击状态
+        self.Step5 = 522  # 紧接上一步，统计剩余目标和剩余UAV数量
         # 一旦运行到Step5，就需要[重新设置Step0~Step5的数值，进行一些变量的清零/重制]，或者[反馈表明UAV已经用光] #
 
         self.close_area = []
@@ -121,7 +121,10 @@ class PolicyMaker_Auciton(PolicyMaker):
 
             elif step == self.Step0:
                 print('resorting')
-                pass
+                if self.index == (len(obs_n)-1):
+                    pass
+                else:
+                    pass
 
             elif step == self.Step1:
                 print('choosing')
