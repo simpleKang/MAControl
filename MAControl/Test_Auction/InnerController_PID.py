@@ -9,7 +9,6 @@ class InnerController_PID(InnerController):
 
         # extra params
         self.dt = world.dt
-        self.inner_pace = 1
         self.ITerm = 0
         self.last_error = 0
         self.action = [0, 0, 0, 0, 0]
