@@ -62,8 +62,8 @@ def update_action(env, world, obs_n, step, NewController):
         list_i = NewController[i][0]. \
             make_policy(WorldTarget, obs_n, step)
 
-        pointAi, pointBi, finishedi, is_attacking = NewController[i][1].\
-            planpath(list_i, obs_n[i], NewController[i][4])
+        pointAi, pointBi, finishedi, NewController[i][5] = NewController[i][1].\
+            planpath(list_i, obs_n[i], NewController[i][4], step)
 
         acctEi, acclEi, NewController[i][4] = NewController[i][2]. \
             get_expected_action(obs_n[i], pointAi, pointBi, step, finishedi)
@@ -80,6 +80,7 @@ def augment_view(env, world, NewController):
     for i in range(env.n):
         if NewController[i][5]:
             world.agents[i].attacking = True
+
 
 if __name__ == '__main__':
     arglist = parse_args()
