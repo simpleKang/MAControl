@@ -127,11 +127,11 @@ class PolicyMaker_Auciton(PolicyMaker):
             else:
                 # TODO 进行各种条件的计算判断，输出单个小飞机的大判断计算结果
                 if step > 100 and len(PolicyMaker_Auciton.Found_Target_Set) != 0:
-                    PolicyMaker_Auciton.Shared_Big_Check = True
+                    PolicyMaker_Auciton.Shared_Big_Check = False
                     PolicyMaker_Auciton.last_step = step
                 self.add_new_target(obs_n[self.index], WorldTarget)
         # 精选拍卖者
-        elif PolicyMaker_Auciton.Shared_UAV_state[self.index] == 1: # =1 选拍卖者
+        elif PolicyMaker_Auciton.Shared_UAV_state[self.index] == 1:  # =1 选拍卖者
             if PolicyMaker_Auciton.Update_step == step - 1 and len(PolicyMaker_Auciton.Resorted_Target) != 0:
                 PolicyMaker_Auciton.Target_index = PolicyMaker_Auciton.Resorted_Target[0][0]
                 print('deal with next target')
@@ -180,7 +180,7 @@ class PolicyMaker_Auciton(PolicyMaker):
                             PolicyMaker_Auciton.Price_list.append([self.index])
                             self.trans_step = PolicyMaker_Auciton.Trans_step[i][1]
         # 竞价阶段
-        elif PolicyMaker_Auciton.Shared_UAV_state[self.index] == 2: #2 竞价
+        elif PolicyMaker_Auciton.Shared_UAV_state[self.index] == 2:  #2 竞价
             if PolicyMaker_Auciton.Resorted_Target[0][2] == 2:
                 # 拍卖者进入判断
                 if self.index == PolicyMaker_Auciton.Auctioneer:
@@ -228,7 +228,8 @@ class PolicyMaker_Auciton(PolicyMaker):
                                     if PolicyMaker_Auciton.Shared_UAV_state[j] != 3:
                                         PolicyMaker_Auciton.Shared_UAV_state[j] = 1
         # 执行阶段
-        elif PolicyMaker_Auciton.Shared_UAV_state[self.index] == 3: #=3 执行
+        elif PolicyMaker_Auciton.Shared_UAV_state[self.index] == 3:  #=3 执行
             self.opt_index = 0
             print('Agent_%d is attacking.' % self.index)
+
         return [self.opt_index, self.x, self.y]

@@ -74,6 +74,8 @@ if __name__ == '__main__':
             else:
                 finishedi = False
             Eacct, Eaccl, Arrive_flag[i] = NewController[i][2].get_expected_action(obs_n[i], pointAi, pointBi, finishedi, step)
+            Eacct, Eaccl, Arrive_flag[i] = NewController[i][2].get_expected_action(obs_n[i], pointAi, pointBi, step)
+            print('>>>', i, ': ', pointAi, pointBi, Arrive_flag[i])
             actioni = NewController[i][3].get_action(obs_n[i], Eacct, Eaccl, step, finishedi)
             action_n.append(actioni)
 

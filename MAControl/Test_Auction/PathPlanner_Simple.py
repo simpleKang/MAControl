@@ -60,11 +60,11 @@ class PathPlanner_Simple(PathPlanner):
 
         # 更改航点状态并输出A、B坐标
         if arrive_flag and self.is_attacking is False and self.waypoint_finished is False:
-            if self.waypoint_list[self.current_wplist][self.pointB_index + 1][2] != 0 and self.pointB_index < 255:
+            if self.waypoint_list[self.current_wplist][self.pointB_index+1][2] != 0 and self.pointB_index < 255:
                 if self.pointB_index > 0:
-                    self.waypoint_list[self.current_wplist][self.pointB_index - 1][2] = 4
+                    self.waypoint_list[self.current_wplist][self.pointB_index-1][2] = 4
                 self.waypoint_list[self.current_wplist][self.pointB_index][2] = 2
-                self.waypoint_list[self.current_wplist][self.pointB_index + 1][2] = 3
+                self.waypoint_list[self.current_wplist][self.pointB_index+1][2] = 3
                 self.pointAi = (self.waypoint_list[self.current_wplist][self.pointB_index][0],
                                 self.waypoint_list[self.current_wplist][self.pointB_index][1])
                 self.pointBi = (self.waypoint_list[self.current_wplist][self.pointB_index+1][0],
