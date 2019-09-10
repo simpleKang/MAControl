@@ -134,7 +134,7 @@ class MotionController_L1_TECS(MotionController):
             self.lateral_acc = lateral_acc_size * lateral_acc_dir
 
             if finishedi:
-                self.arrive_flag = False
+                self.arrive_flag = True
                 self.tangent_acc = 0
                 self.lateral_acc = 0
             else:
