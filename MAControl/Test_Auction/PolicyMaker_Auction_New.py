@@ -199,9 +199,4 @@ class PolicyMaker_Auciton(PolicyMaker):
             else:
                 raise Exception('Wrong Wrong Wrong')
 
-        if random.random() > 0.999999:
-            self.opt_index = 5
-            self.x = random.random()
-            self.y = random.random()
-
         return [self.opt_index, self.x, self.y]
