@@ -10,17 +10,13 @@ class InnerController_PID(InnerController):
         # extra params
         self.ITerm = 0
         self.last_error = 0
-        self.action = [0, 0, 0, 0, 0]
-
-        pass
 
     def get_action(self, obs, Eacct, Eaccl, step, finishedi):
         # print('inner control')
 
         if finishedi:
 
-            self.action[1] = 0
-            self.action[3] = 0
+            action = [0, 0, 0, 0, 0]
 
         else:
 
@@ -53,8 +49,7 @@ class InnerController_PID(InnerController):
             vel_right_unit = np.array([vel_vector[1], -1 * vel_vector[0]]) / speed
             acc = acct * vel_vector / speed + accl * vel_right_unit
 
-            self.action[1] = acc[0]
-            self.action[3] = acc[1]
+            action = [0, acc[0], 0, acc[1], 0]
 
-        return self.action
+        return action
 
