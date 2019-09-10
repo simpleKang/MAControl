@@ -132,15 +132,15 @@ class MotionController_L1_TECS(MotionController):
                 lateral_acc_dir = np.sign(np.dot(lateral_acc_unit, vector_PC))
             self.lateral_acc = lateral_acc_size * lateral_acc_dir
 
-            if finishedi:
+        if finishedi:
+            self.arrive_flag = True
+            self.tangent_acc = 0
+            self.lateral_acc = 0
+        else:
+            if dist_BP < BP_range:
                 self.arrive_flag = True
-                self.tangent_acc = 0
-                self.lateral_acc = 0
             else:
-                if dist_BP < BP_range:
-                    self.arrive_flag = True
-                else:
-                    self.arrive_flag = False
+                self.arrive_flag = False
 
         return self.tangent_acc, self.lateral_acc, self.arrive_flag
 
