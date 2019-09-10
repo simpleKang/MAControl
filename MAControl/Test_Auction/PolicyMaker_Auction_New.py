@@ -12,6 +12,7 @@ class PolicyMaker_Auciton(PolicyMaker):
     Attacked_Target_Index = []  # {TARGET_INDEX}
     Current_Target_Index = -1  # {TARGET_INDEX}
     Remain_UAV_Set = []  # {UAV_STATE}
+    Current_Price_Set = []   # {UAV X STEP}
 
     def __init__(self, name, env, world, agent_index, arglist):
         super(PolicyMaker_Auciton, self).__init__(name, env, world, agent_index, arglist)
@@ -140,6 +141,7 @@ class PolicyMaker_Auciton(PolicyMaker):
                 if self.index == (len(obs_n)-1):
                     PolicyMaker_Auciton.Current_Target_Index = PolicyMaker_Auciton.Remain_Target_Set[0][-1]
                     print('Current_Target_Index: ', PolicyMaker_Auciton.Current_Target_Index)
+                    PolicyMaker_Auciton.Current_Price_Set = []
 
             elif self.Step2 <= step < self.Step3:
                 print('pricing')
