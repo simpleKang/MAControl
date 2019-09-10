@@ -1,11 +1,12 @@
 
 
-a = [False, False, True]
+a = [[1, 2, 1],
+     [6, 5, 1],
+     [2, 8, 1],
+     [0, 0, 0],
+     [0, 0, 0]]
 
-for i in range(len(a)):
-    if a[i] is True:
-        raise Exception('hahaha')
-
+b = a.index([0, 0, 0])
 
 
 

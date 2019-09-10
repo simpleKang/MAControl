@@ -12,13 +12,14 @@ class PathPlanner_Simple(PathPlanner):
         self.pointB_index = 0               # 当前飞向的B点的索引
         self.cycle_index = 1                # 航点列表循环的次数
         self.total_cycle = 2                # 列表循环的总次数
-        self.current_wplist = 0             # 当前航点列表的索引
+        self.current_wplist = -1             # 当前航点列表的索引
         self.path_pace = 50                 # PathPlanner的调用频率
         self.is_init = True                 # 是否为初始时刻
         self.is_attacking = False           # 是否为正在执行
         self.waypoint_finished = False      # 航点是否已经飞完
         # 初始化航点列表
-        self.waypoint_list = CW.creat_snake_waypoint_list(self.waypoint_list, self.env.n, self.index)
+        self.waypoint_list, self.current_wplist = CW.creat_snake_waypoint_list(
+                                                  self.waypoint_list, self.env.n, self.index, self.current_wplist)
 
     def planpath(self, para_list, obs, arrive_flag, step):
         if para_list[0] == 0:
@@ -46,6 +47,9 @@ class PathPlanner_Simple(PathPlanner):
                 self.is_attacking = True
             else:
                 raise Exception('Target coord is changed again! This should not happen!!!')
+
+        else:
+            raise Exception('Unknown operation index. Please check your code.')
 
         # 初始时刻输出A、B坐标
         if self.pointB_index == 0 and self.is_init is True:
@@ -83,12 +87,12 @@ class PathPlanner_Simple(PathPlanner):
         elif arrive_flag and self.is_attacking is True and self.waypoint_finished is False:
             self.waypoint_finished = True
 
-        # else:
-            # print('hai mei dao')
+        else:
+            pass
             
         return self.pointAi, self.pointBi, self.waypoint_finished, self.is_attacking
 
-    # 操作数 = 0 不进行修改
+    # 操作数 = 0 不进行任何操作，返回当前航点列表
     def no_operation(self, original):
         return original
 
@@ -112,11 +116,11 @@ class PathPlanner_Simple(PathPlanner):
         new = []
         return new
 
-    # TODO 操作数 = 5 攻击时替换列表
+    # 操作数 = 5 攻击时刻的特殊操作，生成新的攻击列表，表中只有一行目标坐标
     def attack_replace(self, original, coord, list_index):
         original.append([[0 for i in range(3)] for j in range(256)])
         list_index += 1
-        original[list_index][0][0:3] = [coord[0], coord[1], 5]
+        original[list_index][0][0:3] = [coord[0], coord[1], 1]
         pointB_index = 0
         return original, list_index, pointB_index
 

@@ -1,5 +1,5 @@
 
-def creat_snake_waypoint_list(waypoint_list, N, i, W=0.9, D=0.05, Edge=1):
+def creat_snake_waypoint_list(waypoint_list, N, i, new_list_index, W=0.9, D=0.05, Edge=1):
 
     waypoint_list.append([[0 for j in range(3)] for k in range(256)])
 
@@ -9,8 +9,9 @@ def creat_snake_waypoint_list(waypoint_list, N, i, W=0.9, D=0.05, Edge=1):
     Wide2 = round(D * (2 * i + 1), 3)
     new_waypoint_list = snake_single(Up, Down, Wide1, Wide2, Edge, W, D, i)
     waypoint_list[-1][0:len(new_waypoint_list)] = new_waypoint_list[:]
+    new_list_index += 1
 
-    return waypoint_list
+    return waypoint_list, new_list_index
 
 
 def snake_single(Up, Down, Wide1, Wide2, Edge, W, D, i):
