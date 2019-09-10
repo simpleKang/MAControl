@@ -7,38 +7,16 @@ from MAControl.Util.PointInRec import point_in_rec
 
 class PolicyMaker_Auciton(PolicyMaker):
 
-    Found_Target_Set = []
-    Found_Target_Info = []
-    Shared_UAV_state = []
-    Shared_Big_Check = False
-    Selectable_UAV = []
-    Shared_SortTarget_flag = False
-    Resorted_Target = []      # 按优先级排序的拍卖目标
-    Auctioneer = -1           # 选出的拍卖者编号
-    Target_index = -1         # 当前进行拍卖的目标编号
-
-    Winner = []               # 最终选出来的优胜者列表
-    Price_list = []           # 选出的竞拍者发出的竞拍价格
-    unassigned_list = []      # 没有分到任务的个体列表
-
-    last_step = 0
-    Trans_step = []           # 拍卖者发送出目标给竞拍者的延时step列表
-    wait_step = 30            # 等待的时长
-    wait_step_auction = 10    # 选拍卖者的等待时间
-    Update_step = 0
+    Found_Target_Set = []  # {target_pos, target_vel, target_value, target_defence}
+    Found_Target_Info = []  # {TARGET:UAV_INDEX}
+    Remain_Target_Set = []  # {target_pos, target_vel, target_value, target_defence, TARGET_STATE}
+    Remain_UAV_Set = []  # {UAV_STATE}
 
     def __init__(self, name, env, world, agent_index, arglist):
         super(PolicyMaker_Auciton, self).__init__(name, env, world, agent_index, arglist)
-        self.detect_dis = 0.05
-        self.comm_dis = 0.5
-        self.close_area = []
-        self.trans_step = []
         self.opt_index = 0
         self.x = 0
         self.y = 0
-
-        PolicyMaker_Auciton.Shared_UAV_state.append(0)
-        PolicyMaker_Auciton.unassigned_list.append(self.index)
 
     def find_mate(self, obs_n, R):
         selfpos = np.array(obs_n[self.index][2:4])
@@ -102,7 +80,7 @@ class PolicyMaker_Auciton(PolicyMaker):
         PolicyMaker_Auciton.Selectable_UAV.clear()
         PolicyMaker_Auciton.Trans_step.clear()
         PolicyMaker_Auciton.Price_list.clear()
-        PolicyMaker_Auciton.Auctioneer = -1
+        PolicyMaker_Auciton.Current_Auctioneer = -1
         PolicyMaker_Auciton.Resorted_Target.pop(0)
         PolicyMaker_Auciton.Update_step = step
         PolicyMaker_Auciton.wait_step = 30
@@ -126,7 +104,7 @@ class PolicyMaker_Auciton(PolicyMaker):
                     for i in range(len(PolicyMaker_Auciton.Found_Target_Set)):
                         PolicyMaker_Auciton.Resorted_Target.append([i, PolicyMaker_Auciton.Found_Target_Set[i][4], 0])
                     PolicyMaker_Auciton.Resorted_Target = sorted(PolicyMaker_Auciton.Resorted_Target, key=lambda x: x[1], reverse=True)
-                    PolicyMaker_Auciton.Target_index = PolicyMaker_Auciton.Resorted_Target[0][0]
+                    PolicyMaker_Auciton.Current_Target_index = PolicyMaker_Auciton.Resorted_Target[0][0]
                     PolicyMaker_Auciton.Shared_SortTarget_flag = True
             else:
                 # TODO 进行各种条件的计算判断，输出单个小飞机的大判断计算结果
@@ -137,37 +115,37 @@ class PolicyMaker_Auciton(PolicyMaker):
         # 精选拍卖者
         elif PolicyMaker_Auciton.Shared_UAV_state[self.index] == 1:  # =1 选拍卖者
             if PolicyMaker_Auciton.Update_step == step - 1 and len(PolicyMaker_Auciton.Resorted_Target) != 0:
-                PolicyMaker_Auciton.Target_index = PolicyMaker_Auciton.Resorted_Target[0][0]
+                PolicyMaker_Auciton.Current_Target_index = PolicyMaker_Auciton.Resorted_Target[0][0]
                 print('deal with next target')
             if len(PolicyMaker_Auciton.Resorted_Target) != 0:
                 # 目标状态为0时进行拍卖者的选择，所有人都会进来
                 if PolicyMaker_Auciton.Resorted_Target[0][2] == 0:
                     if PolicyMaker_Auciton.wait_step_auction > 0:
-                        if self.index in PolicyMaker_Auciton.Found_Target_Info[PolicyMaker_Auciton.Target_index]:
+                        if self.index in PolicyMaker_Auciton.Found_Target_Info[PolicyMaker_Auciton.Current_Target_index]:
                             # 进入到这里，说明k具备成为拍卖者的基本条件（知道这个目标，并且并不是正在攻击其他目标）
                             if True:  # TODO 这里可以增加个性化的条件，[满足基本条件但不满足这个条件的UAV]拒绝成为拍卖者，[条件都满足的UAV]向拍卖列表中添加自己的序号
                                 PolicyMaker_Auciton.Selectable_UAV.append(self.index)
                         if self.index == PolicyMaker_Auciton.unassigned_list[-1]: # 最后一个未分配小飞机
                             if len(PolicyMaker_Auciton.Selectable_UAV) != 0:
                                 # TODO 从列表中随机取个体作为拍卖者
-                                PolicyMaker_Auciton.Auctioneer = random.choice(PolicyMaker_Auciton.Selectable_UAV)
+                                PolicyMaker_Auciton.Current_Auctioneer = random.choice(PolicyMaker_Auciton.Selectable_UAV)
                                 PolicyMaker_Auciton.Resorted_Target[0][2] = 1
                             else:
                                 PolicyMaker_Auciton.wait_step_auction -= 1
                     else:
-                        PolicyMaker_Auciton.Selectable_UAV = PolicyMaker_Auciton.Found_Target_Info[PolicyMaker_Auciton.Target_index][:]
+                        PolicyMaker_Auciton.Selectable_UAV = PolicyMaker_Auciton.Found_Target_Info[PolicyMaker_Auciton.Current_Target_index][:]
                         for i in PolicyMaker_Auciton.Selectable_UAV:
                             if PolicyMaker_Auciton.Shared_UAV_state[i] == 3: # 排除正在执行任务
                                 PolicyMaker_Auciton.Selectable_UAV.remove(i)
                         if len(PolicyMaker_Auciton.Selectable_UAV) != 0:
                             # TODO 从列表中随机取个体作为拍卖者
-                            PolicyMaker_Auciton.Auctioneer = random.choice(PolicyMaker_Auciton.Selectable_UAV)
+                            PolicyMaker_Auciton.Current_Auctioneer = random.choice(PolicyMaker_Auciton.Selectable_UAV)
                             PolicyMaker_Auciton.Resorted_Target[0][2] = 1
                         else:
                             print('没有小飞机能打这个目标了，放弃了')
                 # 目标状态为1时所有人都会进来，看看自己是不是拍卖者，是的话进行操作，确认竞拍者及其延时step
                 elif PolicyMaker_Auciton.Resorted_Target[0][2] == 1:
-                    if self.index == PolicyMaker_Auciton.Auctioneer:
+                    if self.index == PolicyMaker_Auciton.Current_Auctioneer:
                         for i in self.close_area:
                             # TODO 传输延时step个数的计算优化
                             if PolicyMaker_Auciton.Shared_UAV_state[i] != 3: #不是正在执行任务
@@ -187,13 +165,13 @@ class PolicyMaker_Auciton(PolicyMaker):
         elif PolicyMaker_Auciton.Shared_UAV_state[self.index] == 2:  #2 竞价
             if PolicyMaker_Auciton.Resorted_Target[0][2] == 2:
                 # 拍卖者进入判断
-                if self.index == PolicyMaker_Auciton.Auctioneer:
+                if self.index == PolicyMaker_Auciton.Current_Auctioneer:
                     # 当拍卖者的等待时间完成时，根据价格选择优胜者
                     if PolicyMaker_Auciton.wait_step == 0:
                         if len(PolicyMaker_Auciton.Price_list) != 0:
                             PolicyMaker_Auciton.Price_list = sorted(PolicyMaker_Auciton.Price_list, key=lambda x: x[1], reverse=True)
-                            if len(PolicyMaker_Auciton.Price_list) > PolicyMaker_Auciton.Found_Target_Set[PolicyMaker_Auciton.Target_index][5]:
-                                for i in range(PolicyMaker_Auciton.Found_Target_Set[PolicyMaker_Auciton.Target_index][5]):
+                            if len(PolicyMaker_Auciton.Price_list) > PolicyMaker_Auciton.Found_Target_Set[PolicyMaker_Auciton.Current_Target_index][5]:
+                                for i in range(PolicyMaker_Auciton.Found_Target_Set[PolicyMaker_Auciton.Current_Target_index][5]):
                                     PolicyMaker_Auciton.Winner.append(PolicyMaker_Auciton.Price_list[i][0])
                             else:
                                 for i in range(len(PolicyMaker_Auciton.Price_list)):
@@ -219,10 +197,10 @@ class PolicyMaker_Auciton(PolicyMaker):
                         PolicyMaker_Auciton.Shared_UAV_state[self.index] = 3
                         # self.waypoint_list, self.current_wplist, self.pointB_index = W.attack_replace(
                         #     self.waypoint_list,
-                        #     PolicyMaker_Auciton.Found_Target_Set[PolicyMaker_Auciton.Target_index][0:2], self.current_wplist)
+                        #     PolicyMaker_Auciton.Found_Target_Set[PolicyMaker_Auciton.Current_Target_index][0:2], self.current_wplist)
                         self.opt_index = 5
-                        self.x = PolicyMaker_Auciton.Found_Target_Set[PolicyMaker_Auciton.Target_index][0]
-                        self.y = PolicyMaker_Auciton.Found_Target_Set[PolicyMaker_Auciton.Target_index][1]
+                        self.x = PolicyMaker_Auciton.Found_Target_Set[PolicyMaker_Auciton.Current_Target_index][0]
+                        self.y = PolicyMaker_Auciton.Found_Target_Set[PolicyMaker_Auciton.Current_Target_index][1]
                         PolicyMaker_Auciton.Winner.remove(self.index)
                         PolicyMaker_Auciton.unassigned_list.remove(self.index)
                         if len(PolicyMaker_Auciton.Winner) == 0:
