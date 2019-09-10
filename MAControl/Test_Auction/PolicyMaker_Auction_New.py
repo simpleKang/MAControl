@@ -128,7 +128,7 @@ class PolicyMaker_Auciton(PolicyMaker):
                     PolicyMaker_Auciton.Remain_Target_Set = []
                     for i in range(len(PolicyMaker_Auciton.Found_Target_Set)):
                         if i not in PolicyMaker_Auciton.Attacked_Target_Index:
-                            PolicyMaker_Auciton.Remain_Target_Set.append(PolicyMaker_Auciton.Found_Target_Set[i])
+                            PolicyMaker_Auciton.Remain_Target_Set.append(PolicyMaker_Auciton.Found_Target_Set[i]+[i])
 
                     PolicyMaker_Auciton.Remain_Target_Set = sorted(PolicyMaker_Auciton.Remain_Target_Set, key=lambda x: x[4], reverse=True)
                     print('Remain_Target_Set: ', PolicyMaker_Auciton.Remain_Target_Set)
