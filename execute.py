@@ -59,7 +59,10 @@ def update_action(env, world, obs_n, step, NewController):
 
     for i in range(env.n):
 
-        list_i = NewController[i][0]. \
+        # list_i = NewController[i][0]. \
+        #     make_policy(WorldTarget, obs_n, step)
+
+        list_i = NewController[i][6]. \
             make_policy(WorldTarget, obs_n, step)
 
         pointAi, pointBi, finishedi, NewController[i][5] = NewController[i][1].\
