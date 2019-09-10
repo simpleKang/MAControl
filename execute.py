@@ -6,6 +6,7 @@ import MAControl.Test_Auction.InnerController_PID as IC_P
 import MAControl.Test_Auction.MotionController_L1_TECS as MC_L
 import MAControl.Test_Auction.PathPlanner_Simple as PP_S
 import MAControl.Test_Auction.PolicyMaker_Auction as PM_A
+import MAControl.Test_Auction.PolicyMaker_Auction_New as PM_A2  # try
 
 
 def parse_args():
@@ -43,6 +44,7 @@ if __name__ == '__main__':
         control.append(PP_S.PathPlanner_Simple("agent_%d" % i, env, world, i, arglist))
         control.append(MC_L.MotionController_L1_TECS("agent_%d" % i, env, world, i, arglist))
         control.append(IC_P.InnerController_PID("agent_%d" % i, env, world, i, arglist))
+        control.append(PM_A2.PolicyMaker_Auciton("agent_%d" % i, env, world, i, arglist))   # try
         NewController.append(control)
         Arrive_flag.append(False)
 
@@ -64,6 +66,7 @@ if __name__ == '__main__':
         action_n = []
         for i in range(env.n):
             return_list = NewController[i][0].make_policy(WorldTarget, obs_n, step)
+            return_list = NewController[i][4].make_policy(WorldTarget, obs_n, step)  # try
             pointAi, pointBi, finishedi = NewController[i][1].planpath(return_list, obs_n[i], Arrive_flag[i])
             Eacct, Eaccl, Arrive_flag[i] = NewController[i][2].get_expected_action(obs_n[i], pointAi, pointBi, step)
             actioni = NewController[i][3].get_action(obs_n[i], Eacct, Eaccl, step, finishedi)
