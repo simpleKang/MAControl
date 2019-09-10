@@ -46,6 +46,12 @@ class MotionController_L1_TECS(MotionController):
         Kp_STE = 0.1   # (系数)
         Kd_STE = 0.0   # (系数)
 
+        # compute BP
+        vector_BP = pointPi - pointBi
+        dist_BP = np.sqrt(np.square(vector_BP[0]) + np.square(vector_BP[1]))
+        dist_BP = max(dist_BP, 0.000000001)
+        vector_BP_unit = vector_BP / dist_BP
+
         # set motion_pace
         if step == 0 or step % self.motion_pace == 0:
 
@@ -88,12 +94,6 @@ class MotionController_L1_TECS(MotionController):
             dist_AP = np.sqrt(np.square(vector_AP[0]) + np.square(vector_AP[1]))
             dist_AP = max(dist_AP, 0.000000001)
             vector_AP_unit = vector_AP/dist_AP
-
-            # compute BP
-            vector_BP = pointPi - pointBi
-            dist_BP = np.sqrt(np.square(vector_BP[0]) + np.square(vector_BP[1]))
-            dist_BP = max(dist_BP, 0.000000001)
-            vector_BP_unit = vector_BP/dist_BP
 
             # extra computation
             alongTrackDist = np.dot(vector_AP, vector_AB_unit)
