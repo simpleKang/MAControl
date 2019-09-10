@@ -24,7 +24,7 @@ class PathPlanner_Simple(PathPlanner):
 
     def planpath(self, para_list, obs, arrive_flag):
         if para_list[0] == 0:
-            pass
+            self.waypoint_list = self.no_operation(self.waypoint_list)
 
         elif para_list[0] == 1:
             pass
@@ -96,32 +96,31 @@ class PathPlanner_Simple(PathPlanner):
             
         return self.pointAi, self.pointBi, self.waypoint_finished, arrive_flag
 
-    # TODO 不进行修改
+    # 操作数 = 0 不进行修改
     def no_operation(self, original):
-        new = []
-        return new
+        return original
 
-    # TODO 添加操作
+    # TODO 操作数 = 1 添加操作
     def add(self, original, addlist):
         new = []
         return new
 
-    # TODO 插入操作
+    # TODO 操作数 = 2 插入操作
     def insert(self, original, insertlist, pos):
         new = []
         return new
 
-    # TODO 替换操作
+    # TODO 操作数 = 3 替换操作
     def replace(self, original):
         new = []
         return new
 
-    # TODO 删除操作
+    # TODO 操作数 = 4 删除操作
     def delete(self, original, deleteindex):
         new = []
         return new
 
-    # TODO 攻击时替换列表
+    # TODO 操作数 = 5 攻击时替换列表
     def attack_replace(self, original, coord, list_index):
         original.append([[0 for i in range(3)] for j in range(256)])
         list_index += 1

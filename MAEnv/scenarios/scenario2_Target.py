@@ -13,7 +13,7 @@ class Scenario(BaseScenario):
         world.damping = 0  # 取消第一种阻尼计算方式
         world.damping2 = 10  # 调整第二种阻尼计算方式的参数
         # set nums
-        num_agents = 1
+        num_agents = 10
         num_targets = 2
         num_obstacles = 0
         num_grids = 5
