@@ -80,6 +80,8 @@ if __name__ == '__main__':
                 get_action(obs_n[i], acctEi, acclEi, step, finishedi)
 
             action_n.append(actioni)
+            print(pointAi, pointBi, finishedi)
+            print(acctEi, acclEi, NewController[i][4])
 
         # environment step
         new_obs_n, rew_n, done_n, info_n = env.step(action_n)
