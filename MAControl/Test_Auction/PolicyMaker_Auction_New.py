@@ -86,6 +86,21 @@ class PolicyMaker_Auciton(PolicyMaker):
             if check and (self.index not in info):
                 info.append(self.index)
 
+    def operate_step(self, operate_index):
+
+        if operate_index == 0:
+            # wait one more step
+            self.Step0 += 1
+            self.Step1 += 1
+            self.Step2 += 1
+            self.Step3 += 1
+            self.Step4 += 1
+            self.Step5 += 1
+
+        if operate_index == 1:
+            # something
+            pass
+
     def make_policy(self, WorldTarget, obs_n, step):
 
         if self.InAttacking:
@@ -100,7 +115,7 @@ class PolicyMaker_Auciton(PolicyMaker):
                 self.close_area = self.find_mate(obs_n)
                 self.add_new_target(obs_n[self.index], WorldTarget)
                 if (step == (self.Step0 - 1)) and (not PolicyMaker_Auciton.Found_Target_Set):
-                    self.Step0 += 1
+                    self.operate_step(0)
                 else:
                     pass
 
