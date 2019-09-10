@@ -72,7 +72,7 @@ def update_action(env, world, obs_n, step, NewController):
 
         action_n.append(actioni)
 
-    return action_n, NewController
+    return action_n
 
 
 if __name__ == '__main__':
@@ -91,7 +91,7 @@ if __name__ == '__main__':
     while True:
 
         # get action
-        action_n, NewController = update_action(env, world, obs_n, step, NewController)
+        action_n = update_action(env, world, obs_n, step, NewController)
 
         # environment step
         new_obs_n, rew_n, done_n, info_n = env.step(action_n)
