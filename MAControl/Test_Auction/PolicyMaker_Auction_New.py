@@ -7,7 +7,6 @@ from MAControl.Util.PointInRec import point_in_rec
 
 class PolicyMaker_Auciton(PolicyMaker):
 
-    # change TESTControl to PolicyMaker_Auciton
     Found_Target_Set = []
     Found_Target_Info = []
     Shared_UAV_state = []
@@ -108,6 +107,9 @@ class PolicyMaker_Auciton(PolicyMaker):
         PolicyMaker_Auciton.Update_step = step
         PolicyMaker_Auciton.wait_step = 30
         PolicyMaker_Auciton.wait_step_auction = 10
+
+    def resort_target(self, found_targets):
+        return found_targets
 
     def auction(self, obs, found_targets):
         # TODO 计算当前竞拍价格
