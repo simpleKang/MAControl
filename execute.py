@@ -30,13 +30,8 @@ def make_env(arglist):
     return env, world
 
 
-if __name__ == '__main__':
-    arglist = parse_args()
-
-    # Create environment
-    env, world = make_env(arglist)
-
-    NewController = []
+def get_controller(env, world, arglist):
+    ControllerSet = []
     for i in range(env.n):
         control = []
         control.append(PM_A.PolicyMaker_Auciton("agent_%d" % i, env, world, i, arglist))
@@ -45,7 +40,18 @@ if __name__ == '__main__':
         control.append(IC_P.InnerController_PID("agent_%d" % i, env, world, i, arglist))
         control.append(False)
         control.append(PM_A2.PolicyMaker_Auciton("agent_%d" % i, env, world, i, arglist))   # >>>>> try
-        NewController.append(control)
+        ControllerSet.append(control)
+    return ControllerSet
+
+
+if __name__ == '__main__':
+    arglist = parse_args()
+
+    # Create environment
+    env, world = make_env(arglist)
+
+    # Create Controller
+    NewController = get_controller(env, world, arglist)
 
     obs_n = env.reset()
     step = 0
@@ -56,10 +62,6 @@ if __name__ == '__main__':
         WorldTarget.append([landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.state.p_vel[0],
                             landmark.state.p_vel[1], landmark.value, landmark.defence])
     print('WorldTarget', WorldTarget)
-    # PM_A.PolicyMaker_Auciton.Found_Target_Set = WorldTarget
-    # PM_A.PolicyMaker_Auciton.Found_Target_Info = [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
-    # PM_A2.PolicyMaker_Auciton.Found_Target_Set = WorldTarget  # >>>>> try
-    # PM_A2.PolicyMaker_Auciton.Found_Target_Info = [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]  #try
 
     while True:
 
