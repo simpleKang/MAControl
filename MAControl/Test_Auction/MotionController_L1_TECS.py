@@ -140,7 +140,6 @@ class MotionController_L1_TECS(MotionController):
             else:
                 if dist_BP < BP_range:
                     self.arrive_flag = True
-                    print('True', obs)
                 else:
                     self.arrive_flag = False
 

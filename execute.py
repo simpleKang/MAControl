@@ -66,9 +66,14 @@ if __name__ == '__main__':
         action_n = []
         for i in range(env.n):
             return_list = NewController[i][0].make_policy(WorldTarget, obs_n, step)
-            return_list = NewController[i][4].make_policy(WorldTarget, obs_n, step)  # try
+            # return_list = NewController[i][4].make_policy(WorldTarget, obs_n, step)  # try
             pointAi, pointBi, finishedi = NewController[i][1].planpath(return_list, obs_n[i], Arrive_flag[i])
-            Eacct, Eaccl, Arrive_flag[i] = NewController[i][2].get_expected_action(obs_n[i], pointAi, pointBi, step)
+            pointBi = (1, -1)
+            if Arrive_flag[i]:
+                finishedi = True
+            else:
+                finishedi = False
+            Eacct, Eaccl, Arrive_flag[i] = NewController[i][2].get_expected_action(obs_n[i], pointAi, pointBi, finishedi, step)
             actioni = NewController[i][3].get_action(obs_n[i], Eacct, Eaccl, step, finishedi)
             action_n.append(actioni)
 
