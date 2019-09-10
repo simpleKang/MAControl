@@ -62,21 +62,8 @@ def update_action(env, world, obs_n, step, NewController):
         list_i = NewController[i][0]. \
             make_policy(WorldTarget, obs_n, step)
 
-        # pointAi, pointBi, finishedi, NewController[i][5] = NewController[i][1].\
-        #     planpath(list_i, obs_n[i], NewController[i][4])
-
-        pointAi = (0,  0)
-        pointBi = (-1, 1)
-        if NewController[i][4]:
-            finishedi = True
-        else:
-            finishedi = False
-
-        if step >= 50 and i == 4:
-            NewController[i][5] = True
-            print('4 is attacking at 50')
-        else:
-            NewController[i][5] = False
+        pointAi, pointBi, finishedi, is_attacking = NewController[i][1].\
+            planpath(list_i, obs_n[i], NewController[i][4])
 
         acctEi, acclEi, NewController[i][4] = NewController[i][2]. \
             get_expected_action(obs_n[i], pointAi, pointBi, step, finishedi)

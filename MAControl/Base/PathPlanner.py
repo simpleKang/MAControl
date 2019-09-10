@@ -11,5 +11,5 @@ class PathPlanner(ABC):
         self.arglist = arglist
 
     @abstractmethod
-    def planpath(self, para_list, obs, arrive_flag):
+    def planpath(self, para_list, obs, arrive_flag, step):
         pass

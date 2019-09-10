@@ -17,11 +17,10 @@ class PathPlanner_Simple(PathPlanner):
         self.is_init = True                 # 是否为初始时刻
         self.is_attacking = False           # 是否为正在执行
         self.waypoint_finished = False      # 航点是否已经飞完
+        # 初始化航点列表
+        self.waypoint_list = CW.creat_snake_waypoint_list(self.waypoint_list, self.env.n, self.index)
 
-        self.waypoint_list.append([[0 for i in range(3)] for j in range(256)])
-        self.waypoint_list[self.current_wplist][0:len(CW.init_waypoint[self.index])] = CW.init_waypoint[self.index]
-
-    def planpath(self, para_list, obs, arrive_flag):
+    def planpath(self, para_list, obs, arrive_flag, step):
         if para_list[0] == 0:
             self.waypoint_list = self.no_operation(self.waypoint_list)
 
