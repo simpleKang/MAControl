@@ -166,8 +166,27 @@ class PolicyMaker_Auciton(PolicyMaker):
                     print('Current_Price_Result: ', PolicyMaker_Auciton.Current_Price_Result)
 
             elif step == self.Step4:
-                print('to attack')
-                pass
+                # 下述计算会在各个UAV本地重复进行，确认自己是否具有攻击资格，部分UAV即将进入攻击阶段
+                # 因为基于共享量进行计算，中间变量的计算结果将相同
+
+                DEMANDED_UAV_NUM = PolicyMaker_Auciton.Found_Target_Set[PolicyMaker_Auciton.Current_Target_Index][5]
+                if DEMANDED_UAV_NUM > len(PolicyMaker_Auciton.Remain_UAV_Set):
+                    print('WARNING: HARD TARGET ', PolicyMaker_Auciton.Current_Target_Index)
+                    CHOSEN_UAV_NUM = len(PolicyMaker_Auciton.Remain_UAV_Set)
+                else:
+                    CHOSEN_UAV_NUM = DEMANDED_UAV_NUM
+
+                CHOSEN_UAV_SET = []
+                for k in range(CHOSEN_UAV_NUM):
+                    CHOSEN_UAV_SET.append(PolicyMaker_Auciton.Current_Price_Result[k][0])
+
+                if self.index in CHOSEN_UAV_SET:
+                    print('UAV', self.index, 'to attack')
+                    self.InAttacking = True
+                    self.x = PolicyMaker_Auciton.Found_Target_Set[PolicyMaker_Auciton.Current_Target_Index][0]
+                    self.y = PolicyMaker_Auciton.Found_Target_Set[PolicyMaker_Auciton.Current_Target_Index][1]
+                else:
+                    print('UAV', self.index, 'not to attack')
 
             elif step == self.Step5:
                 print('evaluating')
