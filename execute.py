@@ -101,6 +101,7 @@ if __name__ == '__main__':
     while True:
 
         # get action
+        print('>>>> step', step)
         action_n = update_action(env, world, obs_n, step, NewController)
 
         # environment step
@@ -112,5 +113,5 @@ if __name__ == '__main__':
         time.sleep(0.01)
         augment_view(env, world, NewController)
         env.render()
-        print('>>>> step', step)
+        # print('>>>> step', step)
 
