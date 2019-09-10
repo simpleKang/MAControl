@@ -154,7 +154,16 @@ class PolicyMaker_Auciton(PolicyMaker):
 
             elif step == self.Step3:
                 print('priced')
-                pass
+
+                if self.index == (len(obs_n)-1):
+
+                    results = sum(np.array(PolicyMaker_Auciton.Current_Price_Set))
+                    for k in range(len(PolicyMaker_Auciton.Remain_UAV_Set)):
+                        PolicyMaker_Auciton.Current_Price_Result.append([PolicyMaker_Auciton.Remain_UAV_Set[k], results[k]])
+
+                    PolicyMaker_Auciton.Current_Price_Result = \
+                        sorted(PolicyMaker_Auciton.Current_Price_Result, key=lambda x: x[1], reverse=True)
+                    print('Current_Price_Result: ', PolicyMaker_Auciton.Current_Price_Result)
 
             elif step == self.Step4:
                 print('to attack')
