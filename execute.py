@@ -57,8 +57,8 @@ if __name__ == '__main__':
         WorldTarget.append([landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.state.p_vel[0],
                             landmark.state.p_vel[1], landmark.value, landmark.defence])
     print('WorldTarget', WorldTarget)
-    # TESTC.TESTControl.Found_Target_Set = WorldTarget
-    # TESTC.TESTControl.Found_Target_Info = [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
+    PM_A.PolicyMaker_Auciton.Found_Target_Set = WorldTarget
+    PM_A.PolicyMaker_Auciton.Found_Target_Info = [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
 
     while True:
 
@@ -67,7 +67,7 @@ if __name__ == '__main__':
         for i in range(env.n):
             return_list = NewController[i][0].make_policy(WorldTarget, obs_n, step)
             # return_list = NewController[i][4].make_policy(WorldTarget, obs_n, step)  # try
-            pointAi, pointBi, finishedi = NewController[i][1].planpath(return_list, obs_n[i], Arrive_flag[i])
+            pointAi, pointBi, finishedi, Arrive_flag[i] = NewController[i][1].planpath(return_list, obs_n[i], Arrive_flag[i])
             pointBi = (1, -1)
             if Arrive_flag[i]:
                 finishedi = True
