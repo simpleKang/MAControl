@@ -49,6 +49,7 @@ class PolicyMaker_Auciton(PolicyMaker):
         self.Step4 = 521
         self.Step5 = 522
 
+        self.swarm_size = 0
         self.close_area = []
         PolicyMaker_Auciton.Remain_UAV_Set.append(self.index)
 
@@ -174,6 +175,7 @@ class PolicyMaker_Auciton(PolicyMaker):
 
             elif step == self.Step3:
                 print('UAV', self.index, 'priced')
+                self.swarm_size = len(PolicyMaker_Auciton.Remain_UAV_Set)
 
                 if self.index == max(PolicyMaker_Auciton.Remain_UAV_Set):
 
@@ -190,9 +192,9 @@ class PolicyMaker_Auciton(PolicyMaker):
                 # 因为基于共享量进行计算，中间变量的计算结果将相同
 
                 DEMANDED_UAV_NUM = PolicyMaker_Auciton.Found_Target_Set[PolicyMaker_Auciton.Current_Target_Index][5]
-                if DEMANDED_UAV_NUM > len(PolicyMaker_Auciton.Remain_UAV_Set):
+                if DEMANDED_UAV_NUM > self.swarm_size:
                     print('WARNING: HARD TARGET ', PolicyMaker_Auciton.Current_Target_Index)
-                    CHOSEN_UAV_NUM = len(PolicyMaker_Auciton.Remain_UAV_Set)
+                    CHOSEN_UAV_NUM = self.swarm_size
                 else:
                     CHOSEN_UAV_NUM = DEMANDED_UAV_NUM
 
