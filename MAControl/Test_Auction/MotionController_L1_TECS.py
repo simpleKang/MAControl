@@ -10,13 +10,10 @@ class MotionController_L1_TECS(MotionController):
         super(MotionController_L1_TECS, self).__init__(name, env, world, agent_index, arglist)
 
         # extra params
-        self.motion_pace = 5
         self.STE_rate_error = 0
         self.throttle_integ_s = 0
         self.tangent_acc = 0
         self.lateral_acc = 0
-
-        pass
 
     def get_expected_action(self, obs, pointAi, pointBi, step, finishedi):
         # print("motion control")
@@ -24,6 +21,7 @@ class MotionController_L1_TECS(MotionController):
         pointPi = np.array(obs[2:4])
         pointAi = np.array(pointAi)
         pointBi = np.array(pointBi)
+        motion_pace = 5
 
         # set L1 params
         L1_ratio = 0.1  # (当v=0.05则L1=0.005km=50m)
@@ -52,7 +50,7 @@ class MotionController_L1_TECS(MotionController):
         vector_BP_unit = vector_BP / dist_BP
 
         # set motion_pace
-        if step == 0 or step % self.motion_pace == 0:
+        if step == 0 or step % motion_pace == 0:
 
             # # # # # tecs # # # # #
 
