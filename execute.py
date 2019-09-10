@@ -17,7 +17,6 @@ def parse_args():
 
 
 def make_env(arglist):
-    print('make_env')
     from MAEnv.environment import MultiAgentEnv
     import MAEnv.scenarios as scenarios
 
@@ -32,6 +31,7 @@ def make_env(arglist):
 
 def get_controller(env, world, arglist):
     ControllerSet = []
+
     for i in range(env.n):
         control = []
         control.append(PM_A.PolicyMaker_Auciton("agent_%d" % i, env, world, i, arglist))
@@ -41,6 +41,7 @@ def get_controller(env, world, arglist):
         control.append(False)
         control.append(PM_A2.PolicyMaker_Auciton("agent_%d" % i, env, world, i, arglist))   # >>>>> try
         ControllerSet.append(control)
+
     return ControllerSet
 
 
@@ -51,10 +52,12 @@ def update_action(env, world, obs_n, step):
     for i, landmark in enumerate(world.targets):
         WorldTarget.append([landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.state.p_vel[0],
                             landmark.state.p_vel[1], landmark.value, landmark.defence])
+
     # get action
     action_n = []
 
     for i in range(env.n):
+
         list_i = NewController[i][0]. \
             make_policy(WorldTarget, obs_n, step)
 
@@ -99,6 +102,4 @@ if __name__ == '__main__':
         time.sleep(0.01)
         env.render()
         print('>>>> step', step)
-        # print('obs_n', obs_n)
-        # print('action_n', action_n)
 
