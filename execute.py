@@ -44,6 +44,34 @@ def get_controller(env, world, arglist):
     return ControllerSet
 
 
+def update_action(env, world, obs_n, step):
+
+    # WorldTarget
+    WorldTarget = []
+    for i, landmark in enumerate(world.targets):
+        WorldTarget.append([landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.state.p_vel[0],
+                            landmark.state.p_vel[1], landmark.value, landmark.defence])
+    # get action
+    action_n = []
+
+    for i in range(env.n):
+        list_i = NewController[i][0]. \
+            make_policy(WorldTarget, obs_n, step)
+
+        pointAi, pointBi, finishedi = NewController[i][1]. \
+            planpath(list_i, obs_n[i], NewController[i][4])
+
+        acctEi, acclEi, NewController[i][4] = NewController[i][2]. \
+            get_expected_action(obs_n[i], pointAi, pointBi, step, finishedi)
+
+        actioni = NewController[i][3]. \
+            get_action(obs_n[i], acctEi, acclEi, step, finishedi)
+
+        action_n.append(actioni)
+
+    return action_n
+
+
 if __name__ == '__main__':
     arglist = parse_args()
 
@@ -57,33 +85,10 @@ if __name__ == '__main__':
     step = 0
     start = time.time()
 
-    WorldTarget = []
-    for i, landmark in enumerate(world.targets):
-        WorldTarget.append([landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.state.p_vel[0],
-                            landmark.state.p_vel[1], landmark.value, landmark.defence])
-    print('WorldTarget', WorldTarget)
-
     while True:
 
         # get action
-        action_n = []
-        for i in range(env.n):
-
-            list_i = NewController[i][0].\
-                make_policy(WorldTarget, obs_n, step)
-
-            pointAi, pointBi, finishedi = NewController[i][1].\
-                planpath(list_i, obs_n[i], NewController[i][4])
-
-            acctEi, acclEi, NewController[i][4] = NewController[i][2].\
-                get_expected_action(obs_n[i], pointAi, pointBi, step, finishedi)
-
-            actioni = NewController[i][3].\
-                get_action(obs_n[i], acctEi, acclEi, step, finishedi)
-
-            action_n.append(actioni)
-            # print("agent_%d" % i, pointAi, pointBi, 'finishedi:', finishedi)
-            # print(acctEi, acclEi, 'arriveflag:', NewController[i][4])
+        action_n = update_action(env, world, obs_n, step)
 
         # environment step
         new_obs_n, rew_n, done_n, info_n = env.step(action_n)
