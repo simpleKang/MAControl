@@ -6,7 +6,7 @@ from MAControl.Util.Constrain import constrain
 import math
 
 
-class PolicyMaker_Auciton(PolicyMaker):
+class PolicyMaker_Auction(PolicyMaker):
 
     #                                       (Step2<=)&(<Step3)
     # 搜索目标[阶段] | 排序目标[步] | 选择目标[步] | 出价[阶段] | 统计价格[步] | 分道扬镳[步] | 重置[步] >>>> 搜索目标[阶段] ....
@@ -34,7 +34,7 @@ class PolicyMaker_Auciton(PolicyMaker):
     Current_Price_Result = []  # {UAV_INDEX,UAV_PRICE}
 
     def __init__(self, name, env, world, agent_index, arglist):
-        super(PolicyMaker_Auciton, self).__init__(name, env, world, agent_index, arglist)
+        super(PolicyMaker_Auction, self).__init__(name, env, world, agent_index, arglist)
         self.opt_index = 0
         self.x = 0
         self.y = 0
@@ -53,7 +53,7 @@ class PolicyMaker_Auciton(PolicyMaker):
 
         self.swarm_size = 0
         self.close_area = []
-        PolicyMaker_Auciton.Remain_UAV_Set.append(self.index)
+        PolicyMaker_Auction.Remain_UAV_Set.append(self.index)
 
     def find_mate(self, obs_n, r=0.5):
         selfpos = np.array(obs_n[self.index][2:4])
@@ -88,24 +88,24 @@ class PolicyMaker_Auciton(PolicyMaker):
                 seen_target.append(target)
 
         # READ AND WRITE TESTControl.Found_Target_Set
-        if not PolicyMaker_Auciton.Found_Target_Set:
-            PolicyMaker_Auciton.Found_Target_Set = seen_target
+        if not PolicyMaker_Auction.Found_Target_Set:
+            PolicyMaker_Auction.Found_Target_Set = seen_target
             for i in range(len(seen_target)):
-                PolicyMaker_Auciton.Found_Target_Info.append(self.close_area)
+                PolicyMaker_Auction.Found_Target_Info.append(self.close_area)
         elif seen_target:
             for target1 in seen_target:
                 check = False
-                for target2 in PolicyMaker_Auciton.Found_Target_Set:
+                for target2 in PolicyMaker_Auction.Found_Target_Set:
                     pos1 = np.array(target1[1:3])
                     pos2 = np.array(target2[1:3])
                     deltapos = np.sqrt(np.dot(pos1 - pos2, pos1 - pos2))
                     check = check | (deltapos <= ttrange)
                 if not check:
-                    PolicyMaker_Auciton.Found_Target_Set.append(target1)
-                    PolicyMaker_Auciton.Found_Target_Info.append(self.close_area)
+                    PolicyMaker_Auction.Found_Target_Set.append(target1)
+                    PolicyMaker_Auction.Found_Target_Info.append(self.close_area)
 
         # COMMUNICATE TESTControl.Found_Target_Info
-        for info in PolicyMaker_Auciton.Found_Target_Info:
+        for info in PolicyMaker_Auction.Found_Target_Info:
             check = False
             for num in self.close_area:
                 check = check | num in info
@@ -113,10 +113,10 @@ class PolicyMaker_Auciton(PolicyMaker):
                 info.append(self.index)
 
     def searching_is_good_enough(self, step):
-        check1 = ((PolicyMaker_Auciton.Found_Target_Set) != [])
-        check2 = (len(PolicyMaker_Auciton.Attacked_Target_Index) != len(PolicyMaker_Auciton.Found_Target_Set))
+        check1 = ((PolicyMaker_Auction.Found_Target_Set) != [])
+        check2 = (len(PolicyMaker_Auction.Attacked_Target_Index) != len(PolicyMaker_Auction.Found_Target_Set))
 
-        check3a = len(PolicyMaker_Auciton.Found_Target_Set)/len(PolicyMaker_Auciton.Remain_UAV_Set)  # 实际情况
+        check3a = len(PolicyMaker_Auction.Found_Target_Set)/len(PolicyMaker_Auction.Remain_UAV_Set)  # 实际情况
         check3b = 0.1  # 将来需要让其随时间减少
         check3 = (check3a > check3b)
 
@@ -173,7 +173,7 @@ class PolicyMaker_Auciton(PolicyMaker):
         e1 = 0.5      # 我方小飞机优势系数
         e2 = 0.5      # 敌方目标战术价值系数  e1 + e2 = 1 (0 <= e1, e2 <= 1)
         pt = 0.8      # 小飞机单发杀伤概率
-        W = PolicyMaker_Auciton.Found_Target_Set[PolicyMaker_Auciton.Current_Target_Index][4]        # 目标的战术价值
+        W = PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][4]        # 目标的战术价值
         sigma1 = 0.5  # 距离优势系数
         sigma2 = 0.5  # 角度优势系数
         D = 0.6       # 小飞机能够攻击目标的最大距离
@@ -184,11 +184,11 @@ class PolicyMaker_Auciton(PolicyMaker):
         pt_ = 0.6     # 目标的单发杀伤概率
 
         # 计算收益U
-        dis = math.sqrt((PolicyMaker_Auciton.Found_Target_Set[PolicyMaker_Auciton.Current_Target_Index][0] - obs[2])**2+
-                        (PolicyMaker_Auciton.Found_Target_Set[PolicyMaker_Auciton.Current_Target_Index][1] - obs[3])**2)
+        dis = math.sqrt((PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][0] - obs[2])**2+
+                        (PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][1] - obs[3])**2)
         v_unit = np.array([obs[0], obs[1]])/math.sqrt(obs[0]**2+obs[1]**2)
-        t_unit = np.array([PolicyMaker_Auciton.Found_Target_Set[PolicyMaker_Auciton.Current_Target_Index][0] - obs[2],
-                           PolicyMaker_Auciton.Found_Target_Set[PolicyMaker_Auciton.Current_Target_Index][1] - obs[3]])/dis
+        t_unit = np.array([PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][0] - obs[2],
+                           PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][1] - obs[3]])/dis
         angle = math.acos(constrain(np.dot(v_unit, t_unit), -1, 1))
         Fd = math.exp(1 - dis / D)
         Fq = math.exp(1 - angle/math.pi)
@@ -225,67 +225,67 @@ class PolicyMaker_Auciton(PolicyMaker):
             elif step == self.Step0:
                 print('UAV', self.index, 'resorting')
 
-                if self.index == max(PolicyMaker_Auciton.Remain_UAV_Set):
+                if self.index == max(PolicyMaker_Auction.Remain_UAV_Set):
 
-                    for i in range(len(PolicyMaker_Auciton.Found_Target_Set)):
-                        if i not in PolicyMaker_Auciton.Attacked_Target_Index:
-                            PolicyMaker_Auciton.Remain_Target_Set.append(PolicyMaker_Auciton.Found_Target_Set[i]+[i])
+                    for i in range(len(PolicyMaker_Auction.Found_Target_Set)):
+                        if i not in PolicyMaker_Auction.Attacked_Target_Index:
+                            PolicyMaker_Auction.Remain_Target_Set.append(PolicyMaker_Auction.Found_Target_Set[i]+[i])
 
-                    PolicyMaker_Auciton.Remain_Target_Set = sorted(PolicyMaker_Auciton.Remain_Target_Set, key=lambda x: x[4], reverse=True)
-                    print('Found_Target_Set: ', PolicyMaker_Auciton.Found_Target_Set)
-                    print('Remain_Target_Set: ', PolicyMaker_Auciton.Remain_Target_Set)
+                    PolicyMaker_Auction.Remain_Target_Set = sorted(PolicyMaker_Auction.Remain_Target_Set, key=lambda x: x[4], reverse=True)
+                    print('Found_Target_Set: ', PolicyMaker_Auction.Found_Target_Set)
+                    print('Remain_Target_Set: ', PolicyMaker_Auction.Remain_Target_Set)
 
             elif step == self.Step1:
                 print('UAV', self.index, 'choosing')
 
-                if self.index == max(PolicyMaker_Auciton.Remain_UAV_Set):
-                    PolicyMaker_Auciton.Current_Target_Index = PolicyMaker_Auciton.Remain_Target_Set[0][-1]
-                    print('Current_Target_Index: ', PolicyMaker_Auciton.Current_Target_Index)
-                    PolicyMaker_Auciton.Current_Price_Set = [[0 for j in range(len(PolicyMaker_Auciton.Remain_UAV_Set))] for k in range(18)]
+                if self.index == max(PolicyMaker_Auction.Remain_UAV_Set):
+                    PolicyMaker_Auction.Current_Target_Index = PolicyMaker_Auction.Remain_Target_Set[0][-1]
+                    print('Current_Target_Index: ', PolicyMaker_Auction.Current_Target_Index)
+                    PolicyMaker_Auction.Current_Price_Set = [[0 for j in range(len(PolicyMaker_Auction.Remain_UAV_Set))] for k in range(18)]
 
             elif self.Step2 <= step < self.Step3:
                 print('UAV', self.index, 'pricing')
 
                 if random.random() > 0.5:
-                    k = PolicyMaker_Auciton.Remain_UAV_Set.index(self.index)
-                    PolicyMaker_Auciton.Current_Price_Set[step - self.Step2][k] = self.bidding(obs_n[self.index])
+                    k = PolicyMaker_Auction.Remain_UAV_Set.index(self.index)
+                    PolicyMaker_Auction.Current_Price_Set[step - self.Step2][k] = self.bidding(obs_n[self.index])
                     # Current_Price_Set 是根据 Remain_UAV_Set 生成的，从后者选取编号
 
             elif step == self.Step3:
                 print('UAV', self.index, 'priced')
-                self.swarm_size = len(PolicyMaker_Auciton.Remain_UAV_Set)
+                self.swarm_size = len(PolicyMaker_Auction.Remain_UAV_Set)
 
-                if self.index == max(PolicyMaker_Auciton.Remain_UAV_Set):
+                if self.index == max(PolicyMaker_Auction.Remain_UAV_Set):
 
-                    results = sum(np.array(PolicyMaker_Auciton.Current_Price_Set))
-                    for k in range(len(PolicyMaker_Auciton.Remain_UAV_Set)):
-                        PolicyMaker_Auciton.Current_Price_Result.append([PolicyMaker_Auciton.Remain_UAV_Set[k], results[k]])
+                    results = sum(np.array(PolicyMaker_Auction.Current_Price_Set))
+                    for k in range(len(PolicyMaker_Auction.Remain_UAV_Set)):
+                        PolicyMaker_Auction.Current_Price_Result.append([PolicyMaker_Auction.Remain_UAV_Set[k], results[k]])
 
-                    PolicyMaker_Auciton.Current_Price_Result = \
-                        sorted(PolicyMaker_Auciton.Current_Price_Result, key=lambda x: x[1], reverse=True)
-                    print('Current_Price_Result: ', PolicyMaker_Auciton.Current_Price_Result)
+                    PolicyMaker_Auction.Current_Price_Result = \
+                        sorted(PolicyMaker_Auction.Current_Price_Result, key=lambda x: x[1], reverse=True)
+                    print('Current_Price_Result: ', PolicyMaker_Auction.Current_Price_Result)
 
             elif step == self.Step4:
                 # 下述计算会在各个UAV本地重复进行，确认自己是否具有攻击资格，部分UAV即将进入攻击阶段
                 # 因为基于共享量进行计算，中间变量的计算结果将相同
 
-                DEMANDED_UAV_NUM = PolicyMaker_Auciton.Found_Target_Set[PolicyMaker_Auciton.Current_Target_Index][5]
+                DEMANDED_UAV_NUM = PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][5]
                 if DEMANDED_UAV_NUM > self.swarm_size:
-                    print('WARNING: HARD TARGET ', PolicyMaker_Auciton.Current_Target_Index)
+                    print('WARNING: HARD TARGET ', PolicyMaker_Auction.Current_Target_Index)
                     CHOSEN_UAV_NUM = self.swarm_size
                 else:
                     CHOSEN_UAV_NUM = DEMANDED_UAV_NUM
 
                 CHOSEN_UAV_SET = []
                 for k in range(CHOSEN_UAV_NUM):
-                    CHOSEN_UAV_SET.append(PolicyMaker_Auciton.Current_Price_Result[k][0])
+                    CHOSEN_UAV_SET.append(PolicyMaker_Auction.Current_Price_Result[k][0])
 
                 if self.index in CHOSEN_UAV_SET:
                     print('UAV', self.index, 'to attack')
                     self.InAttacking = True
-                    self.x = PolicyMaker_Auciton.Found_Target_Set[PolicyMaker_Auciton.Current_Target_Index][0]
-                    self.y = PolicyMaker_Auciton.Found_Target_Set[PolicyMaker_Auciton.Current_Target_Index][1]
-                    PolicyMaker_Auciton.Remain_UAV_Set.remove(self.index)
+                    self.x = PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][0]
+                    self.y = PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][1]
+                    PolicyMaker_Auction.Remain_UAV_Set.remove(self.index)
                 else:
                     print('UAV', self.index, 'not to attack')
 
@@ -293,12 +293,12 @@ class PolicyMaker_Auciton(PolicyMaker):
                 print('UAV', self.index, 'recycling')
                 self.operate_step(1, step)
 
-                if self.index == max(PolicyMaker_Auciton.Remain_UAV_Set):
-                    PolicyMaker_Auciton.Attacked_Target_Index.append(PolicyMaker_Auciton.Current_Target_Index)
-                    PolicyMaker_Auciton.Remain_Target_Set = []
-                    PolicyMaker_Auciton.Current_Target_Index = -1
-                    PolicyMaker_Auciton.Current_Price_Set = []
-                    PolicyMaker_Auciton.Current_Price_Result = []
+                if self.index == max(PolicyMaker_Auction.Remain_UAV_Set):
+                    PolicyMaker_Auction.Attacked_Target_Index.append(PolicyMaker_Auction.Current_Target_Index)
+                    PolicyMaker_Auction.Remain_Target_Set = []
+                    PolicyMaker_Auction.Current_Target_Index = -1
+                    PolicyMaker_Auction.Current_Price_Set = []
+                    PolicyMaker_Auction.Current_Price_Result = []
 
             else:
                 raise Exception('Wrong Wrong Wrong')

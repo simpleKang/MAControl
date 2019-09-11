@@ -33,7 +33,7 @@ def get_controller(env, world, arglist):
 
     for i in range(env.n):
         control = []
-        control.append(PM_A.PolicyMaker_Auciton("agent_%d" % i, env, world, i, arglist))
+        control.append(PM_A.PolicyMaker_Auction("agent_%d" % i, env, world, i, arglist))
         control.append(PP_S.PathPlanner_Simple("agent_%d" % i, env, world, i, arglist))
         control.append(MC_L.MotionController_L1_TECS("agent_%d" % i, env, world, i, arglist))
         control.append(IC_P.InnerController_PID("agent_%d" % i, env, world, i, arglist))
