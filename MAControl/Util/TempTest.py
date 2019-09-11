@@ -1,4 +1,5 @@
-
+import numpy as np
+import math
 a = []
 
 a.append([[1, 2, 1],
@@ -7,15 +8,7 @@ a.append([[1, 2, 1],
           [0, 0, 0],
           [0, 0, 0]])
 
-a.append(a[0].copy())
+b = np.array([1, 2])/math.sqrt(1+4)
 
-a[1][3] = [3, 3, 3]
-
-x = 3
-
-y = x
-
-for i in range(5):
-    y += 1
 
 z = 0
