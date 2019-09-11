@@ -29,6 +29,7 @@ import numpy as np
 
 RAD2DEG = 57.29577951308232
 
+
 def get_display(spec):
     """Convert a display specification (such as :0) into an actual Display
     object.
@@ -41,6 +42,7 @@ def get_display(spec):
         return pyglet.canvas.Display(spec)
     else:
         raise error.Error('Invalid display specification: {}. (Must be a string like :0 or None.)'.format(spec))
+
 
 class Viewer(object):
     def __init__(self, width, height, display=None):
@@ -144,11 +146,13 @@ class Viewer(object):
         arr = arr.reshape(self.height, self.width, 4)
         return arr[::-1,:,0:3]
 
+
 def _add_attrs(geom, attrs):
     if "color" in attrs:
         geom.set_color(*attrs["color"])
     if "linewidth" in attrs:
         geom.set_linewidth(attrs["linewidth"])
+
 
 class Geom(object):
     def __init__(self):
@@ -167,11 +171,13 @@ class Geom(object):
     def set_color(self, r, g, b, alpha=1):
         self._color.vec4 = (r, g, b, alpha)
 
+
 class Attr(object):
     def enable(self):
         raise NotImplementedError
     def disable(self):
         pass
+
 
 class Transform(Attr):
     def __init__(self, translation=(0.0, 0.0), rotation=0.0, scale=(1,1)):
@@ -192,11 +198,14 @@ class Transform(Attr):
     def set_scale(self, newx, newy):
         self.scale = (float(newx), float(newy))
 
+
 class Color(Attr):
     def __init__(self, vec4):
         self.vec4 = vec4
+
     def enable(self):
         glColor4f(*self.vec4)
+
 
 class LineStyle(Attr):
     def __init__(self, style):
@@ -207,11 +216,13 @@ class LineStyle(Attr):
     def disable(self):
         glDisable(GL_LINE_STIPPLE)
 
+
 class LineWidth(Attr):
     def __init__(self, stroke):
         self.stroke = stroke
     def enable(self):
         glLineWidth(self.stroke)
+
 
 class Point(Geom):
     def __init__(self):
@@ -220,6 +231,7 @@ class Point(Geom):
         glBegin(GL_POINTS) # draw point
         glVertex3f(0.0, 0.0, 0.0)
         glEnd()
+
 
 class FilledPolygon(Geom):
     def __init__(self, v):
@@ -240,6 +252,7 @@ class FilledPolygon(Geom):
             glVertex3f(p[0], p[1],0)  # draw each vertex
         glEnd()
 
+
 def make_circle(radius=10, res=30, filled=True):
     points = []
     for i in range(res):
@@ -250,12 +263,15 @@ def make_circle(radius=10, res=30, filled=True):
     else:
         return PolyLine(points, True)
 
+
 def make_polygon(v, filled=True):
     if filled: return FilledPolygon(v)
     else: return PolyLine(v, True)
 
+
 def make_polyline(v):
     return PolyLine(v, False)
+
 
 def make_capsule(length, width):
     l, r, t, b = 0, length, width/2, -width/2
@@ -266,6 +282,37 @@ def make_capsule(length, width):
     geom = Compound([box, circ0, circ1])
     return geom
 
+
+def make_uav89():
+
+    v = [[5,     2],
+         [5,     3],
+         [0.5,   3],
+         [0.2,   3.4],
+         [-0.2,  3.4],
+         [-0.5,  3],
+         [-5,    3],
+         [-5,    2],
+         [-0.5,  2],
+         [-0.5, -1],
+         [-3,   -1],
+         [-3,   -2],
+         [-0.5, -2],
+         [-0.5, -2.2],
+         [-1,   -2.2],
+         [-1,   -2.4],
+         [1,    -2.4],
+         [1,    -2.2],
+         [0.5,  -2.2],
+         [0.5,  -2],
+         [3,    -2],
+         [3,    -1],
+         [0.5,  -1],
+         [0.5,   2]]
+
+    return FilledPolygon(v)
+
+
 class Compound(Geom):
     def __init__(self, gs):
         Geom.__init__(self)
@@ -275,6 +322,7 @@ class Compound(Geom):
     def render1(self):
         for g in self.gs:
             g.render()
+
 
 class PolyLine(Geom):
     def __init__(self, v, close):
@@ -291,6 +339,7 @@ class PolyLine(Geom):
     def set_linewidth(self, x):
         self.linewidth.stroke = x
 
+
 class Line(Geom):
     def __init__(self, start=(0.0, 0.0), end=(0.0, 0.0)):
         Geom.__init__(self)
@@ -305,6 +354,7 @@ class Line(Geom):
         glVertex2f(*self.end)
         glEnd()
 
+
 class Image(Geom):
     def __init__(self, fname, width, height):
         Geom.__init__(self)
@@ -317,6 +367,7 @@ class Image(Geom):
         self.img.blit(-self.width/2, -self.height/2, width=self.width, height=self.height)
 
 # ================================================================
+
 
 class SimpleImageViewer(object):
     def __init__(self, display=None):
