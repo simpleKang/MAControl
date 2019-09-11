@@ -45,8 +45,8 @@ class PathPlanner_Simple(PathPlanner):
                 self.pointBi = (self.waypoint_list[self.current_wplist][0][0],
                                 self.waypoint_list[self.current_wplist][0][1])
                 self.is_attacking = True
-            else:
-                raise Exception('Target coord is changed again! This should not happen!!!')
+            # else:
+                # raise Exception('Target coord is changed again! This should not happen!!!')
 
         else:
             raise Exception('Unknown operation index. Please check your code.')

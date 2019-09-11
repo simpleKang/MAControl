@@ -59,7 +59,10 @@ def update_action(env, world, obs_n, step, NewController):
 
     for i in range(env.n):
 
-        list_i = NewController[i][0]. \
+        # list_i = NewController[i][0]. \
+        #     make_policy(WorldTarget, obs_n, step)
+
+        list_i = NewController[i][6]. \
             make_policy(WorldTarget, obs_n, step)
 
         pointAi, pointBi, finishedi, NewController[i][5] = NewController[i][1].\
@@ -98,6 +101,7 @@ if __name__ == '__main__':
     while True:
 
         # get action
+        print('>>>> step', step)
         action_n = update_action(env, world, obs_n, step, NewController)
 
         # environment step
@@ -109,5 +113,5 @@ if __name__ == '__main__':
         time.sleep(0.01)
         augment_view(env, world, NewController)
         env.render()
-        print('>>>> step', step)
+        # print('>>>> step', step)
 
