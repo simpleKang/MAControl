@@ -110,7 +110,7 @@ if __name__ == '__main__':
         obs_n = new_obs_n
 
         # for displaying
-        time.sleep(0.01)
+        # time.sleep(0.01)
         augment_view(env, world, NewController)
         env.render()
         # print('>>>> step', step)
