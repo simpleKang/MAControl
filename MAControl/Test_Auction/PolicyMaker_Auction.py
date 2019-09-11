@@ -117,7 +117,7 @@ class PolicyMaker_Auction(PolicyMaker):
         check2 = (len(PolicyMaker_Auction.Attacked_Target_Index) != len(PolicyMaker_Auction.Found_Target_Set))
 
         check3a = len(PolicyMaker_Auction.Found_Target_Set)/len(PolicyMaker_Auction.Remain_UAV_Set)  # 实际情况
-        check3b = 0.1  # 将来需要让其随时间减少
+        check3b = 100/(step+1)   # 阈值随时间减少
         check3 = (check3a > check3b)
 
         if check1 and check2 and check3:
