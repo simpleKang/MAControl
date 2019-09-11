@@ -248,7 +248,7 @@ class PolicyMaker_Auciton(PolicyMaker):
 
                 if random.random() > 0.5:
                     k = PolicyMaker_Auciton.Remain_UAV_Set.index(self.index)
-                    PolicyMaker_Auciton.Current_Price_Set[step - self.Step2][k] = random.random()
+                    PolicyMaker_Auciton.Current_Price_Set[step - self.Step2][k] = self.bidding(obs_n[self.index])
                     # Current_Price_Set 是根据 Remain_UAV_Set 生成的，从后者选取编号
 
             elif step == self.Step3:
