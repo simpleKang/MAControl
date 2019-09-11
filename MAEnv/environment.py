@@ -3,6 +3,7 @@ from gym import spaces
 from gym.envs.registration import EnvSpec
 import numpy as np
 from MAEnv.multi_discrete import MultiDiscrete
+import math
 
 # environment for all agents in the multiagent world
 # currently code assumes that no agents will be created/destroyed at runtime!
@@ -218,6 +219,8 @@ class MultiAgentEnv(gym.Env):
             for entity in self.world.entities:
                 if 'grid' in entity.name:
                     geom = rendering.make_polygon([[-0.04, -0.04], [-0.04, 0.04], [0.04, 0.04], [0.04, -0.04]])
+                elif 'agent' in entity.name:
+                    geom = rendering.make_polygon([[-0.02, 0], [0, 0.06], [0.02, 0]])
                 else:
                     geom = rendering.make_circle(entity.size)
                 xform = rendering.Transform()
