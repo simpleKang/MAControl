@@ -143,9 +143,11 @@ class PolicyMaker_Auciton(PolicyMaker):
                 self.close_area = self.find_mate(obs_n)
                 self.add_new_target(obs_n[self.index], WorldTarget)
 
-                if (step == (self.Step0 - 1)) and (not PolicyMaker_Auciton.Found_Target_Set) \
-                        and (len(PolicyMaker_Auciton.Attacked_Target_Index)!=len(PolicyMaker_Auciton.Found_Target_Set)):
-                    self.operate_step(0, step)
+                check1 = ((PolicyMaker_Auciton.Found_Target_Set) != [])
+                check2 = (len(PolicyMaker_Auciton.Attacked_Target_Index) != len(PolicyMaker_Auciton.Found_Target_Set))
+
+                if step == (self.Step0 - 1) and (not(check1 and check2)):
+                        self.operate_step(0, step)
 
             elif step == self.Step0:
                 print('UAV', self.index, 'resorting')
