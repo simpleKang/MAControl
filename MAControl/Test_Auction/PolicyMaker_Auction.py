@@ -230,4 +230,4 @@ class PolicyMaker_Auciton(PolicyMaker):
             else:
                 raise Exception('Wrong Wrong Wrong')
 
-        return [self.opt_index, self.x, self.y]
+        return [self.opt_index, [self.x, self.y]]
