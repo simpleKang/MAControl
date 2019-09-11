@@ -216,7 +216,10 @@ class MultiAgentEnv(gym.Env):
             self.render_geoms = []
             self.render_geoms_xform = []
             for entity in self.world.entities:
-                geom = rendering.make_circle(entity.size)
+                if 'grid' in entity.name:
+                    geom = rendering.make_polygon([[-0.04, -0.04], [-0.04, 0.04], [0.04, 0.04], [0.04, -0.04]])
+                else:
+                    geom = rendering.make_circle(entity.size)
                 xform = rendering.Transform()
                 if 'agent' in entity.name:
                     geom.set_color(*entity.color, alpha=0.5)
