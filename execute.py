@@ -6,7 +6,6 @@ import MAControl.Test_Auction.InnerController_PID as IC_P
 import MAControl.Test_Auction.MotionController_L1_TECS as MC_L
 import MAControl.Test_Auction.PathPlanner_Simple as PP_S
 import MAControl.Test_Auction.PolicyMaker_Auction as PM_A
-import MAControl.Test_Auction.PolicyMaker_Auction_New as PM_A2  # >>>>> try
 
 
 def parse_args():
@@ -40,7 +39,6 @@ def get_controller(env, world, arglist):
         control.append(IC_P.InnerController_PID("agent_%d" % i, env, world, i, arglist))
         control.append(False) # Arriveflag
         control.append(False) # Isattacking
-        control.append(PM_A2.PolicyMaker_Auciton("agent_%d" % i, env, world, i, arglist))   # >>>>> try
         ControllerSet.append(control)
 
     return ControllerSet
@@ -59,10 +57,7 @@ def update_action(env, world, obs_n, step, NewController):
 
     for i in range(env.n):
 
-        # list_i = NewController[i][0]. \
-        #     make_policy(WorldTarget, obs_n, step)
-
-        list_i = NewController[i][6]. \
+        list_i = NewController[i][0]. \
             make_policy(WorldTarget, obs_n, step)
 
         pointAi, pointBi, finishedi, NewController[i][5] = NewController[i][1].\
@@ -110,7 +105,7 @@ if __name__ == '__main__':
         obs_n = new_obs_n
 
         # for displaying
-        time.sleep(0.01)
+        # time.sleep(0.01)
         augment_view(env, world, NewController)
         env.render()
         # print('>>>> step', step)
