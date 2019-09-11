@@ -130,6 +130,15 @@ class PolicyMaker_Auciton(PolicyMaker):
             self.Step4 = self.Step0 + 21
             self.Step5 = self.Step0 + 22
 
+        if operate_index == 2:
+            #  finish searching immediately, start resorting at next step
+            self.Step0 = step + 1
+            self.Step1 = self.Step0 + 1
+            self.Step2 = self.Step0 + 2
+            self.Step3 = self.Step0 + 20
+            self.Step4 = self.Step0 + 21
+            self.Step5 = self.Step0 + 22
+
     def make_policy(self, WorldTarget, obs_n, step):
 
         if self.InAttacking:
