@@ -110,7 +110,21 @@ class PolicyMaker_Auciton(PolicyMaker):
             if check and (self.index not in info):
                 info.append(self.index)
 
-    def operate_step(self, operate_index, step):
+    def searching_is_good_enough(self, step):
+        check1 = ((PolicyMaker_Auciton.Found_Target_Set) != [])
+        check2 = (len(PolicyMaker_Auciton.Attacked_Target_Index) != len(PolicyMaker_Auciton.Found_Target_Set))
+
+        check3a = len(PolicyMaker_Auciton.Found_Target_Set)/len(PolicyMaker_Auciton.Remain_UAV_Set)  # 实际情况
+        check3b = 0.5  # 将来需要让其随时间减少
+        check3 = (check3a > check3b)
+
+        if check1 and check2 and check3:
+            output = True
+        else:
+            output = False
+        return output
+
+    def operate_step(self, operate_index, step, waitstep=5):
 
         if operate_index == 0:
             # wait one more step
@@ -139,6 +153,15 @@ class PolicyMaker_Auciton(PolicyMaker):
             self.Step4 = self.Step0 + 21
             self.Step5 = self.Step0 + 22
 
+        if operate_index == 3:
+            # wait [waitstep] more steps
+            self.Step0 += waitstep
+            self.Step1 += waitstep
+            self.Step2 += waitstep
+            self.Step3 += waitstep
+            self.Step4 += waitstep
+            self.Step5 += waitstep
+
     def make_policy(self, WorldTarget, obs_n, step):
 
         if self.InAttacking:
@@ -152,11 +175,10 @@ class PolicyMaker_Auciton(PolicyMaker):
                 self.close_area = self.find_mate(obs_n)
                 self.add_new_target(obs_n[self.index], WorldTarget)
 
-                check1 = ((PolicyMaker_Auciton.Found_Target_Set) != [])
-                check2 = (len(PolicyMaker_Auciton.Attacked_Target_Index) != len(PolicyMaker_Auciton.Found_Target_Set))
-
-                if step == (self.Step0 - 1) and (not(check1 and check2)):
-                        self.operate_step(0, step)
+                if self.searching_is_good_enough(step):
+                    self.operate_step(2, step)
+                elif step == (self.Step0 - 1):
+                    self.operate_step(3, step, waitstep=10)
 
             elif step == self.Step0:
                 print('UAV', self.index, 'resorting')
