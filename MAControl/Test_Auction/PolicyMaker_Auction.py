@@ -115,7 +115,7 @@ class PolicyMaker_Auciton(PolicyMaker):
         check2 = (len(PolicyMaker_Auciton.Attacked_Target_Index) != len(PolicyMaker_Auciton.Found_Target_Set))
 
         check3a = len(PolicyMaker_Auciton.Found_Target_Set)/len(PolicyMaker_Auciton.Remain_UAV_Set)  # 实际情况
-        check3b = 0.5  # 将来需要让其随时间减少
+        check3b = 0.1  # 将来需要让其随时间减少
         check3 = (check3a > check3b)
 
         if check1 and check2 and check3:
