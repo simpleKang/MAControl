@@ -310,9 +310,9 @@ def make_uav89(size):
          [0.5,  -1],
          [0.5,   2]]
 
-    v = list(np.array(v)*size)
+    v = list(np.array(v)*size*2)
 
-    return FilledPolygon(v)
+    return make_polygon(v, False)
 
 
 class Compound(Geom):
