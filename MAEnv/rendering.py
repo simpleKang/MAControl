@@ -5,6 +5,8 @@ from __future__ import division
 import os
 import six
 import sys
+import math
+import numpy as np
 
 if "Apple" in sys.version:
     if 'DYLD_FALLBACK_LIBRARY_PATH' in os.environ:
@@ -24,8 +26,6 @@ try:
 except ImportError as e:
     reraise(prefix="Error occured while running `from pyglet.gl import *`",suffix="HINT: make sure you have OpenGL install. On Ubuntu, you can run 'apt-get install python-opengl'. If you're running on a server, you may need a virtual frame buffer; something like this should work: 'xvfb-run -s \"-screen 0 1400x900x24\" python <your_script.py>'")
 
-import math
-import numpy as np
 
 RAD2DEG = 57.29577951308232
 
@@ -283,7 +283,7 @@ def make_capsule(length, width):
     return geom
 
 
-def make_uav89():
+def make_uav89(size):
 
     v = [[5,     2],
          [5,     3],
@@ -309,6 +309,8 @@ def make_uav89():
          [3,    -1],
          [0.5,  -1],
          [0.5,   2]]
+
+    v = list(np.array(v)*size)
 
     return FilledPolygon(v)
 

@@ -221,7 +221,7 @@ class MultiAgentEnv(gym.Env):
                     preset = [[-2, -2], [-2, 2], [2, 2], [2, -2]]
                     geom = rendering.make_polygon(list(np.array(preset) * entity.size))
                 elif 'agent' in entity.name:
-                    geom = rendering.make_uav89()
+                    geom = rendering.make_uav89(entity.size)
                 else:
                     geom = rendering.make_circle(entity.size)
                 xform = rendering.Transform()
