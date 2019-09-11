@@ -237,19 +237,73 @@ class FilledPolygon(Geom):
     def __init__(self, v):
         Geom.__init__(self)
         self.v = v
-    def render1(self):
-        if   len(self.v) == 4 : glBegin(GL_QUADS)
-        elif len(self.v)  > 4 : glBegin(GL_POLYGON)
-        else: glBegin(GL_TRIANGLES)
-        for p in self.v:
-            glVertex3f(p[0], p[1],0)  # draw each vertex
-        glEnd()
 
-        color = (self._color.vec4[0] * 0.5, self._color.vec4[1] * 0.5, self._color.vec4[2] * 0.5, self._color.vec4[3] * 0.5)
-        glColor4f(*color)
-        glBegin(GL_LINE_LOOP)
+    def render1(self):
+
+        if len(self.v) == 24:
+            glBegin(GL_QUADS)
+            glVertex3f(self.v[1][0], self.v[1][1], 0)
+            glVertex3f(self.v[2][0], self.v[2][1], 0)
+            glVertex3f(self.v[7][0], self.v[7][1], 0)
+            glVertex3f(self.v[8][0], self.v[8][1], 0)
+            glEnd()
+
+            glBegin(GL_QUADS)
+            glVertex3f(self.v[3][0], self.v[3][1], 0)
+            glVertex3f(self.v[4][0], self.v[4][1], 0)
+            glVertex3f(self.v[5][0], self.v[5][1], 0)
+            glVertex3f(self.v[6][0], self.v[6][1], 0)
+            glEnd()
+
+            glBegin(GL_QUADS)
+            glVertex3f(self.v[0][0], self.v[0][1], 0)
+            glVertex3f(self.v[9][0], self.v[9][1], 0)
+            glVertex3f(self.v[10][0], self.v[10][1], 0)
+            glVertex3f(self.v[23][0], self.v[23][1], 0)
+            glEnd()
+
+            glBegin(GL_QUADS)
+            glVertex3f(self.v[22][0], self.v[22][1], 0)
+            glVertex3f(self.v[11][0], self.v[11][1], 0)
+            glVertex3f(self.v[12][0], self.v[12][1], 0)
+            glVertex3f(self.v[21][0], self.v[21][1], 0)
+            glEnd()
+
+            glBegin(GL_QUADS)
+            glVertex3f(self.v[20][0], self.v[20][1], 0)
+            glVertex3f(self.v[13][0], self.v[13][1], 0)
+            glVertex3f(self.v[14][0], self.v[14][1], 0)
+            glVertex3f(self.v[19][0], self.v[19][1], 0)
+            glEnd()
+
+            glBegin(GL_QUADS)
+            glVertex3f(self.v[18][0], self.v[18][1], 0)
+            glVertex3f(self.v[15][0], self.v[15][1], 0)
+            glVertex3f(self.v[16][0], self.v[16][1], 0)
+            glVertex3f(self.v[17][0], self.v[17][1], 0)
+            glEnd()
+
+            color = (self._color.vec4[0] * 0.5, self._color.vec4[1] * 0.5, self._color.vec4[2] * 0.5, self._color.vec4[3] * 0.5)
+            glColor4f(*color)
+            glBegin(GL_LINE_LOOP)
+
+        else:
+            if len(self.v) == 4:
+                glBegin(GL_QUADS)
+            elif len(self.v) > 4:
+                glBegin(GL_POLYGON)
+            else:
+                glBegin(GL_TRIANGLES)
+            for p in self.v:
+                glVertex3f(p[0], p[1], 0)  # draw each vertex
+            glEnd()
+
+            color = (self._color.vec4[0] * 0.5, self._color.vec4[1] * 0.5, self._color.vec4[2] * 0.5, self._color.vec4[3] * 0.5)
+            glColor4f(*color)
+            glBegin(GL_LINE_LOOP)
+
         for p in self.v:
-            glVertex3f(p[0], p[1],0)  # draw each vertex
+            glVertex3f(p[0], p[1], 0)  # draw each vertex
         glEnd()
 
 
@@ -265,8 +319,10 @@ def make_circle(radius=10, res=30, filled=True):
 
 
 def make_polygon(v, filled=True):
-    if filled: return FilledPolygon(v)
-    else: return PolyLine(v, True)
+    if filled:
+        return FilledPolygon(v)
+    else:
+        return PolyLine(v, True)
 
 
 def make_polyline(v):
@@ -285,7 +341,8 @@ def make_capsule(length, width):
 
 def make_uav89(size):
 
-    v = [[5,     2],
+    v = [[0.5,   2],
+         [5,     2],
          [5,     3],
          [0.5,   3],
          [0.2,   3.4],
@@ -307,12 +364,11 @@ def make_uav89(size):
          [0.5,  -2],
          [3,    -2],
          [3,    -1],
-         [0.5,  -1],
-         [0.5,   2]]
+         [0.5,  -1]]
 
     v = list(np.array(v)*size*2)
 
-    return make_polygon(v, False)
+    return make_polygon(v)
 
 
 class Compound(Geom):

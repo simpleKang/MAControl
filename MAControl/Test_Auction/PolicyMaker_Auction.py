@@ -183,7 +183,7 @@ class PolicyMaker_Auction(PolicyMaker):
         T = 0.5       # 敌方目标对小飞机的威胁程度
         pt_ = 0.6     # 目标的单发杀伤概率
 
-        # 计算收益U
+        # 计算中间变量
         dis = math.sqrt((PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][0] - obs[2])**2+
                         (PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][1] - obs[3])**2)
         v_unit = np.array([obs[0], obs[1]])/math.sqrt(obs[0]**2+obs[1]**2)
@@ -192,8 +192,9 @@ class PolicyMaker_Auction(PolicyMaker):
         angle = math.acos(constrain(np.dot(v_unit, t_unit), -1, 1))
         Fd = math.exp(1 - dis / D)
         Fq = math.exp(1 - angle/math.pi)
-        # 对目标优势
         P = sigma1 * Fd + sigma2 * Fq
+
+        # 计算收益U
         U = (e1 * P + e2 * W) * (1 - (1 - pt)**x)
 
         # 计算成本C
