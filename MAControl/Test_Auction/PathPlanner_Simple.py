@@ -11,7 +11,7 @@ class PathPlanner_Simple(PathPlanner):
         self.pointBi = (0, 0)               # B点坐标
         self.pointB_index = 0               # 当前飞向的B点的索引
         self.cycle_index = 1                # 航点列表循环的次数
-        self.total_cycle = 2                # 列表循环的总次数
+        self.total_cycle = 3                # 列表循环的总次数
         self.current_wplist = -1            # 当前航点列表的索引
         self.path_pace = 50                 # PathPlanner的调用频率
         self.is_init = True                 # 是否为初始时刻
