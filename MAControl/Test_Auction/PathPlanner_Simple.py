@@ -1,5 +1,6 @@
 from MAControl.Base.PathPlanner import PathPlanner
 import MAControl.Util.CreateWaypoint as CW
+import math
 
 
 class PathPlanner_Simple(PathPlanner):
@@ -39,7 +40,14 @@ class PathPlanner_Simple(PathPlanner):
 
         elif para_list[0] == 5:
             arrive_flag = self.complete_replace(para_list[1])
-            # pass
+            length = self.waypoint_list[self.current_wplist].index([0, 0, 0])
+            sort = []
+            for i in range(length):
+                dis = math.sqrt((self.waypoint_list[self.current_wplist][i][0]-obs[2])**2 +
+                                (self.waypoint_list[self.current_wplist][i][1]-obs[3])**2)
+                sort.append([i, dis])
+            sort = sorted(sort, key=lambda x: x[1])
+            self.pointB_index = sort[0][0] - 1
 
         elif para_list[0] == 10:
             # 攻击状态切换只能进来一次哦～～
@@ -207,9 +215,6 @@ class PathPlanner_Simple(PathPlanner):
     def complete_replace(self, para_list):
         self.waypoint_list, self.current_wplist = CW.creat_snake_waypoint_list(
                                                self.waypoint_list, para_list[0], para_list[1], self.current_wplist)
-
-        self.pointB_index = 0
-        self.is_init = True
 
         return True
 
