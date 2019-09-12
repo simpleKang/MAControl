@@ -12,4 +12,4 @@ class PathPlanner(ABC):
 
     @abstractmethod
     def planpath(self, para_list, obs, arrive_flag, step):
-        pass
+        raise NotImplementedError

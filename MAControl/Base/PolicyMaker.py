@@ -12,4 +12,4 @@ class PolicyMaker(ABC):
 
     @abstractmethod
     def make_policy(self, WorldTarget, obs_n, step):
-        pass
+        raise NotImplementedError
