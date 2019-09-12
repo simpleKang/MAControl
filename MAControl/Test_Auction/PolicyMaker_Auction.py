@@ -126,7 +126,8 @@ class PolicyMaker_Auction(PolicyMaker):
         check2 = (len(PolicyMaker_Auction.Attacked_Target_Index) != len(PolicyMaker_Auction.Found_Target_Set))
 
         # 实际情况
-        check3a = (np.sum(PolicyMaker_Auction.Found_Target_Set, axis=0))[4] / len(PolicyMaker_Auction.Remain_UAV_Set)
+        check3a = 0 if len(PolicyMaker_Auction.Found_Target_Set) == 0 \
+            else (np.sum(PolicyMaker_Auction.Found_Target_Set, axis=0))[4]/len(PolicyMaker_Auction.Remain_UAV_Set)
         # 阈值随时间减少
         check3b = 100/(step+1)
         check3 = (check3a > check3b)
