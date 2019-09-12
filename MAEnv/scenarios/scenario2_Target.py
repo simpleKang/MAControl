@@ -4,7 +4,7 @@ import numpy as np
 import random
 from MAEnv.core import World, Agent, Landmark
 from MAEnv.scenario import BaseScenario
-
+import MAEnv.scenarios.TargetProfile as T
 
 class Scenario(BaseScenario):
     def make_world(self):
@@ -14,7 +14,7 @@ class Scenario(BaseScenario):
         world.damping2 = 10  # 调整第二种阻尼计算方式的参数
         # set nums
         num_agents = 10
-        num_targets = 3
+        num_targets = T.num_targets
         num_obstacles = 0
         num_grids = 5
         # add agents
