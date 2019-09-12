@@ -34,9 +34,9 @@ class Scenario(BaseScenario):
             landmark.name = 'target %d' % i
             landmark.collide = False
             landmark.movable = False
-            landmark.value = np.ceil(random.random() * 10)
-            landmark.size = landmark.value * 0.01
-            landmark.defence = int(np.ceil(random.random() * 3))
+            landmark.value = T.target_value[i]
+            landmark.size = T.target_size[i] * 0.01
+            landmark.defence = T.target_defence[i]
             landmark.attacking = False
         world.obstacles = [Landmark() for i in range(num_obstacles)]
         for i, landmark in enumerate(world.obstacles):
@@ -65,20 +65,17 @@ class Scenario(BaseScenario):
             agent.state.p_pos = np.random.uniform(-0.9, -0.8, world.dim_p)
             agent.state.p_vel = np.array([0, 0.05])  # 50 米/秒
             agent.state.p_acc = np.array([0, 0])
-            agent.color = np.array([0.47, 0.79, 0.79])
+            agent.color = T.agent_color
 
         for i, landmark in enumerate(world.landmarks):
-            landmark.state.p_pos = np.random.uniform(-0.9, 0.9, world.dim_p)
             landmark.state.p_vel = np.zeros(world.dim_p)
-            landmark.color = np.random.uniform(0, 1, 3)
-            if i >= len(world.targets):
-                landmark.color = np.array([0.25, 0.25, 0.25])
 
-        world.landmarks[len(world.targets)+0].state.p_pos = np.array([0.0, 0.0])
-        world.landmarks[len(world.targets)+1].state.p_pos = np.array([-1.0,  1.0])
-        world.landmarks[len(world.targets)+2].state.p_pos = np.array([-1.0, -1.0])
-        world.landmarks[len(world.targets)+3].state.p_pos = np.array([1.0,   1.0])
-        world.landmarks[len(world.targets)+4].state.p_pos = np.array([1.0,  -1.0])
+            if i < len(world.targets):
+                landmark.color = np.random.uniform(0, 1, 3)
+                landmark.state.p_pos = np.array(T.target_pos[i])
+            else:
+                landmark.color = T.grid_color
+                landmark.state.p_pos = np.array(T.grid_pos[i-len(world.targets)])
 
     def benchmark_data(self, agent, world):
         # returns data for benchmarking purposes
