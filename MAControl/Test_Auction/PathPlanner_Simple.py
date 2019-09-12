@@ -38,6 +38,9 @@ class PathPlanner_Simple(PathPlanner):
             arrive_flag = self.delete(para_list[1])
 
         elif para_list[0] == 5:
+            arrive_flag = self.complete_replace(para_list[1])
+
+        elif para_list[0] == 10:
             # 攻击状态切换只能进来一次哦～～
             if self.is_attacking is False:
                 self.attack_replace(para_list[1])
@@ -199,7 +202,17 @@ class PathPlanner_Simple(PathPlanner):
 
         return True
 
-    # 操作数 = 5 攻击时刻的特殊操作，生成新的攻击列表，表中只有一行目标坐标
+    # 操作数 = 5 参数形式 [5, [total_num, index]]
+    def complete_replace(self, para_list):
+        self.waypoint_list, self.current_wplist = CW.creat_snake_waypoint_list(
+                                               self.waypoint_list, para_list[0], para_list[1], self.current_wplist)
+
+        self.pointB_index = 0
+        self.is_init = True
+
+        return True
+
+    # 操作数 = 10 攻击时刻的特殊操作，生成新的攻击列表，表中只有一行目标坐标
     def attack_replace(self, coord):
         self.waypoint_list.append([[0 for i in range(3)] for j in range(256)])
         self.current_wplist += 1

@@ -8,7 +8,9 @@ a.append([[1, 2, 1],
           [0, 0, 0],
           [0, 0, 0]])
 
-b = np.array([1, 2])/math.sqrt(1+4)
+b = np.array([[2, 3], [5, 6]])
+
+c = sum(b)
 
 
 z = 0

@@ -37,8 +37,8 @@ def get_controller(env, world, arglist):
         control.append(PP_S.PathPlanner_Simple("agent_%d" % i, env, world, i, arglist))
         control.append(MC_L.MotionController_L1_TECS("agent_%d" % i, env, world, i, arglist))
         control.append(IC_P.InnerController_PID("agent_%d" % i, env, world, i, arglist))
-        control.append(False) # Arriveflag
-        control.append(False) # Isattacking
+        control.append(False)  # Arriveflag
+        control.append(False)  # Isattacking
         ControllerSet.append(control)
 
     return ControllerSet

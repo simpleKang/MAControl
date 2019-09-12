@@ -52,7 +52,7 @@ class Scenario(BaseScenario):
             landmark.name = 'grid %d' % i
             landmark.collide = False
             landmark.movable = False
-            landmark.size = 0.03
+            landmark.size = 0.005
             landmark.attacking = False
         world.landmarks = world.targets + world.obstacles + world.grids
         # make initial conditions
