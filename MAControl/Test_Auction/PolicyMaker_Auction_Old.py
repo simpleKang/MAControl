@@ -110,7 +110,7 @@ class PolicyMaker_Auciton(PolicyMaker):
         PolicyMaker_Auciton.wait_step_auction = 10
 
     def auction(self, obs, found_targets):
-        # TODO 计算当前竞拍价格
+        # TTODO 计算当前竞拍价格
         price = random.random()
         return price
 
@@ -127,7 +127,7 @@ class PolicyMaker_Auciton(PolicyMaker):
                     PolicyMaker_Auciton.Target_index = PolicyMaker_Auciton.Resorted_Target[0][0]
                     PolicyMaker_Auciton.Target_is_sorted = True
             else:
-                # TODO 进行各种条件的计算判断，输出单个小飞机的大判断计算结果
+                # TTODO 进行各种条件的计算判断，输出单个小飞机的大判断计算结果
                 if step > 1500 and len(PolicyMaker_Auciton.Found_Target_Set) != 0:
                     PolicyMaker_Auciton.Shared_Big_Check = True
                     PolicyMaker_Auciton.last_step = step
@@ -143,11 +143,11 @@ class PolicyMaker_Auciton(PolicyMaker):
                     if PolicyMaker_Auciton.wait_step_auction > 0:
                         if self.index in PolicyMaker_Auciton.Found_Target_Info[PolicyMaker_Auciton.Target_index]:
                             # 进入到这里，说明k具备成为拍卖者的基本条件（知道这个目标，并且并不是正在攻击其他目标）
-                            if True:  # TODO 这里可以增加个性化的条件，[满足基本条件但不满足这个条件的UAV]拒绝成为拍卖者，[条件都满足的UAV]向拍卖列表中添加自己的序号
+                            if True:  # TTODO 这里可以增加个性化的条件，[满足基本条件但不满足这个条件的UAV]拒绝成为拍卖者，[条件都满足的UAV]向拍卖列表中添加自己的序号
                                 PolicyMaker_Auciton.Selectable_UAV.append(self.index)
                         if self.index == PolicyMaker_Auciton.unassigned_list[-1]: # 最后一个未分配小飞机
                             if len(PolicyMaker_Auciton.Selectable_UAV) != 0:
-                                # TODO 从列表中随机取个体作为拍卖者
+                                # TTODO 从列表中随机取个体作为拍卖者
                                 PolicyMaker_Auciton.Auctioneer = random.choice(PolicyMaker_Auciton.Selectable_UAV)
                                 PolicyMaker_Auciton.Resorted_Target[0][2] = 1
                             else:
@@ -158,7 +158,7 @@ class PolicyMaker_Auciton(PolicyMaker):
                             if PolicyMaker_Auciton.Shared_UAV_state[i] == 3: # 排除正在执行任务
                                 PolicyMaker_Auciton.Selectable_UAV.remove(i)
                         if len(PolicyMaker_Auciton.Selectable_UAV) != 0:
-                            # TODO 从列表中随机取个体作为拍卖者
+                            # TTODO 从列表中随机取个体作为拍卖者
                             PolicyMaker_Auciton.Auctioneer = random.choice(PolicyMaker_Auciton.Selectable_UAV)
                             PolicyMaker_Auciton.Resorted_Target[0][2] = 1
                         else:
@@ -167,14 +167,14 @@ class PolicyMaker_Auciton(PolicyMaker):
                 elif PolicyMaker_Auciton.Resorted_Target[0][2] == 1:
                     if self.index == PolicyMaker_Auciton.Auctioneer:
                         for i in self.close_area:
-                            # TODO 传输延时step个数的计算优化
+                            # TTODO 传输延时step个数的计算优化
                             if PolicyMaker_Auciton.Shared_UAV_state[i] != 3: #不是正在执行任务
                                 PolicyMaker_Auciton.Trans_step.append([i, round(math.sqrt(
                                     (obs_n[self.index][2] - obs_n[i][2]) ** 2 + (obs_n[self.index][3] - obs_n[i][3]) ** 2) / 0.05)])
                             PolicyMaker_Auciton.last_step = step
                             PolicyMaker_Auciton.Resorted_Target[0][2] = 2
                 # 目标状态为2时更改竞拍者状态为2，在下一个step进行更新
-                # TODO 优化
+                # TTODO 优化
                 elif PolicyMaker_Auciton.Resorted_Target[0][2] == 2 and (PolicyMaker_Auciton.last_step == step - 1):
                     for i in range(len(PolicyMaker_Auciton.Trans_step)):
                         if self.index == PolicyMaker_Auciton.Trans_step[i][0]:
@@ -202,7 +202,7 @@ class PolicyMaker_Auciton(PolicyMaker):
                     else:
                         PolicyMaker_Auciton.wait_step -= 1
                 # 所有竞拍者（拍卖者也是竞拍者）进入
-                # TODO 已经可以重复添加价格了
+                # TTODO 已经可以重复添加价格了
                 for i in range(len(PolicyMaker_Auciton.Price_list)):
                     if self.index == PolicyMaker_Auciton.Price_list[i][0]:
                         if self.trans_step == 0 and PolicyMaker_Auciton.wait_step > 0:
