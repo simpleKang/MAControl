@@ -304,6 +304,11 @@ class PolicyMaker_Auction(PolicyMaker):
                 print('UAV', self.index, 'recycling')
                 self.operate_step(1, step)
 
+                if len(PolicyMaker_Auction.Remain_Target_Set) == 1:
+                    self.opt_index = 5
+                    self.x = len(PolicyMaker_Auction.Remain_UAV_Set)
+                    self.y = PolicyMaker_Auction.Remain_UAV_Set.index(self.index)
+
                 if self.index == max(PolicyMaker_Auction.Remain_UAV_Set):
                     PolicyMaker_Auction.Attacked_Target_Index.append(PolicyMaker_Auction.Current_Target_Index)
                     PolicyMaker_Auction.Remain_Target_Set = []
