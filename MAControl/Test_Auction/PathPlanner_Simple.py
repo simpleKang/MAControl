@@ -39,6 +39,7 @@ class PathPlanner_Simple(PathPlanner):
 
         elif para_list[0] == 5:
             arrive_flag = self.complete_replace(para_list[1])
+            # pass
 
         elif para_list[0] == 10:
             # 攻击状态切换只能进来一次哦～～

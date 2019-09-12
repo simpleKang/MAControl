@@ -229,6 +229,7 @@ class PolicyMaker_Auction(PolicyMaker):
                 print('UAV', self.index, 'searching')
                 self.close_area = self.find_mate(obs_n)
                 self.add_new_target(obs_n[self.index], WorldTarget)
+                self.opt_index = 0
 
                 if self.searching_is_good_enough(step):
                     self.operate_step(2, step)

@@ -106,7 +106,7 @@ class MotionController_L1_TECS(MotionController):
 
             elif abs(AB_to_BP_bearing) < math.radians(100):
                 # calculate eta to fly to waypoint B
-                eta = math.acos(np.dot(-1 * vector_BP_unit, vel_vector/speed))
+                eta = math.acos(constrain(np.dot(-1 * vector_BP_unit, vel_vector/speed), -1, 1))
 
             else:
                 # calculate eta to fly along the line between A and B
