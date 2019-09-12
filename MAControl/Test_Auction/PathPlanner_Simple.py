@@ -203,7 +203,7 @@ class PathPlanner_Simple(PathPlanner):
 
         return True
 
-    # 操作数 = 5 参数形式 [5, [total_num, index]]
+    # 操作数 = 5 参数形式 [5, [total_num, index]] 按total_num个个体生成第index个个体的蛇形航点列表
     def complete_replace(self, para_list):
         self.waypoint_list, self.current_wplist = CW.creat_snake_waypoint_list(
                                                self.waypoint_list, para_list[0], para_list[1], self.current_wplist)

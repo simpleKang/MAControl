@@ -24,8 +24,8 @@ class InnerController_PID(InnerController):
             True_lateral_acc = round(obs[5], 5)
 
             delta_time = self.world.dt
-            P_value = 0.9
-            I_value = 0.01
+            P_value = 0.8
+            I_value = 0.08
             D_value = 0.0
             Iterm_window = 1
 

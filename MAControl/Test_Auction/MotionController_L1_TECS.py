@@ -127,7 +127,7 @@ class MotionController_L1_TECS(MotionController):
 
             # lateral_acc
             lateral_acc_unit = np.array([vel_vector[1], -1*vel_vector[0]])/speed
-            if -0.01 < np.dot(lateral_acc_unit, vector_PC) < 0.01:  # <a1,PC>直角
+            if -0.008 < np.dot(lateral_acc_unit, vector_PC) < 0.008:  # <a1,PC>直角
                 lateral_acc_dir = np.sign(np.dot(lateral_acc_unit, vector_AB))
             else:
                 lateral_acc_dir = np.sign(np.dot(lateral_acc_unit, vector_PC))
