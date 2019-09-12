@@ -156,7 +156,7 @@ def _add_attrs(geom, attrs):
 
 class Geom(object):
     def __init__(self):
-        self._color=Color((0, 0, 0, 1.0))
+        self._color = Color((0, 0, 0, 1.0))
         self.attrs = [self._color]
     def render(self):
         for attr in reversed(self.attrs):

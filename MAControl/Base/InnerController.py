@@ -12,4 +12,4 @@ class InnerController(ABC):
 
     @abstractmethod
     def get_action(self, obs, Eacct, Eaccl, step, finishedi):
-        pass
+        raise NotImplementedError

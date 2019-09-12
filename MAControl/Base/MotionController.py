@@ -12,5 +12,5 @@ class MotionController(ABC):
 
     @abstractmethod
     def get_expected_action(self, obs, pointAi, pointBi, step, finishedi):
-        pass
+        raise NotImplementedError
 

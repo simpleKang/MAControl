@@ -207,7 +207,7 @@ class MultiAgentEnv(gym.Env):
                 # import rendering only if we need it (and don't import for headless machines)
                 #from gym.envs.classic_control import rendering
                 from MAEnv import rendering
-                self.viewers[i] = rendering.Viewer(1000,1000)
+                self.viewers[i] = rendering.Viewer(1000, 1000)
 
         # create rendering geometry
         if self.render_geoms is None:
@@ -248,7 +248,7 @@ class MultiAgentEnv(gym.Env):
                 pos = np.zeros(self.world.dim_p)
             else:
                 pos = self.agents[i].state.p_pos
-            self.viewers[i].set_bounds(pos[0]-cam_range,pos[0]+cam_range,pos[1]-cam_range,pos[1]+cam_range)
+            self.viewers[i].set_bounds(pos[0]-cam_range, pos[0]+cam_range,pos[1]-cam_range, pos[1]+cam_range)
             # update geometry positions
             for e, entity in enumerate(self.world.entities):
                 self.render_geoms_xform[e].set_translation(*entity.state.p_pos)
@@ -258,9 +258,10 @@ class MultiAgentEnv(gym.Env):
                     rot = math.atan2(vy, vx) - math.pi/2
                     self.render_geoms_xform[e].set_rotation(rot)
                 if 'agent' in entity.name and entity.attacking:
-                    self.render_geoms_xform[e].set_scale(3, 3)
+                    # self.render_geoms_xform[e].set_scale(3, 3)
+                    self.render_geoms[e].set_color(1, 0, 0, 0.8)
             # render to display or array
-            results.append(self.viewers[i].render(return_rgb_array = mode=='rgb_array'))
+            results.append(self.viewers[i].render(return_rgb_array=mode == 'rgb_array'))
 
         return results
 
