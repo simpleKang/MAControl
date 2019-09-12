@@ -18,7 +18,11 @@ class MotionController_L1_TECS(MotionController):
     def get_expected_action(self, obs, pointAi, pointBi, step, finishedi):
         # print("motion control")
         vel_vector = np.array(obs[0:2])
+        vel_vector[0] = round(vel_vector[0], 4)
+        vel_vector[1] = round(vel_vector[1], 4)
         pointPi = np.array(obs[2:4])
+        pointPi[0] = round(pointPi[0], 3)
+        pointPi[1] = round(pointPi[1], 3)
         pointAi = np.array(pointAi)
         pointBi = np.array(pointBi)
         motion_pace = 5

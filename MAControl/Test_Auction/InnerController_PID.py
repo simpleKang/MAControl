@@ -21,7 +21,7 @@ class InnerController_PID(InnerController):
         else:
 
             Exp_lateral_acc = Eaccl
-            True_lateral_acc = np.array(obs[5])
+            True_lateral_acc = round(obs[5], 5)
 
             delta_time = self.world.dt
             P_value = 0.9
@@ -45,6 +45,8 @@ class InnerController_PID(InnerController):
             acct = Eacct
             accl = P_value * PTerm + I_value * self.ITerm + D_value * DTerm
             vel_vector = np.array(obs[0:2])
+            vel_vector[0] = round(vel_vector[0], 4)
+            vel_vector[1] = round(vel_vector[1], 4)
             speed = np.sqrt(np.square(vel_vector[0]) + np.square(vel_vector[1]))
             vel_right_unit = np.array([vel_vector[1], -1 * vel_vector[0]]) / speed
             acc = acct * vel_vector / speed + accl * vel_right_unit
