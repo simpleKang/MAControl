@@ -125,8 +125,10 @@ class PolicyMaker_Auction(PolicyMaker):
         check1 = ((PolicyMaker_Auction.Found_Target_Set) != [])
         check2 = (len(PolicyMaker_Auction.Attacked_Target_Index) != len(PolicyMaker_Auction.Found_Target_Set))
 
-        check3a = len(PolicyMaker_Auction.Found_Target_Set)/len(PolicyMaker_Auction.Remain_UAV_Set)  # 实际情况
-        check3b = 100/(step+1)   # 阈值随时间减少
+        # 实际情况
+        check3a = (np.sum(PolicyMaker_Auction.Found_Target_Set, axis=0))[4] / len(PolicyMaker_Auction.Remain_UAV_Set)
+        # 阈值随时间减少
+        check3b = 100/(step+1)
         check3 = (check3a > check3b)
 
         if check1 and check2 and check3:
