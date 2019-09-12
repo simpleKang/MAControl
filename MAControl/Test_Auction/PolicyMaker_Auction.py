@@ -92,7 +92,7 @@ class PolicyMaker_Auction(PolicyMaker):
         # GENERATE seen_target
         seen_target = []
         for target in WorldTarget:
-            targetpos = np.array(target[1:3])
+            targetpos = np.array(target[0:2])
             if point_in_rec(selfview1, selfview2, selfview3, selfview4, targetpos):
                 seen_target.append(target)
 
@@ -105,8 +105,8 @@ class PolicyMaker_Auction(PolicyMaker):
             for target1 in seen_target:
                 check = False
                 for target2 in PolicyMaker_Auction.Found_Target_Set:
-                    pos1 = np.array(target1[1:3])
-                    pos2 = np.array(target2[1:3])
+                    pos1 = np.array(target1[0:2])
+                    pos2 = np.array(target2[0:2])
                     deltapos = np.sqrt(np.dot(pos1 - pos2, pos1 - pos2))
                     check = check | (deltapos <= ttrange)
                 if not check:
