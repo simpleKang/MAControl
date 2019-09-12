@@ -223,7 +223,7 @@ class MultiAgentEnv(gym.Env):
                 elif 'agent' in entity.name:
                     geom = rendering.make_uav89(entity.size)
                 else:
-                    geom = rendering.make_tank(0.02)
+                    geom = rendering.make_tank(entity.size)
                 xform = rendering.Transform()
                 if 'agent' in entity.name:
                     geom.set_color(*entity.color, alpha=0.5)
