@@ -1,6 +1,7 @@
 from MAControl.Base.PolicyMaker import PolicyMaker
 import random
 import numpy as np
+import math
 from MAControl.Util.PointInRec import point_in_rec
 from MAControl.Util.Constrain import constrain
 import math
@@ -71,14 +72,22 @@ class PolicyMaker_Auction(PolicyMaker):
         selfvel = np.array(obs[0:2])
         selfpos = np.array(obs[2:4])
         selfvelunit = selfvel / np.sqrt(np.dot(selfvel, selfvel))
-        selfvelrightunit = np.array([selfvelunit[1], -1 * selfvelunit[0]])
-        d1 = 0
-        d2 = 0.5
-        d3 = 0.5
-        selfview1 = selfpos + selfvelunit * (d1 + d2) - selfvelrightunit * d3 / 2
-        selfview2 = selfpos + selfvelunit * (d1 + d2) + selfvelrightunit * d3 / 2
-        selfview3 = selfpos + selfvelunit * d1 + selfvelrightunit * d3 / 2
-        selfview4 = selfpos + selfvelunit * d1 - selfvelrightunit * d3 / 2
+        selfdir = math.atan2(selfvel[1], selfvel[0])
+        d1 = 0  # 轴向视场距离
+        d2 = 0.2  # 轴向视场宽度
+        d3 = 0.2  # 侧向视场宽度
+        xx1 = -d3/2 * math.cos(selfdir) - d2/2 * math.sin(selfdir) * -1
+        xx2 = -d3/2 * math.cos(selfdir) + d2/2 * math.sin(selfdir) * -1
+        xx3 = d3/2 * math.cos(selfdir) + d2/2 * math.sin(selfdir) * -1
+        xx4 = d3/2 * math.cos(selfdir) - d2/2 * math.sin(selfdir) * -1
+        yy1 = -d3/2 * math.sin(selfdir) - d2/2 * math.cos(selfdir)
+        yy2 = -d3/2 * math.sin(selfdir) + d2/2 * math.cos(selfdir)
+        yy3 = d3/2 * math.sin(selfdir) + d2/2 * math.cos(selfdir)
+        yy4 = d3/2 * math.sin(selfdir) - d2/2 * math.cos(selfdir)
+        selfview1 = selfpos + selfvelunit * (d1+d2/2) + np.array([xx1, yy1])
+        selfview2 = selfpos + selfvelunit * (d1+d2/2) + np.array([xx2, yy2])
+        selfview3 = selfpos + selfvelunit * (d1+d2/2) + np.array([xx3, yy3])
+        selfview4 = selfpos + selfvelunit * (d1+d2/2) + np.array([xx4, yy4])
 
         # GENERATE seen_target
         seen_target = []
