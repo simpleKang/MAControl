@@ -6,11 +6,15 @@ import MAControl.Test_Auction.InnerController_PID as IC_P
 import MAControl.Test_Auction.MotionController_L1_TECS as MC_L
 import MAControl.Test_Auction.PathPlanner_Simple as PP_S
 import MAControl.Test_Auction.PolicyMaker_Auction as PM_A
+import MAControl.Test_Movable_Target_Auction.InnerController_PID as T_IC_P
+import MAControl.Test_Movable_Target_Auction.MotionController_L1_TECS as T_MC_L
+import MAControl.Test_Movable_Target_Auction.PathPlanner_Simple as T_PP_S
+import MAControl.Test_Movable_Target_Auction.PolicyMaker_Auction as T_PM_A
 
 
 def parse_args():
     parser = argparse.ArgumentParser("Control Experiments for Multi-Agent Environments")
-    parser.add_argument("--scenario", type=str, default="scenario2_Target", help="name of the scenario script")
+    parser.add_argument("--scenario", type=str, default="scenario3_Movable_Target", help="name of the scenario script")
     parser.add_argument("--step-max", type=int, default=4000, help="maximum steps")
     return parser.parse_args()
 
@@ -31,12 +35,22 @@ def make_env(arglist):
 def get_controller(env, world, arglist):
     ControllerSet = []
 
-    for i in range(env.n):
+    for i in range(env.n - len(world.movable_targets)):
         control = []
         control.append(PM_A.PolicyMaker_Auction("agent_%d" % i, env, world, i, arglist))
         control.append(PP_S.PathPlanner_Simple("agent_%d" % i, env, world, i, arglist))
         control.append(MC_L.MotionController_L1_TECS("agent_%d" % i, env, world, i, arglist))
         control.append(IC_P.InnerController_PID("agent_%d" % i, env, world, i, arglist))
+        control.append(False)  # Arriveflag
+        control.append(False)  # Isattacking
+        ControllerSet.append(control)
+
+    for i in range(len(world.movable_targets)):
+        control = []
+        control.append(T_PM_A.PolicyMaker_Auction("movable_target_%d" % i, env, world, i, arglist))
+        control.append(T_PP_S.PathPlanner_Simple("movable_target_%d" % i, env, world, i, arglist))
+        control.append(T_MC_L.MotionController_L1_TECS("movable_target_%d" % i, env, world, i, arglist))
+        control.append(T_IC_P.InnerController_PID("movable_target_%d" % i, env, world, i, arglist))
         control.append(False)  # Arriveflag
         control.append(False)  # Isattacking
         ControllerSet.append(control)
@@ -55,12 +69,28 @@ def update_action(env, world, obs_n, step, NewController):
     # get action
     action_n = []
 
-    for i in range(env.n):
+    for i in range(env.n - len(world.movable_targets)):
 
         list_i = NewController[i][0]. \
             make_policy(WorldTarget, obs_n, step)
 
         pointAi, pointBi, finishedi, NewController[i][5] = NewController[i][1].\
+            planpath(list_i, obs_n[i], NewController[i][4], step)
+
+        acctEi, acclEi, NewController[i][4] = NewController[i][2]. \
+            get_expected_action(obs_n[i], pointAi, pointBi, step, finishedi)
+
+        actioni = NewController[i][3]. \
+            get_action(obs_n[i], acctEi, acclEi, step, finishedi)
+
+        action_n.append(actioni)
+
+    for i in range(env.n - len(world.movable_targets), env.n):
+
+        list_i = NewController[i][0]. \
+            make_policy(WorldTarget, obs_n, step)
+
+        pointAi, pointBi, finishedi, NewController[i][5] = NewController[i][1]. \
             planpath(list_i, obs_n[i], NewController[i][4], step)
 
         acctEi, acclEi, NewController[i][4] = NewController[i][2]. \
