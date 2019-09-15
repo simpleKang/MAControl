@@ -480,6 +480,21 @@ def make_tank(size):
 
     return make_polygon(v)
 
+
+def make_house(size):
+
+    v = [
+        [3,     2],
+        [4,    -3],
+        [-4,   -3],
+        [-3,    2],
+        [0,     4]
+        ]
+
+    v = list(np.array(v) * size)
+
+    return make_polygon(v)
+
 class Compound(Geom):
     def __init__(self, gs):
         Geom.__init__(self)

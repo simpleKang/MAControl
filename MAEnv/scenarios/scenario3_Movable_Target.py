@@ -89,7 +89,8 @@ class Scenario(BaseScenario):
                 agent.state.p_pos = np.array(T.m_target_pos[i+T.m_num_targets-len(world.agents)])
                 agent.state.p_vel = np.array([0, 0.02])
                 agent.state.p_acc = np.array([0, 0])
-                agent.color = T.m_target_color
+                agent.color = np.random.uniform(0, 1, 3)
+                # agent.color = T.m_target_color
 
         for i, landmark in enumerate(world.landmarks):
             landmark.state.p_vel = np.zeros(world.dim_p)

@@ -223,8 +223,10 @@ class MultiAgentEnv(gym.Env):
                     geom = rendering.make_polygon(list(np.array(preset) * entity.size))
                 elif 'agent' in entity.name:
                     geom = rendering.make_uav89(entity.size)
-                else:
+                elif 'movable' in entity.name:
                     geom = rendering.make_tank(entity.size)
+                else:
+                    geom = rendering.make_house(entity.size)
                 xform = rendering.Transform()
                 if 'agent' in entity.name:
                     geom.set_color(*entity.color, alpha=0.5)
@@ -253,7 +255,7 @@ class MultiAgentEnv(gym.Env):
             # update geometry positions
             for e, entity in enumerate(self.world.entities):
                 self.render_geoms_xform[e].set_translation(*entity.state.p_pos)
-                if 'agent' in entity.name:
+                if 'agent' in entity.name or 'movable' in entity.name:
                     vx = entity.state.p_vel[0]
                     vy = entity.state.p_vel[1]
                     rot = math.atan2(vy, vx) - math.pi/2

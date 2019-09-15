@@ -6,10 +6,10 @@ import MAControl.Test_Auction.InnerController_PID as IC_P
 import MAControl.Test_Auction.MotionController_L1_TECS as MC_L
 import MAControl.Test_Auction.PathPlanner_Simple as PP_S
 import MAControl.Test_Auction.PolicyMaker_Auction as PM_A
-import MAControl.Test_Movable_Target_Auction.InnerController_PID as T_IC_P
-import MAControl.Test_Movable_Target_Auction.MotionController_L1_TECS as T_MC_L
-import MAControl.Test_Movable_Target_Auction.PathPlanner_Simple as T_PP_S
-import MAControl.Test_Movable_Target_Auction.PolicyMaker_Auction as T_PM_A
+import MAControl.Test_Movable_Target_Policy.InnerController_PID as T_IC_P
+import MAControl.Test_Movable_Target_Policy.MotionController_L1_TECS as T_MC_L
+import MAControl.Test_Movable_Target_Policy.PathPlanner_Simple as T_PP_S
+import MAControl.Test_Movable_Target_Policy.PolicyMaker_Auction as T_PM_A
 
 
 def parse_args():
@@ -47,7 +47,7 @@ def get_controller(env, world, arglist):
 
     for i in range(len(world.movable_targets)):
         control = []
-        control.append(T_PM_A.PolicyMaker_Auction("movable_target_%d" % i, env, world, i, arglist))
+        control.append(T_PM_A.PolicyMaker_Target("movable_target_%d" % i, env, world, i, arglist))
         control.append(T_PP_S.PathPlanner_Simple("movable_target_%d" % i, env, world, i, arglist))
         control.append(T_MC_L.MotionController_L1_TECS("movable_target_%d" % i, env, world, i, arglist))
         control.append(T_IC_P.InnerController_PID("movable_target_%d" % i, env, world, i, arglist))

@@ -20,7 +20,7 @@ class PathPlanner_Simple(PathPlanner):
         self.waypoint_finished = False      # 航点是否已经飞完
         # 初始化航点列表
         self.waypoint_list, self.current_wplist = CW.creat_snake_waypoint_list(
-                                                  self.waypoint_list, self.env.n, self.index, self.current_wplist)
+                        self.waypoint_list, self.env.n-len(self.world.movable_targets), self.index, self.current_wplist)
 
     def planpath(self, para_list, obs, arrive_flag, step):
         if para_list[0] == 0:

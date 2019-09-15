@@ -37,3 +37,20 @@ def snake_single(Up, Down, Wide1, Wide2, Edge, W, D, i):
         wp_list.append(point)
 
     return wp_list
+
+
+def create_simple_waypoint_list(waypoint_list, new_list_index, init_point, Edge=1):
+
+    waypoint_list.append([[0 for j in range(3)] for k in range(256)])
+    wp_list = []
+    point = [init_point[0], init_point[1], 1]
+    wp_list.append(point)
+    while True:
+        point = [point[0], point[1]+0.2, 1]
+        if abs(point[1]) > Edge:
+            break
+        wp_list.append(point)
+    waypoint_list[-1][0:len(wp_list)] = wp_list[:]
+    new_list_index += 1
+
+    return waypoint_list, new_list_index
