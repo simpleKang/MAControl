@@ -1,10 +1,4 @@
 from MAControl.Base.PolicyMaker import PolicyMaker
-import random
-import numpy as np
-import math
-from MAControl.Util.PointInRec import point_in_rec
-from MAControl.Util.Constrain import constrain
-import math
 
 
 class PolicyMaker_Target(PolicyMaker):

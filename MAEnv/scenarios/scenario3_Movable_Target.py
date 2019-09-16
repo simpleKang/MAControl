@@ -37,7 +37,7 @@ class Scenario(BaseScenario):
             M_target.name = 'movable target %d' % i
             M_target.collide = False
             M_target.silent = True
-            M_target.UAV = True
+            M_target.UAV = False
             M_target.value = T.m_target_value[i]
             M_target.size = T.m_target_size[i] * 0.01
             M_target.defence = T.m_target_defence[i]

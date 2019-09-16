@@ -4,7 +4,6 @@ import numpy as np
 import math
 from MAControl.Util.PointInRec import point_in_rec
 from MAControl.Util.Constrain import constrain
-import math
 
 
 class PolicyMaker_Auction(PolicyMaker):
@@ -136,7 +135,7 @@ class PolicyMaker_Auction(PolicyMaker):
             output = True
         else:
             output = False
-        return False
+        return output
 
     def operate_step(self, operate_index, step, waitstep=5):
 
