@@ -50,7 +50,7 @@ def update_action(env, world, obs_n, step, NewController):
     WorldTarget = []
     for i, landmark in enumerate(world.targets):
         WorldTarget.append([landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.state.p_vel[0],
-                            landmark.state.p_vel[1], landmark.value, landmark.defence])
+                            landmark.state.p_vel[1], landmark.value, landmark.defence, landmark.type])
 
     # get action
     action_n = []
