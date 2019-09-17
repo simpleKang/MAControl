@@ -39,6 +39,7 @@ def get_controller(env, world, arglist):
         control.append(IC_P.InnerController_PID("agent_%d" % i, env, world, i, arglist))
         control.append(False)  # Arriveflag
         control.append(False)  # Isattacking
+        control.append(-1)  # which target is it attacking
         ControllerSet.append(control)
 
     return ControllerSet
@@ -60,6 +61,8 @@ def update_action(env, world, obs_n, step, NewController):
         list_i = NewController[i][0]. \
             make_policy(WorldTarget, obs_n, step)
 
+        NewController[i][6] = list_i[1][2]
+
         pointAi, pointBi, finishedi, NewController[i][5] = NewController[i][1].\
             planpath(list_i, obs_n[i], NewController[i][4], step)
 
@@ -76,6 +79,7 @@ def update_action(env, world, obs_n, step, NewController):
 
 def augment_view(env, world, NewController):
     for i in range(env.n):
+        world.agents[i].attacking_to = NewController[i][6]
         if NewController[i][5]:
             world.agents[i].attacking = True
 
