@@ -6,6 +6,7 @@ from MAEnv.core import World, Agent, Landmark
 from MAEnv.scenario import BaseScenario
 import MAEnv.scenarios.TargetProfile as T
 
+
 class Scenario(BaseScenario):
     def make_world(self):
         world = World()
