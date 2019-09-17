@@ -38,6 +38,7 @@ class Scenario(BaseScenario):
             landmark.size = T.target_size[i] * 0.01
             landmark.defence = T.target_defence[i]
             landmark.attacking = False
+            landmark.type = T.target_type[i]
         world.obstacles = [Landmark() for i in range(num_obstacles)]
         for i, landmark in enumerate(world.obstacles):
             landmark.UAV = False
