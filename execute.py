@@ -19,7 +19,7 @@ logging.info('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 def parse_args():
     parser = argparse.ArgumentParser("Control Experiments for Multi-Agent Environments")
     parser.add_argument("--scenario", type=str, default="scenario2_Target", help="name of the scenario script")
-    parser.add_argument("--step-max", type=int, default=2000, help="maximum steps")
+    parser.add_argument("--step-max", type=int, default=4000, help="maximum steps")
     parser.add_argument("--episode-max", type=int, default=30, help="maximum episodes")
     return parser.parse_args()
 
@@ -97,6 +97,7 @@ if __name__ == '__main__':
     env, world = make_env(arglist)
 
     episode = 0
+    t_start = time.time()
 
     while episode < arglist.episode_max:
 
@@ -130,8 +131,11 @@ if __name__ == '__main__':
                     pairing.append(world.agents[i].attacking_to)
                 print('pairing: ', pairing)
                 print('reward:', rew_n[0][0])
+                timing = round(time.time() - t_start, 3)
+                t_start = time.time()
+                print('timing: ', timing)
                 if episode == 1:
-                    logging.info('EPISODE | PAIRING                                                      REWARD')
-                logging.info([episode, pairing, rew_n[0][0]])
+                    logging.info('EPISODE | PAIRING                                               REWARD          TIME')
+                logging.info([episode]+pairing+[rew_n[0][0]]+[timing])
                 if episode == arglist.episode_max:
                     logging.info('\n')
