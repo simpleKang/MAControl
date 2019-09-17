@@ -95,30 +95,24 @@ class PolicyMaker_Auction(PolicyMaker):
             if point_in_rec(selfview1, selfview2, selfview3, selfview4, targetpos):
                 seen_target.append(target)
                 truetype = target[-1]
-                randnum = random.random()
                 if truetype == 1:
-                    if randnum < 0.8:
-                        pass
-                    elif randnum < 0.9:
+                    gtype = np.random.choice([1, 2, 3], 1, p=[0.8, 0.1, 0.1])
+                    if gtype == 2:
                         seen_target[-1][-3:] = [10, 1, 2]
-                    else:
+                    elif gtype == 3:
                         seen_target[-1][-3:] = [5, 2, 3]
                 elif truetype == 2:
-                    if randnum < 0.7:
-                        pass
-                    elif randnum < 0.95:
+                    gtype = np.random.choice([1, 2, 3], 1, p=[0.08, 0.7, 0.22])
+                    if gtype == 3:
                         seen_target[-1][-3:] = [5, 2, 3]
-                    else:
+                    elif gtype == 1:
                         seen_target[-1][-3:] = [2, 5, 1]
                 elif truetype == 3:
-                    if randnum < 0.7:
-                        pass
-                    elif randnum < 0.95:
-                        seen_target[-1][-3:] = [10, 1, 2]
-                    else:
+                    gtype = np.random.choice([1, 2, 3], 1, p=[0.08, 0.22, 0.7])
+                    if gtype == 1:
                         seen_target[-1][-3:] = [2, 5, 1]
-                else:
-                    pass
+                    elif gtype == 2:
+                        seen_target[-1][-3:] = [10, 1, 2]
 
         # READ AND WRITE TESTControl.Found_Target_Set
         if not PolicyMaker_Auction.Found_Target_Set:
