@@ -18,7 +18,7 @@ class PolicyMaker_Auction(PolicyMaker):
     #                                                                     攻击[阶段]
 
     # 在搜索目标阶段(<Step0)操作，只增不减
-    Found_Target_Set = []  # {target_pos, target_vel, target_value, target_defence, INFO_RELIABILITY}
+    Found_Target_Set = []  # {target_pos, target_vel, target_value, target_defence, target_type}
     Found_Target_Info = []  # {TARGET:UAV_INDEX}
 
     # 在重置步(==Step5)操作，只增不减
@@ -28,7 +28,7 @@ class PolicyMaker_Auction(PolicyMaker):
     Remain_UAV_Set = []  # {UAV_INDEX}
 
     # 在重置步(==Step5)重置
-    Remain_Target_Set = []  # {target_pos, target_vel, target_value, target_defence, INFO_RELIABILITY, TARGET_INDEX}
+    Remain_Target_Set = []  # {target_pos, target_vel, target_value, target_defence, target_type, TARGET_INDEX}
     Current_Target_Index = -1  # {TARGET_INDEX}
     Current_Price_Set = []   # {UAV X STEP}
     Current_Price_Result = []  # {UAV_INDEX,UAV_PRICE}
@@ -93,9 +93,32 @@ class PolicyMaker_Auction(PolicyMaker):
         for target in WorldTarget:
             targetpos = np.array(target[0:2])
             if point_in_rec(selfview1, selfview2, selfview3, selfview4, targetpos):
-                seen_target.append(target+[random.random()])   # 置信度
-                seen_target[-1][4] = int(np.ceil((random.random()+0.01)*9))  # 错误值
-                seen_target[-1][5] = int(np.ceil((random.random()+0.01)*4))  # 错误值
+                seen_target.append(target)
+                truetype = target[-1]
+                randnum = random.random()
+                if truetype == 1:
+                    if randnum < 0.8:
+                        pass
+                    elif randnum < 0.9:
+                        seen_target[-1][-3:] = [10, 1, 2]
+                    else:
+                        seen_target[-1][-3:] = [5, 2, 3]
+                elif truetype == 2:
+                    if randnum < 0.7:
+                        pass
+                    elif randnum < 0.95:
+                        seen_target[-1][-3:] = [5, 2, 3]
+                    else:
+                        seen_target[-1][-3:] = [2, 5, 1]
+                elif truetype == 3:
+                    if randnum < 0.7:
+                        pass
+                    elif randnum < 0.95:
+                        seen_target[-1][-3:] = [10, 1, 2]
+                    else:
+                        seen_target[-1][-3:] = [2, 5, 1]
+                else:
+                    pass
 
         # READ AND WRITE TESTControl.Found_Target_Set
         if not PolicyMaker_Auction.Found_Target_Set:
