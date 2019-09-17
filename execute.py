@@ -9,8 +9,9 @@ import MAControl.Test_Auction.PolicyMaker_Auction as PM_A
 import logging
 
 logging.basicConfig(filename='/home/samantha/gitr/logs/result.log', level=logging.INFO)
-logging.info('\n')
+logging.info('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
 logging.info(time.strftime('%Y-%m-%d, %H:%M:%S'))
+logging.info('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
 # 需要自行指定为本地存在的绝对路径，指定名称的文件如果不存在，会自动创建
 # 如果存在，不会覆盖内容，会从结尾处向后添加新内容
 
@@ -18,7 +19,8 @@ logging.info(time.strftime('%Y-%m-%d, %H:%M:%S'))
 def parse_args():
     parser = argparse.ArgumentParser("Control Experiments for Multi-Agent Environments")
     parser.add_argument("--scenario", type=str, default="scenario2_Target", help="name of the scenario script")
-    parser.add_argument("--step-max", type=int, default=4000, help="maximum steps")
+    parser.add_argument("--step-max", type=int, default=2000, help="maximum steps")
+    parser.add_argument("--episode-max", type=int, default=30, help="maximum episodes")
     return parser.parse_args()
 
 
@@ -54,15 +56,12 @@ def get_controller(env, world, arglist):
 
 def update_action(env, world, obs_n, step, NewController):
 
-    # WorldTarget
     WorldTarget = []
     for i, landmark in enumerate(world.targets):
         WorldTarget.append([landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.state.p_vel[0],
                             landmark.state.p_vel[1], landmark.value, landmark.defence, landmark.type, i])
 
-    # get action
     action_n = []
-
     for i in range(env.n):
 
         list_i = NewController[i][0]. \
@@ -97,28 +96,42 @@ if __name__ == '__main__':
     # Create environment
     env, world = make_env(arglist)
 
-    # Create Controller
-    NewController = get_controller(env, world, arglist)
+    episode = 0
 
-    obs_n = env.reset()
-    step = 0
-    start = time.time()
+    while episode < arglist.episode_max:
 
-    while True:
+        # Create Controller
+        NewController = []
+        NewController = get_controller(env, world, arglist)
 
-        # get action
-        print('>>>> step', step)
-        action_n = update_action(env, world, obs_n, step, NewController)
+        obs_n = env.reset()
+        episode += 1
+        step = 0
 
-        # environment step
-        new_obs_n, rew_n, done_n, info_n = env.step(action_n)
-        step += 1
-        obs_n = new_obs_n
+        while step <= arglist.step_max:
 
-        # for displaying
-        # time.sleep(0.01)
-        augment_view(env, world, NewController)
-        env.render()
-        print('reward:', rew_n[0][0])
-        # print('>>>> step', step)
+            # get action
+            action_n = update_action(env, world, obs_n, step, NewController)
 
+            # environment step
+            new_obs_n, rew_n, done_n, info_n = env.step(action_n)
+            step += 1
+            obs_n = new_obs_n
+
+            # for displaying
+            augment_view(env, world, NewController)
+            # env.render()  # could be commented out
+
+            # for recording
+            if step == arglist.step_max:
+                print('>>>>>>>>>>> Episode', episode)
+                pairing = []
+                for i in range(env.n):
+                    pairing.append(world.agents[i].attacking_to)
+                print('pairing: ', pairing)
+                print('reward:', rew_n[0][0])
+                if episode == 1:
+                    logging.info('EPISODE | PAIRING                                                      REWARD')
+                logging.info([episode, pairing, rew_n[0][0]])
+                if episode == arglist.episode_max:
+                    logging.info('\n')
