@@ -22,16 +22,13 @@ class Scenario(BaseScenario):
         world.agents = [Agent() for i in range(num_agents)]
         for i, agent in enumerate(world.agents):
             agent.name = 'agent %d' % i
-            # agent.collide = True
             agent.collide = False
             agent.silent = True
             agent.size = 0.01  # 10米
-            agent.UAV = True
             agent.attacking = False
         # add landmarks
         world.targets = [Landmark() for i in range(num_targets)]
         for i, landmark in enumerate(world.targets):
-            landmark.UAV = False
             landmark.name = 'target %d' % i
             landmark.collide = False
             landmark.movable = False
@@ -42,7 +39,6 @@ class Scenario(BaseScenario):
             landmark.type = T.target_type[i]
         world.obstacles = [Landmark() for i in range(num_obstacles)]
         for i, landmark in enumerate(world.obstacles):
-            landmark.UAV = False
             landmark.name = 'obstacle %d' % i
             landmark.collide = False
             landmark.movable = False
@@ -50,7 +46,6 @@ class Scenario(BaseScenario):
             landmark.attacking = False
         world.grids = [Landmark() for i in range(num_grids)]
         for i, landmark in enumerate(world.grids):
-            landmark.UAV = False
             landmark.name = 'grid %d' % i
             landmark.collide = False
             landmark.movable = False
