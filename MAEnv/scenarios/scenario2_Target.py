@@ -67,7 +67,6 @@ class Scenario(BaseScenario):
 
         for i, landmark in enumerate(world.landmarks):
             landmark.state.p_vel = np.zeros(world.dim_p)
-
             if i < len(world.targets):
                 landmark.color = np.random.uniform(0, 1, 3)
                 landmark.state.p_pos = np.array(T.target_pos[i])
@@ -102,18 +101,34 @@ class Scenario(BaseScenario):
         dist_min = (agent1.size + agent2.size) * 1.5
         return True if dist < dist_min else False
 
+    def result(self, world):
+        # TARGET-UAV分配情况
+        res = []
+        for a, agent in enumerate(world.agents):
+            res.append(agent.attacking_to)  # 长度为UAV数量，每个元素是所攻击的目标（未攻击则为-1）
+        res2 = []
+        res3 = []
+        for t in range(len(world.targets)):
+            res2.append(res.count(t))  # 长度为TARGET数量，每个元素是分配给这个目标的UAV个数
+            res3.append(world.targets[t].defence)  # 长度为TARGET数量，每个元素是这个目标需要的UAV个数
+        res4 = list(np.array(res2)-np.array(res3))  # 长度为TARGET数量，每个元素是上述两项差值
+        res5 = []   # 长度为TARGET数量，每个元素是根据差值计算出的奖励值
+        for r in res4:
+            if r > 0:
+                res5.append(1/(0.3*r+1))
+            elif r < 0:
+                res5.append(1/(0.7*abs(r)+1))
+            else:
+                res5.append(1)
+        return res5
+
     def reward(self, agent, world):
-        # Agents are rewarded based on minimum agent distance to each landmark, penalized for dangers
+        # 根据TARGET-UAV分配情况，计算整体评价
+        # 目前只考虑了效益，尚未考虑代价
         rew = 0
-        for l in world.landmarks:
-            dists = [np.sqrt(np.sum(np.square(a.state.p_pos - l.state.p_pos))) for a in world.agents]
-            rew -= min(dists)
-        if agent.collide:
-            for a in world.agents:
-                if agent == a:
-                    continue
-                if self.is_danger(a, agent):
-                    rew -= 1
+        res5 = self.result(world)
+        for t, target in enumerate(world.targets):
+            rew += target.value * res5[t]
         return rew
 
     def observation(self, agent, world):
@@ -125,4 +140,3 @@ class Scenario(BaseScenario):
         a_front = np.dot(a1, vel_front_unit) + np.dot(a2, vel_front_unit)
         a_right = np.dot(a2, vel_right_unit) + np.dot(a2, vel_right_unit)
         return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + [a_front] + [a_right])
-
