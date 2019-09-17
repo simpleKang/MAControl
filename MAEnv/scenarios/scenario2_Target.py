@@ -26,6 +26,7 @@ class Scenario(BaseScenario):
             agent.silent = True
             agent.size = 0.01  # 10米
             agent.attacking = False
+            agent.attacking_to = -1
         # add landmarks
         world.targets = [Landmark() for i in range(num_targets)]
         for i, landmark in enumerate(world.targets):

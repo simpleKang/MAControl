@@ -49,6 +49,7 @@ class Entity(object):
         self.initial_mass = 1.0
         # attacking
         self.attacking = False
+        self.attacking_to = -1  # true target index
 
     @property
     def mass(self):
