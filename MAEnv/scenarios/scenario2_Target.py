@@ -25,8 +25,6 @@ class Scenario(BaseScenario):
             agent.collide = False
             agent.silent = True
             agent.size = 0.01  # 10米
-            agent.attacking = False
-            agent.attacking_to = -1
         # add landmarks
         world.targets = [Landmark() for i in range(num_targets)]
         for i, landmark in enumerate(world.targets):
@@ -64,6 +62,8 @@ class Scenario(BaseScenario):
             agent.state.p_vel = np.array([0, 0.05])  # 50 米/秒
             agent.state.p_acc = np.array([0, 0])
             agent.color = T.agent_color
+            agent.attacking = False
+            agent.attacking_to = -1
 
         for i, landmark in enumerate(world.landmarks):
             landmark.state.p_vel = np.zeros(world.dim_p)
