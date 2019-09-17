@@ -18,7 +18,7 @@ class PolicyMaker_Auction(PolicyMaker):
     #                                                                     攻击[阶段]
 
     # 在搜索目标阶段(<Step0)操作，只增不减
-    Found_Target_Set = []  # {target_pos, target_vel, target_value, target_defence, target_type}
+    Found_Target_Set = []  # {target_pos, target_vel, target_value, target_defence, target_type, T_INDEX}
     Found_Target_Info = []  # {TARGET:UAV_INDEX}
 
     # 在重置步(==Step5)操作，只增不减
@@ -28,7 +28,7 @@ class PolicyMaker_Auction(PolicyMaker):
     Remain_UAV_Set = []  # {UAV_INDEX}
 
     # 在重置步(==Step5)重置
-    Remain_Target_Set = []  # {target_pos, target_vel, target_value, target_defence, target_type, TARGET_INDEX}
+    Remain_Target_Set = []  # {target_pos, target_vel, target_value, target_defence, target_type, T_INDEX, TARGET_INDEX}
     Current_Target_Index = -1  # {TARGET_INDEX}
     Current_Price_Set = []   # {UAV X STEP}
     Current_Price_Result = []  # {UAV_INDEX,UAV_PRICE}
@@ -94,25 +94,26 @@ class PolicyMaker_Auction(PolicyMaker):
             targetpos = np.array(target[0:2])
             if point_in_rec(selfview1, selfview2, selfview3, selfview4, targetpos):
                 seen_target.append(target)
-                truetype = target[-1]
+                truetype = target[-2]
                 if truetype == 1:
                     gtype = np.random.choice([1, 2, 3], 1, p=[0.8, 0.1, 0.1])
                     if gtype == 2:
-                        seen_target[-1][-3:] = [10, 1, 2]
+                        seen_target[-1][-4:-1] = [10, 1, 2]
                     elif gtype == 3:
-                        seen_target[-1][-3:] = [5, 2, 3]
+                        seen_target[-1][-4:-1] = [5, 2, 3]
                 elif truetype == 2:
                     gtype = np.random.choice([1, 2, 3], 1, p=[0.08, 0.7, 0.22])
                     if gtype == 3:
-                        seen_target[-1][-3:] = [5, 2, 3]
+                        seen_target[-1][-4:-1] = [5, 2, 3]
                     elif gtype == 1:
-                        seen_target[-1][-3:] = [2, 5, 1]
+                        seen_target[-1][-4:-1] = [2, 5, 1]
                 elif truetype == 3:
                     gtype = np.random.choice([1, 2, 3], 1, p=[0.08, 0.22, 0.7])
                     if gtype == 1:
-                        seen_target[-1][-3:] = [2, 5, 1]
+                        seen_target[-1][-4:-1] = [2, 5, 1]
                     elif gtype == 2:
-                        seen_target[-1][-3:] = [10, 1, 2]
+                        seen_target[-1][-4:-1] = [10, 1, 2]
+                # 在seen_target中，真序号是准确的（唯一标识），类型可能有误（相应的价值和防御能力都有误）
 
         # READ AND WRITE TESTControl.Found_Target_Set
         if not PolicyMaker_Auction.Found_Target_Set:
