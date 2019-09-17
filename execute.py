@@ -6,6 +6,13 @@ import MAControl.Test_Auction.InnerController_PID as IC_P
 import MAControl.Test_Auction.MotionController_L1_TECS as MC_L
 import MAControl.Test_Auction.PathPlanner_Simple as PP_S
 import MAControl.Test_Auction.PolicyMaker_Auction as PM_A
+import logging
+
+logging.basicConfig(filename='/home/samantha/gitr/logs/result.log', level=logging.INFO)
+logging.info('\n')
+logging.info(time.strftime('%Y-%m-%d, %H:%M:%S'))
+# 需要自行指定为本地存在的绝对路径，指定名称的文件如果不存在，会自动创建
+# 如果存在，不会覆盖内容，会从结尾处向后添加新内容
 
 
 def parse_args():
