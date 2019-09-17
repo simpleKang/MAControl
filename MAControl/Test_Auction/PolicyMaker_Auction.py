@@ -39,6 +39,7 @@ class PolicyMaker_Auction(PolicyMaker):
         self.x = 0
         self.y = 0
         self.InAttacking = False
+        self.result = -1
 
         # 以下为一些阶段的初始设定步数
         # >> 未来步数点可修改，从而可以主动停留在某一阶段/步
@@ -319,6 +320,7 @@ class PolicyMaker_Auction(PolicyMaker):
                     self.InAttacking = True
                     self.x = PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][0]
                     self.y = PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][1]
+                    self.result = PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][7]
                     PolicyMaker_Auction.Remain_UAV_Set.remove(self.index)
                 else:
                     print('UAV', self.index, 'not to attack')
@@ -342,4 +344,4 @@ class PolicyMaker_Auction(PolicyMaker):
             else:
                 raise Exception('Wrong Wrong Wrong')
 
-        return [self.opt_index, [self.x, self.y]]
+        return [self.opt_index, [self.x, self.y, self.result]]
