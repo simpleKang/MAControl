@@ -112,5 +112,6 @@ if __name__ == '__main__':
         # time.sleep(0.01)
         augment_view(env, world, NewController)
         env.render()
+        print('reward:', rew_n[0][0])
         # print('>>>> step', step)
 
