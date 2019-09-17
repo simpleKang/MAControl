@@ -5,6 +5,8 @@ from __future__ import division
 import os
 import six
 import sys
+import math
+import numpy as np
 
 if "Apple" in sys.version:
     if 'DYLD_FALLBACK_LIBRARY_PATH' in os.environ:
@@ -24,10 +26,9 @@ try:
 except ImportError as e:
     reraise(prefix="Error occured while running `from pyglet.gl import *`",suffix="HINT: make sure you have OpenGL install. On Ubuntu, you can run 'apt-get install python-opengl'. If you're running on a server, you may need a virtual frame buffer; something like this should work: 'xvfb-run -s \"-screen 0 1400x900x24\" python <your_script.py>'")
 
-import math
-import numpy as np
 
 RAD2DEG = 57.29577951308232
+
 
 def get_display(spec):
     """Convert a display specification (such as :0) into an actual Display
@@ -41,6 +42,7 @@ def get_display(spec):
         return pyglet.canvas.Display(spec)
     else:
         raise error.Error('Invalid display specification: {}. (Must be a string like :0 or None.)'.format(spec))
+
 
 class Viewer(object):
     def __init__(self, width, height, display=None):
@@ -144,15 +146,17 @@ class Viewer(object):
         arr = arr.reshape(self.height, self.width, 4)
         return arr[::-1,:,0:3]
 
+
 def _add_attrs(geom, attrs):
     if "color" in attrs:
         geom.set_color(*attrs["color"])
     if "linewidth" in attrs:
         geom.set_linewidth(attrs["linewidth"])
 
+
 class Geom(object):
     def __init__(self):
-        self._color=Color((0, 0, 0, 1.0))
+        self._color = Color((0, 0, 0, 1.0))
         self.attrs = [self._color]
     def render(self):
         for attr in reversed(self.attrs):
@@ -167,11 +171,13 @@ class Geom(object):
     def set_color(self, r, g, b, alpha=1):
         self._color.vec4 = (r, g, b, alpha)
 
+
 class Attr(object):
     def enable(self):
         raise NotImplementedError
     def disable(self):
         pass
+
 
 class Transform(Attr):
     def __init__(self, translation=(0.0, 0.0), rotation=0.0, scale=(1,1)):
@@ -192,11 +198,14 @@ class Transform(Attr):
     def set_scale(self, newx, newy):
         self.scale = (float(newx), float(newy))
 
+
 class Color(Attr):
     def __init__(self, vec4):
         self.vec4 = vec4
+
     def enable(self):
         glColor4f(*self.vec4)
+
 
 class LineStyle(Attr):
     def __init__(self, style):
@@ -207,11 +216,13 @@ class LineStyle(Attr):
     def disable(self):
         glDisable(GL_LINE_STIPPLE)
 
+
 class LineWidth(Attr):
     def __init__(self, stroke):
         self.stroke = stroke
     def enable(self):
         glLineWidth(self.stroke)
+
 
 class Point(Geom):
     def __init__(self):
@@ -221,24 +232,158 @@ class Point(Geom):
         glVertex3f(0.0, 0.0, 0.0)
         glEnd()
 
+
 class FilledPolygon(Geom):
     def __init__(self, v):
         Geom.__init__(self)
         self.v = v
-    def render1(self):
-        if   len(self.v) == 4 : glBegin(GL_QUADS)
-        elif len(self.v)  > 4 : glBegin(GL_POLYGON)
-        else: glBegin(GL_TRIANGLES)
-        for p in self.v:
-            glVertex3f(p[0], p[1],0)  # draw each vertex
-        glEnd()
 
-        color = (self._color.vec4[0] * 0.5, self._color.vec4[1] * 0.5, self._color.vec4[2] * 0.5, self._color.vec4[3] * 0.5)
-        glColor4f(*color)
-        glBegin(GL_LINE_LOOP)
-        for p in self.v:
-            glVertex3f(p[0], p[1],0)  # draw each vertex
-        glEnd()
+    def render1(self):
+
+        if len(self.v) == 24:
+            glBegin(GL_QUADS)
+            glVertex3f(self.v[1][0], self.v[1][1], 0)
+            glVertex3f(self.v[2][0], self.v[2][1], 0)
+            glVertex3f(self.v[7][0], self.v[7][1], 0)
+            glVertex3f(self.v[8][0], self.v[8][1], 0)
+            glEnd()
+
+            glBegin(GL_QUADS)
+            glVertex3f(self.v[3][0], self.v[3][1], 0)
+            glVertex3f(self.v[4][0], self.v[4][1], 0)
+            glVertex3f(self.v[5][0], self.v[5][1], 0)
+            glVertex3f(self.v[6][0], self.v[6][1], 0)
+            glEnd()
+
+            glBegin(GL_QUADS)
+            glVertex3f(self.v[0][0], self.v[0][1], 0)
+            glVertex3f(self.v[9][0], self.v[9][1], 0)
+            glVertex3f(self.v[10][0], self.v[10][1], 0)
+            glVertex3f(self.v[23][0], self.v[23][1], 0)
+            glEnd()
+
+            glBegin(GL_QUADS)
+            glVertex3f(self.v[22][0], self.v[22][1], 0)
+            glVertex3f(self.v[11][0], self.v[11][1], 0)
+            glVertex3f(self.v[12][0], self.v[12][1], 0)
+            glVertex3f(self.v[21][0], self.v[21][1], 0)
+            glEnd()
+
+            glBegin(GL_QUADS)
+            glVertex3f(self.v[20][0], self.v[20][1], 0)
+            glVertex3f(self.v[13][0], self.v[13][1], 0)
+            glVertex3f(self.v[14][0], self.v[14][1], 0)
+            glVertex3f(self.v[19][0], self.v[19][1], 0)
+            glEnd()
+
+            glBegin(GL_QUADS)
+            glVertex3f(self.v[18][0], self.v[18][1], 0)
+            glVertex3f(self.v[15][0], self.v[15][1], 0)
+            glVertex3f(self.v[16][0], self.v[16][1], 0)
+            glVertex3f(self.v[17][0], self.v[17][1], 0)
+            glEnd()
+
+            color = (self._color.vec4[0] * 0.5, self._color.vec4[1] * 0.5, self._color.vec4[2] * 0.5, self._color.vec4[3] * 0.5)
+            glColor4f(*color)
+
+            glBegin(GL_LINE_LOOP)
+            for p in self.v:
+                glVertex3f(p[0], p[1], 0)  # draw each vertex
+            glEnd()
+
+        elif len(self.v) == 22:
+            glBegin(GL_QUADS)
+            glVertex3f(self.v[0][0], self.v[0][1], 0)
+            glVertex3f(self.v[1][0], self.v[1][1], 0)
+            glVertex3f(self.v[2][0], self.v[2][1], 0)
+            glVertex3f(self.v[3][0], self.v[3][1], 0)
+            glEnd()
+
+            glBegin(GL_QUADS)
+            glVertex3f(self.v[4][0], self.v[4][1], 0)
+            glVertex3f(self.v[5][0], self.v[5][1], 0)
+            glVertex3f(self.v[6][0], self.v[6][1], 0)
+            glVertex3f(self.v[7][0], self.v[7][1], 0)
+            glEnd()
+
+            glBegin(GL_QUADS)
+            glVertex3f(self.v[8][0], self.v[8][1], 0)
+            glVertex3f(self.v[9][0], self.v[9][1], 0)
+            glVertex3f(self.v[10][0], self.v[10][1], 0)
+            glVertex3f(self.v[11][0], self.v[11][1], 0)
+            glEnd()
+
+            glBegin(GL_QUADS)
+            glVertex3f(self.v[12][0], self.v[12][1], 0)
+            glVertex3f(self.v[13][0], self.v[13][1], 0)
+            glVertex3f(self.v[14][0], self.v[14][1], 0)
+            glVertex3f(self.v[15][0], self.v[15][1], 0)
+            glEnd()
+
+            glBegin(GL_QUADS)
+            glVertex3f(self.v[16][0], self.v[16][1], 0)
+            glVertex3f(self.v[17][0], self.v[17][1], 0)
+            glVertex3f(self.v[20][0], self.v[20][1], 0)
+            glVertex3f(self.v[21][0], self.v[21][1], 0)
+            glEnd()
+
+            color = (self._color.vec4[0] * 0.5, self._color.vec4[1] * 0.5, self._color.vec4[2] * 0.5, self._color.vec4[3] * 0.5)
+            glColor4f(*color)
+
+            glBegin(GL_QUADS)
+            glVertex3f(self.v[0][0], self.v[0][1], 0)
+            glVertex3f(self.v[1][0], self.v[1][1], 0)
+            glVertex3f(self.v[2][0], self.v[2][1], 0)
+            glVertex3f(self.v[3][0], self.v[3][1], 0)
+            glEnd()
+
+            glBegin(GL_QUADS)
+            glVertex3f(self.v[4][0], self.v[4][1], 0)
+            glVertex3f(self.v[5][0], self.v[5][1], 0)
+            glVertex3f(self.v[6][0], self.v[6][1], 0)
+            glVertex3f(self.v[7][0], self.v[7][1], 0)
+            glEnd()
+
+            glBegin(GL_QUADS)
+            glVertex3f(self.v[8][0], self.v[8][1], 0)
+            glVertex3f(self.v[9][0], self.v[9][1], 0)
+            glVertex3f(self.v[10][0], self.v[10][1], 0)
+            glVertex3f(self.v[11][0], self.v[11][1], 0)
+            glEnd()
+
+            glBegin(GL_QUADS)
+            glVertex3f(self.v[12][0], self.v[12][1], 0)
+            glVertex3f(self.v[13][0], self.v[13][1], 0)
+            glVertex3f(self.v[14][0], self.v[14][1], 0)
+            glVertex3f(self.v[15][0], self.v[15][1], 0)
+            glEnd()
+
+            glBegin(GL_QUADS)
+            glVertex3f(self.v[16][0], self.v[16][1], 0)
+            glVertex3f(self.v[18][0], self.v[18][1], 0)
+            glVertex3f(self.v[19][0], self.v[19][1], 0)
+            glVertex3f(self.v[21][0], self.v[21][1], 0)
+            glEnd()
+
+        else:
+            if len(self.v) == 4:
+                glBegin(GL_QUADS)
+            elif len(self.v) > 4:
+                glBegin(GL_POLYGON)
+            else:
+                glBegin(GL_TRIANGLES)
+            for p in self.v:
+                glVertex3f(p[0], p[1], 0)  # draw each vertex
+            glEnd()
+
+            color = (self._color.vec4[0] * 0.5, self._color.vec4[1] * 0.5, self._color.vec4[2] * 0.5, self._color.vec4[3] * 0.5)
+            glColor4f(*color)
+
+            glBegin(GL_LINE_LOOP)
+            for p in self.v:
+                glVertex3f(p[0], p[1], 0)  # draw each vertex
+            glEnd()
+
 
 def make_circle(radius=10, res=30, filled=True):
     points = []
@@ -250,12 +395,17 @@ def make_circle(radius=10, res=30, filled=True):
     else:
         return PolyLine(points, True)
 
+
 def make_polygon(v, filled=True):
-    if filled: return FilledPolygon(v)
-    else: return PolyLine(v, True)
+    if filled:
+        return FilledPolygon(v)
+    else:
+        return PolyLine(v, True)
+
 
 def make_polyline(v):
     return PolyLine(v, False)
+
 
 def make_capsule(length, width):
     l, r, t, b = 0, length, width/2, -width/2
@@ -266,6 +416,70 @@ def make_capsule(length, width):
     geom = Compound([box, circ0, circ1])
     return geom
 
+
+def make_uav89(size):
+
+    v = [[0.5,   2],
+         [5,     2],
+         [5,     3],
+         [0.5,   3],
+         [0.2,   3.4],
+         [-0.2,  3.4],
+         [-0.5,  3],
+         [-5,    3],
+         [-5,    2],
+         [-0.5,  2],
+         [-0.5, -1],
+         [-3,   -1],
+         [-3,   -2],
+         [-0.5, -2],
+         [-0.5, -2.2],
+         [-1,   -2.2],
+         [-1,   -2.4],
+         [1,    -2.4],
+         [1,    -2.2],
+         [0.5,  -2.2],
+         [0.5,  -2],
+         [3,    -2],
+         [3,    -1],
+         [0.5,  -1]]
+
+    v = list(np.array(v)*size)
+
+    return make_polygon(v)
+
+
+def make_tank(size):
+
+    v = [
+        [3.5,   4],
+        [3.5,  -4],
+        [2,    -4],
+        [2,     4],
+        [2,     3],
+        [2,    -2],
+        [-2,   -2],
+        [-2,    3],
+        [-2,    4],
+        [-2,   -4],
+        [-3.5, -4],
+        [-3.5,  4],
+        [1,     1],
+        [1,    -1],
+        [-1,   -1],
+        [-1,    1],
+        [0.5,   5],
+        [0.5,   3],
+        [0.5,   1],
+        [-0.5,  1],
+        [-0.5,  3],
+        [-0.5,  5]
+    ]
+
+    v = list(np.array(v) * size)
+
+    return make_polygon(v)
+
 class Compound(Geom):
     def __init__(self, gs):
         Geom.__init__(self)
@@ -275,6 +489,7 @@ class Compound(Geom):
     def render1(self):
         for g in self.gs:
             g.render()
+
 
 class PolyLine(Geom):
     def __init__(self, v, close):
@@ -291,6 +506,7 @@ class PolyLine(Geom):
     def set_linewidth(self, x):
         self.linewidth.stroke = x
 
+
 class Line(Geom):
     def __init__(self, start=(0.0, 0.0), end=(0.0, 0.0)):
         Geom.__init__(self)
@@ -305,6 +521,7 @@ class Line(Geom):
         glVertex2f(*self.end)
         glEnd()
 
+
 class Image(Geom):
     def __init__(self, fname, width, height):
         Geom.__init__(self)
@@ -317,6 +534,7 @@ class Image(Geom):
         self.img.blit(-self.width/2, -self.height/2, width=self.width, height=self.height)
 
 # ================================================================
+
 
 class SimpleImageViewer(object):
     def __init__(self, display=None):

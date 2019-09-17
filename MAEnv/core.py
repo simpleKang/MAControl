@@ -65,6 +65,8 @@ class Landmark(Entity):
         self.value = 0
         # defence
         self.defence = 0
+        # type
+        self.type = 0
 
 
 # properties of agent entities

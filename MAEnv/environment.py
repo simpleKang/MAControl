@@ -3,12 +3,13 @@ from gym import spaces
 from gym.envs.registration import EnvSpec
 import numpy as np
 from MAEnv.multi_discrete import MultiDiscrete
+import math
 
 # environment for all agents in the multiagent world
 # currently code assumes that no agents will be created/destroyed at runtime!
 class MultiAgentEnv(gym.Env):
     metadata = {
-        'render.modes' : ['human', 'rgb_array']
+        'render.modes': ['human', 'rgb_array']
     }
 
     def __init__(self, world, reset_callback=None, reward_callback=None,
@@ -206,7 +207,7 @@ class MultiAgentEnv(gym.Env):
                 # import rendering only if we need it (and don't import for headless machines)
                 #from gym.envs.classic_control import rendering
                 from MAEnv import rendering
-                self.viewers[i] = rendering.Viewer(1000,1000)
+                self.viewers[i] = rendering.Viewer(1000, 1000)
 
         # create rendering geometry
         if self.render_geoms is None:
@@ -216,12 +217,18 @@ class MultiAgentEnv(gym.Env):
             self.render_geoms = []
             self.render_geoms_xform = []
             for entity in self.world.entities:
-                geom = rendering.make_circle(entity.size)
+                if 'grid' in entity.name:
+                    preset = [[-2, -2], [-2, 2], [2, 2], [2, -2]]
+                    geom = rendering.make_polygon(list(np.array(preset) * entity.size))
+                elif 'agent' in entity.name:
+                    geom = rendering.make_uav89(entity.size)
+                else:
+                    geom = rendering.make_tank(entity.size)
                 xform = rendering.Transform()
                 if 'agent' in entity.name:
                     geom.set_color(*entity.color, alpha=0.5)
                 else:
-                    geom.set_color(*entity.color)
+                    geom.set_color(*entity.color, alpha=0.2)
                 geom.add_attr(xform)
                 self.render_geoms.append(geom)
                 self.render_geoms_xform.append(xform)
@@ -241,14 +248,20 @@ class MultiAgentEnv(gym.Env):
                 pos = np.zeros(self.world.dim_p)
             else:
                 pos = self.agents[i].state.p_pos
-            self.viewers[i].set_bounds(pos[0]-cam_range,pos[0]+cam_range,pos[1]-cam_range,pos[1]+cam_range)
+            self.viewers[i].set_bounds(pos[0]-cam_range, pos[0]+cam_range,pos[1]-cam_range, pos[1]+cam_range)
             # update geometry positions
             for e, entity in enumerate(self.world.entities):
                 self.render_geoms_xform[e].set_translation(*entity.state.p_pos)
+                if 'agent' in entity.name:
+                    vx = entity.state.p_vel[0]
+                    vy = entity.state.p_vel[1]
+                    rot = math.atan2(vy, vx) - math.pi/2
+                    self.render_geoms_xform[e].set_rotation(rot)
                 if 'agent' in entity.name and entity.attacking:
-                    self.render_geoms_xform[e].set_scale(10, 10)
+                    # self.render_geoms_xform[e].set_scale(3, 3)
+                    self.render_geoms[e].set_color(1, 0, 0, 0.8)
             # render to display or array
-            results.append(self.viewers[i].render(return_rgb_array = mode=='rgb_array'))
+            results.append(self.viewers[i].render(return_rgb_array=mode == 'rgb_array'))
 
         return results
 

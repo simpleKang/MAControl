@@ -1,8 +1,11 @@
 # coding=utf-8
+
 import argparse
 import time
-import MAControl.TESTControl as TESTC
-import MAControl.util as U
+import MAControl.Test_Auction.InnerController_PID as IC_P
+import MAControl.Test_Auction.MotionController_L1_TECS as MC_L
+import MAControl.Test_Auction.PathPlanner_Simple as PP_S
+import MAControl.Test_Auction.PolicyMaker_Auction as PM_A
 
 
 def parse_args():
@@ -13,7 +16,6 @@ def parse_args():
 
 
 def make_env(arglist):
-    print('make_env')
     from MAEnv.environment import MultiAgentEnv
     import MAEnv.scenarios as scenarios
 
@@ -26,54 +28,76 @@ def make_env(arglist):
     return env, world
 
 
+def get_controller(env, world, arglist):
+    ControllerSet = []
+
+    for i in range(env.n):
+        control = []
+        control.append(PM_A.PolicyMaker_Auction("agent_%d" % i, env, world, i, arglist))
+        control.append(PP_S.PathPlanner_Simple("agent_%d" % i, env, world, i, arglist))
+        control.append(MC_L.MotionController_L1_TECS("agent_%d" % i, env, world, i, arglist))
+        control.append(IC_P.InnerController_PID("agent_%d" % i, env, world, i, arglist))
+        control.append(False)  # Arriveflag
+        control.append(False)  # Isattacking
+        ControllerSet.append(control)
+
+    return ControllerSet
+
+
+def update_action(env, world, obs_n, step, NewController):
+
+    # WorldTarget
+    WorldTarget = []
+    for i, landmark in enumerate(world.targets):
+        WorldTarget.append([landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.state.p_vel[0],
+                            landmark.state.p_vel[1], landmark.value, landmark.defence, landmark.type])
+
+    # get action
+    action_n = []
+
+    for i in range(env.n):
+
+        list_i = NewController[i][0]. \
+            make_policy(WorldTarget, obs_n, step)
+
+        pointAi, pointBi, finishedi, NewController[i][5] = NewController[i][1].\
+            planpath(list_i, obs_n[i], NewController[i][4], step)
+
+        acctEi, acclEi, NewController[i][4] = NewController[i][2]. \
+            get_expected_action(obs_n[i], pointAi, pointBi, step, finishedi)
+
+        actioni = NewController[i][3]. \
+            get_action(obs_n[i], acctEi, acclEi, step, finishedi)
+
+        action_n.append(actioni)
+
+    return action_n
+
+
+def augment_view(env, world, NewController):
+    for i in range(env.n):
+        if NewController[i][5]:
+            world.agents[i].attacking = True
+
+
 if __name__ == '__main__':
     arglist = parse_args()
 
     # Create environment
     env, world = make_env(arglist)
 
-    # Create Controllers
-    Control = []
-    for i in range(env.n):
-        Control.append(TESTC.TESTControl("agent_%d" % i, env, world, i, arglist))
-        Control[i].waypoint_list[Control[i].current_wplist][0:len(U.init_waypoint[i])] = U.init_waypoint[i]
+    # Create Controller
+    NewController = get_controller(env, world, arglist)
 
     obs_n = env.reset()
     step = 0
     start = time.time()
 
-    WorldTarget = []
-    for i, landmark in enumerate(world.targets):
-        WorldTarget.append([landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.state.p_vel[0],
-                            landmark.state.p_vel[1], landmark.value, landmark.defence])
-    print('WorldTarget', WorldTarget)
-    # >>>>>>>>>>>>>>>>>>>>>>>>>>> Not Tested >>>>>>>>>>>>>>>>>>>>>>>>
-    TESTC.TESTControl.Found_Target_Set = WorldTarget
-    TESTC.TESTControl.Found_Target_Info = [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
-    # <<<<<<<<<<<<<<<<<<<<<<<<<<< Not Tested <<<<<<<<<<<<<<<<<<<<<<<<
-
     while True:
 
         # get action
-        action_n = []
-        for i in range(env.n):
-            pointAi, pointBi, finishedi, world = \
-                Control[i].PolicyMaker(WorldTarget, obs_n, step, i, world)
-            print(pointAi, pointBi, i, finishedi)
-            acc_it, acc_il = Control[i].MotionController(obs_n[i], pointAi, pointBi, step)
-            actioni = Control[i].InnerController(obs_n[i], acc_it, acc_il, step, finishedi)
-            action_n.append(actioni)
-        print('Shared_UAV_state: ', TESTC.TESTControl.Shared_UAV_state)
-        print('WorldTarget: ', WorldTarget)
-        print('Found_Target_Set: ', TESTC.TESTControl.Found_Target_Set)
-        print('Found_Target_Info: ', TESTC.TESTControl.Found_Target_Info)
-        print('Target_index: ', TESTC.TESTControl.Target_index)
-        print('Resorted_Target: ', TESTC.TESTControl.Resorted_Target)
-        print('Selectable_UAV: ', TESTC.TESTControl.Selectable_UAV)
-        print('Auctioneer: ', TESTC.TESTControl.Auctioneer)
-        print('Trans_step: ', TESTC.TESTControl.Trans_step)
-        print('Winner: ', TESTC.TESTControl.Winner)
-        print('Price_list: ', TESTC.TESTControl.Price_list)
+        print('>>>> step', step)
+        action_n = update_action(env, world, obs_n, step, NewController)
 
         # environment step
         new_obs_n, rew_n, done_n, info_n = env.step(action_n)
@@ -81,9 +105,8 @@ if __name__ == '__main__':
         obs_n = new_obs_n
 
         # for displaying
-        time.sleep(0.01)
+        # time.sleep(0.01)
+        augment_view(env, world, NewController)
         env.render()
-        print('>>>> step', step)
-        # print('obs_n', obs_n)
-        # print('action_n', action_n)
+        # print('>>>> step', step)
 
