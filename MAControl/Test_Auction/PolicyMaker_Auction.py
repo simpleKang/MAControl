@@ -305,6 +305,7 @@ class PolicyMaker_Auction(PolicyMaker):
 
                 DEMANDED_UAV_NUM = PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][5]
                 if DEMANDED_UAV_NUM > self.swarm_size:
+                    # print('WARNING: HARD TARGET ', PolicyMaker_Auction.Current_Target_Index)
                     CHOSEN_UAV_NUM = self.swarm_size
                 else:
                     CHOSEN_UAV_NUM = DEMANDED_UAV_NUM
@@ -313,27 +314,16 @@ class PolicyMaker_Auction(PolicyMaker):
                 for k in range(CHOSEN_UAV_NUM):
                     CHOSEN_UAV_SET.append(PolicyMaker_Auction.Current_Price_Result[k][0])
 
-                if self.index in CHOSEN_UAV_SET:  # 排位靠前的UAV，有大概率去打击
-                    gchoice = np.random.choice([1, 2], 1, p=[0.9, 0.1])
-                    if gchoice == 1:
-                        self.InAttacking = True
-                        self.x = PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][0]
-                        self.y = PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][1]
-                        self.result = PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][7]
-                        PolicyMaker_Auction.Remain_UAV_Set.remove(self.index)
-                    else:
-                        pass
-
-                else:  # 排位靠后的UAV，有小概率去打击
-                    gchoice = np.random.choice([1, 2], 1, p=[0.2, 0.8])
-                    if gchoice == 1:
-                        self.InAttacking = True
-                        self.x = PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][0]
-                        self.y = PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][1]
-                        self.result = PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][7]
-                        PolicyMaker_Auction.Remain_UAV_Set.remove(self.index)
-                    else:
-                        pass
+                if self.index in CHOSEN_UAV_SET:
+                    # print('UAV', self.index, 'to attack')
+                    self.InAttacking = True
+                    self.x = PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][0]
+                    self.y = PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][1]
+                    self.result = PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][7]
+                    PolicyMaker_Auction.Remain_UAV_Set.remove(self.index)
+                else:
+                    pass
+                    # print('UAV', self.index, 'not to attack')
 
             elif step == self.Step5:
                 # print('UAV', self.index, 'recycling')
