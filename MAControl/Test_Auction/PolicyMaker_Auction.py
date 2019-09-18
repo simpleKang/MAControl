@@ -301,9 +301,16 @@ class PolicyMaker_Auction(PolicyMaker):
 
             elif step == self.Step4:
                 # 下述计算会在各个UAV本地重复进行，确认自己是否具有攻击资格，部分UAV即将进入攻击阶段
-                # 因为基于共享量进行计算，中间变量的计算结果将相同
 
-                DEMANDED_UAV_NUM = PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][5]
+                # 根据当前目标的类型估计，重新讨论目标的类型（含有随机性），进而确定需要的UAV个数
+                DEMANDED_UAV_NUM = 0
+                if PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][5] == 5:
+                    DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=[0.8, 0.1, 0.1])
+                elif PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][5] == 1:
+                    DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=[0.1, 0.8, 0.1])
+                elif PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][5] == 2:
+                    DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=[0.1, 0.1, 0.8])
+
                 if DEMANDED_UAV_NUM > self.swarm_size:
                     # print('WARNING: HARD TARGET ', PolicyMaker_Auction.Current_Target_Index)
                     CHOSEN_UAV_NUM = self.swarm_size
