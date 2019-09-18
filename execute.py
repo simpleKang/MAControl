@@ -19,7 +19,7 @@ logging.info('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 def parse_args():
     parser = argparse.ArgumentParser("Control Experiments for Multi-Agent Environments")
     parser.add_argument("--scenario", type=str, default="scenario2_Target", help="name of the scenario script")
-    parser.add_argument("--step-max", type=int, default=10000, help="maximum steps")
+    parser.add_argument("--step-max", type=int, default=2000, help="maximum steps")
     parser.add_argument("--episode-max", type=int, default=200, help="maximum episodes")
     return parser.parse_args()
 
@@ -112,6 +112,7 @@ if __name__ == '__main__':
         while step <= arglist.step_max:
 
             # get action
+            print('>>> step ', step)
             action_n = update_action(env, world, obs_n, step, NewController)
 
             # environment step
@@ -121,7 +122,11 @@ if __name__ == '__main__':
 
             # for displaying
             augment_view(env, world, NewController)
-            # env.render()  # could be commented out
+            env.render()  # could be commented out
+
+            # for inspecting
+            if step == 50:
+                print('new start')
 
             # for recording
             if step == arglist.step_max:
