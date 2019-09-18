@@ -54,7 +54,6 @@ class PolicyMaker_Auction(PolicyMaker):
 
         self.swarm_size = 0
         self.close_area = []
-        PolicyMaker_Auction.Remain_UAV_Set.append(self.index)
 
     def find_mate(self, obs_n, r=0.5):
         selfpos = np.array(obs_n[self.index][2:4])
