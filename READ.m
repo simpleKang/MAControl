@@ -1,15 +1,18 @@
-clc
-clear
+fname = 'result[0.8-0.7-0.7][0.8-0.8-0.8new]';
+vname = 'score_877_888n';
 
-[index,c0,c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,score,time]=...
-    textread('result[0.8-0.7-0.7][0.5-0.5].log',...
+[~,c0,c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,score,~]=...
+    textread(strcat(fname,'.log'),...
     '%s %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %f %s',...
     'delimiter',',',...
     'headerlines',4);
 
+clear c*
 score = score(1:200,:);
+s.(vname) = score
 
-save result[0.8-0.7-0.7][0.5-0.5].mat score
+% READ SCORES from a STANDARD log file generated from a SINGLE CLEAN run
+% 1) put the xxx.log file and this .m file under the same directory
+% 2) modify 'fname' and 'vname' accordingly
 
-% 作用：从纯净的单次结果的log文件中读取分数，已测试通过
-% 使用方法：将这个文件和log文件放在同一个目录下，根据实际情况修改xxxxx.log及xxxxxx.mat并运行
+save(strcat(fname,'.mat'),'s')
