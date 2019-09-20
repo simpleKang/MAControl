@@ -116,9 +116,9 @@ class PolicyMaker_Auction(PolicyMaker):
                 # 在seen_target中，真序号是准确的（唯一标识），类型可能有误（相应的价值和防御能力都有误）
                 # !! 一种对评价标准投其所好的方式 !!
                 now_defence = seen_target[-1][-3]
-                mean_defence = (5+1+2)/3
-                if now_defence < mean_defence and random.random() < 0.9:
-                    seen_target[-1][-3] = seen_target[-1][-3] + 1
+                mean_defence = (5*4+1+2)/6
+                if now_defence < mean_defence and random.random() < 0.7:
+                    seen_target[-1][-3] = 5
                 # !! 模糊处理结束 !!
 
         # READ AND WRITE TESTControl.Found_Target_Set
