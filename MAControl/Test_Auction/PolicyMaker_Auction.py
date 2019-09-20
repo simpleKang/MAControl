@@ -327,12 +327,13 @@ class PolicyMaker_Auction(PolicyMaker):
 
                 # 根据当前目标的类型估计，重新讨论目标的类型（含有随机性），进而确定需要的UAV个数
                 DEMANDED_UAV_NUM = 0
+                r = random.random() * 2 - 1
                 if PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][5] == 5:
-                    DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=[0.2980, 0.3361, 0.3659])[0]
+                    DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=[0.3291+0.18*r, 0.3248-0.18*r, 0.3461])[0]
                 elif PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][5] == 1:
-                    DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=[0.2126, 0.4394, 0.3480])[0]
+                    DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=[0.2711+0.21*r, 0.4068-0.21*r, 0.3221])[0]
                 elif PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][5] == 2:
-                    DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=[0.2323, 0.4155, 0.3522])[0]
+                    DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=[0.3002+0.23*r, 0.3701-0.23*r, 0.3297])[0]
 
                 # # 另一种计算DEMANDED_UAV_NUM的方式
                 # if PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][4] == 2:
