@@ -96,47 +96,47 @@ class PolicyMaker_Auction(PolicyMaker):
                 seen_target.append(target)
                 truetype = target[-2]
                 if truetype == 1:
-                    gtype = np.random.choice([1, 2, 3], 1, p=[0.6, 0.2, 0.2])
+                    gtype = np.random.choice([1, 2, 3], 1, p=[0.2, 0.4, 0.4])
                     if gtype == 2:
                         seen_target[-1][-4:-1] = [10, 1, 2]
                     elif gtype == 3:
                         seen_target[-1][-4:-1] = [5, 2, 3]
                 elif truetype == 2:
-                    gtype = np.random.choice([1, 2, 3], 1, p=[0.2, 0.6, 0.2])
+                    gtype = np.random.choice([1, 2, 3], 1, p=[0.4, 0.2, 0.4])
                     if gtype == 3:
                         seen_target[-1][-4:-1] = [5, 2, 3]
                     elif gtype == 1:
                         seen_target[-1][-4:-1] = [2, 5, 1]
                 elif truetype == 3:
-                    gtype = np.random.choice([1, 2, 3], 1, p=[0.2, 0.2, 0.6])
+                    gtype = np.random.choice([1, 2, 3], 1, p=[0.4, 0.4, 0.2])
                     if gtype == 1:
                         seen_target[-1][-4:-1] = [2, 5, 1]
                     elif gtype == 2:
                         seen_target[-1][-4:-1] = [10, 1, 2]
                 # 在seen_target中，真序号是准确的（唯一标识），类型可能有误（相应的价值和防御能力都有误）
-                # !! 接下来把这个可能有问题的观测值模糊成一个四不像的目标 !!
-                now_type = seen_target[-1][-2]
-                g_defence = 0
-                g_value = 0
-                M = 0
-                if now_type == 1:
-                    g_value = np.dot([2, 10, 5], [0.6, 0.2, 0.2])
-                    g_defence = np.dot([5, 1, 2], [0.6, 0.2, 0.2])
-                    M = 5
-                elif now_type == 2:
-                    g_value = np.dot([2, 10, 5], [0.2, 0.6, 0.2])
-                    g_defence = np.dot([5, 1, 2], [0.2, 0.6, 0.2])
-                    M = 1
-                elif now_type == 3:
-                    g_value = np.dot([2, 10, 5], [0.2, 0.2, 0.6])
-                    g_defence = np.dot([5, 1, 2], [0.2, 0.2, 0.6])
-                    M = 2
-                g_defence1 = int(np.floor(g_defence))
-                g_defence2 = int(np.ceil(g_defence))
-                g_defencek = g_defence1 if abs(g_defence1 - M) <= abs(g_defence2 - M) else g_defence2
-                g_defence = max(M, g_defencek)
-                seen_target[-1][-4:-2] = [g_value, g_defence]
-                # !! 模糊处理结束 !!
+                # # !! 接下来把这个可能有问题的观测值模糊成一个四不像的目标 !!
+                # now_type = seen_target[-1][-2]
+                # g_defence = 0
+                # g_value = 0
+                # M = 0
+                # if now_type == 1:
+                #     g_value = np.dot([2, 10, 5], [0.6, 0.2, 0.2])
+                #     g_defence = np.dot([5, 1, 2], [0.6, 0.2, 0.2])
+                #     M = 5
+                # elif now_type == 2:
+                #     g_value = np.dot([2, 10, 5], [0.2, 0.6, 0.2])
+                #     g_defence = np.dot([5, 1, 2], [0.2, 0.6, 0.2])
+                #     M = 1
+                # elif now_type == 3:
+                #     g_value = np.dot([2, 10, 5], [0.2, 0.2, 0.6])
+                #     g_defence = np.dot([5, 1, 2], [0.2, 0.2, 0.6])
+                #     M = 2
+                # g_defence1 = int(np.floor(g_defence))
+                # g_defence2 = int(np.ceil(g_defence))
+                # g_defencek = g_defence1 if abs(g_defence1 - M) <= abs(g_defence2 - M) else g_defence2
+                # g_defence = max(M, g_defencek)
+                # seen_target[-1][-4:-2] = [g_value, g_defence]
+                # # !! 模糊处理结束 !!
 
         # READ AND WRITE TESTControl.Found_Target_Set
         if not PolicyMaker_Auction.Found_Target_Set:
@@ -325,14 +325,14 @@ class PolicyMaker_Auction(PolicyMaker):
             elif step == self.Step4:
                 # 下述计算会在各个UAV本地重复进行，确认自己是否具有攻击资格，部分UAV即将进入攻击阶段
 
-                # # 根据当前目标的类型估计，重新讨论目标的类型（含有随机性），进而确定需要的UAV个数
-                # DEMANDED_UAV_NUM = 0
-                # if PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][5] == 5:
-                #     DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=[0.8, 0.1, 0.1])[0]
-                # elif PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][5] == 1:
-                #     DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=[0.1, 0.8, 0.1])[0]
-                # elif PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][5] == 2:
-                #     DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=[0.1, 0.1, 0.8])[0]
+                # 根据当前目标的类型估计，重新讨论目标的类型（含有随机性），进而确定需要的UAV个数
+                DEMANDED_UAV_NUM = 0
+                if PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][5] == 5:
+                    DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=[0.2980, 0.3361, 0.3659])[0]
+                elif PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][5] == 1:
+                    DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=[0.2126, 0.4394, 0.3480])[0]
+                elif PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][5] == 2:
+                    DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=[0.2323, 0.4155, 0.3522])[0]
 
                 # # 另一种计算DEMANDED_UAV_NUM的方式
                 # if PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][4] == 2:
@@ -354,8 +354,8 @@ class PolicyMaker_Auction(PolicyMaker):
                 #     M = 2
                 #     DEMANDED_UAV_NUM = g_Defence1 if abs(g_Defence1-M) <= abs(g_Defence2-M) else g_Defence2
 
-                # 最基础的DEMANDED_UAV_NUM的计算方式
-                DEMANDED_UAV_NUM = PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][5]
+                # # 最基础的DEMANDED_UAV_NUM的计算方式
+                # DEMANDED_UAV_NUM = PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][5]
 
                 if DEMANDED_UAV_NUM > self.swarm_size:
                     # print('WARNING: HARD TARGET ', PolicyMaker_Auction.Current_Target_Index)
