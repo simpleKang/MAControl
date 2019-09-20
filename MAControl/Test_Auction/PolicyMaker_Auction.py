@@ -114,6 +114,28 @@ class PolicyMaker_Auction(PolicyMaker):
                     elif gtype == 2:
                         seen_target[-1][-4:-1] = [10, 1, 2]
                 # 在seen_target中，真序号是准确的（唯一标识），类型可能有误（相应的价值和防御能力都有误）
+                # !! 接下来把这个可能有问题的观测值模糊成一个四不像的目标 !!
+                now_type = seen_target[-1][-2]
+                g_defence = 0
+                g_value = 0
+                M = 0
+                if now_type == 1:
+                    g_value = np.dot([2, 10, 5], [0.6, 0.2, 0.2])
+                    g_defence = np.dot([5, 1, 2], [0.6, 0.2, 0.2])
+                    M = 5
+                elif now_type == 2:
+                    g_value = np.dot([2, 10, 5], [0.2, 0.6, 0.2])
+                    g_defence = np.dot([5, 1, 2], [0.2, 0.6, 0.2])
+                    M = 1
+                elif now_type == 3:
+                    g_value = np.dot([2, 10, 5], [0.2, 0.2, 0.6])
+                    g_defence = np.dot([5, 1, 2], [0.2, 0.2, 0.6])
+                    M = 2
+                g_defence1 = int(np.floor(g_defence))
+                g_defence2 = int(np.ceil(g_defence))
+                g_defence = g_defence1 if abs(g_defence1 - M) <= abs(g_defence2 - M) else g_defence2
+                seen_target[-1][-4:-2] = [g_value, g_defence]
+                # !! 模糊处理结束 !!
 
         # READ AND WRITE TESTControl.Found_Target_Set
         if not PolicyMaker_Auction.Found_Target_Set:
