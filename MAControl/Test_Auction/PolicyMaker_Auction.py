@@ -96,19 +96,19 @@ class PolicyMaker_Auction(PolicyMaker):
                 seen_target.append(target)
                 truetype = target[-2]
                 if truetype == 1:
-                    gtype = np.random.choice([1, 2, 3], 1, p=[0.8, 0.1, 0.1])
+                    gtype = np.random.choice([1, 2, 3], 1, p=[0.6, 0.2, 0.2])
                     if gtype == 2:
                         seen_target[-1][-4:-1] = [10, 1, 2]
                     elif gtype == 3:
                         seen_target[-1][-4:-1] = [5, 2, 3]
                 elif truetype == 2:
-                    gtype = np.random.choice([1, 2, 3], 1, p=[0.08, 0.7, 0.22])
+                    gtype = np.random.choice([1, 2, 3], 1, p=[0.2, 0.6, 0.2])
                     if gtype == 3:
                         seen_target[-1][-4:-1] = [5, 2, 3]
                     elif gtype == 1:
                         seen_target[-1][-4:-1] = [2, 5, 1]
                 elif truetype == 3:
-                    gtype = np.random.choice([1, 2, 3], 1, p=[0.08, 0.22, 0.7])
+                    gtype = np.random.choice([1, 2, 3], 1, p=[0.2, 0.2, 0.6])
                     if gtype == 1:
                         seen_target[-1][-4:-1] = [2, 5, 1]
                     elif gtype == 2:
@@ -311,25 +311,28 @@ class PolicyMaker_Auction(PolicyMaker):
                 # elif PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][5] == 2:
                 #     DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=[0.1, 0.1, 0.8])[0]
 
-                # 另一种计算DEMANDED_UAV_NUM的方式
-                if PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][4] == 2:
-                    g_Defence = np.dot([5, 1, 2], [0.8, 0.1, 0.1])
-                    g_Defence1 = int(np.floor(g_Defence))
-                    g_Defence2 = int(np.ceil(g_Defence))
-                    M = 5
-                    DEMANDED_UAV_NUM = g_Defence1 if abs(g_Defence1-M) <= abs(g_Defence2-M) else g_Defence2
-                elif PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][4] == 10:
-                    g_Defence = np.dot([5, 1, 2], [0.08, 0.7, 0.22])
-                    g_Defence1 = int(np.floor(g_Defence))
-                    g_Defence2 = int(np.ceil(g_Defence))
-                    M = 1
-                    DEMANDED_UAV_NUM = g_Defence1 if abs(g_Defence1-M) <= abs(g_Defence2-M) else g_Defence2
-                elif PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][4] == 5:
-                    g_Defence = np.dot([5, 1, 2], [0.08, 0.22, 0.7])
-                    g_Defence1 = int(np.floor(g_Defence))
-                    g_Defence2 = int(np.ceil(g_Defence))
-                    M = 2
-                    DEMANDED_UAV_NUM = g_Defence1 if abs(g_Defence1-M) <= abs(g_Defence2-M) else g_Defence2
+                # # 另一种计算DEMANDED_UAV_NUM的方式
+                # if PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][4] == 2:
+                #     g_Defence = np.dot([5, 1, 2], [0.6, 0.2, 0.2])
+                #     g_Defence1 = int(np.floor(g_Defence))
+                #     g_Defence2 = int(np.ceil(g_Defence))
+                #     M = 5
+                #     DEMANDED_UAV_NUM = g_Defence1 if abs(g_Defence1-M) <= abs(g_Defence2-M) else g_Defence2
+                # elif PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][4] == 10:
+                #     g_Defence = np.dot([5, 1, 2], [0.2, 0.6, 0.2])
+                #     g_Defence1 = int(np.floor(g_Defence))
+                #     g_Defence2 = int(np.ceil(g_Defence))
+                #     M = 1
+                #     DEMANDED_UAV_NUM = g_Defence1 if abs(g_Defence1-M) <= abs(g_Defence2-M) else g_Defence2
+                # elif PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][4] == 5:
+                #     g_Defence = np.dot([5, 1, 2], [0.2, 0.2, 0.6])
+                #     g_Defence1 = int(np.floor(g_Defence))
+                #     g_Defence2 = int(np.ceil(g_Defence))
+                #     M = 2
+                #     DEMANDED_UAV_NUM = g_Defence1 if abs(g_Defence1-M) <= abs(g_Defence2-M) else g_Defence2
+
+                # 最基础的DEMANDED_UAV_NUM的计算方式
+                DEMANDED_UAV_NUM = PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][5]
 
                 if DEMANDED_UAV_NUM > self.swarm_size:
                     # print('WARNING: HARD TARGET ', PolicyMaker_Auction.Current_Target_Index)
