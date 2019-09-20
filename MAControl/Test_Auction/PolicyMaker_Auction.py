@@ -96,29 +96,46 @@ class PolicyMaker_Auction(PolicyMaker):
                 seen_target.append(target)
                 truetype = target[-2]
                 if truetype == 1:
-                    gtype = np.random.choice([1, 2, 3], 1, p=[0.2, 0.4, 0.4])
+                    gtype = np.random.choice([1, 2, 3], 1, p=[0.6, 0.2, 0.2])
                     if gtype == 2:
                         seen_target[-1][-4:-1] = [10, 1, 2]
                     elif gtype == 3:
                         seen_target[-1][-4:-1] = [5, 2, 3]
                 elif truetype == 2:
-                    gtype = np.random.choice([1, 2, 3], 1, p=[0.4, 0.2, 0.4])
+                    gtype = np.random.choice([1, 2, 3], 1, p=[0.2, 0.6, 0.2])
                     if gtype == 3:
                         seen_target[-1][-4:-1] = [5, 2, 3]
                     elif gtype == 1:
                         seen_target[-1][-4:-1] = [2, 5, 1]
                 elif truetype == 3:
-                    gtype = np.random.choice([1, 2, 3], 1, p=[0.4, 0.4, 0.2])
+                    gtype = np.random.choice([1, 2, 3], 1, p=[0.2, 0.2, 0.6])
                     if gtype == 1:
                         seen_target[-1][-4:-1] = [2, 5, 1]
                     elif gtype == 2:
                         seen_target[-1][-4:-1] = [10, 1, 2]
                 # 在seen_target中，真序号是准确的（唯一标识），类型可能有误（相应的价值和防御能力都有误）
-                # !! 一种对评价标准投其所好的方式 !!
-                now_defence = seen_target[-1][-3]
-                mean_defence = (5*4+1+2)/6
-                if now_defence < mean_defence and random.random() < 0.7:
-                    seen_target[-1][-3] = 5
+                # !! 接下来把这个可能有问题的观测值模糊成一个四不像的目标 !!
+                now_type = seen_target[-1][-2]
+                g_defence = 0
+                g_value = 0
+                M = 0
+                if now_type == 1:
+                    g_value = np.dot([2, 10, 5], [0.6, 0.2, 0.2])
+                    g_defence = np.dot([5, 1, 2], [0.6, 0.2, 0.2])
+                    M = 5
+                elif now_type == 2:
+                    g_value = np.dot([2, 10, 5], [0.2, 0.6, 0.2])
+                    g_defence = np.dot([5, 1, 2], [0.2, 0.6, 0.2])
+                    M = 1
+                elif now_type == 3:
+                    g_value = np.dot([2, 10, 5], [0.2, 0.2, 0.6])
+                    g_defence = np.dot([5, 1, 2], [0.2, 0.2, 0.6])
+                    M = 2
+                g_defence1 = int(np.floor(g_defence))
+                g_defence2 = int(np.ceil(g_defence))
+                g_defencek = g_defence1 if abs(g_defence1 - M) <= abs(g_defence2 - M) else g_defence2
+                g_defence = max(M, g_defencek)
+                seen_target[-1][-4:-2] = [g_value, g_defence]
                 # !! 模糊处理结束 !!
 
         # READ AND WRITE TESTControl.Found_Target_Set
