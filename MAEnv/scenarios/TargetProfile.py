@@ -12,3 +12,4 @@ grid_pos = [[0, 0], [-1, 1], [-1, -1], [1, 1], [1, -1]]
 grid_color = np.array([0.25, 0.25, 0.25])
 
 agent_color = np.array([0.47, 0.79, 0.79])
+agent_pos_init = [-0.9, -0.8]

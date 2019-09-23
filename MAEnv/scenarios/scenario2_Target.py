@@ -58,7 +58,7 @@ class Scenario(BaseScenario):
     def reset_world(self, world):
 
         for i, agent in enumerate(world.agents):
-            agent.state.p_pos = np.random.uniform(-0.9, -0.8, world.dim_p)
+            agent.state.p_pos = np.random.uniform(T.agent_pos_init[0], T.agent_pos_init[1], world.dim_p)
             agent.state.p_vel = np.array([0, 0.05])  # 50 米/秒
             agent.state.p_acc = np.array([0, 0])
             agent.color = T.agent_color
