@@ -135,10 +135,6 @@ if __name__ == '__main__':
             augment_view(env, world, NewController)
             # env.render()  # could be commented out
 
-            # # for inspecting
-            # if step == 50:
-            #     print('new start')
-
             # for recording
             if step == arglist.step_max:
                 print('>>>>>>>>>>> Episode', episode)
