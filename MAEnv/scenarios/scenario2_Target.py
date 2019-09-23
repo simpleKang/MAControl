@@ -77,7 +77,6 @@ class Scenario(BaseScenario):
     def benchmark_data(self, agent, world):
         # returns data for benchmarking purposes
         rew = 0
-        dangers = 0
         occupied_landmarks = 0
         min_dists = 0
         for l in world.landmarks:
@@ -86,20 +85,7 @@ class Scenario(BaseScenario):
             rew -= min(dists)
             if min(dists) < 0.1:
                 occupied_landmarks += 1
-        if agent.collide:
-            for a in world.agents:
-                if agent == a:
-                    continue
-                if self.is_danger(a, agent):
-                    rew -= 1
-                    dangers += 1
-        return (rew, dangers, min_dists, occupied_landmarks)
-
-    def is_danger(self, agent1, agent2):
-        delta_pos = agent1.state.p_pos - agent2.state.p_pos
-        dist = np.sqrt(np.sum(np.square(delta_pos)))
-        dist_min = (agent1.size + agent2.size) * 1.5
-        return True if dist < dist_min else False
+        return rew, min_dists, occupied_landmarks
 
     def result(self, world):
         # TARGET-UAV分配情况
