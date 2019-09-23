@@ -311,29 +311,6 @@ class PolicyMaker_Auction(PolicyMaker):
                 elif PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][5] == 2:
                     DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=[0.0384, 0.3925, 0.5691])[0]
 
-                # # 另一种计算DEMANDED_UAV_NUM的方式
-                # if PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][4] == 2:
-                #     g_Defence = np.dot([5, 1, 2], [0.6, 0.2, 0.2])
-                #     g_Defence1 = int(np.floor(g_Defence))
-                #     g_Defence2 = int(np.ceil(g_Defence))
-                #     M = 5
-                #     DEMANDED_UAV_NUM = g_Defence1 if abs(g_Defence1-M) <= abs(g_Defence2-M) else g_Defence2
-                # elif PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][4] == 10:
-                #     g_Defence = np.dot([5, 1, 2], [0.2, 0.6, 0.2])
-                #     g_Defence1 = int(np.floor(g_Defence))
-                #     g_Defence2 = int(np.ceil(g_Defence))
-                #     M = 1
-                #     DEMANDED_UAV_NUM = g_Defence1 if abs(g_Defence1-M) <= abs(g_Defence2-M) else g_Defence2
-                # elif PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][4] == 5:
-                #     g_Defence = np.dot([5, 1, 2], [0.2, 0.2, 0.6])
-                #     g_Defence1 = int(np.floor(g_Defence))
-                #     g_Defence2 = int(np.ceil(g_Defence))
-                #     M = 2
-                #     DEMANDED_UAV_NUM = g_Defence1 if abs(g_Defence1-M) <= abs(g_Defence2-M) else g_Defence2
-
-                # # 最基础的DEMANDED_UAV_NUM的计算方式
-                # DEMANDED_UAV_NUM = PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][5]
-
                 if DEMANDED_UAV_NUM > self.swarm_size:
                     # print('WARNING: HARD TARGET ', PolicyMaker_Auction.Current_Target_Index)
                     CHOSEN_UAV_NUM = self.swarm_size
