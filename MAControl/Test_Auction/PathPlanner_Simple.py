@@ -7,17 +7,18 @@ class PathPlanner_Simple(PathPlanner):
 
     def __init__(self, name, env, world, agent_index, arglist):
         super(PathPlanner_Simple, self).__init__(name, env, world, agent_index, arglist)
-        self.waypoint_list = []             # 256×3的航点列表，第3列为航点状态 [0: 无航点] [1: 未飞] [2: pointA] [3: pointB] [4: 已到达]
-        self.pointAi = (0, 0)               # A点坐标
-        self.pointBi = (0, 0)               # B点坐标
-        self.pointB_index = 0               # 当前飞向的B点的索引
-        self.cycle_index = 1                # 航点列表循环的次数
-        self.total_cycle = 5                # 列表循环的总次数
-        self.current_wplist = -1            # 当前航点列表的索引
+        self.pointAi = (0, 0)               # A点坐标，含义不变
+        self.pointBi = (0, 0)               # B点坐标，非航线中某一航点，而是边界上此时刻生成航点
         self.path_pace = 50                 # PathPlanner的调用频率
         self.is_init = True                 # 是否为初始时刻
+        self.total_cycle = 5                # 列表循环的总次数，含义为第几次生成的航点
+        self.current_wplist = -1            # 当前航点列表的索引
         self.is_attacking = False           # 是否为正在执行
         self.waypoint_finished = False      # 航点是否已经飞完
+        self.waypoint_list = []             # 256×3的航点列表，第3列为航点状态 [0: 无航点] [1: 未飞] [2: pointA] [3: pointB] [4: 已到达]
+        self.pointB_index = 0               # 当前飞向的B点的索引
+        self.cycle_index = 1                # 航点列表循环的次数
+
         # 初始化航点列表
         self.waypoint_list, self.current_wplist = CW.creat_snake_waypoint_list(
                         self.waypoint_list, self.env.n-len(self.world.movable_targets), self.index, self.current_wplist)

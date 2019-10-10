@@ -14,7 +14,7 @@ import MAControl.Test_Movable_Target_Policy.PolicyMaker_Auction as T_PM_A
 
 def parse_args():
     parser = argparse.ArgumentParser("Control Experiments for Multi-Agent Environments")
-    parser.add_argument("--scenario", type=str, default="scenario3_Movable_Target", help="name of the scenario script")
+    parser.add_argument("--scenario", type=str, default="scenario4_Xuxiao", help="name of the scenario script")
     parser.add_argument("--step-max", type=int, default=4000, help="maximum steps")
     return parser.parse_args()
 
