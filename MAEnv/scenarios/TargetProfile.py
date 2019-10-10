@@ -1,14 +1,14 @@
 import numpy as np
 
 # target parameters
-num_targets = 5
+num_targets = 0
 target_value = [7, 5, 2, 3, 5]
 target_size = [2, 2, 2, 2, 2]
 target_defence = [1, 1, 1, 1, 1]
 target_pos = [[-0.5, 0.9], [0, 0.9], [0.5, -0.5], [0.0, 0.0], [-0.9, -0.9]]
 
 # movable target parameters
-m_num_targets = 5
+m_num_targets = 0
 m_target_value = [7, 5, 2, 3, 5]
 m_target_size = [2, 2, 2, 2, 2]
 m_target_defence = [1, 1, 1, 1, 1]

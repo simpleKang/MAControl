@@ -35,6 +35,7 @@ def make_env(arglist):
 def get_controller(env, world, arglist):
     ControllerSet = []
 
+    # 初始化小瓜子
     for i in range(env.n - len(world.movable_targets)):
         control = []
         control.append(PM_A.PolicyMaker_Auction("agent_%d" % i, env, world, i, arglist))
@@ -45,6 +46,7 @@ def get_controller(env, world, arglist):
         control.append(False)  # Isattacking
         ControllerSet.append(control)
 
+    # 初始化动目标
     for i in range(len(world.movable_targets)):
         control = []
         control.append(T_PM_A.PolicyMaker_Target("movable_target_%d" % i, env, world, i, arglist))
@@ -69,6 +71,7 @@ def update_action(env, world, obs_n, step, NewController):
     # get action
     action_n = []
 
+    # 小瓜子运动
     for i in range(env.n - len(world.movable_targets)):
 
         list_i = NewController[i][0]. \
@@ -85,6 +88,7 @@ def update_action(env, world, obs_n, step, NewController):
 
         action_n.append(actioni)
 
+    # 动目标运动
     for i in range(env.n - len(world.movable_targets), env.n):
 
         list_i = NewController[i][0]. \
@@ -138,5 +142,5 @@ if __name__ == '__main__':
         # time.sleep(0.01)
         augment_view(env, world, NewController)
         env.render()
-        # print('>>>> step', step)
+        print('>>>> step', step)
 

@@ -14,7 +14,7 @@ class Scenario(BaseScenario):
         world.damping = 0  # 取消第一种阻尼计算方式
         world.damping2 = 10  # 调整第二种阻尼计算方式的参数
         # set nums
-        num_agents = 10
+        num_agents = 1
         num_targets = T.num_targets
         num_m_target = T.m_num_targets
         num_obstacles = 0
@@ -81,8 +81,8 @@ class Scenario(BaseScenario):
 
         for i, agent in enumerate(world.agents):
             if i < len(world.agents) - T.m_num_targets:
-                agent.state.p_pos = np.random.uniform(-0.2, 0.2, world.dim_p)
-                agent.state.p_vel = np.random.uniform(-0.05, 0.05,world.dim_p)  # 50 米/秒
+                agent.state.p_pos = np.random.uniform(-0.5, 0.5, world.dim_p)
+                agent.state.p_vel = np.random.uniform(-0.05, 0.05, world.dim_p)  # 50 米/秒
                 agent.state.p_acc = np.array([0, 0])
                 agent.color = T.agent_color
             else:
