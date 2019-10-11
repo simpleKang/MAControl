@@ -16,3 +16,19 @@ for i, t in enumerate(c):
     print(i, t)
 
 z = 0
+
+vel = np.array([3,4])
+print(np.linalg.norm(vel))
+print(vel[1]/vel[0])
+intersection = [0]*2
+intersection[1] = [1, 2]
+intersection.append([3, 4])
+print(intersection[1])
+print(intersection[1][1])
+
+for i in range(3):
+    print(i,'\n')
+
+sm=[0]*2
+sm.insert(0,1)
+print(sm)

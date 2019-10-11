@@ -4,7 +4,8 @@ import argparse
 import time
 import MAControl.Test_Auction.InnerController_PID as IC_P
 import MAControl.Test_Auction.MotionController_L1_TECS as MC_L
-import MAControl.Test_Auction.PathPlanner_Simple as PP_S
+#import MAControl.Test_Auction.PathPlanner_Simple as PP_S
+import MAControl.Test_Auction.PathPlanner_generate_at_present as PP_G
 import MAControl.Test_Auction.PolicyMaker_Auction as PM_A
 import MAControl.Test_Movable_Target_Policy.InnerController_PID as T_IC_P
 import MAControl.Test_Movable_Target_Policy.MotionController_L1_TECS as T_MC_L
@@ -39,7 +40,7 @@ def get_controller(env, world, arglist):
     for i in range(env.n - len(world.movable_targets)):
         control = []
         control.append(PM_A.PolicyMaker_Auction("agent_%d" % i, env, world, i, arglist))
-        control.append(PP_S.PathPlanner_Simple("agent_%d" % i, env, world, i, arglist))
+        control.append(PP_G.PathPLanner_generate_at_present("agent_%d" % i, env, world, i, arglist))
         control.append(MC_L.MotionController_L1_TECS("agent_%d" % i, env, world, i, arglist))
         control.append(IC_P.InnerController_PID("agent_%d" % i, env, world, i, arglist))
         control.append(False)  # Arriveflag

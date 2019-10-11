@@ -18,9 +18,10 @@ class PathPLanner_generate_at_present(PathPlanner):
         self.waypoint_list = []       # 1×2的航点信息，每新增一个航点则增加一个列表，每个列表只存储一个航点
 
         # TODO 生成初始航点
-        self.waypoint_list, self.current_wplist = CW.create_simple_waypoint_list()
+        self.waypoint_list, self.current_wplist = CW.creat_initial_waypoint_list\
+            (world.agents[agent_index].state.p_pos, world.agents[agent_index].state.p_vel, 1)
 
-    def generate_new_point(self, para_list, obs, arrive_flag, step):
+    def planpath(self, para_list, obs, arrive_flag, step):
         if para_list[0] == 0:
             self.no_operation()
 
@@ -80,4 +81,4 @@ class PathPLanner_generate_at_present(PathPlanner):
     # TODO 生成新的航点
     def get_new_point(self):
         self.waypoint_list.append([0 for i in range(2)])
-
+        self.waypoint_list[-1] = CW.creat_random_edgepoint(self.waypoint_list[-2], 1)
