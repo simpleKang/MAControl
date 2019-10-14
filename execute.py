@@ -128,6 +128,10 @@ if __name__ == '__main__':
     step = 0
     start = time.time()
 
+    # 为每个小瓜子创建路径文件
+    for k in range(env.n - len(world.movable_targets)):
+        open('/home/wzq/pycode/MAC/MAControl/track/agent_%d_track.txt' % k, 'w')
+
     while True:
 
         # get action
@@ -138,6 +142,11 @@ if __name__ == '__main__':
         new_obs_n, rew_n, done_n, info_n = env.step(action_n)
         step += 1
         obs_n = new_obs_n
+
+        # 记录每个小瓜子每个step的位置
+        for k in range(env.n - len(world.movable_targets)):
+            with open('/home/wzq/pycode/MAC/MAControl/track/agent_%d_track.txt' % k, 'a') as f:
+                f.write(str(obs_n[k][2])+' '+str(obs_n[k][3])+'\n')
 
         # for displaying
         # time.sleep(0.01)

@@ -7,6 +7,7 @@ class PathPLanner_generate_at_present(PathPlanner):
 
     def __init__(self, name, env, world, agent_index, arglist):
         super().__init__(name, env, world, agent_index, arglist)
+        self.index = agent_index
         self.pointAi = (0, 0)         # A点坐标，即上一时刻已到达航点坐标
         self.pointBi = (0, 0)         # B点坐标，即此时待飞航点坐标
         # self.arrivals_current = 0     # 已经到达航点数
