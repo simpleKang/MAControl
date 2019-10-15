@@ -72,7 +72,7 @@ class PolicyMaker_Auction(PolicyMaker):
         selfpos = np.array(obs[2:4])
         selfvelunit = selfvel / np.sqrt(np.dot(selfvel, selfvel))
         selfdir = math.atan2(selfvel[1], selfvel[0])
-        d1 = 0  # 轴向视场距离
+        d1 = 0.1  # 轴向视场距离
         d2 = 0.2  # 轴向视场宽度
         d3 = 0.2  # 侧向视场宽度
         xx1 = -d3/2 * math.cos(selfdir) - d2/2 * math.sin(selfdir) * -1
