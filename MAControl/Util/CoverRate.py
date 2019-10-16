@@ -2,13 +2,16 @@ import numpy as np
 import math
 
 
-def update_area_cover(cell, area, obs_n, num):
+def update_area_cover(cell, area, last_cover, obs_n, num):
 
     area_width = 2            # 正方形区域实际边长
     scale = area_width/cell   # 离散度(比例尺)
     iter_range = 0.25         # 迭代区域大小
+    new_last = []
 
     for k in range(num):
+
+        new_last.append([])
 
         # 计算迭代区域的上下界
         x = obs_n[k][2]
@@ -32,8 +35,18 @@ def update_area_cover(cell, area, obs_n, num):
             for j in range(length_down, length_up):
                 target = np.array([scale*j-1, 1-scale*i])
                 if point_in_rec(point1, point2, point3, point4, target):
-                    area[i][j] = 1
-    return area
+                    if area[i][j] == 0:
+                        area[i][j] = 1
+                        new_last[k].append([i, j])
+                    elif area[i][j] > 0 and [i, j] in last_cover[k]:
+                        new_last[k].append([i, j])
+                    elif area[i][j] > 0 and [i, j] not in last_cover[k]:
+                        area[i][j] += 1
+                        new_last[k].append([i, j])
+                    else:
+                        raise Exception('Unexpected situation!!!')
+
+    return area, new_last
 
 
 def cal_cover_rate(area):
@@ -42,11 +55,12 @@ def cal_cover_rate(area):
     cover = 0
     for i in range(length):
         for j in range(width):
-            if area[i][j] == 1:
+            if area[i][j] > 0:
                 cover += 1
     cover_rate = cover / (length*width)
+    overlap_rate = np.sum(area) / (length*width)
 
-    return cover_rate
+    return cover_rate, overlap_rate
 
 
 def agent_cover_range(obs):
