@@ -80,7 +80,8 @@ def creat_random_edgepoint(pos, Edge):
 
     candidate_edge = []  #候选边编号
     new_edgepoint = []
-    #判断目前航点所在边编号。上边1,下边2，右边3，左边4
+
+    # 判断目前航点所在边编号。上边1,下边2，右边3，左边4
     if pos[0] == Edge:
         current_edge = 3
     elif pos[0] == -1 * Edge:
@@ -91,14 +92,17 @@ def creat_random_edgepoint(pos, Edge):
         current_edge = 2
     else:
         current_edge = 1
-    #生成候选边序列，即不包含目前边的边序列
+
+    # 生成候选边序列，即不包含目前边的边序列
     for i in range(4):
         if i != (current_edge - 1):
             candidate_edge.append(i+1)
-    #候选边序列随机选取边编号，为新航点所在边编号;并在该边上随机选取一点
+
+    # 候选边序列随机选取边编号，为新航点所在边编号;并在该边上随机选取一点
     new_edge = candidate_edge[random.randint(0, 2)]
     random_point = random.uniform(-1 * Edge, Edge)
-    #根据新航点所在边编号，生成新航点
+
+    # 根据新航点所在边编号，生成新航点
     if new_edge == 1:
         new_edgepoint = [random_point, Edge]
     elif new_edge == 2:

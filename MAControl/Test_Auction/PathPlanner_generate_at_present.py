@@ -3,10 +3,10 @@ import MAControl.Util.CreateWaypoint as CW
 import math
 
 
-class PathPLanner_generate_at_present(PathPlanner):
+class PathPlanner_generate_at_present(PathPlanner):
 
     def __init__(self, name, env, world, agent_index, arglist):
-        super().__init__(name, env, world, agent_index, arglist)
+        super(PathPlanner_generate_at_present, self).__init__(name, env, world, agent_index, arglist)
         self.index = agent_index
         self.pointAi = (0, 0)         # A点坐标，即上一时刻已到达航点坐标
         self.pointBi = (0, 0)         # B点坐标，即此时待飞航点坐标
@@ -18,7 +18,6 @@ class PathPLanner_generate_at_present(PathPlanner):
         self.is_attacking = False     # 是否为正在执行
         self.waypoint_list = []       # 1×2的航点信息，每新增一个航点则增加一个列表，每个列表只存储一个航点
 
-        # TODO 生成初始航点
         self.waypoint_list, self.current_wplist = CW.creat_initial_waypoint_list\
             (world.agents[agent_index].state.p_pos, world.agents[agent_index].state.p_vel, 1)
 
@@ -79,7 +78,6 @@ class PathPLanner_generate_at_present(PathPlanner):
         self.current_wplist += 1
         self.waypoint_list[self.current_wplist] = [coord[0], coord[1]]
 
-    # TODO 生成新的航点
     def get_new_point(self):
         self.waypoint_list.append([0 for i in range(2)])
         self.waypoint_list[-1] = CW.creat_random_edgepoint(self.waypoint_list[-2], 1)

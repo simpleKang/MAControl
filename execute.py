@@ -3,7 +3,8 @@
 import argparse
 import numpy as np
 import time
-import MAControl.Util.CoverRate as CR
+import os
+import MAControl.Util.OnlineCoverRate as CR
 import MAControl.Test_Auction.InnerController_PID as IC_P
 import MAControl.Test_Auction.MotionController_L1_TECS as MC_L
 import MAControl.Test_Auction.PathPlanner_Simple as PP_S
@@ -19,7 +20,6 @@ def parse_args():
     parser = argparse.ArgumentParser("Control Experiments for Multi-Agent Environments")
     parser.add_argument("--scenario", type=str, default="scenario4_Xuxiao", help="name of the scenario script")
     parser.add_argument("--step-max", type=int, default=4000, help="maximum steps")
-    parser.add_argument("--track_file", type=str, default="/home/wzq/pycode/MAC/MAControl/track", help="file path of agent's track")
     parser.add_argument("--cover_edge", type=int, default=200, help="number of cells of one edge")
     parser.add_argument("--OnlineCoverRate", type=int, default=1, help="Online or offline to calculate cover rate")
     return parser.parse_args()
@@ -46,7 +46,7 @@ def get_controller(env, world, arglist):
         control = []
         control.append(PM_A.PolicyMaker_Auction("agent_%d" % i, env, world, i, arglist))
         # control.append(PP_S.PathPlanner_Simple("agent_%d" % i, env, world, i, arglist))
-        control.append(PP_G.PathPLanner_generate_at_present("agent_%d" % i, env, world, i, arglist))
+        control.append(PP_G.PathPlanner_generate_at_present("agent_%d" % i, env, world, i, arglist))
         control.append(MC_L.MotionController_L1_TECS("agent_%d" % i, env, world, i, arglist))
         control.append(IC_P.InnerController_PID("agent_%d" % i, env, world, i, arglist))
         control.append(False)  # Arriveflag
@@ -128,7 +128,7 @@ if __name__ == '__main__':
     # Create environment
     env, world = make_env(arglist)
 
-    with open(arglist.track_file + '/para.txt', 'w') as f:
+    with open(os.path.dirname(__file__) + '/track/para.txt', 'w') as f:
         f.write(str(arglist.cover_edge)+'\n')
         f.write(str(env.n - len(world.movable_targets)) + '\n')
 
@@ -141,7 +141,7 @@ if __name__ == '__main__':
 
     # 为每个小瓜子创建路径文件
     for k in range(env.n - len(world.movable_targets)):
-        open(arglist.track_file+'/agent_%d_track.txt' % k, 'w')
+        open(os.path.dirname(__file__) + '/track/agent_%d_track.txt' % k, 'w')
 
     if arglist.OnlineCoverRate:
         last_cover = []
@@ -171,7 +171,7 @@ if __name__ == '__main__':
 
         # 记录每个小瓜子每个step的位置
         for k in range(env.n - len(world.movable_targets)):
-            with open(arglist.track_file+'/agent_%d_track.txt' % k, 'a') as f:
+            with open(os.path.dirname(__file__) + '/track/agent_%d_track.txt' % k, 'a') as f:
                 f.write(str(obs_n[k][0])+' '+str(obs_n[k][1])+' '+str(obs_n[k][2])+' '+str(obs_n[k][3])+'\n')
 
         # for displaying

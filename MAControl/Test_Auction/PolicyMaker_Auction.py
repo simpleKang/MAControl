@@ -1,9 +1,9 @@
 from MAControl.Base.PolicyMaker import PolicyMaker
+from MAControl.Util.PointInRec import point_in_rec
+from MAControl.Util.Constrain import constrain
 import random
 import numpy as np
 import math
-from MAControl.Util.PointInRec import point_in_rec
-from MAControl.Util.Constrain import constrain
 
 
 class PolicyMaker_Auction(PolicyMaker):

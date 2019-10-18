@@ -1,12 +1,16 @@
 import numpy as np
+import os
 import matplotlib.pyplot as plt
 
-para = np.loadtxt('/home/wzq/pycode/MAC/MAControl/track/para.txt')
+curdir = os.path.dirname(__file__)
+pardir = os.path.dirname(os.path.dirname(curdir))
+
+para = np.loadtxt(pardir + '/track/para.txt')
 num = int(para[1])
 
 track = []
 for i in range(num):
-    track.append(np.loadtxt('/home/wzq/pycode/MAC/MAControl/track/agent_%d_track.txt' % i))
+    track.append(np.loadtxt(pardir + '/track/agent_%d_track.txt' % i))
 
 plt.figure()
 line = plt.gca()

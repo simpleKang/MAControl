@@ -58,7 +58,7 @@ def cal_cover_rate(area):
             if area[i][j] > 0:
                 cover += 1
     cover_rate = cover / (length*width)
-    overlap_rate = np.sum(area) / (length*width)
+    overlap_rate = (np.sum(area) - cover) / (length*width)
 
     return cover_rate, overlap_rate
 

@@ -1,16 +1,20 @@
 import numpy as np
-import MAControl.Util.CoverRate as CR
+import os
+import MAControl.Util.OnlineCoverRate as CR
 
-open('/home/wzq/pycode/MAC/MAControl/cover_rate.txt', 'w')
+curdir = os.path.dirname(__file__)
+pardir = os.path.dirname(os.path.dirname(curdir))
 
-para = np.loadtxt('/home/wzq/pycode/MAC/MAControl/track/para.txt')
+open(pardir + '/cover_rate.txt', 'w')
+
+para = np.loadtxt(pardir + '/track/para.txt')
 cell = int(para[0])
 num = int(para[1])
 
 track = []
 last_cover = []
 for i in range(num):
-    track.append(np.loadtxt('/home/wzq/pycode/MAC/MAControl/track/agent_%d_track.txt' % i))
+    track.append(np.loadtxt(pardir + '/track/agent_%d_track.txt' % i))
     last_cover.append([])
 
 area = np.zeros((cell, cell))
@@ -59,10 +63,10 @@ for l in range(0, np.size(track[-1], 0), 5):
     print('Total ', np.size(track[-1], 0), ' >>> step ', l)
 
     cover_rate, overlap_rate = CR.cal_cover_rate(area)
-    with open('/home/wzq/pycode/MAC/MAControl/cover_rate.txt', 'a') as c:
+    with open(pardir + '/cover_rate.txt', 'a') as c:
         c.write(str(l) + ' ' + str(cover_rate) + ' ' + str(overlap_rate) + '\n')
 
-np.savetxt('/home/wzq/pycode/MAC/MAControl/area.text', area, fmt='%d')
+np.savetxt(pardir + '/area.text', area, fmt='%d')
 
 print('Finished!')
 
