@@ -96,19 +96,19 @@ class PolicyMaker_Auction(PolicyMaker):
                 seen_target.append(target)
                 truetype = target[-2]
                 if truetype == 1:
-                    gtype = np.random.choice([1, 2, 3], 1, p=[1.0, 0.0, 0.0])
+                    gtype = np.random.choice([1, 2, 3], 1, p=self.arglist.p1)
                     if gtype == 2:
                         seen_target[-1][-4:-1] = [10, 1, 2]
                     elif gtype == 3:
                         seen_target[-1][-4:-1] = [5, 2, 3]
                 elif truetype == 2:
-                    gtype = np.random.choice([1, 2, 3], 1, p=[0.0, 1.0, 0.0])
+                    gtype = np.random.choice([1, 2, 3], 1, p=self.arglist.p2)
                     if gtype == 3:
                         seen_target[-1][-4:-1] = [5, 2, 3]
                     elif gtype == 1:
                         seen_target[-1][-4:-1] = [2, 5, 1]
                 elif truetype == 3:
-                    gtype = np.random.choice([1, 2, 3], 1, p=[0.0, 0.0, 1.0])
+                    gtype = np.random.choice([1, 2, 3], 1, p=self.arglist.p3)
                     if gtype == 1:
                         seen_target[-1][-4:-1] = [2, 5, 1]
                     elif gtype == 2:
@@ -305,11 +305,11 @@ class PolicyMaker_Auction(PolicyMaker):
                 # 根据当前目标的类型估计，重新讨论目标的类型（含有随机性），进而确定需要的UAV个数
                 DEMANDED_UAV_NUM = 0
                 if PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][5] == 5:
-                    DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=[1.0, 0.0, 0.0])[0]
+                    DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=self.arglist.q1)[0]
                 elif PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][5] == 1:
-                    DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=[0.0, 1.0, 0.0])[0]
+                    DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=self.arglist.q2)[0]
                 elif PolicyMaker_Auction.Found_Target_Set[PolicyMaker_Auction.Current_Target_Index][5] == 2:
-                    DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=[0.0, 0.0, 1.0])[0]
+                    DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=self.arglist.q3)[0]
 
                 if DEMANDED_UAV_NUM > self.swarm_size:
                     # print('WARNING: HARD TARGET ', PolicyMaker_Auction.Current_Target_Index)

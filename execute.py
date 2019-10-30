@@ -21,6 +21,12 @@ def parse_args():
     parser.add_argument("--scenario", type=str, default="scenario2_Target", help="name of the scenario script")
     parser.add_argument("--step-max", type=int, default=3000, help="maximum steps")
     parser.add_argument("--episode-max", type=int, default=200, help="maximum episodes")
+    parser.add_argument("--p1", type=list, default=[1.0, 0.0, 0.0], help="P: Line one")
+    parser.add_argument("--p2", type=list, default=[0.0, 1.0, 0.0], help="P: Line Two")
+    parser.add_argument("--p3", type=list, default=[0.0, 0.0, 1.0], help="P: Line Three")
+    parser.add_argument("--q1", type=list, default=[1.0, 0.0, 0.0], help="Q: Line One")
+    parser.add_argument("--q2", type=list, default=[0.0, 1.0, 0.0], help="Q: Line Two")
+    parser.add_argument("--q3", type=list, default=[0.0, 0.0, 1.0], help="Q: Line Three")
     return parser.parse_args()
 
 
