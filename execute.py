@@ -18,7 +18,7 @@ logging.info('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 def parse_args():
     parser = argparse.ArgumentParser("Control Experiments for Multi-Agent Environments")
-    parser.add_argument("--scenario", type=str, default="scenario2_Target", help="name of the scenario script")
+    parser.add_argument("--scenario", type=str, default="scenario_paper", help="name of the scenario script")
     parser.add_argument("--step-max", type=int, default=3000, help="maximum steps")
     parser.add_argument("--episode-max", type=int, default=200, help="maximum episodes")
     parser.add_argument("--p1", type=list, default=[1.0, 0.0, 0.0], help="P: Line one")
@@ -27,6 +27,10 @@ def parse_args():
     parser.add_argument("--q1", type=list, default=[1.0, 0.0, 0.0], help="Q: Line One")
     parser.add_argument("--q2", type=list, default=[0.0, 1.0, 0.0], help="Q: Line Two")
     parser.add_argument("--q3", type=list, default=[0.0, 0.0, 1.0], help="Q: Line Three")
+    parser.add_argument("--numU", type=int, default=20, help="how many UAVs")
+    parser.add_argument("--typeT", type=list, default=[1, 1, 1, 1, 1, 1, 1, 1, 1, 1], help="target types")
+    parser.add_argument("--valueT", type=list, default=[2, 2, 2, 2, 2, 2, 2, 2, 2, 2], help="target values")
+    parser.add_argument("--defenceT", type=list, default=[5, 5, 5, 5, 5, 5, 5, 5, 5, 5], help="target hit points")
     return parser.parse_args()
 
 
@@ -38,7 +42,7 @@ def make_env(arglist):
     scenario = scenarios.load(arglist.scenario + ".py").Scenario()
 
     # create world and env
-    world = scenario.make_world()
+    world = scenario.make_s_world(arglist.numU, arglist.typeT, arglist.valueT, arglist.defenceT)
     env = MultiAgentEnv(world, scenario.reset_world, scenario.reward, scenario.observation)
     return env, world
 

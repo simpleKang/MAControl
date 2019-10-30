@@ -8,13 +8,13 @@ import MAEnv.scenarios.TargetProfile as T
 
 
 class Scenario(BaseScenario):
-    def make_world(self):
+    def make_s_world(self, agent_num, target_type, target_value, target_defence):
         world = World()
         # set any world properties first
         world.damping = 0  # 取消第一种阻尼计算方式
         world.damping2 = 10  # 调整第二种阻尼计算方式的参数
         # set nums
-        num_agents = T.num_agents
+        num_agents = agent_num
         num_targets = T.num_targets
         num_obstacles = 0
         num_grids = 5
@@ -31,11 +31,11 @@ class Scenario(BaseScenario):
             landmark.name = 'target %d' % i
             landmark.collide = False
             landmark.movable = False
-            landmark.value = T.target_value[i]
+            landmark.value = target_value[i]
             landmark.size = T.target_size[i] * 0.01
-            landmark.defence = T.target_defence[i]
+            landmark.defence = target_defence[i]
             landmark.attacking = False
-            landmark.type = T.target_type[i]
+            landmark.type = target_type[i]
         world.obstacles = [Landmark() for i in range(num_obstacles)]
         for i, landmark in enumerate(world.obstacles):
             landmark.name = 'obstacle %d' % i
