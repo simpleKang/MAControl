@@ -29,8 +29,6 @@ def parse_args():
     parser.add_argument("--q3", type=list, default=[0.0, 0.0, 1.0], help="Q: Line Three")
     parser.add_argument("--numU", type=int, default=20, help="how many UAVs")
     parser.add_argument("--typeT", type=list, default=[1, 1, 1, 1, 1, 1, 1, 1, 1, 1], help="target types")
-    parser.add_argument("--valueT", type=list, default=[2, 2, 2, 2, 2, 2, 2, 2, 2, 2], help="target values")
-    parser.add_argument("--defenceT", type=list, default=[5, 5, 5, 5, 5, 5, 5, 5, 5, 5], help="target hit points")
     return parser.parse_args()
 
 
@@ -42,7 +40,7 @@ def make_env(arglist):
     scenario = scenarios.load(arglist.scenario + ".py").Scenario()
 
     # create world and env
-    world = scenario.make_s_world(arglist.numU, arglist.typeT, arglist.valueT, arglist.defenceT)
+    world = scenario.make_s_world(arglist.numU, arglist.typeT)
     env = MultiAgentEnv(world, scenario.reset_world, scenario.reward, scenario.observation)
     return env, world
 

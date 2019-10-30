@@ -8,7 +8,7 @@ import MAEnv.scenarios.TargetProfile as T
 
 
 class Scenario(BaseScenario):
-    def make_s_world(self, agent_num, target_type, target_value, target_defence):
+    def make_s_world(self, agent_num, target_type):
         world = World()
         # set any world properties first
         world.damping = 0  # 取消第一种阻尼计算方式
@@ -27,13 +27,15 @@ class Scenario(BaseScenario):
             agent.size = 0.01  # 10米
         # add landmarks
         world.targets = [Landmark() for i in range(num_targets)]
+        VALUE = [2, 10, 5]
+        DEFENCE = [5, 1, 2]
         for i, landmark in enumerate(world.targets):
             landmark.name = 'target %d' % i
             landmark.collide = False
             landmark.movable = False
-            landmark.value = target_value[i]
+            landmark.value = VALUE[target_type[i]-1]
             landmark.size = T.target_size[i] * 0.01
-            landmark.defence = target_defence[i]
+            landmark.defence = DEFENCE[target_type[i]-1]
             landmark.attacking = False
             landmark.type = target_type[i]
         world.obstacles = [Landmark() for i in range(num_obstacles)]
