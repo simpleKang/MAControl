@@ -1,6 +1,7 @@
 import numpy as np
 
 num_targets = 6
+num_agents = 10
 
 target_type = [1, 1, 1, 1, 2, 3]  # 1=发射车 2=雷达 3=补给车
 target_value = [2, 2, 2, 2, 10, 5]
