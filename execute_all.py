@@ -1,2 +1,2 @@
 import os
-os.system("python ./execute.py")
+os.system("python ./MAControl/Util/TempTest.py")
