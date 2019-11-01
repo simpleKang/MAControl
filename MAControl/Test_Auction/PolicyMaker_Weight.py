@@ -12,19 +12,17 @@ class PolicyMaker_Weight(PolicyMaker):
 
     def __init__(self, name, env, world, agent_index, arglist):
         super(PolicyMaker_Weight, self).__init__(name, env, world, agent_index, arglist)
-        self.opt_index = 0
-        self.decision = 0
-        self.friends_in_sight = []
-        self.targets_in_sight = []
-        self.current_friends = []
-        self.current_targets = []
-        self.wait_step = -1
-        self.init_step = 200
-        self.after_decision_step = 0
-        self.is_target_visible = False
-        self.target_step = 1000
-        self.num = env.n - len(world.movable_targets)
-        self.w = [0.33, 0.33, 0.33]
+        self.opt_index = 0                    # 操作数, 目前有0 / 1 / 10
+        self.decision = 0                     # 决策内容
+        self.friends_in_sight = list()        # 决策前存储视野中友军
+        self.targets_in_sight = list()        # 决策前存储视野中目标
+        self.current_friends = list()         # 当前视野中友军
+        self.current_targets = list()         # 当前视野中目标
+        self.wait_step = -1                   # 决定开始决策前的等待步长
+        self.init_step = 200                  # 初始前XX步内不进行任何决策
+        self.after_decision_step = 0          # 决策后XX步内不进行任何决策
+        self.num = env.n - len(world.movable_targets)   # 小瓜子数量
+        self.w = [0.33, 0.33, 0.33]           # 权重 w1 / w2 / w3
 
         curdir = os.path.dirname(__file__)
         pardir = os.path.dirname(os.path.dirname(curdir))
@@ -159,9 +157,6 @@ class PolicyMaker_Weight(PolicyMaker):
 
         self.after_decision_step -= 1
         self.init_step -= 1
-        self.target_step -= 1
-        if self.target_step < 0:
-            self.is_target_visible = True
 
         self.opt_index = 0
         self.decision = 0
