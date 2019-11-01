@@ -11,8 +11,9 @@ class Scenario(BaseScenario):
     def make_world(self):
         world = World()
         # set any world properties first
-        world.damping = 0  # 取消第一种阻尼计算方式
-        world.damping2 = 10  # 调整第二种阻尼计算方式的参数
+        world.damping = 0     # 取消第一种阻尼计算方式
+        world.damping2 = 10   # 调整第二种阻尼计算方式的参数
+        world.edge = T.edge   # 确定边界
         # set nums
         num_agents = 10
         num_targets = T.num_targets
@@ -152,4 +153,3 @@ class Scenario(BaseScenario):
         a_front = np.dot(a1, vel_front_unit) + np.dot(a2, vel_front_unit)
         a_right = np.dot(a2, vel_right_unit) + np.dot(a2, vel_right_unit)
         return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + [a_front] + [a_right])
-

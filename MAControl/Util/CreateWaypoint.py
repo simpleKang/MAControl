@@ -55,30 +55,29 @@ def create_simple_waypoint_list(waypoint_list, new_list_index, init_point, Edge)
     new_list_index += 1
 
 
-def creat_initial_waypoint_list(pos, vel, Edge=1):
+def creat_veledge_point(pos, vel, Edge):
 
     intersection = [[0]*2 for i in range(4)]
-    waypoint_list = [[0]*2]
+    waypoint_list = list()
     vel_arg = round((vel[1]/vel[0]), 2)
-    intersection[0] = [pos[0] + (Edge - pos[1]) / vel_arg, 1]
-    intersection[1] = [pos[0] - (Edge + pos[1]) / vel_arg, -1]
-    intersection[2] = [1, pos[1] + (Edge - pos[0]) * vel_arg]
-    intersection[3] = [-1, pos[1] - (Edge + pos[0]) * vel_arg]
+    intersection[0] = [pos[0] + (Edge - pos[1]) / vel_arg, Edge]
+    intersection[1] = [pos[0] - (Edge + pos[1]) / vel_arg, -Edge]
+    intersection[2] = [Edge, pos[1] + (Edge - pos[0]) * vel_arg]
+    intersection[3] = [-Edge, pos[1] - (Edge + pos[0]) * vel_arg]
     for i in range(4):
         if abs(intersection[i][0]) <= Edge and abs(intersection[i][1]) <= Edge:
-            if (intersection[i][0] - pos[0])/ vel[0] > 0:
-                waypoint_list[0] = intersection[i]
+            if (intersection[i][0] - pos[0]) / vel[0] > 0:
+                waypoint_list = intersection[i]
                 break
         else:
-            waypoint_list[0] = pos
-    current_wplist = 0
+            waypoint_list = pos
 
-    return waypoint_list, current_wplist
+    return waypoint_list
 
 
 def creat_random_edgepoint(pos, Edge):
 
-    candidate_edge = []  #候选边编号
+    candidate_edge = []  # 候选边编号
     new_edgepoint = []
 
     # 判断目前航点所在边编号。上边1,下边2，右边3，左边4

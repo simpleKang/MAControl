@@ -5,11 +5,13 @@ import MAControl.Util.OnlineCoverRate as CR
 curdir = os.path.dirname(__file__)
 pardir = os.path.dirname(os.path.dirname(curdir))
 
-open(pardir + '/cover_rate.txt', 'w')
-
 para = np.loadtxt(pardir + '/track/para.txt')
 cell = int(para[0])
 num = int(para[1])
+
+para_w = np.loadtxt(pardir + '/track/para_w.txt')
+txt_name = '/cover_rate-%s-%s-%s.txt' % (str(para_w[0]), str(para_w[1]), str(para_w[2]))
+open(pardir + txt_name, 'w')
 
 track = []
 last_cover = []
@@ -63,10 +65,9 @@ for l in range(0, np.size(track[-1], 0), 5):
     print('Total ', np.size(track[-1], 0), ' >>> step ', l)
 
     cover_rate, overlap_rate = CR.cal_cover_rate(area)
-    with open(pardir + '/cover_rate.txt', 'a') as c:
+    with open(pardir + txt_name, 'a') as c:
         c.write(str(l) + ' ' + str(cover_rate) + ' ' + str(overlap_rate) + '\n')
 
 np.savetxt(pardir + '/area.text', area, fmt='%d')
 
 print('Finished!')
-

@@ -10,6 +10,7 @@ import MAControl.Test_Auction.MotionController_L1_TECS as MC_L
 import MAControl.Test_Auction.PathPlanner_Simple as PP_S
 import MAControl.Test_Auction.PathPlanner_generate_at_present as PP_G
 import MAControl.Test_Auction.PolicyMaker_Auction as PM_A
+import MAControl.Test_Auction.PolicyMaker_Weight as PM_V
 import MAControl.Test_Movable_Target_Policy.InnerController_PID as T_IC_P
 import MAControl.Test_Movable_Target_Policy.MotionController_L1_TECS as T_MC_L
 import MAControl.Test_Movable_Target_Policy.PathPlanner_Simple as T_PP_S
@@ -19,9 +20,9 @@ import MAControl.Test_Movable_Target_Policy.PolicyMaker_Auction as T_PM_A
 def parse_args():
     parser = argparse.ArgumentParser("Control Experiments for Multi-Agent Environments")
     parser.add_argument("--scenario", type=str, default="scenario4_Xuxiao", help="name of the scenario script")
-    parser.add_argument("--step-max", type=int, default=4000, help="maximum steps")
+    parser.add_argument("--step_max", type=int, default=4000, help="maximum steps")
     parser.add_argument("--cover_edge", type=int, default=200, help="number of cells of one edge")
-    parser.add_argument("--OnlineCoverRate", type=int, default=1, help="Online or offline to calculate cover rate")
+    parser.add_argument("--OnlineCoverRate", type=int, default=0, help="Online or offline to calculate cover rate")
     return parser.parse_args()
 
 
@@ -43,8 +44,9 @@ def get_controller(env, world, arglist):
 
     # 初始化小瓜子
     for i in range(env.n - len(world.movable_targets)):
-        control = []
-        control.append(PM_A.PolicyMaker_Auction("agent_%d" % i, env, world, i, arglist))
+        control = list()
+        # control.append(PM_A.PolicyMaker_Auction("agent_%d" % i, env, world, i, arglist))
+        control.append(PM_V.PolicyMaker_Weight("agent_%d" % i, env, world, i, arglist))
         # control.append(PP_S.PathPlanner_Simple("agent_%d" % i, env, world, i, arglist))
         control.append(PP_G.PathPlanner_generate_at_present("agent_%d" % i, env, world, i, arglist))
         control.append(MC_L.MotionController_L1_TECS("agent_%d" % i, env, world, i, arglist))
@@ -55,7 +57,7 @@ def get_controller(env, world, arglist):
 
     # 初始化动目标
     for i in range(len(world.movable_targets)):
-        control = []
+        control = list()
         control.append(T_PM_A.PolicyMaker_Target("movable_target_%d" % i, env, world, i, arglist))
         control.append(T_PP_S.PathPlanner_Simple("movable_target_%d" % i, env, world, i, arglist))
         control.append(T_MC_L.MotionController_L1_TECS("movable_target_%d" % i, env, world, i, arglist))
@@ -70,7 +72,7 @@ def get_controller(env, world, arglist):
 def update_action(env, world, obs_n, step, NewController):
 
     # WorldTarget
-    WorldTarget = []
+    WorldTarget = list()
     for i, landmark in enumerate(world.targets):
         WorldTarget.append([landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.state.p_vel[0],
                             landmark.state.p_vel[1], landmark.value, landmark.defence])
@@ -143,12 +145,12 @@ if __name__ == '__main__':
     for k in range(env.n - len(world.movable_targets)):
         open(os.path.dirname(__file__) + '/track/agent_%d_track.txt' % k, 'w')
 
-    if arglist.OnlineCoverRate:
-        last_cover = []
-        area = np.zeros((arglist.cover_edge, arglist.cover_edge))
-        open('cover_rate.txt', 'w')
-        for k in range(env.n - len(world.movable_targets)):
-            last_cover.append([])
+    # if arglist.OnlineCoverRate:
+    #     last_cover = list()
+    #     area = np.zeros((arglist.cover_edge, arglist.cover_edge))
+    #     open('cover_rate.txt', 'w')
+    #     for k in range(env.n - len(world.movable_targets)):
+    #         last_cover.append([])
 
     while True:
 
@@ -161,13 +163,13 @@ if __name__ == '__main__':
         step += 1
         obs_n = new_obs_n
 
-        if arglist.OnlineCoverRate:
-            if step % 5 == 0:
-                area, last_cover = CR.update_area_cover(arglist.cover_edge, area, last_cover, obs_n, env.n - len(world.movable_targets))
-                cover_rate, overlap_rate = CR.cal_cover_rate(area)
-                with open('cover_rate.txt', 'a') as c:
-                    c.write(str(step)+' '+str(cover_rate)+' '+str(overlap_rate)+'\n')
-                print('>>>> cover rate ', cover_rate)
+        # if arglist.OnlineCoverRate:
+        #     if step % 5 == 0:
+        #         area, last_cover = CR.update_area_cover(arglist.cover_edge, area, last_cover, obs_n, env.n - len(world.movable_targets))
+        #         cover_rate, overlap_rate = CR.cal_cover_rate(area)
+        #         with open('cover_rate.txt', 'a') as c:
+        #             c.write(str(step)+' '+str(cover_rate)+' '+str(overlap_rate)+'\n')
+        #         print('>>>> cover rate ', cover_rate)
 
         # 记录每个小瓜子每个step的位置
         for k in range(env.n - len(world.movable_targets)):
