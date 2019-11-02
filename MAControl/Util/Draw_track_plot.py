@@ -46,4 +46,3 @@ plt.xlabel('X / km')
 plt.ylabel('Y / km')
 # plt.savefig('track %d.png' % k)
 plt.show()
-

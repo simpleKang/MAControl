@@ -68,6 +68,6 @@ for l in range(0, np.size(track[-1], 0), 5):
     with open(pardir + txt_name, 'a') as c:
         c.write(str(l) + ' ' + str(cover_rate) + ' ' + str(overlap_rate) + '\n')
 
-np.savetxt(pardir + '/area.text', area, fmt='%d')
+# np.savetxt(pardir + '/area.text', area, fmt='%d')
 
 print('Finished!')

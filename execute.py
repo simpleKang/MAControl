@@ -37,11 +37,18 @@ def make_env(arglist):
     # create world and env
     world = scenario.make_world()
     env = MultiAgentEnv(world, scenario.reset_world, scenario.reward, scenario.observation)
-    return env, world
+
+    # creat WorldTarget
+    WorldTarget = list()
+    for i, landmark in enumerate(world.targets):
+        WorldTarget.append([landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.value, landmark.defence])
+
+    return env, world, WorldTarget
 
 
 def get_controller(env, world, arglist):
-    ControllerSet = []
+
+    ControllerSet = list()
 
     # 初始化小瓜子
     for i in range(env.n - len(world.movable_targets)):
@@ -49,8 +56,10 @@ def get_controller(env, world, arglist):
         # control.append(PM_A.PolicyMaker_Auction("agent_%d" % i, env, world, i, arglist))
         # control.append(PM_V.PolicyMaker_Weight("agent_%d" % i, env, world, i, arglist))
         control.append(PM_T.PolicyMaker_Weight_T("agent_%d" % i, env, world, i, arglist))
+
         # control.append(PP_S.PathPlanner_Simple("agent_%d" % i, env, world, i, arglist))
         control.append(PP_G.PathPlanner_generate_at_present("agent_%d" % i, env, world, i, arglist))
+
         control.append(MC_L.MotionController_L1_TECS("agent_%d" % i, env, world, i, arglist))
         control.append(IC_P.InnerController_PID("agent_%d" % i, env, world, i, arglist))
         control.append(False)  # Arriveflag
@@ -71,16 +80,10 @@ def get_controller(env, world, arglist):
     return ControllerSet
 
 
-def update_action(env, world, obs_n, step, NewController):
-
-    # WorldTarget
-    WorldTarget = list()
-    for i, landmark in enumerate(world.targets):
-        WorldTarget.append([landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.state.p_vel[0],
-                            landmark.state.p_vel[1], landmark.value, landmark.defence])
+def update_action(env, world, WorldTarget, obs_n, step, NewController):
 
     # get action
-    action_n = []
+    action_n = list()
 
     # 小瓜子运动
     for i in range(env.n - len(world.movable_targets)):
@@ -88,8 +91,8 @@ def update_action(env, world, obs_n, step, NewController):
         list_i = NewController[i][0]. \
             make_policy(WorldTarget, obs_n, step)
 
-        pointAi, pointBi, finishedi, NewController[i][5] = NewController[i][1].\
-            planpath(list_i, obs_n[i], NewController[i][4], step)
+        pointAi, pointBi, finishedi, NewController[i][5], WorldTarget = NewController[i][1].\
+            planpath(list_i, obs_n[i], NewController[i][4], step, WorldTarget)
 
         acctEi, acclEi, NewController[i][4] = NewController[i][2]. \
             get_expected_action(obs_n[i], pointAi, pointBi, step, finishedi)
@@ -116,7 +119,7 @@ def update_action(env, world, obs_n, step, NewController):
 
         action_n.append(actioni)
 
-    return action_n
+    return action_n, WorldTarget
 
 
 def augment_view(env, world, NewController):
@@ -130,7 +133,7 @@ if __name__ == '__main__':
     arglist = parse_args()
 
     # Create environment
-    env, world = make_env(arglist)
+    env, world, worldtarget = make_env(arglist)
 
     with open(os.path.dirname(__file__) + '/track/para.txt', 'w') as f:
         f.write(str(arglist.cover_edge)+'\n')
@@ -158,7 +161,7 @@ if __name__ == '__main__':
 
         # get action
         # print('>>>> step', step)
-        action_n = update_action(env, world, obs_n, step, NewController)
+        action_n, worldtarget = update_action(env, world, worldtarget, obs_n, step, NewController)
 
         # environment step
         new_obs_n, rew_n, done_n, info_n = env.step(action_n)
@@ -167,7 +170,8 @@ if __name__ == '__main__':
 
         # if arglist.OnlineCoverRate:
         #     if step % 5 == 0:
-        #         area, last_cover = CR.update_area_cover(arglist.cover_edge, area, last_cover, obs_n, env.n - len(world.movable_targets))
+        #         area, last_cover = CR.update_area_cover(arglist.cover_edge, area, last_cover, obs_n,
+        #                                                 env.n - len(world.movable_targets))
         #         cover_rate, overlap_rate = CR.cal_cover_rate(area)
         #         with open('cover_rate.txt', 'a') as c:
         #             c.write(str(step)+' '+str(cover_rate)+' '+str(overlap_rate)+'\n')
