@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import MAControl.Util.OnlineCoverRate as CR
+import MAEnv.scenarios.TargetProfile as T
 
 curdir = os.path.dirname(__file__)
 pardir = os.path.dirname(os.path.dirname(curdir))
@@ -20,7 +21,7 @@ for i in range(num):
     last_cover.append([])
 
 area = np.zeros((cell, cell))
-area_width = 2                 # 正方形区域实际边长
+area_width = T.edge*2          # 正方形区域实际边长
 scale = area_width/cell        # 离散度(比例尺)
 iter_range = 0.25              # 迭代区域大小
 

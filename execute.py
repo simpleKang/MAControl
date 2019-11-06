@@ -160,7 +160,6 @@ if __name__ == '__main__':
     while True:
 
         # get action
-        # print('>>>> step', step)
         action_n, worldtarget = update_action(env, world, worldtarget, obs_n, step, NewController)
 
         # environment step

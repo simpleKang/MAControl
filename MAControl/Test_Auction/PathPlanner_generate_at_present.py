@@ -13,7 +13,7 @@ class PathPlanner_generate_at_present(PathPlanner):
         self.pointBi = (0, 0)         # B点坐标，即此时待飞航点坐标
         self.edge = world.edge        # 区域边界，为一个象限的边长，即区域总边长为2×edge，单位km
         # self.arrivals_current = 0     # 已经到达航点数
-        self.arrivals_maxium = 1000     # 最多到达多少次边界结束
+        self.arrivals_maxium = 1000   # 最多到达多少次边界结束
         self.current_wplist = 0       # 当前航点列表的索引
         self.is_init = True           # 判断是否为初始时刻
         self.finished = False         # 是否到达最大循环数
