@@ -22,9 +22,7 @@ plt.ylim(-(T.edge+0.2), T.edge+0.2)
 edge = np.array(([T.edge, T.edge], [T.edge, -T.edge], [-T.edge, -T.edge], [-T.edge, T.edge], [T.edge, T.edge]))
 line.plot(edge[:, 0], edge[:, 1], 'r--')
 
-color = ['b-', 'g-', 'r-', 'c-', 'm-', 'y-', 'k-',
-         'b-.', 'g-.', 'r-.', 'c-.', 'm-.', 'y-.', 'k-.',
-         'b:', 'g:', 'r:', 'c:', 'm:', 'y:', 'k:']
+color = ['gold', 'lime', 'r', 'c', 'm', 'y', 'k', 'gold', 'lime', 'r', 'c', 'm', 'y', 'k','gold', 'lime', 'r', 'c', 'm', 'y', 'k']
 
 # TODO
 pos = ['b', 'g', 'r', 'c', 'm', 'y', 'k',
@@ -36,7 +34,7 @@ for i in range(num):
     if i >= 21:
         k = i - 21
     plt.scatter(track[i][0, 2], track[i][0, 3], c=pos[k], marker='o')
-    line.plot(track[i][:, 2], track[i][:, 3], color[k])
+    line.plot(track[i][0:3000, 2], track[i][0:3000, 3], color[k])
 
 # i = 9
 # plt.scatter(track[i][0, 2], track[i][0, 3], c=pos[i], marker='o')

@@ -417,6 +417,7 @@ def make_capsule(length, width):
     return geom
 
 
+# @XJ
 def make_uav89(size):
 
     v = [[0.5,   2],
@@ -449,6 +450,7 @@ def make_uav89(size):
     return make_polygon(v)
 
 
+# @WZQ
 def make_tank(size):
 
     v = [
@@ -481,6 +483,7 @@ def make_tank(size):
     return make_polygon(v)
 
 
+# @WZQ
 def make_house(size):
 
     v = [
@@ -495,29 +498,35 @@ def make_house(size):
 
     return make_polygon(v)
 
+
 class Compound(Geom):
+
     def __init__(self, gs):
         Geom.__init__(self)
         self.gs = gs
         for g in self.gs:
             g.attrs = [a for a in g.attrs if not isinstance(a, Color)]
+
     def render1(self):
         for g in self.gs:
             g.render()
 
 
 class PolyLine(Geom):
+
     def __init__(self, v, close):
         Geom.__init__(self)
         self.v = v
         self.close = close
         self.linewidth = LineWidth(1)
         self.add_attr(self.linewidth)
+
     def render1(self):
         glBegin(GL_LINE_LOOP if self.close else GL_LINE_STRIP)
         for p in self.v:
             glVertex3f(p[0], p[1],0)  # draw each vertex
         glEnd()
+
     def set_linewidth(self, x):
         self.linewidth.stroke = x
 
@@ -545,6 +554,7 @@ class Image(Geom):
         img = pyglet.image.load(fname)
         self.img = img
         self.flip = False
+
     def render1(self):
         self.img.blit(-self.width/2, -self.height/2, width=self.width, height=self.height)
 
@@ -552,10 +562,12 @@ class Image(Geom):
 
 
 class SimpleImageViewer(object):
+
     def __init__(self, display=None):
         self.window = None
         self.isopen = False
         self.display = display
+
     def imshow(self, arr):
         if self.window is None:
             height, width, channels = arr.shape
@@ -570,9 +582,11 @@ class SimpleImageViewer(object):
         self.window.dispatch_events()
         image.blit(0,0)
         self.window.flip()
+
     def close(self):
         if self.isopen:
             self.window.close()
             self.isopen = False
+
     def __del__(self):
         self.close()

@@ -5,30 +5,26 @@ import random
 import math
 import os
 import matplotlib.pyplot as plt
-
+from matplotlib import colors
 
 tar = [[0, 1, 2],
        [6, 5, 8],
        [8, 7, 4]]
 
-a = [1, 2, 3]
+w = [1, 2, 3, 4]
 
-b = [4, 5, 6]
+v1 = np.array([1, 1])
+v2 = 0
+v3 = np.array([3, 3])
+v4 = np.array([4, 4])
 
+v = [v1, v2, v3, v4]
 
-import gym
-env = gym.make('CartPole-v0')
-for i in range(200):
-    observation = env.reset()
-    for t in range(100):
-        env.render()
-        print(observation)
-        action = env.action_space.sample()
-        observation, reward, done, info = env.step(action)
-        if done:
-            print("Episode finished after {} timesteps".format(t+1))
-        break
+he = np.array([0, 0])
 
+for i in range(len(w)):
+    v[i] = v[i]*w[i]
+    he += v[i]
 
 
 pass
