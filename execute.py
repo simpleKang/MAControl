@@ -37,11 +37,11 @@ def parse_args():
 
     # Environment
     parser.add_argument("--scenario", type=str, default="scenario5_dqn", help="name of the scenario script")
-    parser.add_argument("--episode-step-max", type=int, default=2000, help="maximum episode length")
+    parser.add_argument("--episode-step-max", type=int, default=4000, help="maximum episode length")
     parser.add_argument("--train-step-max", type=int, default=200, help="number of episodes")
     parser.add_argument("--display-step-max", type=int, default=4000, help="number of episodes for displaying")
     parser.add_argument("--cover-edge", type=int, default=400, help="number of cells of one edge")
-    parser.add_argument("--agent-num", type=int, default=20, help="number of agent")
+    parser.add_argument("--agent-num", type=int, default=3, help="number of agent")
     parser.add_argument("--OnlineCoverRate", type=int, default=0, help="Online or offline to calculate cover rate")
 
     # Core training parameters
@@ -245,7 +245,7 @@ if __name__ == '__main__':
             start = time.time()
             agent_index = np.random.randint(0, arglist.agent_num)
 
-            # 初始化全局reward
+            # 初始化全局 reward
             last_cover = list()
             area = np.zeros((arglist.cover_edge, arglist.cover_edge))
             for k in range(arglist.agent_num):
@@ -259,32 +259,38 @@ if __name__ == '__main__':
 
                 # 根据网络选择动作
                 action_n, worldtarget, v_set, w = net_choose_action(arglist, worldtarget, obs_n, episode_step, NewController, trainer)
-
                 new_obs_n, rew_n, done_n, info_n = env.step(action_n)
-
-                new_obs_index = new_obs_n[agent_index]
 
                 # 计算全局 reward
                 area, last_cover = CR.update_area_cover(arglist.cover_edge, area, last_cover, obs_n, arglist.agent_num)
                 cover_rate, overlap_rate = CR.cal_cover_rate(area)
                 cover_update = cover_rate - _cover_rate
                 overlap_update = overlap_rate - _overlap_rate
-
                 _cover_rate = cover_rate
                 _overlap_rate = overlap_rate
 
-                # 更新选中个体的 obs / action (w) / reward / ovs_new
-                for v1_4 in v_set[agent_index]:
-                    new_obs_index = np.concatenate([new_obs_index] + [v1_4])
-                cache_obs_new = new_obs_index.copy()
+                new_obs_cache = list()
+                for agent in range(arglist.agent_num):
+                    new_obs_temp = new_obs_n[agent].copy()
+                    for v1_4 in v_set[agent]:
+                        new_obs_temp = np.concatenate([new_obs_temp] + [v1_4])
+                    new_obs_cache.append(new_obs_temp)
 
                 if episode_step > 0:
-                    trainer.store_transition(cache_obs, cache_w, cache_rew, cache_obs_new)
+                    for agent in range(arglist.agent_num):
+                        v2_not_0 = np.sum(v_set[agent][1])
+                        v3_not_0 = np.sum(v_set[agent][2])
+                        v4_not_0 = np.sum(v_set[agent][3])
+                        if v2_not_0 != 0 or v3_not_0 != 0 or v4_not_0 != 0:
+                            trainer.store_transition(cache_obs[agent],
+                                                     np.array([cache_w[agent]]),
+                                                     cache_rew,
+                                                     new_obs_cache[agent])
 
                 # 更新缓存区
-                cache_obs = new_obs_index.copy()
-                cache_w = np.array([w[agent_index]])
-                cache_rew = np.array(cover_update)
+                cache_obs = new_obs_cache.copy()
+                cache_w = w.copy()
+                cache_rew = np.array([cover_update])
 
                 obs_n = new_obs_n
 
@@ -300,17 +306,16 @@ if __name__ == '__main__':
     if arglist.display:
 
         with open(os.path.dirname(__file__) + '/track/para.txt', 'w') as f:
-            f.write(str(arglist.cover_edge)+' '+str(arglist.agent_num))
+            f.write(str(arglist.cover_edge)+' '+str(arglist.agent_num)+' '+str(arglist.display_step_max))
 
         # 为每个小瓜子创建状态文件
         for k in range(arglist.agent_num):
             open(os.path.dirname(__file__) + '/track/agent_%d_track.txt' % k, 'w')
 
-        step = 0
         obs_n = env.reset()
         start = time.time()
 
-        while True:
+        for step in range(arglist.display_step_max):
 
             # 根据网络选择动作
             # action_n, worldtarget, v_set, w = net_choose_action(arglist, worldtarget, obs_n, step, NewController, trainer)
@@ -320,7 +325,6 @@ if __name__ == '__main__':
             action_n, worldtarget = specific_w_action(env, world, worldtarget, obs_n, step, NewController, w)
 
             new_obs_n, rew_n, done_n, info_n = env.step(action_n)
-            step += 1
             obs_n = new_obs_n
 
             # 保存每个小瓜子每个step的状态信息
@@ -331,10 +335,8 @@ if __name__ == '__main__':
             # 画图展示
             augment_view(arglist, world, NewController)
             # env.render()
-
-            if step > arglist.display_step_max:
-                end = time.time()
-                interval = round((end - start), 2)
-                print('Time Interval ', interval)
-                break
             print('>>>> step', step)
+
+        end = time.time()
+        interval = round((end - start), 2)
+        print('Time Interval ', interval)

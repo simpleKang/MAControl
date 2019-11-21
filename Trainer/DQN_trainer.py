@@ -8,7 +8,7 @@ class DQN_trainer():
                  env,
                  world,
                  arglist,
-                 memory_size=2000,
+                 memory_size=1000,
                  e_greedy=0.9,
                  e_greedy_increment=None,
                  n_actions=4,
