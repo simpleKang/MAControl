@@ -8,24 +8,24 @@ class DQN_trainer():
                  env,
                  world,
                  arglist,
-                 memory_size=1000,
+                 memory_size=2000,
                  e_greedy=0.9,
                  e_greedy_increment=None,
-                 n_actions=4):
+                 n_actions=4,
+                 n_features=16):
 
         print("DQN_trianer init")
         self.env = env
         self.world = world
         self.arglist = arglist
-        self.obs_shape_n = [env.observation_space[i].shape for i in range(env.n)]
         # self.actions_n = [world.dim_p * 2 + 1 for i in range(env.n)]
         self.memory_size = memory_size
         self.n_actions = n_actions
-        self.memory = np.zeros((self.memory_size, self.obs_shape_n[0][0] * 2 + 1 + 1))  # 1 + 1 -> act + reward
+        self.n_features = n_features
+        self.memory = np.zeros((self.memory_size, self.n_features * 2 + 1 + 1))  # 1 + 1 -> act + reward
         self.epsilon_max = e_greedy
         self.epsilon_increment = e_greedy_increment
         self.epsilon = 0 if e_greedy_increment is not None else self.epsilon_max
-        self.n_features = self.obs_shape_n[0][0]
         self.learn_step_counter = 0
 
         self.s = None
@@ -50,7 +50,7 @@ class DQN_trainer():
         self.sess = tf.Session()
         self.sess.run(tf.global_variables_initializer())
         self.cost_his = []
-        self.saver = tf.train.Saver(max_to_keep=2)
+        self.saver = tf.train.Saver(max_to_keep=1)
         if self.arglist.load_dir != "":
             self.load_model(self.arglist.load_dir)
 
@@ -103,16 +103,19 @@ class DQN_trainer():
         self.memory_counter += 1
 
     def choose_action(self, observation):
+
         # to have batch dimension when feed into tf placeholder
-        observation = observation
 
         if np.random.uniform() < self.epsilon:
             # forward feed the observation and get q value for every actions
             actions_value = self.sess.run(self.q_eval, feed_dict={self.s: observation})
             action = np.argmax(actions_value, axis=1)
+            action = list(action)[0]
+
         else:
-            action = np.random.randint(0, self.n_actions, [self.arglist.agent_num, 1])
-        return list(action)
+            action = np.random.randint(0, self.n_actions)
+
+        return action
 
     def learn(self):
         # check to replace target parameters

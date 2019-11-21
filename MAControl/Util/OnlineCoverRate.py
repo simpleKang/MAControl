@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import MAEnv.scenarios.TargetProfile as T
 
 
 def update_area_cover(cell, area, last_cover, obs_n, num):
@@ -16,10 +17,10 @@ def update_area_cover(cell, area, last_cover, obs_n, num):
         # 计算迭代区域的上下界
         x = obs_n[k][2]
         y = obs_n[k][3]
-        width_down = round((1 - y - iter_range) / scale)
-        width_up = round((1 - y + iter_range) / scale)
-        length_down = round((1 + x - iter_range) / scale)
-        length_up = round((1 + x + iter_range) / scale)
+        width_down = round((T.edge - y - iter_range) / scale)
+        width_up = round((T.edge - y + iter_range) / scale)
+        length_down = round((T.edge + x - iter_range) / scale)
+        length_up = round((T.edge + x + iter_range) / scale)
 
         # 将迭代区域上下界限制在区域内
         width_down = int(constrain(width_down, 'down', 0))
@@ -33,7 +34,7 @@ def update_area_cover(cell, area, last_cover, obs_n, num):
         # 判断迭代区域内的点是否在探测范围内，更新区域离散矩阵
         for i in range(width_down, width_up):
             for j in range(length_down, length_up):
-                target = np.array([scale*j-1, 1-scale*i])
+                target = np.array([scale*j-T.edge, T.edge-scale*i])
                 if point_in_rec(point1, point2, point3, point4, target):
                     if area[i][j] == 0:
                         area[i][j] = 1

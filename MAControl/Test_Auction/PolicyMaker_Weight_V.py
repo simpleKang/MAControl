@@ -19,11 +19,10 @@ class PolicyMaker_Weight_V(PolicyMaker):
         self.current_friends = list()         # 当前视野中友军
         self.current_targets = list()         # 当前视野中目标
         self.wait_step = -1                   # 决定开始决策前的等待步长
-        self.init_step = 20                  # 初始前XX步内不进行任何决策
+        self.init_step = 20                   # 初始前XX步内不进行任何决策
         self.after_decision_step = 0          # 决策后XX步内不进行任何决策
-        self.num = env.n - len(world.movable_targets)   # 小瓜子数量
-        # self.w = [0, 0, 0, 1]     # 权重 w1 / w2 / w3 / w4
-        #
+        self.num = arglist.agent_num          # 小瓜子数量
+
         # curdir = os.path.dirname(__file__)
         # pardir = os.path.dirname(os.path.dirname(curdir))
         # with open(pardir + '/track/para_w.txt', 'w') as f:
@@ -172,6 +171,12 @@ class PolicyMaker_Weight_V(PolicyMaker):
         self.opt_index = 0
         self.decision = 0
 
+        v1 = self.v_1(obs_n[self.index])
+        v2 = np.array([0., 0.])
+        v3 = np.array([0., 0.])
+        v4 = np.array([0., 0.])
+        v = [v1, v2, v3, v4]
+
         if self.current_friends or self.current_targets:
             is_same_friends = operator.eq(self.current_friends, self.friends_in_sight)
             is_same_targets = operator.eq(self.current_targets, self.targets_in_sight)
@@ -187,24 +192,21 @@ class PolicyMaker_Weight_V(PolicyMaker):
             if self.targets_in_sight:
                 v2 = self.v_2(obs_n[self.index], self.targets_in_sight)
             else:
-                v2 = 0
+                v2 = np.array([0., 0.])
 
             if self.friends_in_sight:
                 v3 = self.v_3(obs_n)
                 v4 = self.v_4(obs_n)
             else:
-                v3 = 0
-                v4 = 0
+                v3 = np.array([0., 0.])
+                v4 = np.array([0., 0.])
 
-            # v = self.w[0]*v1 + self.w[1]*v2 + self.w[2]*v3 + self.w[3]*v4
             v = [v1, v2, v3, v4]
 
             self.opt_index = 1
 
-            self.decision = v
+            self.after_decision_step = 5
 
-            self.after_decision_step = 10
-
-        opt = [self.opt_index, self.decision]
+        opt = [self.opt_index, v]
 
         return opt

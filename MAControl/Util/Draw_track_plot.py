@@ -22,22 +22,21 @@ plt.ylim(-(T.edge+0.2), T.edge+0.2)
 edge = np.array(([T.edge, T.edge], [T.edge, -T.edge], [-T.edge, -T.edge], [-T.edge, T.edge], [T.edge, T.edge]))
 line.plot(edge[:, 0], edge[:, 1], 'r--')
 
-color = ['gold', 'lime', 'r', 'c', 'm', 'y', 'k', 'gold', 'lime', 'r', 'c', 'm', 'y', 'k','gold', 'lime', 'r', 'c', 'm', 'y', 'k']
+color = ['black', 'darkorange', 'forestgreen', 'slategrey', 'lightcoral', 'gold', 'mediumturquoise', 'darkviolet',
+         'gray', 'burlywood', 'limegreen', 'cornflowerblue', 'firebrick', 'khaki', 'teal', 'plum',
+         'silver', 'darkgoldenrod', 'lime', 'slateblue', 'red', 'yellow', 'cyan', 'purple',
+         'lightgrey', 'gold', 'turquoise', 'blueviolet', 'darksalmon', 'darkseagreen', 'deepskyblue', 'hotpink']
 
-# TODO
-pos = ['b', 'g', 'r', 'c', 'm', 'y', 'k',
-       'b', 'g', 'r', 'c', 'm', 'y', 'k',
-       'b', 'g', 'r', 'c', 'm', 'y', 'k']
 
 for i in range(num):
     k = i
-    if i >= 21:
-        k = i - 21
-    plt.scatter(track[i][0, 2], track[i][0, 3], c=pos[k], marker='o')
-    line.plot(track[i][0:3000, 2], track[i][0:3000, 3], color[k])
+    if i >= 32:
+        k = i - 32
+    plt.scatter(track[i][0, 2], track[i][0, 3], c=color[k], marker='o')
+    line.plot(track[i][0:2000, 2], track[i][0:2000, 3], color[k])
 
 # i = 9
-# plt.scatter(track[i][0, 2], track[i][0, 3], c=pos[i], marker='o')
+# plt.scatter(track[i][0, 2], track[i][0, 3], c=color[i], marker='o')
 # line.plot(track[i][:, 2], track[i][:, 3], color[i])
 
 plt.xlabel('X / km')

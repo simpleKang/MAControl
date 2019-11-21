@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 curdir = os.path.dirname(__file__)
 pardir = os.path.dirname(os.path.dirname(curdir))
 
-data = np.loadtxt(pardir + '/cover_rate-0.33-0.33-0.33.txt')
+data = np.loadtxt(pardir + '/cover_rate.txt')
 
 # for i in range(-10, 300, 10):
 
@@ -13,7 +13,7 @@ plt.figure()
 line = plt.gca()
 line.plot(data[:, 0], data[:, 1], 'c--')
 plt.yticks([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])
-# plt.xlim(0, 4000)
+plt.xlim(0, 4000)
 # plt.ylim(0, 1)
 plt.xlabel('step')
 plt.ylabel('Cover Rate / %')

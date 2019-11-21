@@ -10,8 +10,8 @@ para = np.loadtxt(pardir + '/track/para.txt')
 cell = int(para[0])
 num = int(para[1])
 
-para_w = np.loadtxt(pardir + '/track/para_w.txt')
-txt_name = '/cover_rate-%s-%s-%s.txt' % (str(para_w[0]), str(para_w[1]), str(para_w[2]))
+# para_w = np.loadtxt(pardir + '/track/para_w.txt')
+txt_name = '/cover_rate-%s-%s-%s.txt' % (str(20), str(4000), str(3))
 open(pardir + txt_name, 'w')
 
 track = []
@@ -39,10 +39,10 @@ for l in range(0, np.size(track[-1], 0), 5):
         y = track[k][l][3]
 
         # 将迭代区域上下界限制在区域内
-        width_down = int(CR.constrain(round((1 - y - iter_range) / scale), 'down', 0))
-        width_up = int(CR.constrain(round((1 - y + iter_range) / scale), 'up', cell))
-        length_down = int(CR.constrain(round((1 + x - iter_range) / scale), 'down', 0))
-        length_up = int(CR.constrain(round((1 + x + iter_range) / scale), 'up', cell))
+        width_down = int(CR.constrain(round((T.edge - y - iter_range) / scale), 'down', 0))
+        width_up = int(CR.constrain(round((T.edge - y + iter_range) / scale), 'up', cell))
+        length_down = int(CR.constrain(round((T.edge + x - iter_range) / scale), 'down', 0))
+        length_up = int(CR.constrain(round((T.edge + x + iter_range) / scale), 'up', cell))
 
         # 计算视场边界
         point1, point2, point3, point4 = CR.agent_cover_range(track[k][l])
@@ -50,7 +50,7 @@ for l in range(0, np.size(track[-1], 0), 5):
         # 判断迭代区域内的点是否在探测范围内，更新区域离散矩阵
         for i in range(width_down, width_up):
             for j in range(length_down, length_up):
-                target = np.array([scale*j-1, 1-scale*i])
+                target = np.array([scale*j-T.edge, T.edge-scale*i])
                 if CR.point_in_rec(point1, point2, point3, point4, target):
                     if area[i][j] == 0:
                         area[i][j] = 1
@@ -69,6 +69,6 @@ for l in range(0, np.size(track[-1], 0), 5):
     with open(pardir + txt_name, 'a') as c:
         c.write(str(l) + ' ' + str(cover_rate) + ' ' + str(overlap_rate) + '\n')
 
-# np.savetxt(pardir + '/area.text', area, fmt='%d')
+np.savetxt(pardir + '/area.text', area, fmt='%d')
 
 print('Finished!')
