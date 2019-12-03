@@ -65,6 +65,7 @@ def cal_cover_rate(area):
 
 
 def agent_cover_range(obs):
+
     # COMPUTE selfview
     selfvel = np.array(obs[0:2])
     selfpos = np.array(obs[2:4])

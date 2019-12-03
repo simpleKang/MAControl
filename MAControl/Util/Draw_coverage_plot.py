@@ -2,6 +2,8 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 
+plt.rcParams['figure.dpi'] = 800
+
 curdir = os.path.dirname(__file__)
 pardir = os.path.dirname(os.path.dirname(curdir))
 

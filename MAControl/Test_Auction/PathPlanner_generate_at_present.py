@@ -1,5 +1,6 @@
 from MAControl.Base.PathPlanner import PathPlanner
 import MAControl.Util.CreateWaypoint as CW
+import numpy as np
 import math
 
 
@@ -30,10 +31,12 @@ class PathPlanner_generate_at_present(PathPlanner):
             self.no_operation()
 
         elif para_list[0] == 1:
-            self.new_decision_point(para_list[1], obs[2:4])
-            self.pointAi = (obs[2], obs[3])
-            self.pointBi = (self.waypoint_list[self.current_wplist][0],
-                            self.waypoint_list[self.current_wplist][1])
+            s = np.sum(para_list[1])
+            if s != 0:
+                self.new_decision_point(para_list[1], obs[2:4])
+                self.pointAi = (obs[2], obs[3])
+                self.pointBi = (self.waypoint_list[self.current_wplist][0],
+                                self.waypoint_list[self.current_wplist][1])
 
         elif para_list[0] == 9:
 

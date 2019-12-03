@@ -4,9 +4,12 @@ import MAControl.Util.OnlineCoverRate as CR
 import MAEnv.scenarios.TargetProfile as T
 
 
-def calculate_coverage(cell, num, step):
+def calculate_coverage(cell, num, step, loop=0):
 
-    txt_name = '/cover_rate-%s-%s.txt' % (str(num), str(step))
+    curdir = os.path.dirname(__file__)
+    pardir = os.path.dirname(os.path.dirname(curdir))
+
+    txt_name = '/cover_rate-%s-%s-%s.txt' % (str(num), str(step), str(loop))
     open(pardir + txt_name, 'w')
 
     track = list()
@@ -57,22 +60,22 @@ def calculate_coverage(cell, num, step):
                         else:
                             raise Exception('Unexpected situation!!!')
         last_cover[:] = new_last[:]
-        print('Total ', np.size(track[-1], 0), ' >>> step ', l)
+        print('>>> Round', loop, 'Total ', np.size(track[-1], 0), ' >>> step ', l)
 
         cover_rate, overlap_rate = CR.cal_cover_rate(area)
         with open(pardir + txt_name, 'a') as c:
             c.write(str(l) + ' ' + str(cover_rate) + ' ' + str(overlap_rate) + '\n')
 
-    np.savetxt(pardir + '/area.text', area, fmt='%d')
+    # np.savetxt(pardir + '/area.text', area, fmt='%d')
 
     print('Finished!')
 
 
 if __name__ == '__main__':
 
-    curdir = os.path.dirname(__file__)
-    pardir = os.path.dirname(os.path.dirname(curdir))
-    para = np.loadtxt(pardir + '/track/para.txt')
+    curdir_ = os.path.dirname(__file__)
+    pardir_ = os.path.dirname(os.path.dirname(curdir_))
+    para = np.loadtxt(pardir_ + '/track/para.txt')
     cell_ = int(para[0])
     num_ = int(para[1])
     step_ = int(para[2])

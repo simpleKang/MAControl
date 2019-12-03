@@ -3,6 +3,8 @@ import os
 import matplotlib.pyplot as plt
 import MAEnv.scenarios.TargetProfile as T
 
+plt.rcParams['figure.dpi'] = 800
+
 curdir = os.path.dirname(__file__)
 pardir = os.path.dirname(os.path.dirname(curdir))
 
@@ -15,8 +17,9 @@ for i in range(num):
 
 # for k in range(-10, 1501, 25):
 
-plt.figure()
+plt.figure(facecolor='w')
 line = plt.gca()
+line.patch.set_facecolor('black')
 plt.xlim(-(T.edge+0.2), T.edge+0.2)
 plt.ylim(-(T.edge+0.2), T.edge+0.2)
 edge = np.array(([T.edge, T.edge], [T.edge, -T.edge], [-T.edge, -T.edge], [-T.edge, T.edge], [T.edge, T.edge]))
@@ -27,13 +30,13 @@ color = ['black', 'darkorange', 'forestgreen', 'slategrey', 'lightcoral', 'gold'
          'silver', 'darkgoldenrod', 'lime', 'slateblue', 'red', 'yellow', 'cyan', 'purple',
          'lightgrey', 'gold', 'turquoise', 'blueviolet', 'darksalmon', 'darkseagreen', 'deepskyblue', 'hotpink']
 
+for i in range(num):
+    line.plot(track[i][:, 2], track[i][:, 3], color='silver', linewidth=20)
 
 for i in range(num):
-    k = i
-    if i >= 32:
-        k = i - 32
+    k = i % len(color)
     plt.scatter(track[i][0, 2], track[i][0, 3], c=color[k], marker='o')
-    line.plot(track[i][0:2000, 2], track[i][0:2000, 3], color[k])
+    line.plot(track[i][:, 2], track[i][:, 3], color[k])
 
 # i = 9
 # plt.scatter(track[i][0, 2], track[i][0, 3], c=color[i], marker='o')

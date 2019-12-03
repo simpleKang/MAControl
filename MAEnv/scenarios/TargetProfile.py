@@ -1,7 +1,7 @@
 import numpy as np
 
 # target parameters
-num_targets = 3
+num_targets = 0
 target_value = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 target_size = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
 target_defence = [5, 3, 1, 1, 1, 1, 1, 1, 1, 1]

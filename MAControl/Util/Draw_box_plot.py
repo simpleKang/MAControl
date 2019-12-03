@@ -4,59 +4,103 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
-curdir = os.path.dirname(__file__)
-pardir = os.path.dirname(os.path.dirname(curdir))
+def draw_box_plot(data_num, name):
 
-coverage_set = list()
+    curdir = os.path.dirname(__file__)
+    pardir = os.path.dirname(os.path.dirname(curdir))
 
-for i in range(30):
-    coverage_set.append(np.loadtxt(pardir + '/coverage-20-4000/cover_rate-20-4000-%d.txt' % i))
+    coverage_set = list()
 
-step, _ = coverage_set[0].shape
+    for i in range(data_num):
+        coverage_set.append(np.loadtxt(pardir + '/coverage-20-4000-%s/cover_rate-20-4000-%d.txt' % (str(name), i)))
 
-# plt.figure()
+    step, _ = coverage_set[0].shape
 
-box = list()
+    box = list()
 
-for k in range(int(step)):
+    for k in range(int(step)):
 
-    box.append([])
+        box.append([])
 
-    for j in range(30):
+        for j in range(data_num):
 
-        box[-1].append(coverage_set[j][k][1])
+            box[-1].append(coverage_set[j][k][1])
 
-# for x in range(step):
-#     plt.boxplot(box[x], positions=[x*5])
+    box = np.array(box).T
 
-array = np.array(box).T
+    box_ = pd.DataFrame(box)
 
-box_ = pd.DataFrame(array)
-
-f = box_.plot.box(showfliers=False, patch_artist=True, showcaps=False, return_type='dict')
-
-for whisker in f['whiskers']:
-    whisker.set(color='deepskyblue')
-for box in f['boxes']:
-    box.set(color='deepskyblue')
-    box.set(facecolor='deepskyblue')
-for median in f['medians']:
-    median.set(color='lime')
-
-plt.xticks([0, 200, 400, 600, 800], [0, 1000, 2000, 3000, 4000])
-plt.show()
+    return box_
 
 
+def set_controlled_group_color(f, b_color='pink', me_color='crimson'):
+
+    for whisker in f['whiskers']:
+        whisker.set(color=b_color)
+    for box in f['boxes']:
+        box.set(color=b_color)
+        box.set(facecolor=b_color)
+    for median in f['medians']:
+        median.set(color=me_color)
 
 
+def set_experimental_group_color(f, b_color='lightgreen', me_color='seagreen'):
+
+    for whisker in f['whiskers']:
+        whisker.set(color=b_color, alpha=0.3)
+    for box in f['boxes']:
+        box.set(color=b_color, alpha=0.3)
+        box.set(facecolor=b_color, alpha=0.3)
+    for median in f['medians']:
+        median.set(color=me_color)
 
 
+def calculate_median(dataset):
+
+    # 需要在根目录下放置Data文件夹,并在其内放好数据
+
+    curdir = os.path.dirname(__file__)
+    pardir = os.path.dirname(os.path.dirname(curdir))
+    coverage_set = list()
+
+    for i in range(dataset):
+        coverage_set.append(np.loadtxt(pardir + '/Data/cover_rate-20-4000-%d.txt' % i))
+
+    open(pardir + '/median.txt', 'w')
+
+    shape, _ = coverage_set[0].shape
+
+    for j in range(shape):
+
+        median_cur = list()
+
+        for k in range(dataset):
+            median_cur.append(coverage_set[k][j][1])
+
+        median_cur = np.array([median_cur])
+
+        median = np.median(median_cur)
+
+        with open(pardir + '/median.txt', 'a') as c:
+            c.write(str(median) + '\n')
 
 
+if __name__ == '__main__':
 
+    plt.rcParams['figure.dpi'] = 800
+    data_num_ = 30
 
+    folder_ra = 'ra'
+    random_box = draw_box_plot(data_num_, folder_ra)
+    ra = random_box.boxplot(showfliers=False, patch_artist=True, showcaps=False, return_type='dict')
+    plt.xticks([0, 200, 400, 600, 800], [0, 1000, 2000, 3000, 4000])
 
+    folder_tr = 'tr'
+    trained_box = draw_box_plot(data_num_, folder_tr)
+    tr = trained_box.boxplot(showfliers=False, patch_artist=True, showcaps=False, return_type='dict')
+    plt.xticks([0, 200, 400, 600, 800], [0, 1000, 2000, 3000, 4000])
 
+    set_controlled_group_color(ra)
+    set_experimental_group_color(tr)
 
-
-pass
+    plt.show()
