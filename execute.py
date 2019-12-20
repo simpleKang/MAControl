@@ -32,30 +32,29 @@ def parse_args():
 
     # Environment
     parser.add_argument("--scenario", type=str, default="scenario5_dqn", help="name of the scenario script")
-    parser.add_argument("--episode-step-max", type=int, default=4000, help="maximum episode length")
-    parser.add_argument("--train-step-max", type=int, default=500, help="number of episodes")
-    parser.add_argument("--display-step-max", type=int, default=4000, help="number of episodes for displaying")
-    parser.add_argument("--learn-num", type=int, default=200, help="number of learning rounds after collecting data")
-    parser.add_argument("--cover-edge", type=int, default=200, help="number of cells of one edge")
     parser.add_argument("--agent-num", type=int, default=20, help="number of agent")
-    parser.add_argument("--OnlineCoverRate", type=int, default=0, help="Online or offline to calculate cover rate")
+    parser.add_argument("--train-step-max", type=int, default=20, help="number of episodes")
+    parser.add_argument("--episode-step-max", type=int, default=4000, help="maximum episode length")
+    parser.add_argument("--display-step-max", type=int, default=4000, help="number of episodes for displaying")
+    parser.add_argument("--learn-num", type=int, default=50, help="number of learning rounds after collecting data")
     parser.add_argument("--data-collect-num", type=int, default=30, help="number of data collector")
+    parser.add_argument("--cover-edge", type=int, default=200, help="number of cells of one edge")
 
     # Core training parameters
-    parser.add_argument("--lr", type=float, default=1e-2, help="learning rate for Adam optimizer")
+    parser.add_argument("--lr", type=float, default=1e-3, help="learning rate for Adam optimizer")
     parser.add_argument("--gamma", type=float, default=0.9, help="discount factor")
     parser.add_argument("--e-greedy", type=float, default=0.9, help="epsilon greedy")
     parser.add_argument("--e-greedy-max", type=float, default=0.99, help="max of epsilon greedy")
     parser.add_argument("--e-greedy-increment", type=float, default=1e-3, help="increment of epsilon greedy")
     parser.add_argument("--batch-size", type=int, default=50, help="sample batch memory from all memory for training")
-    parser.add_argument("--memory-size", type=int, default=10000, help="memory for training")
+    parser.add_argument("--memory-size", type=int, default=1000000, help="memory for training")
     parser.add_argument("--replace-target-iter", type=int, default=300, help="copy eval net params into target net")
     parser.add_argument("--use-doubleQ", action="store_false", default=True, help="whether to use double Q net")
 
     # Checkpointing
     parser.add_argument("--save-dir", type=str, default="./save_model/model",
                         help="directory in which training state and model should be saved")
-    parser.add_argument("--save-rate", type=int, default=20,
+    parser.add_argument("--save-rate", type=int, default=5,
                         help="save model once every time this many episodes are completed")
     parser.add_argument("--load-dir", type=str, default="./save_model/",
                         help="directory in which training state and model are loaded")
@@ -124,6 +123,16 @@ def get_controller(env, world, arglist):
 
 def specific_w_action(env, world, WorldTarget, obs_n, step, NewController, w):
 
+    def update_w(list_i, w):
+
+        if len(list_i[1]) == len(w):
+            v = 0
+            for i in range(len(w)):
+                v += list_i[1][i] * w[i]
+            list_i[1] = v
+
+        return list_i
+
     # get action
     action_n = list()
 
@@ -166,25 +175,18 @@ def specific_w_action(env, world, WorldTarget, obs_n, step, NewController, w):
     return action_n, WorldTarget
 
 
-def update_w(list_i, w):
-
-    if len(list_i[1]) == len(w):
-        v = 0
-        for i in range(len(w)):
-            v += list_i[1][i] * w[i]
-        list_i[1] = v
-
-    return list_i
-
-
-def store_valuable_state(arglist, episode_step_, cache_obs_, cache_w_, cache_rew_):
+def store_valuable_state(arglist, episode_step_, new_obs_n_, cache_obs_, cache_w_, cache_rew_):
 
     # 更新每个个体的 new_bos
     new_obs_cache = list()
     for agent in range(arglist.agent_num):
-        new_obs_temp = new_obs_n[agent].copy()
+        new_obs_temp = new_obs_n_[agent].copy()
         for v1_4 in v_set[agent]:
             new_obs_temp = np.concatenate([new_obs_temp] + [v1_4])
+
+        # 删除多余状态信息 速度/加速度
+        new_obs_temp = np.delete(new_obs_temp, [0, 1, 4, 5, 6, 7], axis=0)
+
         new_obs_cache.append(new_obs_temp)
 
     # 存储有价值的个体的 obs / w / reward / new_obs
@@ -219,7 +221,8 @@ if __name__ == '__main__':
 
     # Create environment
     env, world, worldtarget = make_env(arglist)
-    trainer = T.DQN_trainer(env, world, arglist, n_actions=len(ua.action_dict), n_features=16)
+    # 手动输入状态维度 n_features
+    trainer = T.DQN_trainer(env, world, arglist, n_actions=len(ua.action_dict), n_features=10)
 
     # Create Controller
     NewController = get_controller(env, world, arglist)
@@ -228,7 +231,7 @@ if __name__ == '__main__':
 
         open(os.path.dirname(__file__) + '/save_model/cost.txt', 'w')
         # open(os.path.dirname(__file__) + '/save_model/reward.txt', 'w')
-        median = np.loadtxt('median.txt')
+        median = np.loadtxt('reflection_median.txt')
 
         for episode in range(arglist.train_step_max):
 
@@ -257,13 +260,15 @@ if __name__ == '__main__':
                 # 计算全局 reward
                 # reward, area, last_cover = ur.update_reward_1(arglist, area, last_cover, obs_n, episode_step)
                 # reward, area, last_cover = ur.update_reward_2(arglist, area, last_cover, obs_n, median[episode_step])
-                reward, area, last_cover = ur.update_reward_3(arglist, area, last_cover, obs_n, median[episode_step])
+                # reward, area, last_cover = ur.update_reward_3(arglist, area, last_cover, obs_n, median[episode_step])
+                # reward, area, last_cover = ur.update_reward_4(arglist, area, last_cover, obs_n)
+                reward, area, last_cover = ur.update_reward_5(arglist, area, last_cover, obs_n, episode_step, median)
 
                 # with open(os.path.dirname(__file__) + '/save_model/reward.txt', 'a') as f:
                 #     f.write(str(episode_step)+' '+str(reward)+'\n')
 
                 # 按规则存储数据
-                cache_obs, cache_w, cache_rew = store_valuable_state(arglist, episode_step, cache_obs, cache_w, cache_rew)
+                cache_obs, cache_w, cache_rew = store_valuable_state(arglist, episode_step, new_obs_n, cache_obs, cache_w, cache_rew)
 
                 obs_n = new_obs_n
 
@@ -293,7 +298,8 @@ if __name__ == '__main__':
             for step in range(arglist.display_step_max):
 
                 # 根据网络选择动作
-                action_n, worldtarget, v_set, w = ua.net_choose_action_w(arglist, worldtarget, obs_n, step, NewController, trainer)
+                action_n, worldtarget, v_set, w = ua.net_choose_action_w(arglist, worldtarget, obs_n, step,
+                                                                         NewController, trainer)
 
                 # 自定义动作
                 # w = [1, 0, 0, 0]

@@ -27,9 +27,12 @@ def net_choose_action_w(arglist, WorldTarget, obs_n, step, NewController, traine
         for v1_4 in v_:
             input_obs = np.concatenate([input_obs] + [v1_4])
 
+        # 在这个位置更改状态
+        input_obs = np.delete(input_obs, [0, 1, 4, 5, 6, 7], axis=0)
+
         v_set.append(v_)
 
-        w.append(trainer.choose_action(input_obs.reshape(1, 16)))
+        w.append(trainer.choose_action(input_obs.reshape(1, 10)))
 
         w_env.append(action_dict[str(int(w[i]))])
 

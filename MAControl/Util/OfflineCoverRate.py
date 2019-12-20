@@ -10,7 +10,7 @@ def calculate_coverage(cell, num, step, loop=0):
     pardir = os.path.dirname(os.path.dirname(curdir))
 
     txt_name = '/cover_rate-%s-%s-%s.txt' % (str(num), str(step), str(loop))
-    open(pardir + txt_name, 'w')
+    open(pardir + '/cover_rate_Folder' + txt_name, 'w')
 
     track = list()
     last_cover = list()
@@ -63,10 +63,10 @@ def calculate_coverage(cell, num, step, loop=0):
         print('>>> Round', loop, 'Total ', np.size(track[-1], 0), ' >>> step ', l)
 
         cover_rate, overlap_rate = CR.cal_cover_rate(area)
-        with open(pardir + txt_name, 'a') as c:
+        with open(pardir + '/cover_rate_Folder' + txt_name, 'a') as c:
             c.write(str(l) + ' ' + str(cover_rate) + ' ' + str(overlap_rate) + '\n')
 
-    # np.savetxt(pardir + '/area.text', area, fmt='%d')
+    # np.savetxt(pardir + '/cover_rate_Folder' + '/area.text', area, fmt='%d')
 
     print('Finished!')
 

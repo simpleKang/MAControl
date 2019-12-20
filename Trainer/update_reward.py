@@ -31,3 +31,27 @@ def update_reward_3(arglist, area, last_cover, obs_n, median):
         reward_ = -1
 
     return reward_, area_, last_cover_
+
+
+def update_reward_4(arglist, area, last_cover, obs_n):
+
+    area_, last_cover_ = CR.update_area_cover(arglist.cover_edge, area, last_cover, obs_n, arglist.agent_num)
+    cover_rate_, overlap_rate_ = CR.cal_cover_rate(area_)
+    reward_ = cover_rate_
+
+    return reward_, area_, last_cover_
+
+
+def update_reward_5(arglist, area, last_cover, obs_n, episode_step, median):
+
+    area_, last_cover_ = CR.update_area_cover(arglist.cover_edge, area, last_cover, obs_n, arglist.agent_num)
+    cover_rate_, overlap_rate_ = CR.cal_cover_rate(area_)
+    if cover_rate_ == median[episode_step//5]:
+        reward_ = 0
+    elif cover_rate_ > median[episode_step//5]:
+        reward_ = 1
+    else:
+        reward_ = -1
+
+    return reward_, area_, last_cover_
+

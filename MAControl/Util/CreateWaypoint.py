@@ -1,4 +1,7 @@
 import random
+import numpy as np
+import operator
+
 
 def creat_snake_waypoint_list(waypoint_list, N, i, new_list_index, W=0.9, D=0.05, Edge=1):
 
@@ -59,7 +62,7 @@ def creat_veledge_point(pos, vel, Edge):
 
     intersection = [[0]*2 for i in range(4)]
     waypoint_list = list()
-    vel_arg = round((vel[1]/vel[0]), 2)
+    vel_arg = vel[1]/vel[0]
     intersection[0] = [pos[0] + (Edge - pos[1]) / vel_arg, Edge]
     intersection[1] = [pos[0] - (Edge + pos[1]) / vel_arg, -Edge]
     intersection[2] = [Edge, pos[1] + (Edge - pos[0]) * vel_arg]
@@ -112,3 +115,36 @@ def creat_random_edgepoint(pos, Edge):
         new_edgepoint = [-1 * Edge, random_point]
 
     return new_edgepoint
+
+
+def creat_reflection_edgepoint(current_point, edge, vel):
+
+    if abs(current_point[0]) - edge >= 0:
+        new_direction = np.array([-vel[0], vel[1]])
+    elif abs(current_point[1]) - edge >= 0:
+        new_direction = np.array([vel[0], -vel[1]])
+    else:
+        raise Exception('There is a weird waypoint!!!')
+    waypoint_list = list()
+    possible_point = [[] for i in range(4)]
+    slope = new_direction[1] / new_direction[0]
+    possible_point[0] = [current_point[0] + (edge - current_point[1]) / slope, edge]
+    possible_point[1] = [current_point[0] - (edge + current_point[1]) / slope, -edge]
+    possible_point[2] = [edge, current_point[1] + (edge - current_point[0]) * slope]
+    possible_point[3] = [-edge, current_point[1] - (edge + current_point[0]) * slope]
+    for point in possible_point:
+        if abs(point[0]) <= edge and abs(point[1]) <= edge:
+            dis = np.sqrt((current_point[0]-point[0])**2+(current_point[1]-point[1])**2)
+            if dis > 0:
+                waypoint_list = point
+                break
+    if not waypoint_list:
+        the_min = list()
+        for ele in possible_point:
+            the_min.append(np.sqrt(ele[0]**2 + ele[1]**2))
+        waypoint_list = possible_point[the_min.index(min(the_min))]
+
+    if not waypoint_list:
+        raise Exception('Can not create a waypoint!!!')
+
+    return waypoint_list

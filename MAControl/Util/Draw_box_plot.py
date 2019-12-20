@@ -84,18 +84,20 @@ def calculate_median(dataset):
         with open(pardir + '/median.txt', 'a') as c:
             c.write(str(median) + '\n')
 
+    print('Finished')
+
 
 if __name__ == '__main__':
 
     plt.rcParams['figure.dpi'] = 800
     data_num_ = 30
 
-    folder_ra = 'ra'
+    folder_ra = 'controlled'
     random_box = draw_box_plot(data_num_, folder_ra)
     ra = random_box.boxplot(showfliers=False, patch_artist=True, showcaps=False, return_type='dict')
     plt.xticks([0, 200, 400, 600, 800], [0, 1000, 2000, 3000, 4000])
 
-    folder_tr = 'tr'
+    folder_tr = 'experimental'
     trained_box = draw_box_plot(data_num_, folder_tr)
     tr = trained_box.boxplot(showfliers=False, patch_artist=True, showcaps=False, return_type='dict')
     plt.xticks([0, 200, 400, 600, 800], [0, 1000, 2000, 3000, 4000])
