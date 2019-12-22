@@ -25,3 +25,5 @@ execute.py
 #         print('>>>> cover rate ', cover_rate)
 
 
+# with open(os.path.dirname(__file__) + '/save_model/reward.txt', 'a') as f:
+#   f.write(str(episode_step)+' '+str(reward)+'\n')

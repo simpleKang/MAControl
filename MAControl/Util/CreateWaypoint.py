@@ -1,6 +1,7 @@
 import random
 import numpy as np
 import operator
+import MAControl.Util.SignIsSame as sis
 
 
 def creat_snake_waypoint_list(waypoint_list, N, i, new_list_index, W=0.9, D=0.05, Edge=1):
@@ -58,22 +59,16 @@ def create_simple_waypoint_list(waypoint_list, new_list_index, init_point, Edge)
     new_list_index += 1
 
 
-def creat_veledge_point(pos, vel, Edge):
+def creat_veledge_point(pos, vel, edge):
 
-    intersection = [[0]*2 for i in range(4)]
-    waypoint_list = list()
-    vel_arg = vel[1]/vel[0]
-    intersection[0] = [pos[0] + (Edge - pos[1]) / vel_arg, Edge]
-    intersection[1] = [pos[0] - (Edge + pos[1]) / vel_arg, -Edge]
-    intersection[2] = [Edge, pos[1] + (Edge - pos[0]) * vel_arg]
-    intersection[3] = [-Edge, pos[1] - (Edge + pos[0]) * vel_arg]
-    for i in range(4):
-        if abs(intersection[i][0]) <= Edge and abs(intersection[i][1]) <= Edge:
-            if (intersection[i][0] - pos[0]) / vel[0] > 0:
-                waypoint_list = intersection[i]
-                break
-        else:
-            waypoint_list = pos
+    waypoint_list = list(pos)
+    delta = 0.2
+    while True:
+        waypoint_list[0] += delta * vel[0]
+        waypoint_list[1] += delta * vel[1]
+        if edge - abs(waypoint_list[0]) < 0.01 or edge - abs(waypoint_list[1]) < 0.01:
+            waypoint_list = [round(waypoint_list[0], 3), round(waypoint_list[1], 3)]
+            break
 
     return waypoint_list
 
@@ -117,34 +112,44 @@ def creat_random_edgepoint(pos, Edge):
     return new_edgepoint
 
 
-def creat_reflection_edgepoint(current_point, edge, vel):
+def creat_reflection_edgepoint(current_point, vel, edge):
 
-    if abs(current_point[0]) - edge >= 0:
+    if edge - abs(current_point[0]) < 0.1:
         new_direction = np.array([-vel[0], vel[1]])
-    elif abs(current_point[1]) - edge >= 0:
+    elif edge - abs(current_point[1]) < 0.1:
         new_direction = np.array([vel[0], -vel[1]])
     else:
         raise Exception('There is a weird waypoint!!!')
-    waypoint_list = list()
-    possible_point = [[] for i in range(4)]
-    slope = new_direction[1] / new_direction[0]
-    possible_point[0] = [current_point[0] + (edge - current_point[1]) / slope, edge]
-    possible_point[1] = [current_point[0] - (edge + current_point[1]) / slope, -edge]
-    possible_point[2] = [edge, current_point[1] + (edge - current_point[0]) * slope]
-    possible_point[3] = [-edge, current_point[1] - (edge + current_point[0]) * slope]
-    for point in possible_point:
-        if abs(point[0]) <= edge and abs(point[1]) <= edge:
-            dis = np.sqrt((current_point[0]-point[0])**2+(current_point[1]-point[1])**2)
-            if dis > 0:
-                waypoint_list = point
-                break
-    if not waypoint_list:
-        the_min = list()
-        for ele in possible_point:
-            the_min.append(np.sqrt(ele[0]**2 + ele[1]**2))
-        waypoint_list = possible_point[the_min.index(min(the_min))]
 
-    if not waypoint_list:
-        raise Exception('Can not create a waypoint!!!')
+    waypoint_list = list(current_point).copy()
+
+    delta = 0.7
+    x = y = False
+
+    if edge - abs(waypoint_list[0]) < 0.05:
+        x = True
+    if edge - abs(waypoint_list[1]) < 0.05:
+        y = True
+
+    while True:
+
+        waypoint_list[0] += delta * new_direction[0]
+        waypoint_list[1] += delta * new_direction[1]
+
+        if x:
+            if not sis.sign_is_same(current_point[0], waypoint_list[0]) and edge - abs(waypoint_list[0]) < 0.01:
+                waypoint_list = [round(waypoint_list[0], 3), round(waypoint_list[1], 3)]
+                break
+            elif edge - abs(waypoint_list[1]) < 0.01:
+                waypoint_list = [round(waypoint_list[0], 3), round(waypoint_list[1], 3)]
+                break
+
+        if y:
+            if not sis.sign_is_same(current_point[1], waypoint_list[1]) and edge - abs(waypoint_list[1]) < 0.01:
+                waypoint_list = [round(waypoint_list[0], 3), round(waypoint_list[1], 3)]
+                break
+            elif edge - abs(waypoint_list[0]) < 0.01:
+                waypoint_list = [round(waypoint_list[0], 3), round(waypoint_list[1], 3)]
+                break
 
     return waypoint_list

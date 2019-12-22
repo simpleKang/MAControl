@@ -9,7 +9,7 @@ class DQN_trainer():
                  world,
                  arglist,
                  n_features,
-                 n_actions=4):
+                 n_actions):
 
         print("DQN_trainer init")
 
