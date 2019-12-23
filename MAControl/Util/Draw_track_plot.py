@@ -19,7 +19,7 @@ for i in range(num):
 
 plt.figure(facecolor='w')
 line = plt.gca()
-line.patch.set_facecolor('black')
+line.patch.set_facecolor('white')
 plt.xlim(-(T.edge+0.2), T.edge+0.2)
 plt.ylim(-(T.edge+0.2), T.edge+0.2)
 edge = np.array(([T.edge, T.edge], [T.edge, -T.edge], [-T.edge, -T.edge], [-T.edge, T.edge], [T.edge, T.edge]))
@@ -30,8 +30,8 @@ color = ['black', 'darkorange', 'forestgreen', 'slategrey', 'lightcoral', 'gold'
          'silver', 'darkgoldenrod', 'lime', 'slateblue', 'red', 'yellow', 'cyan', 'purple',
          'lightgrey', 'gold', 'turquoise', 'blueviolet', 'darksalmon', 'darkseagreen', 'deepskyblue', 'hotpink']
 
-for i in range(num):
-    line.plot(track[i][:, 2], track[i][:, 3], color='silver', linewidth=20)
+# for i in range(num):
+#     line.plot(track[i][:, 2], track[i][:, 3], color='silver', linewidth=20)
 
 for i in range(num):
     k = i % len(color)

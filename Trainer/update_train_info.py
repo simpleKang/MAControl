@@ -3,7 +3,7 @@ import numpy as np
 import math
 
 
-# [up, down, left, right]
+# [UP or DOWN, RIGHT or LEFT]
 action_dict = {"0": [0., 1.],    # u
                "1": [1., 1.],    # u r
                "2": [1., 0.],    #   r

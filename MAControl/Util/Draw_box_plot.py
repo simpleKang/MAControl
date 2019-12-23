@@ -36,15 +36,26 @@ def draw_box_plot(data_num, name):
 def set_controlled_group_color(f, b_color='pink', me_color='crimson'):
 
     for whisker in f['whiskers']:
-        whisker.set(color=b_color)
+        whisker.set(color=b_color, alpha=0.5)
     for box in f['boxes']:
-        box.set(color=b_color)
-        box.set(facecolor=b_color)
+        box.set(color=b_color, alpha=0.5)
+        box.set(facecolor=b_color, alpha=0.5)
     for median in f['medians']:
         median.set(color=me_color)
 
 
 def set_experimental_group_color(f, b_color='lightgreen', me_color='seagreen'):
+
+    for whisker in f['whiskers']:
+        whisker.set(color=b_color, alpha=0.3)
+    for box in f['boxes']:
+        box.set(color=b_color, alpha=0.3)
+        box.set(facecolor=b_color, alpha=0.3)
+    for median in f['medians']:
+        median.set(color=me_color)
+
+
+def set_random_group_color(f, b_color='cornflowerblue', me_color='blue'):
 
     for whisker in f['whiskers']:
         whisker.set(color=b_color, alpha=0.3)
@@ -92,9 +103,9 @@ if __name__ == '__main__':
     plt.rcParams['figure.dpi'] = 800
     data_num_ = 30
 
-    folder_ra = 'controlled'
-    random_box = draw_box_plot(data_num_, folder_ra)
-    ra = random_box.boxplot(showfliers=False, patch_artist=True, showcaps=False, return_type='dict')
+    folder_co = 'controlled'
+    control_box = draw_box_plot(data_num_, folder_co)
+    co = control_box.boxplot(showfliers=False, patch_artist=True, showcaps=False, return_type='dict')
     plt.xticks([0, 200, 400, 600, 800], [0, 1000, 2000, 3000, 4000])
 
     folder_tr = 'experimental'
@@ -102,7 +113,13 @@ if __name__ == '__main__':
     tr = trained_box.boxplot(showfliers=False, patch_artist=True, showcaps=False, return_type='dict')
     plt.xticks([0, 200, 400, 600, 800], [0, 1000, 2000, 3000, 4000])
 
-    set_controlled_group_color(ra)
+    folder_ra = 'random'
+    random_box = draw_box_plot(data_num_, folder_ra)
+    ra = random_box.boxplot(showfliers=False, patch_artist=True, showcaps=False, return_type='dict')
+    plt.xticks([0, 200, 400, 600, 800], [0, 1000, 2000, 3000, 4000])
+
+    set_controlled_group_color(co)
     set_experimental_group_color(tr)
+    set_random_group_color(ra)
 
     plt.show()

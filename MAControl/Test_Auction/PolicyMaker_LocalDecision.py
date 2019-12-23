@@ -2,9 +2,10 @@ from MAControl.Base.PolicyMaker import PolicyMaker
 from MAControl.Util.PointInRec import point_in_rec
 import numpy as np
 import math
+import random
 import operator
 
-# [up, down, left, right]
+# [UP or DOWN, RIGHT or LEFT]
 action_dict = {"0": [0., 1.],    # u
                "1": [1., 1.],    # u r
                "2": [1., 0.],    #   r
@@ -27,10 +28,6 @@ class PolicyMaker_LocalDecision(PolicyMaker):
         self.init_step = 300                  # 初始前XX步内不进行任何决策
         self.after_decision_step = 100         # 决策后XX步内不进行任何决策
         self.num = arglist.agent_num          # 小瓜子数量
-        self.unit_up = np.array([0., 1.])
-        self.unit_down = np.array([0., -1.])
-        self.unit_left = np.array([-1., 0.])
-        self.unit_right = np.array([1., 0.])
         self.is_decision = False
         self.state = np.zeros(self.num*2)
         self.action_index = None
@@ -102,6 +99,7 @@ class PolicyMaker_LocalDecision(PolicyMaker):
                     self.state[(num+1)*2:(num+2)*2] = self.unitization(obs_n[self.friends_in_sight[num]])
 
                 self.action_index = trainer.choose_action(self.state.reshape(1, len(self.state)))
+                # self.action_index = random.randint(0, 7)
 
                 self.decision = action_dict[str(int(self.action_index))]
 

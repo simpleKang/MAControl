@@ -25,7 +25,7 @@ def parse_args():
     parser.add_argument("--episode-step-max", type=int, default=4000, help="maximum episode length")
     parser.add_argument("--display-step-max", type=int, default=4000, help="number of episodes for displaying")
     parser.add_argument("--learn-num", type=int, default=50, help="number of learning rounds after collecting data")
-    parser.add_argument("--data-collect-num", type=int, default=30, help="number of data collector")
+    parser.add_argument("--data-collect-num", type=int, default=1, help="number of data collector")
     parser.add_argument("--cover-edge", type=int, default=200, help="number of cells of one edge")
 
     # Core training parameters
@@ -204,7 +204,9 @@ if __name__ == '__main__':
                 augment_view(arglist, world, NewController)
                 # env.render()
                 print('>>> Num', num, '>>>> step', step)
+                time.sleep(0.01)
 
+            time.sleep(1)
             OCR.calculate_coverage(arglist.cover_edge, arglist.agent_num, arglist.display_step_max, num)
             end = time.time()
             interval = round((end - start), 2)
