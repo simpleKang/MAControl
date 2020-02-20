@@ -16,3 +16,5 @@ s.(vname) = score
 % 2) modify 'fname' and 'vname' accordingly
 
 save(strcat(fname,'.mat'),'s')
+
+% git test on 2020.02.21
