@@ -71,7 +71,7 @@ class PolicyMaker_LocalDecision(PolicyMaker):
 
         return v1
 
-    def make_policy(self, WorldTarget, obs_n, step, trainer):
+    def make_policy(self, WorldTarget, obs_n, step):
 
         self.find_objects_in_sight(obs_n)
 
@@ -98,8 +98,8 @@ class PolicyMaker_LocalDecision(PolicyMaker):
                 for num in range(len(self.friends_in_sight)):
                     self.state[(num+1)*2:(num+2)*2] = self.unitization(obs_n[self.friends_in_sight[num]])
 
-                self.action_index = trainer.choose_action(self.state.reshape(1, len(self.state)))
-                # self.action_index = random.randint(0, 7)
+                #self.action_index = trainer.choose_action(self.state.reshape(1, len(self.state)))
+                self.action_index = random.randint(0, 7)
 
                 self.decision = action_dict[str(int(self.action_index))]
 

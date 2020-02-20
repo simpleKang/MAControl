@@ -49,7 +49,7 @@ def parse_args():
 
     # Evaluation
     parser.add_argument("--restore", action="store_true", default=False)
-    parser.add_argument("--display", action="store_true", default=False)
+    parser.add_argument("--display", action="store_true", default=True)
     parser.add_argument("--train", action="store_false", default=True)
 
     return parser.parse_args()
@@ -94,7 +94,7 @@ def get_controller(env, world, arglist):
     return ControllerSet
 
 
-def action(arglist, WorldTarget, obs_n, step, NewController, trainer_):
+def action(arglist, WorldTarget, obs_n, step, NewController):
 
     # get action
     action_n = list()
@@ -103,7 +103,7 @@ def action(arglist, WorldTarget, obs_n, step, NewController, trainer_):
     for i in range(arglist.agent_num):
 
         list_i, sight_friends = NewController[i][0]. \
-            make_policy(WorldTarget, obs_n, step, trainer_)
+            make_policy(WorldTarget, obs_n, step)
 
         pointAi, pointBi, finishedi, NewController[i][5], WorldTarget = NewController[i][1].\
             planpath(list_i, obs_n[i], NewController[i][4], step, WorldTarget)
@@ -132,45 +132,45 @@ if __name__ == '__main__':
     # Create environment
     env, world, worldtarget = make_env(arglist)
     # 手动输入状态维度 n_features
-    trainer = T.DQN_trainer(env, world, arglist, n_actions=len(ut.action_dict), n_features=40)
+    #trainer = T.DQN_trainer(env, world, arglist, n_actions=len(ut.action_dict), n_features=40)
 
     # Create Controller
     NewController = get_controller(env, world, arglist)
 
-    if arglist.train:
-
-        open(os.path.dirname(__file__) + '/save_model/cost.txt', 'w')
-
-        for episode in range(arglist.train_step_max):
-
-            obs_n = env.reset()
-            start = time.time()
-
-            for episode_step in range(arglist.episode_step_max):
-
-                # env.render()
-
-                # 根据网络选择动作
-                action_n, worldtarget, store_state = ut.update_next_state(arglist, worldtarget, obs_n,
-                                                                          episode_step, NewController, trainer)
-                new_obs_n, rew_n, done_n, info_n = env.step(action_n)
-
-                if store_state:
-
-                    reward = ut.update_reward_6(store_state)
-
-                    is_store = ut.update_storage(arglist, store_state, new_obs_n, reward, trainer)
-
-                obs_n = new_obs_n
-
-                print("Train Step:", episode, " Episode Step:", episode_step)
-
-            for train in range(arglist.learn_num):
-                trainer.learn()
-                end = time.time()
-                print("cost:", trainer.cost_his[-1])
-                with open(os.path.dirname(__file__) + '/save_model/cost.txt', 'a') as f:
-                    f.write(str(trainer.learn_step_counter)+' '+str(trainer.cost_his[-1])+'\n')
+    # if arglist.train:
+    #
+    #     open(os.path.dirname(__file__) + '/save_model/cost.txt', 'w')
+    #
+    #     for episode in range(arglist.train_step_max):
+    #
+    #         obs_n = env.reset()
+    #         start = time.time()
+    #
+    #         for episode_step in range(arglist.episode_step_max):
+    #
+    #             # env.render()
+    #
+    #             # 根据网络选择动作
+    #             action_n, worldtarget, store_state = ut.update_next_state(arglist, worldtarget, obs_n,
+    #                                                                       episode_step, NewController, trainer)
+    #             new_obs_n, rew_n, done_n, info_n = env.step(action_n)
+    #
+    #             if store_state:
+    #
+    #                 reward = ut.update_reward_6(store_state)
+    #
+    #                 is_store = ut.update_storage(arglist, store_state, new_obs_n, reward, trainer)
+    #
+    #             obs_n = new_obs_n
+    #
+    #             print("Train Step:", episode, " Episode Step:", episode_step)
+    #
+    #         for train in range(arglist.learn_num):
+    #             trainer.learn()
+    #             end = time.time()
+    #             print("cost:", trainer.cost_his[-1])
+    #             with open(os.path.dirname(__file__) + '/save_model/cost.txt', 'a') as f:
+    #                 f.write(str(trainer.learn_step_counter)+' '+str(trainer.cost_his[-1])+'\n')
 
     if arglist.display:
 
@@ -189,7 +189,7 @@ if __name__ == '__main__':
             for step in range(arglist.display_step_max):
 
                 # 选择动作
-                action_n, worldtarget = action(arglist, worldtarget, obs_n, step, NewController, trainer)
+                action_n, worldtarget = action(arglist, worldtarget, obs_n, step, NewController)
 
                 new_obs_n, rew_n, done_n, info_n = env.step(action_n)
 
@@ -202,7 +202,7 @@ if __name__ == '__main__':
 
                 # 画图展示
                 augment_view(arglist, world, NewController)
-                # env.render()
+                env.render()
                 print('>>> Num', num, '>>>> step', step)
                 time.sleep(0.01)
 
