@@ -4,8 +4,6 @@ import argparse
 import numpy as np
 import time
 import os
-import Trainer.DQN_trainer as T
-import Trainer.update_train_info as ut
 import MAControl.Util.OfflineCoverRate as OCR
 
 import MAControl.Test_Auction.InnerController_PID as IC_P
@@ -50,7 +48,6 @@ def parse_args():
     # Evaluation
     parser.add_argument("--restore", action="store_true", default=False)
     parser.add_argument("--display", action="store_true", default=True)
-    parser.add_argument("--train", action="store_false", default=True)
 
     return parser.parse_args()
 
@@ -132,45 +129,9 @@ if __name__ == '__main__':
     # Create environment
     env, world, worldtarget = make_env(arglist)
     # 手动输入状态维度 n_features
-    #trainer = T.DQN_trainer(env, world, arglist, n_actions=len(ut.action_dict), n_features=40)
 
     # Create Controller
     NewController = get_controller(env, world, arglist)
-
-    # if arglist.train:
-    #
-    #     open(os.path.dirname(__file__) + '/save_model/cost.txt', 'w')
-    #
-    #     for episode in range(arglist.train_step_max):
-    #
-    #         obs_n = env.reset()
-    #         start = time.time()
-    #
-    #         for episode_step in range(arglist.episode_step_max):
-    #
-    #             # env.render()
-    #
-    #             # 根据网络选择动作
-    #             action_n, worldtarget, store_state = ut.update_next_state(arglist, worldtarget, obs_n,
-    #                                                                       episode_step, NewController, trainer)
-    #             new_obs_n, rew_n, done_n, info_n = env.step(action_n)
-    #
-    #             if store_state:
-    #
-    #                 reward = ut.update_reward_6(store_state)
-    #
-    #                 is_store = ut.update_storage(arglist, store_state, new_obs_n, reward, trainer)
-    #
-    #             obs_n = new_obs_n
-    #
-    #             print("Train Step:", episode, " Episode Step:", episode_step)
-    #
-    #         for train in range(arglist.learn_num):
-    #             trainer.learn()
-    #             end = time.time()
-    #             print("cost:", trainer.cost_his[-1])
-    #             with open(os.path.dirname(__file__) + '/save_model/cost.txt', 'a') as f:
-    #                 f.write(str(trainer.learn_step_counter)+' '+str(trainer.cost_his[-1])+'\n')
 
     if arglist.display:
 
