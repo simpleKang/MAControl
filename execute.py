@@ -137,13 +137,6 @@ if __name__ == '__main__':
 
         for num in range(arglist.data_collect_num):
 
-            with open(os.path.dirname(__file__) + '/track/para.txt', 'w') as f:
-                f.write(str(arglist.cover_edge)+' '+str(arglist.agent_num)+' '+str(arglist.display_step_max))
-
-            # 为每个小瓜子创建状态文件
-            for k in range(arglist.agent_num):
-                open(os.path.dirname(__file__) + '/track/agent_%d_track.txt' % k, 'w')
-
             obs_n = env.reset()
             start = time.time()
 
@@ -155,11 +148,6 @@ if __name__ == '__main__':
                 new_obs_n, rew_n, done_n, info_n = env.step(action_n)
 
                 obs_n = new_obs_n
-
-                # 保存每个小瓜子每个step的状态信息
-                for k in range(arglist.agent_num):
-                    with open(os.path.dirname(__file__) + '/track/agent_%d_track.txt' % k, 'a') as f:
-                        f.write(str(obs_n[k][0])+' '+str(obs_n[k][1])+' '+str(obs_n[k][2])+' '+str(obs_n[k][3])+'\n')
 
                 # 画图展示
                 augment_view(arglist, world, NewController)
