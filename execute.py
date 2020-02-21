@@ -1,15 +1,12 @@
 # coding=utf-8
 
 import argparse
-import numpy as np
 import time
-import os
-import MAControl.Util.OfflineCoverRate as OCR
 
-import MAControl.Test_Auction.InnerController_PID as IC_P
-import MAControl.Test_Auction.MotionController_L1_TECS as MC_L
-import MAControl.Test_Auction.PathPlanner_EgdeWaypoint as PP_G
-import MAControl.Test_Auction.PolicyMaker_LocalDecision as PM_L
+import MAControl.Default1.InnerController_PID as IC_P
+import MAControl.Default1.MotionController_L1_TECS as MC_L
+import MAControl.Default1.PathPlanner_EgdeWaypoint as PP_G
+import MAControl.Default1.PolicyMaker_LocalDecision as PM_L
 
 
 def parse_args():
@@ -156,7 +153,6 @@ if __name__ == '__main__':
                 time.sleep(0.01)
 
             time.sleep(1)
-            OCR.calculate_coverage(arglist.cover_edge, arglist.agent_num, arglist.display_step_max, num)
             end = time.time()
             interval = round((end - start), 2)
             print('Time Interval ', interval)
