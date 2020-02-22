@@ -8,7 +8,7 @@ class BaseScenario(object):
         raise NotImplementedError()
 
     # create elements of the world
-    def make_World(self, agent_num):
+    def make_World(self, uav_num):
         raise NotImplementedError()
 
     # create initial conditions of the world
@@ -16,5 +16,5 @@ class BaseScenario(object):
         raise NotImplementedError()
 
     # create initial conditions of the world
-    def reset_World(self, world, agent_num):
+    def reset_World(self, world, uav_num):
         raise NotImplementedError()
