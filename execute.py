@@ -42,8 +42,8 @@ def make_env(arglist):
 
     # creat WorldTarget
     worldtarget_ = list()
-    for i, landmark in enumerate(world_.targets):
-        worldtarget_.append([landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.value, landmark.defence])
+    for i, agent in enumerate(world_.T_agents):
+        worldtarget_.append([agent.state.p_pos[0], agent.state.p_pos[1], agent.w, agent.H])
 
     return env_, world_, worldtarget_
 
@@ -53,7 +53,7 @@ def get_controller(env, world, arglist):
     ControllerSet = list()
 
     # 初始化小瓜子
-    for i in range(arglist.agent_num):
+    for i in range(arglist.uav_num):
         control = list()
 
         control.append(PM_L.PolicyMaker_LocalDecision("agent_%d" % i, env, world, i, arglist))
@@ -74,7 +74,7 @@ def action(arglist, WorldTarget, obs_n, step, NewController):
     action_n = list()
 
     # 小瓜子运动
-    for i in range(arglist.agent_num):
+    for i in range(arglist.uav_num):
 
         list_i, sight_friends = NewController[i][0]. \
             make_policy(WorldTarget, obs_n, step)
@@ -94,7 +94,7 @@ def action(arglist, WorldTarget, obs_n, step, NewController):
 
 
 def augment_view(arglist, world, NewController):
-    for i in range(arglist.agent_num):
+    for i in range(arglist.uav_num):
         if NewController[i][5]:
             world.agents[i].attacking = True
 
