@@ -23,25 +23,6 @@ def parse_args():
     parser.add_argument("--data-collect-num", type=int, default=1, help="number of data collector")
     parser.add_argument("--cover-edge", type=int, default=200, help="number of cells of one edge")
 
-    # Core training parameters
-    parser.add_argument("--lr", type=float, default=1e-3, help="learning rate for Adam optimizer")
-    parser.add_argument("--gamma", type=float, default=0.9, help="discount factor")
-    parser.add_argument("--e-greedy", type=float, default=0.9, help="epsilon greedy")
-    parser.add_argument("--e-greedy-max", type=float, default=0.99, help="max of epsilon greedy")
-    parser.add_argument("--e-greedy-increment", type=float, default=1e-3, help="increment of epsilon greedy")
-    parser.add_argument("--batch-size", type=int, default=50, help="sample batch memory from all memory for training")
-    parser.add_argument("--memory-size", type=int, default=1000000, help="memory for training")
-    parser.add_argument("--replace-target-iter", type=int, default=300, help="copy eval net params into target net")
-    parser.add_argument("--use-doubleQ", action="store_false", default=True, help="whether to use double Q net")
-
-    # Checkpointing
-    parser.add_argument("--save-dir", type=str, default="./save_model/model",
-                        help="directory in which training state and model should be saved")
-    parser.add_argument("--save-rate", type=int, default=5,
-                        help="save model once every time this many episodes are completed")
-    parser.add_argument("--load-dir", type=str, default="./save_model/",
-                        help="directory in which training state and model are loaded")
-
     # Evaluation
     parser.add_argument("--restore", action="store_true", default=False)
     parser.add_argument("--display", action="store_true", default=True)
