@@ -36,6 +36,8 @@ class Scenario(BaseScenario):
             target.size = T.target_size[i] * 0.01
             target.movable = True
             target.Target = True
+            target.H = T.target_defence[i]
+            target.w = T.target_value[i]
 
         # agents summary
         world.agents = world.agents + world.T_agents
