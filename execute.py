@@ -6,10 +6,10 @@ import time
 import os
 import MAControl.Util.OfflineCoverRate as OCR
 
-import MAControl.Default1.InnerController_PID as IC_P
-import MAControl.Default1.MotionController_L1_TECS as MC_L
-import MAControl.Default1.PathPlanner_EgdeWaypoint as PP_G
-import MAControl.Default1.PolicyMaker_SelfOrganization as PM_S
+import MAControl.Default.InnerController_PID as IC_P
+import MAControl.Default.MotionController_L1_TECS as MC_L
+import MAControl.Default.PathPlanner_EgdeWaypoint as PP_G
+import MAControl.Default.PolicyMaker_SelfOrganization as PM_S
 
 
 def parse_args():
@@ -18,7 +18,7 @@ def parse_args():
 
     # Environment
     parser.add_argument("--scenario", type=str, default="scenario6_AFIT", help="name of the scenario script")
-    parser.add_argument("--uav-num", type=int, default=10, help="number of agent")
+    parser.add_argument("--uav-num", type=int, default=10, help="number of uav")
     parser.add_argument("--display-step-max", type=int, default=1000, help="number of episodes for displaying")
     parser.add_argument("--data-collect-num", type=int, default=3, help="number of data collector")
     parser.add_argument("--cover-edge", type=int, default=200, help="number of cells of one edge")
