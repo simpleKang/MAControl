@@ -17,8 +17,8 @@ def parse_args():
     parser = argparse.ArgumentParser("Control Experiments for Multi-Agent Environments")
 
     # Environment
-    parser.add_argument("--scenario", type=str, default="scenario5_dqn", help="name of the scenario script")
-    parser.add_argument("--agent-num", type=int, default=10, help="number of agent")
+    parser.add_argument("--scenario", type=str, default="scenario6_AFIT", help="name of the scenario script")
+    parser.add_argument("--uav-num", type=int, default=10, help="number of agent")
     parser.add_argument("--display-step-max", type=int, default=1000, help="number of episodes for displaying")
     parser.add_argument("--data-collect-num", type=int, default=3, help="number of data collector")
     parser.add_argument("--cover-edge", type=int, default=200, help="number of cells of one edge")
