@@ -2,6 +2,7 @@ import numpy as np
 
 
 # physical/external base state of all entites
+# external # 可对应 AFIT 论文中的 Macro State
 class EntityState(object):
     def __init__(self):
         # physical position
@@ -13,6 +14,7 @@ class EntityState(object):
 
 
 # state of agents (including communication and internal/mental state)
+# internal # 可对应 AFIT 论文中的 Micro State / Dynamic System State
 class AgentState(EntityState):
     def __init__(self):
         super(AgentState, self).__init__()
@@ -54,10 +56,10 @@ class Entity(object):
         self.state = EntityState()
         # mass
         self.initial_mass = 1.0
-        # UAV or Target or ...
+        # UAV or Target or Landmark
         self.UAV = False
         self.Target = False
-        self.Other = False
+        self.Landmark = False
 
     @property
     def mass(self):
@@ -68,9 +70,11 @@ class Entity(object):
 class Landmark(Entity):
     def __init__(self):
         super(Landmark, self).__init__()
+        self.Landmark = True
+        self.obstacle = None
 
 
-# properties of agent entities
+# properties of agent entities (agent = UAV + target )
 class Agent(Entity):
     def __init__(self):
         super(Agent, self).__init__()
