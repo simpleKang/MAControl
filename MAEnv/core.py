@@ -18,6 +18,9 @@ class AgentState(EntityState):
         super(AgentState, self).__init__()
         # communication utterance
         self.c = None
+        self.H = None  # 可承受攻击总量
+        self.h = None  # 已承受攻击量
+        self.w = None  # 价值
 
 
 # action of the agent
@@ -51,10 +54,10 @@ class Entity(object):
         self.state = EntityState()
         # mass
         self.initial_mass = 1.0
-        # UAV
+        # UAV or Target or ...
         self.UAV = False
-        # attacking
-        self.attacking = False
+        self.Target = False
+        self.Other = False
 
     @property
     def mass(self):
@@ -65,10 +68,6 @@ class Entity(object):
 class Landmark(Entity):
     def __init__(self):
         super(Landmark, self).__init__()
-        # value
-        self.value = 0
-        # defence
-        self.defence = 0
 
 
 # properties of agent entities
