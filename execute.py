@@ -15,7 +15,7 @@ def parse_args():
 
     # Environment
     parser.add_argument("--scenario", type=str, default="scenario6_AFIT", help="name of the scenario script")
-    parser.add_argument("--agent-num", type=int, default=10, help="number of agent")
+    parser.add_argument("--uav-num", type=int, default=10, help="number of uav")
     parser.add_argument("--train-step-max", type=int, default=10000, help="number of episodes")
     parser.add_argument("--episode-step-max", type=int, default=4000, help="maximum episode length")
     parser.add_argument("--display-step-max", type=int, default=4000, help="number of episodes for displaying")
@@ -37,7 +37,7 @@ def make_env(arglist):
     scenario = scenarios.load(arglist.scenario + ".py").Scenario()
 
     # create world and env
-    world_ = scenario.make_World(arglist.agent_num)
+    world_ = scenario.make_World(arglist.uav_num)
     env_ = MultiAgentEnv(world_, scenario.reset_world, scenario.reward, scenario.observation)
 
     # creat WorldTarget
