@@ -1,4 +1,6 @@
 # 环境长度 1 = 实际长度 1000 米 = 1 千米
+# 初步应用了 entity = agent + landmark 和 agent = uav + target 的区分，删去了许多参数，仍需进一步修改
+# （landmark = grid + obstacle + ...  , target = fixed_target + movable_target)
 
 import numpy as np
 import random
@@ -8,140 +10,77 @@ import MAEnv.scenarios.TargetProfile as T
 
 
 class Scenario(BaseScenario):
-    def make_World(self, agent_num):
+    def make_World(self, _uav_num):
         world = World()
         # set any world properties first
         world.damping = 0     # 取消第一种阻尼计算方式
         world.damping2 = 10   # 调整第二种阻尼计算方式的参数
         world.edge = T.edge   # 确定边界
         # set nums
-        num_agents = agent_num
+        num_uav = _uav_num
         num_targets = T.num_targets
-        num_m_target = T.m_num_targets
-        num_obstacles = 0
-        num_grids = 5
+        num_grids = T.num_grids
 
-        # add agents
-        world.agents = [Agent() for i in range(num_agents)]
-        for i, agent in enumerate(world.agents):
-            agent.name = 'agent %d' % i
-            # agent.collide = True
-            agent.collide = False
-            agent.silent = True
-            agent.size = 0.01  # 10米
-            agent.UAV = True
-            agent.attacking = False
+        # add agents (uavs)
+        world.U_agents = [Agent() for i in range(num_uav)]
+        for i, uav in enumerate(world.U_agents):
+            uav.name = 'uav %d' % i
+            uav.size = 0.01  # 10米
+            uav.movable = True
+            uav.UAV = True
 
-        # add Movable targets
-        world.movable_targets = [Agent() for i in range(num_m_target)]
-        for i, M_target in enumerate(world.movable_targets):
-            M_target.name = 'movable target %d' % i
-            M_target.collide = False
-            M_target.silent = True
-            M_target.UAV = False
-            M_target.value = T.m_target_value[i]
-            M_target.size = T.m_target_size[i] * 0.01
-            M_target.defence = T.m_target_defence[i]
-            M_target.attacking = False
-        world.agents = world.agents + world.movable_targets
+        # add agents (targets)
+        world.T_agents = [Agent() for i in range(num_targets)]
+        for i, target in enumerate(world.T_agents):
+            target.name = 'target %d' % i
+            target.size = T.target_size[i] * 0.01
+            target.movable = True
+            target.Target = True
 
-        # add landmarks
-        world.targets = [Landmark() for i in range(num_targets)]
-        for i, landmark in enumerate(world.targets):
-            landmark.UAV = False
-            landmark.name = 'target %d' % i
-            landmark.collide = False
-            landmark.movable = False
-            landmark.value = T.target_value[i]
-            landmark.size = T.target_size[i] * 0.01
-            landmark.defence = T.target_defence[i]
-            landmark.attacking = False
-        world.obstacles = [Landmark() for i in range(num_obstacles)]
-        for i, landmark in enumerate(world.obstacles):
-            landmark.UAV = False
-            landmark.name = 'obstacle %d' % i
-            landmark.collide = False
-            landmark.movable = False
-            landmark.size = np.ceil(random.random()*10)*0.01
-            landmark.attacking = False
+        # agents summary
+        world.agents = world.agents + world.T_agents
+
+        # add grids
         world.grids = [Landmark() for i in range(num_grids)]
-        for i, landmark in enumerate(world.grids):
-            landmark.UAV = False
-            landmark.name = 'grid %d' % i
-            landmark.collide = False
-            landmark.movable = False
-            landmark.size = 0.005
-            landmark.attacking = False
-        world.landmarks = world.targets + world.obstacles + world.grids
+        for i, grid in enumerate(world.grids):
+            grid.name = 'grid %d' % i
+            grid.size = T.grid_size
+            grid.movable = False
+            grid.Landmark = True
+
+        # landmarks summary
+        world.landmarks = world.grids
 
         # make initial conditions
-        self.reset_world(world)
+        self.reset_World(world, _uav_num)
         return world
 
-    def reset_world(self, world):
+    def reset_World(self, world, _uav_num):
 
         for i, agent in enumerate(world.agents):
-            if i < len(world.agents) - T.m_num_targets:
+            if agent.UAV:
                 agent.state.p_pos = np.random.uniform(-0.5, 0.5, world.dim_p)
                 agent.state.p_vel = np.random.uniform(-0.05, 0.05, world.dim_p)  # 50 米/秒
                 agent.state.p_acc = np.array([0, 0])
-                agent.color = T.agent_color
+                agent.color = T.UAV_color
             else:
-                agent.state.p_pos = np.array(T.m_target_pos[i+T.m_num_targets-len(world.agents)])
-                agent.state.p_vel = np.array([0, 0.02])
+                agent.state.p_pos = np.array(T.target_pos[i-_uav_num])
+                agent.state.p_vel = np.random.uniform(-0.02, 0.02, world.dim_p)  # 20 米/秒
                 agent.state.p_acc = np.array([0, 0])
-                agent.color = np.random.uniform(0, 1, 3)
-                # agent.color = T.m_target_color
+                agent.color = T.target_color
 
         for i, landmark in enumerate(world.landmarks):
             landmark.state.p_vel = np.zeros(world.dim_p)
-
-            if i < len(world.targets):
-                landmark.color = np.random.uniform(0, 1, 3)
-                landmark.state.p_pos = np.array(T.target_pos[i])
-            else:
+            if 'grid' in landmark.name:
                 landmark.color = T.grid_color
-                landmark.state.p_pos = np.array(T.grid_pos[i-len(world.targets)])
 
     def benchmark_data(self, agent, world):
         # returns data for benchmarking purposes
-        rew = 0
-        dangers = 0
-        occupied_landmarks = 0
-        min_dists = 0
-        for l in world.landmarks:
-            dists = [np.sqrt(np.sum(np.square(a.state.p_pos - l.state.p_pos))) for a in world.agents]
-            min_dists += min(dists)
-            rew -= min(dists)
-            if min(dists) < 0.1:
-                occupied_landmarks += 1
-        if agent.collide:
-            for a in world.agents:
-                if agent == a:
-                    continue
-                if self.is_danger(a, agent):
-                    rew -= 1
-                    dangers += 1
-        return (rew, dangers, min_dists, occupied_landmarks)
-
-    def is_danger(self, agent1, agent2):
-        delta_pos = agent1.state.p_pos - agent2.state.p_pos
-        dist = np.sqrt(np.sum(np.square(delta_pos)))
-        dist_min = (agent1.size + agent2.size) * 1.5
-        return True if dist < dist_min else False
+        rew = agent.color[0] + world.edge
+        return rew
 
     def reward(self, agent, world):
-        # Agents are rewarded based on minimum agent distance to each landmark, penalized for dangers
-        rew = 0
-        # for l in world.landmarks:
-        #     dists = [np.sqrt(np.sum(np.square(a.state.p_pos - l.state.p_pos))) for a in world.agents]
-        #     rew -= min(dists)
-        # if agent.collide:
-        #     for a in world.agents:
-        #         if agent == a:
-        #             continue
-        #         if self.is_danger(a, agent):
-        #             rew -= 1
+        rew = agent.color[0] + world.edge
         return rew
 
     def observation(self, agent, world):
