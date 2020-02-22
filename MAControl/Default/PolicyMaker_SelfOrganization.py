@@ -2,8 +2,6 @@ from MAControl.Base.PolicyMaker import PolicyMaker
 from MAControl.Util.PointInRec import point_in_rec
 import numpy as np
 import math
-import random
-import operator
 
 
 class PolicyMaker_SelfOrganization(PolicyMaker):
@@ -17,9 +15,9 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self.wait_step = -1                   # 决定开始决策前的等待步长
         self.init_step = 300                  # 初始前XX步内不进行任何决策
         self.after_decision_step = 100        # 决策后XX步内不进行任何决策
-        self.num = arglist.agent_num          # 小瓜子数量
+        self.uav_num = arglist.uav_num        # 小瓜子数量
         self.is_decision = False
-        self.state = np.zeros(self.num*2)
+        self.state = np.zeros(self.uav_num*2)
         self.action_index = None
 
     def find_objects_in_sight(self, obs):
@@ -48,7 +46,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self.current_friends.clear()
 
         # 寻找视场内友军
-        for i in range(self.num):
+        for i in range(self.uav_num):
             friends_pos = np.array(obs[i][2:4])
             if point_in_rec(selfview1, selfview2, selfview3, selfview4, friends_pos):
                 self.current_friends.append(i)
