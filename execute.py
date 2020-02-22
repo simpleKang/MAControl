@@ -14,14 +14,14 @@ def parse_args():
     parser = argparse.ArgumentParser("Control Experiments for Multi-Agent Environments")
 
     # Environment
-    parser.add_argument("--scenario", type=str, default="scenario5_dqn", help="name of the scenario script")
-    parser.add_argument("--agent-num", type=int, default=20, help="number of agent")
+    parser.add_argument("--scenario", type=str, default="scenario6_AFIT", help="name of the scenario script")
+    parser.add_argument("--agent-num", type=int, default=10, help="number of agent")
+    parser.add_argument("--target-num", type=int, default=5, help="number of target")
     parser.add_argument("--train-step-max", type=int, default=10000, help="number of episodes")
     parser.add_argument("--episode-step-max", type=int, default=4000, help="maximum episode length")
     parser.add_argument("--display-step-max", type=int, default=4000, help="number of episodes for displaying")
     parser.add_argument("--learn-num", type=int, default=50, help="number of learning rounds after collecting data")
     parser.add_argument("--data-collect-num", type=int, default=1, help="number of data collector")
-    parser.add_argument("--cover-edge", type=int, default=200, help="number of cells of one edge")
 
     # Evaluation
     parser.add_argument("--restore", action="store_true", default=False)
