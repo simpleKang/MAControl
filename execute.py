@@ -16,7 +16,6 @@ def parse_args():
     # Environment
     parser.add_argument("--scenario", type=str, default="scenario6_AFIT", help="name of the scenario script")
     parser.add_argument("--agent-num", type=int, default=10, help="number of agent")
-    parser.add_argument("--target-num", type=int, default=5, help="number of target")
     parser.add_argument("--train-step-max", type=int, default=10000, help="number of episodes")
     parser.add_argument("--episode-step-max", type=int, default=4000, help="maximum episode length")
     parser.add_argument("--display-step-max", type=int, default=4000, help="number of episodes for displaying")

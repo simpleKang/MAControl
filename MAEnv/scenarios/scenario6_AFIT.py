@@ -8,7 +8,7 @@ import MAEnv.scenarios.TargetProfile as T
 
 
 class Scenario(BaseScenario):
-    def make_world(self, agent_num):
+    def make_World(self, agent_num):
         world = World()
         # set any world properties first
         world.damping = 0     # 取消第一种阻尼计算方式
