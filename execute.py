@@ -1,12 +1,15 @@
 # coding=utf-8
 
 import argparse
+import numpy as np
 import time
+import os
+import MAControl.Util.OfflineCoverRate as OCR
 
 import MAControl.Default1.InnerController_PID as IC_P
 import MAControl.Default1.MotionController_L1_TECS as MC_L
 import MAControl.Default1.PathPlanner_EgdeWaypoint as PP_G
-import MAControl.Default1.PolicyMaker_LocalDecision as PM_L
+import MAControl.Default1.PolicyMaker_SelfOrganization as PM_S
 
 
 def parse_args():
@@ -14,17 +17,11 @@ def parse_args():
     parser = argparse.ArgumentParser("Control Experiments for Multi-Agent Environments")
 
     # Environment
-    parser.add_argument("--scenario", type=str, default="scenario6_AFIT", help="name of the scenario script")
-    parser.add_argument("--uav-num", type=int, default=10, help="number of uav")
-    parser.add_argument("--train-step-max", type=int, default=10000, help="number of episodes")
-    parser.add_argument("--episode-step-max", type=int, default=4000, help="maximum episode length")
-    parser.add_argument("--display-step-max", type=int, default=4000, help="number of episodes for displaying")
-    parser.add_argument("--learn-num", type=int, default=50, help="number of learning rounds after collecting data")
-    parser.add_argument("--data-collect-num", type=int, default=1, help="number of data collector")
-
-    # Evaluation
-    parser.add_argument("--restore", action="store_true", default=False)
-    parser.add_argument("--display", action="store_true", default=True)
+    parser.add_argument("--scenario", type=str, default="scenario5_dqn", help="name of the scenario script")
+    parser.add_argument("--agent-num", type=int, default=10, help="number of agent")
+    parser.add_argument("--display-step-max", type=int, default=1000, help="number of episodes for displaying")
+    parser.add_argument("--data-collect-num", type=int, default=3, help="number of data collector")
+    parser.add_argument("--cover-edge", type=int, default=200, help="number of cells of one edge")
 
     return parser.parse_args()
 
@@ -56,7 +53,7 @@ def get_controller(env, world, arglist):
     for i in range(arglist.uav_num):
         control = list()
 
-        control.append(PM_L.PolicyMaker_LocalDecision("agent_%d" % i, env, world, i, arglist))
+        control.append(PM_S.PolicyMaker_SelfOrganization("agent_%d" % i, env, world, i, arglist))
         control.append(PP_G.PathPlanner_EgdeWaypoint("agent_%d" % i, env, world, i, arglist))
         control.append(MC_L.MotionController_L1_TECS("agent_%d" % i, env, world, i, arglist))
         control.append(IC_P.InnerController_PID("agent_%d" % i, env, world, i, arglist))
@@ -76,7 +73,7 @@ def action(arglist, WorldTarget, obs_n, step, NewController):
     # 小瓜子运动
     for i in range(arglist.uav_num):
 
-        list_i, sight_friends = NewController[i][0]. \
+        list_i = NewController[i][0].\
             make_policy(WorldTarget, obs_n, step)
 
         pointAi, pointBi, finishedi, NewController[i][5], WorldTarget = NewController[i][1].\
@@ -110,29 +107,40 @@ if __name__ == '__main__':
     # Create Controller
     NewController = get_controller(env, world, arglist)
 
-    if arglist.display:
+    for num in range(arglist.data_collect_num):
 
-        for num in range(arglist.data_collect_num):
+        with open(os.path.dirname(__file__) + '/track/para.txt', 'w') as f:
+            f.write(str(arglist.cover_edge)+' '+str(arglist.agent_num)+' '+str(arglist.display_step_max))
 
-            obs_n = env.reset()
-            start = time.time()
+        # 为每个小瓜子创建状态文件
+        for k in range(arglist.agent_num):
+            open(os.path.dirname(__file__) + '/track/agent_%d_track.txt' % k, 'w')
 
-            for step in range(arglist.display_step_max):
+        obs_n = env.reset()
+        start = time.time()
 
-                # 选择动作
-                action_n, worldtarget = action(arglist, worldtarget, obs_n, step, NewController)
+        for step in range(arglist.display_step_max):
 
-                new_obs_n, rew_n, done_n, info_n = env.step(action_n)
+            # 选择动作
+            action_n, worldtarget = action(arglist, worldtarget, obs_n, step, NewController)
 
-                obs_n = new_obs_n
+            new_obs_n, rew_n, done_n, info_n = env.step(action_n)
 
-                # 画图展示
-                augment_view(arglist, world, NewController)
-                env.render()
-                print('>>> Num', num, '>>>> step', step)
-                time.sleep(0.01)
+            obs_n = new_obs_n
 
-            time.sleep(1)
-            end = time.time()
-            interval = round((end - start), 2)
-            print('Time Interval ', interval)
+            # 保存每个小瓜子每个step的状态信息
+            for k in range(arglist.agent_num):
+                with open(os.path.dirname(__file__) + '/track/agent_%d_track.txt' % k, 'a') as f:
+                    f.write(str(obs_n[k][0])+' '+str(obs_n[k][1])+' '+str(obs_n[k][2])+' '+str(obs_n[k][3])+'\n')
+
+            # 画图展示
+            augment_view(arglist, world, NewController)
+            env.render()
+            print('>>> Num', num, '>>>> step', step)
+            time.sleep(0.01)
+
+        time.sleep(1)
+        OCR.calculate_coverage(arglist.cover_edge, arglist.agent_num, arglist.display_step_max, num)
+        end = time.time()
+        interval = round((end - start), 2)
+        print('Time Interval ', interval)
