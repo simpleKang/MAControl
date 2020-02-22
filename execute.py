@@ -6,10 +6,10 @@ import time
 import os
 import MAControl.Util.OfflineCoverRate as OCR
 
-import MAControl.Test_Auction.InnerController_PID as IC_P
-import MAControl.Test_Auction.MotionController_L1_TECS as MC_L
-import MAControl.Test_Auction.PathPlanner_EgdeWaypoint as PP_G
-import MAControl.Test_Auction.PolicyMaker_SelfOrganization as PM_S
+import MAControl.Default.InnerController_PID as IC_P
+import MAControl.Default.MotionController_L1_TECS as MC_L
+import MAControl.Default.PathPlanner_EgdeWaypoint as PP_G
+import MAControl.Default.PolicyMaker_SelfOrganization as PM_S
 
 
 def parse_args():
