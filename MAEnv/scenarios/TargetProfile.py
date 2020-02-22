@@ -4,7 +4,7 @@ import numpy as np
 UAV_color = np.array([0.47, 0.79, 0.79])
 
 # target parameters
-num_targets = 0
+num_targets = 5
 target_size = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
 target_pos = [[1.2,     1],
               [0.5,  -1.5],
