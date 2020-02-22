@@ -101,8 +101,10 @@ class Agent(Entity):
 # multi-agent world
 class World(object):
     def __init__(self):
-        # list of agents and entities (can change at execution-time!)
-        self.agents = []
+        # list of agents and landmarks (can change at execution-time!)
+        self.U_agents = []
+        self.T_agents = []
+        self.agents = self.U_agents + self. T_agents
         self.landmarks = []
         # communication channel dimensionality
         self.dim_c = 0
