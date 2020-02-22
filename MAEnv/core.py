@@ -44,7 +44,7 @@ class Entity(object):
         # entity can move / be pushed
         self.movable = False
         # entity collides with others
-        self.collide = True
+        self.collide = False
         # material density (affects mass)
         self.density = 25.0
         # color
@@ -81,7 +81,7 @@ class Agent(Entity):
         # agents are movable by default
         self.movable = True
         # cannot send communication signals
-        self.silent = False
+        self.silent = True
         # cannot observe the world
         self.blind = False
         # physical motor noise amount
