@@ -221,14 +221,14 @@ class MultiAgentEnv(gym.Env):
                 if 'grid' in entity.name:
                     preset = [[-2, -2], [-2, 2], [2, 2], [2, -2]]
                     geom = rendering.make_polygon(list(np.array(preset) * entity.size))
-                elif 'agent' in entity.name:
+                elif 'uav' in entity.name:
                     geom = rendering.make_uav89(entity.size)
-                elif 'movable' in entity.name:
+                elif 'target' in entity.name:
                     geom = rendering.make_tank(entity.size)
                 else:
                     geom = rendering.make_house(entity.size)
                 xform = rendering.Transform()
-                if 'agent' in entity.name:
+                if 'uav' in entity.name:
                     geom.set_color(*entity.color, alpha=0.5)
                 else:
                     geom.set_color(*entity.color)
@@ -251,7 +251,7 @@ class MultiAgentEnv(gym.Env):
                 pos = np.zeros(self.world.dim_p)
             else:
                 pos = self.agents[i].state.p_pos
-            self.viewers[i].set_bounds(pos[0]-cam_range, pos[0]+cam_range,pos[1]-cam_range, pos[1]+cam_range)
+            self.viewers[i].set_bounds(pos[0]-cam_range, pos[0]+cam_range, pos[1]-cam_range, pos[1]+cam_range)
             # update geometry positions
             for e, entity in enumerate(self.world.entities):
                 self.render_geoms_xform[e].set_translation(*entity.state.p_pos)
