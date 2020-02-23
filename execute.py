@@ -119,7 +119,9 @@ if __name__ == '__main__':
         for step in range(arglist.step_max):
 
             # 选择动作
-            action_n, worldtarget = action(arglist, worldtarget, obs_n, step, NewController)
+            action_Un = action(worldtarget, obs_n[0:arglist.uav_num], step, Controllers[0])
+            action_Tn = action(worldtarget, obs_n[arglist.uav_num:], step, Controllers[1])
+            action_n = action_Un + action_Tn
 
             new_obs_n, rew_n, done_n, info_n = env.step(action_n)
 
