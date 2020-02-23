@@ -16,6 +16,7 @@ target_pos = [[1.2,     1],
               [-1.2, -0.8],
               [1.6,  -0.6],
               [0.6,  -1.2]]
+target_movable = [True, True, True, False, False, False, False, False, False, False]
 target_color = np.array([0, 0.8, 0])
 target_defence = [10, 10, 10, 10, 10, 8, 8, 8, 8, 8]
 target_value = [2, 2, 5, 2, 3, 2, 2, 5, 2, 3]
