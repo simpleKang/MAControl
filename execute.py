@@ -64,10 +64,11 @@ def get_controller(env, world, arglist):
     for i in range(T.num_targets):
         control = list()
 
-        control.append(PM_S.PolicyMaker_SelfOrganization("target_%d" % i, env, world, i, arglist))
-        control.append(PP_G.PathPlanner_EgdeWaypoint("target_%d" % i, env, world, i, arglist))
-        control.append(MC_L.MotionController_L1_TECS("target_%d" % i, env, world, i, arglist))
-        control.append(IC_P.InnerController_PID("target_%d" % i, env, world, i, arglist))
+        # i 是作为target的编号 # i+arglist.uav_num 是作为agent的编号
+        control.append(PM_S.PolicyMaker_SelfOrganization("target_%d" % i, env, world, i+arglist.uav_num, arglist))
+        control.append(PP_G.PathPlanner_EgdeWaypoint("target_%d" % i, env, world, i+arglist.uav_num, arglist))
+        control.append(MC_L.MotionController_L1_TECS("target_%d" % i, env, world, i+arglist.uav_num, arglist))
+        control.append(IC_P.InnerController_PID("target_%d" % i, env, world, i+arglist.uav_num, arglist))
         control.append(False)  # Arriveflag
 
         targetController.append(control)
