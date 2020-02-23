@@ -255,14 +255,11 @@ class MultiAgentEnv(gym.Env):
             # update geometry positions
             for e, entity in enumerate(self.world.entities):
                 self.render_geoms_xform[e].set_translation(*entity.state.p_pos)
-                if 'agent' in entity.name or 'movable' in entity.name:
+                if 'agent' in entity.name or 'target' in entity.name:
                     vx = entity.state.p_vel[0]
                     vy = entity.state.p_vel[1]
                     rot = math.atan2(vy, vx) - math.pi/2
                     self.render_geoms_xform[e].set_rotation(rot)
-                if 'agent' in entity.name and entity.attacking:
-                    # self.render_geoms_xform[e].set_scale(3, 3)
-                    self.render_geoms[e].set_color(1, 0, 0, 0.8)
             # render to display or array
             results.append(self.viewers[i].render(return_rgb_array=mode == 'rgb_array'))
 
