@@ -20,6 +20,7 @@ class Scenario(BaseScenario):
         num_uav = _uav_num
         num_targets = T.num_targets
         num_grids = T.num_grids
+        num_square = T.num_square
 
         # add agents (uavs)
         world.U_agents = [Agent() for i in range(num_uav)]
@@ -48,11 +49,19 @@ class Scenario(BaseScenario):
         for i, grid in enumerate(world.grids):
             grid.name = 'grid %d' % i
             grid.size = T.grid_size
-            grid.movable = False
             grid.Landmark = True
+            grid.obstacle = False
+
+        # add squares
+        world.squares = [Landmark() for i in range(num_square)]
+        for i, square in enumerate(world.squares):
+            square.name = 'square %d' % i
+            square.size = T.square_size
+            square.Landmark = True
+            square.obstacle = True
 
         # landmarks summary
-        world.landmarks = world.grids
+        world.landmarks = world.grids + world.squares
 
         # make initial conditions
         self.reset_world(world)
@@ -78,10 +87,15 @@ class Scenario(BaseScenario):
                     agent.color = T.fixed_target_color
 
         for i, landmark in enumerate(world.landmarks):
-            landmark.state.p_pos = T.grid_pos[i]
             landmark.state.p_vel = np.zeros(world.dim_p)
             if 'grid' in landmark.name:
                 landmark.color = T.grid_color
+                landmark.state.p_pos = T.grid_pos[i]
+            elif 'square' in landmark.name:
+                landmark.color = T.square_color
+                landmark.state.p_pos = T.square_pos[i-T.num_grids]
+            else:
+                pass
 
     def benchmark_data(self, agent, world):
         # returns data for benchmarking purposes
