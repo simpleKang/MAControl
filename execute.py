@@ -33,7 +33,7 @@ def make_env(arglist):
 
     # create world and env
     world_ = scenario.make_World(arglist.uav_num)
-    env_ = MultiAgentEnv(world_, scenario.reset_World, scenario.reward, scenario.observation)
+    env_ = MultiAgentEnv(world_, scenario.reset_world, scenario.reward, scenario.observation)
 
     # creat WorldTarget
     worldtarget_ = list()
