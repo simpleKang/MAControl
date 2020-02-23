@@ -72,7 +72,10 @@ class Scenario(BaseScenario):
                 agent.state.p_pos = np.array(T.target_pos[i-uav_count])
                 agent.state.p_vel = np.random.uniform(-0.02, 0.02, world.dim_p)  # 20 米/秒
                 agent.state.p_acc = np.array([0, 0])
-                agent.color = T.target_color
+                if agent.movable:
+                    agent.color = T.movable_target_color
+                else:
+                    agent.color = T.fixed_target_color
 
         for i, landmark in enumerate(world.landmarks):
             landmark.state.p_pos = T.grid_pos[i]
