@@ -40,7 +40,7 @@ class Scenario(BaseScenario):
             target.w = T.target_value[i]
 
         # agents summary
-        world.agents = world.agents + world.T_agents
+        world.agents = world.U_agents + world.T_agents
 
         # add grids
         world.grids = [Landmark() for i in range(num_grids)]
