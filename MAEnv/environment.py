@@ -219,7 +219,8 @@ class MultiAgentEnv(gym.Env):
             self.render_geoms_xform = []
             for entity in self.world.entities:
                 if 'grid' in entity.name:
-                    geom = rendering.make_circle(radius=entity.size)
+                    preset = [[-2, -2], [-2, 2], [2, 2], [2, -2]]
+                    geom = rendering.make_polygon(list(np.array(preset) * entity.size))
                 elif 'uav' in entity.name:
                     geom = rendering.make_uav89(entity.size)
                 elif 'target' in entity.name:
@@ -252,13 +253,13 @@ class MultiAgentEnv(gym.Env):
                 pos = self.agents[i].state.p_pos
             self.viewers[i].set_bounds(pos[0]-cam_range, pos[0]+cam_range, pos[1]-cam_range, pos[1]+cam_range)
             # update geometry positions
-            for a, agent in enumerate(self.world.agents):
-                self.render_geoms_xform[a].set_translation(*agent.state.p_pos)
-                if 'uav' in agent.name or 'target' in agent.name:
-                    vx = agent.state.p_vel[0]
-                    vy = agent.state.p_vel[1]
+            for e, entity in enumerate(self.world.entities):
+                self.render_geoms_xform[e].set_translation(*entity.state.p_pos)
+                if 'uav' in entity.name or 'target' in entity.name:
+                    vx = entity.state.p_vel[0]
+                    vy = entity.state.p_vel[1]
                     rot = math.atan2(vy, vx) - math.pi/2
-                    self.render_geoms_xform[a].set_rotation(rot)
+                    self.render_geoms_xform[e].set_rotation(rot)
             # render to display or array
             results.append(self.viewers[i].render(return_rgb_array=mode == 'rgb_array'))
 
