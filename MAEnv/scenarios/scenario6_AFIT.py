@@ -74,6 +74,7 @@ class Scenario(BaseScenario):
                 agent.color = T.target_color
 
         for i, landmark in enumerate(world.landmarks):
+            landmark.state.p_pos = T.grid_pos[i]
             landmark.state.p_vel = np.zeros(world.dim_p)
             if 'grid' in landmark.name:
                 landmark.color = T.grid_color
