@@ -34,7 +34,7 @@ class Scenario(BaseScenario):
         for i, target in enumerate(world.T_agents):
             target.name = 'target %d' % i
             target.size = T.target_size[i] * 0.01
-            if not T.target_movable:
+            if not T.target_movable[i]:
                 target.movable = False
             target.Target = True
             target.H = T.target_defence[i]
