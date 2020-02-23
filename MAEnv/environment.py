@@ -219,8 +219,7 @@ class MultiAgentEnv(gym.Env):
             self.render_geoms_xform = []
             for entity in self.world.entities:
                 if 'grid' in entity.name:
-                    preset = [[-2, -2], [-2, 2], [2, 2], [2, -2]]
-                    geom = rendering.make_polygon(list(np.array(preset) * entity.size))
+                    geom = rendering.make_circle(radius=entity.size)
                 elif 'uav' in entity.name:
                     geom = rendering.make_uav89(entity.size)
                 elif 'target' in entity.name:
