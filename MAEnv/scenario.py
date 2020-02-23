@@ -14,7 +14,3 @@ class BaseScenario(object):
     # create initial conditions of the world
     def reset_world(self, world):
         raise NotImplementedError()
-
-    # create initial conditions of the world
-    def reset_World(self, world, uav_num):
-        raise NotImplementedError()

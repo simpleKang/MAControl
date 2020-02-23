@@ -54,19 +54,21 @@ class Scenario(BaseScenario):
         world.landmarks = world.grids
 
         # make initial conditions
-        self.reset_World(world, _uav_num)
+        self.reset_world(world)
         return world
 
-    def reset_World(self, world, _uav_num):
+    def reset_world(self, world):
 
+        uav_count = 0
         for i, agent in enumerate(world.agents):
             if agent.UAV:
                 agent.state.p_pos = np.random.uniform(-0.5, 0.5, world.dim_p)
                 agent.state.p_vel = np.random.uniform(-0.05, 0.05, world.dim_p)  # 50 米/秒
                 agent.state.p_acc = np.array([0, 0])
                 agent.color = T.UAV_color
+                uav_count += 1
             else:
-                agent.state.p_pos = np.array(T.target_pos[i-_uav_num])
+                agent.state.p_pos = np.array(T.target_pos[i-uav_count])
                 agent.state.p_vel = np.random.uniform(-0.02, 0.02, world.dim_p)  # 20 米/秒
                 agent.state.p_acc = np.array([0, 0])
                 agent.color = T.target_color
