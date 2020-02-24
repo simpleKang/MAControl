@@ -61,7 +61,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         for i in range(obs.__len__() - self.uav_num):
             target_pos = np.array(obs[i+self.uav_num][2:4])
             if point_in_rec(selfview1, selfview2, selfview3, selfview4, target_pos):
-                _seen_targets.append(i)
+                _seen_targets.append(i+self.uav_num)
 
         # TODO  尚未考虑视线遮挡 [p98-(5.5)]
 
@@ -80,6 +80,27 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
 
         _COMMates.remove(self.index)
         return _COMMates
+
+    def extend_known_objects(self, obs):
+        _known_uavs = PolicyMaker_SelfOrganization.seen_uavs[self.index]
+        _known_targets = PolicyMaker_SelfOrganization.seen_targets[self.index]
+
+        for k in self.find_communication_mates(obs):
+            if k not in _known_uavs:
+                _known_uavs.append(k)
+            else:
+                pass
+
+            targets_k = PolicyMaker_SelfOrganization.seen_targets[k]
+
+            for t in targets_k:
+                if t not in _known_targets:
+                    _known_targets.append(t)
+                else:
+                    pass
+
+        self.known_uavs = _known_uavs
+        self.known_targets = _known_targets
 
     def make_policy(self, obstacles, obs_n, step):
 
