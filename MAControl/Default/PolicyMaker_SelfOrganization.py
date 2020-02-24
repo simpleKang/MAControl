@@ -60,7 +60,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
 
         # TODO  尚未考虑视线遮挡
 
-    def make_policy(self, WorldTarget, obs_n, step):
+    def make_policy(self, obstacles, obs_n, step):
 
         self.opt_index = 0
 

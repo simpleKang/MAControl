@@ -25,7 +25,7 @@ class PathPlanner_EgdeWaypoint(PathPlanner):
 
         PathPlanner_EgdeWaypoint.AGENT_ALIVE.append(True)
 
-    def planpath(self, para_list, obs, arrive_flag, step, worldtarget):
+    def planpath(self, para_list, obs, arrive_flag, step, obstacles):
         if para_list[0] == 0:
             self.no_operation()
 
