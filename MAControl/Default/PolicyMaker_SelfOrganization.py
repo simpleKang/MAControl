@@ -7,6 +7,7 @@ import math
 class PolicyMaker_SelfOrganization(PolicyMaker):
     seen_targets = list()
     seen_uavs = list()
+    pheromonal = list()
 
     def __init__(self, name, env, world, agent_index, arglist):
         super(PolicyMaker_SelfOrganization, self).__init__(name, env, world, agent_index, arglist)
@@ -14,6 +15,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self.decision = 0                     # 决策内容
         PolicyMaker_SelfOrganization.seen_uavs.append(())           # 个体视野中uav
         PolicyMaker_SelfOrganization.seen_targets.append(())        # 个体视野中target
+        PolicyMaker_SelfOrganization.pheromonal.append(-1)     # agent 会将它更新为非负数. # 一直是 -1 表示自己是个target.
         self.known_uavs = list()              # 视野+通信到的uav
         self.known_targets = list()           # 视野+通信到的target
         self.communication_range = 1
@@ -63,6 +65,9 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             if point_in_rec(selfview1, selfview2, selfview3, selfview4, target_pos):
                 _seen_targets.append(i+self.uav_num)
 
+        if (_seen_targets.__len__() != 0) and (self.index < self.uav_num):
+            PolicyMaker_SelfOrganization.pheromonal[self.index] = 1
+
         # TODO  尚未考虑视线遮挡 [p98-(5.5)]
 
         PolicyMaker_SelfOrganization.seen_uavs[self.index] = _seen_uavs
@@ -84,6 +89,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
     def extend_known_objects(self, obs):
         _known_uavs = PolicyMaker_SelfOrganization.seen_uavs[self.index]
         _known_targets = PolicyMaker_SelfOrganization.seen_targets[self.index]
+        _neighbor_pheromone = list()
 
         for k in self.find_communication_mates(obs):
             if k not in _known_uavs:
@@ -92,6 +98,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
                 pass
 
             targets_k = PolicyMaker_SelfOrganization.seen_targets[k]
+            _neighbor_pheromone.append(PolicyMaker_SelfOrganization.pheromonal[k])
 
             for t in targets_k:
                 if t not in _known_targets:
@@ -101,6 +108,17 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
 
         self.known_uavs = _known_uavs
         self.known_targets = _known_targets
+
+        if PolicyMaker_SelfOrganization.pheromonal[self.index] != 1:
+            _neighbor_pheromone.append(0)
+            result = max(_neighbor_pheromone)/2
+            result = 0 if result < 0.001 else result
+            if self.index < self.uav_num:
+                PolicyMaker_SelfOrganization.pheromonal[self.index] = result
+            else:
+                pass
+        else:
+            pass
 
     def make_policy(self, obstacles, obs_n, step):
 
