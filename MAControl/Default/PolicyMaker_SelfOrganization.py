@@ -10,8 +10,8 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         super(PolicyMaker_SelfOrganization, self).__init__(name, env, world, agent_index, arglist)
         self.opt_index = 0                    # 操作数, 目前有0 / 1 / 10
         self.decision = 0                     # 决策内容
-        self.friends_in_sight = list()        # 决策前存储视野中友军
-        self.current_friends = list()         # 当前视野中友军
+        self.seen_uavs = list()               # 当前视野中uav
+        self.seen_targets = list()            # 当前视野中target
         self.wait_step = -1                   # 决定开始决策前的等待步长
         self.init_step = 300                  # 初始前XX步内不进行任何决策
         self.after_decision_step = 100        # 决策后XX步内不进行任何决策
@@ -43,13 +43,22 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         selfview3 = selfpos + selfvelunit * (d1 + d2 / 2) + np.array([xx3, yy3])
         selfview4 = selfpos + selfvelunit * (d1 + d2 / 2) + np.array([xx4, yy4])
 
-        self.current_friends.clear()
+        self.seen_uavs.clear()
+        self.seen_targets.clear()
 
-        # 寻找视场内友军
+        # 寻找视场内uav
         for i in range(self.uav_num):
-            friends_pos = np.array(obs[i][2:4])
-            if point_in_rec(selfview1, selfview2, selfview3, selfview4, friends_pos):
-                self.current_friends.append(i)
+            uav_pos = np.array(obs[i][2:4])
+            if point_in_rec(selfview1, selfview2, selfview3, selfview4, uav_pos):
+                self.seen_uavs.append(i)
+
+        # 寻找视场内target
+        for i in range(obs.__len__() - self.uav_num):
+            target_pos = np.array(obs[i+self.uav_num][2:4])
+            if point_in_rec(selfview1, selfview2, selfview3, selfview4, target_pos):
+                self.seen_targets.append(i)
+
+        # TODO  尚未考虑视线遮挡
 
     def make_policy(self, WorldTarget, obs_n, step):
 
