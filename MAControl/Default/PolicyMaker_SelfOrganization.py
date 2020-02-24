@@ -12,6 +12,9 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self.decision = 0                     # 决策内容
         self.seen_uavs = list()               # 当前视野中uav
         self.seen_targets = list()            # 当前视野中target
+        self.known_uavs = list()              # 视野+通信到的uav
+        self.known_targets = list()           # 视野+通信到的target
+        self.communication_range = 1
         self.wait_step = -1                   # 决定开始决策前的等待步长
         self.init_step = 300                  # 初始前XX步内不进行任何决策
         self.after_decision_step = 100        # 决策后XX步内不进行任何决策
@@ -58,7 +61,22 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             if point_in_rec(selfview1, selfview2, selfview3, selfview4, target_pos):
                 self.seen_targets.append(i)
 
-        # TODO  尚未考虑视线遮挡
+        # TODO  尚未考虑视线遮挡 [p98-(5.5)]
+
+        return self.seen_targets, self.seen_uavs
+
+    def find_communication_mates(self, obs):
+        _COMMates = list()
+
+        self_pos = np.array(obs[self.index][2:4])
+        for i in range(self.uav_num):
+            uav_pos = np.array(obs[i][2:4])
+            distance = np.linalg.norm(uav_pos-self_pos)
+            if distance < self.communication_range:
+                _COMMates.append(i)
+
+        _COMMates.remove(self.index)
+        return _COMMates
 
     def make_policy(self, obstacles, obs_n, step):
 
