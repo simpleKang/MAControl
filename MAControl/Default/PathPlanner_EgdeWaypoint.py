@@ -71,17 +71,10 @@ class PathPlanner_EgdeWaypoint(PathPlanner):
                 self.finished = True
                 PathPlanner_EgdeWaypoint.AGENT_ALIVE[self.index] = False
 
-        # 在攻击状态下到达航点时认为攻击目标成功，判断航点finish
-        elif arrive_flag and self.is_attacking is True and self.finished is False:
-            self.finished = True
-            target_index = worldtarget.index(self.attacking_target)
-            worldtarget[target_index][3] -= 1
-            PathPlanner_EgdeWaypoint.AGENT_ALIVE[self.index] = False
-
         else:
             pass
 
-        return self.pointAi, self.pointBi, self.finished, self.is_attacking, worldtarget
+        return self.pointAi, self.pointBi, self.finished, self.is_attacking
 
     # 操作数 = 0 不进行任何操作，返回当前航点列表
     def no_operation(self):

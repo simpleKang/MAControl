@@ -35,12 +35,13 @@ def make_env(arglist):
     world_ = scenario.make_World(arglist.uav_num)
     env_ = MultiAgentEnv(world_, scenario.reset_world, scenario.reward, scenario.observation)
 
-    # creat WorldTarget
-    worldtarget_ = list()
-    for i, agent in enumerate(world_.T_agents):
-        worldtarget_.append([agent.state.p_pos[0], agent.state.p_pos[1], agent.w, agent.H])
+    # creat obstacle_info_
+    obstacle_info_ = list()
+    for k, landmark in enumerate(world_.landmarks):
+        if landmark.obstacle:
+            obstacle_info_.append([landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.size, k])
 
-    return env_, world_, worldtarget_
+    return env_, world_, obstacle_info_
 
 
 def get_controller(env, world, arglist):
@@ -76,8 +77,7 @@ def get_controller(env, world, arglist):
     return uavController, targetController
 
 
-def action(WorldTarget, obs_n, step, ControllerSet):
-    # 将WorldTarget作为action的输入参数是为了统一uav/target的控制形式，后者实际拿来不用
+def action(obs_n, step, ControllerSet, obstacles):
 
     # get action
     action_n = list()
@@ -86,10 +86,10 @@ def action(WorldTarget, obs_n, step, ControllerSet):
     for i in range(ControllerSet.__len__()):  # 提取ControllerSet的长度
 
         list_i = ControllerSet[i][0].\
-            make_policy(WorldTarget, obs_n, step)
+            make_policy(obstacles, obs_n, step)
 
-        pointAi, pointBi, finishedi, tempr, WorldTarget = ControllerSet[i][1].\
-            planpath(list_i, obs_n[i], ControllerSet[i][4], step, WorldTarget)
+        pointAi, pointBi, finishedi, tempr = ControllerSet[i][1].\
+            planpath(list_i, obs_n[i], ControllerSet[i][4], step, obstacles)
 
         acctEi, acclEi, ControllerSet[i][4] = ControllerSet[i][2]. \
             get_expected_action(obs_n[i], pointAi, pointBi, step, finishedi)
@@ -107,7 +107,7 @@ if __name__ == '__main__':
     arglist = parse_args()
 
     # Create environment
-    env, world, worldtarget = make_env(arglist)
+    env, world, obstacle_info = make_env(arglist)
 
     # Create Controller
     Controllers = get_controller(env, world, arglist)
@@ -120,8 +120,8 @@ if __name__ == '__main__':
         for step in range(arglist.step_max):
 
             # 选择动作
-            action_Un = action(worldtarget, obs_n[0:arglist.uav_num], step, Controllers[0])
-            action_Tn = action(worldtarget, obs_n[arglist.uav_num:], step, Controllers[1])
+            action_Un = action(obs_n[0:arglist.uav_num], step, Controllers[0], obstacle_info)
+            action_Tn = action(obs_n[arglist.uav_num:], step, Controllers[1], obstacle_info)
             action_n = action_Un + action_Tn
 
             new_obs_n, rew_n, done_n, info_n = env.step(action_n)
