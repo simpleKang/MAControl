@@ -232,6 +232,8 @@ class MultiAgentEnv(gym.Env):
                 xform = rendering.Transform()
                 if 'uav' in entity.name:
                     geom.set_color(*entity.color, alpha=0.5)
+                elif 'square' in entity.name:
+                    geom.set_color(*entity.color, alpha=0.3)
                 else:
                     geom.set_color(*entity.color)
                 geom.add_attr(xform)
