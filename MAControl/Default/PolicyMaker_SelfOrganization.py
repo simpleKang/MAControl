@@ -57,13 +57,15 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         for i in range(self.uav_num):
             uav_pos = np.array(obs[i][2:4])
             if point_in_rec(selfview1, selfview2, selfview3, selfview4, uav_pos):
-                _seen_uavs.append(i)
+                if i!= self.index:
+                    _seen_uavs.append(i)
 
         # 寻找视场内target
         for i in range(obs.__len__() - self.uav_num):
             target_pos = np.array(obs[i+self.uav_num][2:4])
             if point_in_rec(selfview1, selfview2, selfview3, selfview4, target_pos):
-                _seen_targets.append(i+self.uav_num)
+                if i != (self.index - self.uav_num):
+                    _seen_targets.append(i+self.uav_num)
 
         if (_seen_targets.__len__() != 0) and (self.index < self.uav_num):
             PolicyMaker_SelfOrganization.pheromonal[self.index] = 1
