@@ -57,7 +57,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         for i in range(self.uav_num):
             uav_pos = np.array(obs[i][2:4])
             if point_in_rec(selfview1, selfview2, selfview3, selfview4, uav_pos):
-                if i!= self.index:
+                if i != self.index:
                     _seen_uavs.append(i)
 
         # 寻找视场内target
@@ -121,6 +121,18 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
                 pass
         else:
             pass
+
+    def get_UAV_density(self, obs):
+        item = list()
+
+        self_pos = np.array(obs[self.index][2:4])
+        for i in self.known_uavs:
+            uav_pos = np.array(obs[i][2:4])
+            distance = np.linalg.norm(uav_pos-self_pos)
+            item.append(1/distance)
+
+        _density = sum(item)
+        return _density
 
     def make_policy(self, obstacles, obs_n, step):
 
