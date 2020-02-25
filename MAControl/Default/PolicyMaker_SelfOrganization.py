@@ -2,6 +2,7 @@ from MAControl.Base.PolicyMaker import PolicyMaker
 from MAControl.Util.PointInRec import point_in_rec
 import numpy as np
 import math
+import MAControl.Default.Behavior_Archetype as BA
 
 
 class PolicyMaker_SelfOrganization(PolicyMaker):
@@ -136,7 +137,24 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
 
     def make_policy(self, obstacles, obs_n, step):
 
-        self.opt_index = 0
+        if self.index < self.uav_num:  # uav policy
+            if step % 10 == 9:
+                self.find_objects_in_sight(obs_n)
+            elif step % 10 == 0:
+                if step != 0:
+                    self.extend_known_objects(obs_n)
+            elif step % 10 == 1:
+                pheromonal = PolicyMaker_SelfOrganization.pheromonal[self.index]
+                density = self.get_UAV_density(obs_n)
+                BEHAVIOR = [-10, -10]
+                for k, ba_k in enumerate(BA.BA):
+                    BA_k = pheromonal * ba_k[0] + density * ba_k[1]
+                    BEHAVIOR = [BA_k, k] if BEHAVIOR[0] < BA_k else BEHAVIOR
+            else:
+                pass
+
+        else:  # target policy
+            pass
 
         opt = [self.opt_index, self.decision]
 
