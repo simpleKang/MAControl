@@ -137,7 +137,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
 
     def rule_summation(self, ba_index, obs_n):
 
-        W = BA.BA[ba_index][3:]
+        W = BA.BA[ba_index][2:]
         W.append(2)
         W.append(2)
 
