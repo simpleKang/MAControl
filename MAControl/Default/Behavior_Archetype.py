@@ -1,9 +1,14 @@
-# BA_b = [b.C1  b.C2]
+# BA_b = [b.C1  b.C2  b.W1  b.W2  b.W3  b.W4  b.W5  b.W6  b.W7  b.W8]
 
 BA = list()
 
-BA.append([1, 2])
-BA.append([3, 5])
-BA.append([0, 7])
-BA.append([5, 0])
+BA.append([1, 7, 1, 0, 0, 0, 0, 0, 0, 0])
+BA.append([2, 4, 0, 1, 0, 0, 0, 0, 0, 0])
+BA.append([2, 7, 1, 0, 1, 0, 0, 0, 0, 0])
+BA.append([2, 4, 0, 0, 0, 1, 0, 0, 0, 0])
+BA.append([1, 4, 0, 0, 0, 0, 1, 0, 0, 0])
+BA.append([2, 7, 0, 0, 0, 0, 0, 1, 0, 0])
+BA.append([2, 4, 0, 0, 0, 0, 0, 0, 1, 0])
+BA.append([1, 4, 0, 0, 0, 0, 0, 0, 0, 1])
+
 
