@@ -135,6 +135,37 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         _density = sum(item)
         return _density
 
+    def rule_summation(self, ba_index, obs_n):
+
+        W = BA.BA[ba_index][3:]
+        W.append(2)
+        W.append(2)
+
+        UR = list()
+        UR.append(np.array(self.rule1(obs_n)))
+        UR.append(np.array(self.rule2(obs_n)))
+        UR.append(np.array(self.rule3(obs_n)))
+        UR.append(np.array(self.rule4(obs_n)))
+        UR.append(np.array(self.rule5(obs_n)))
+        UR.append(np.array(self.rule6(obs_n)))
+        UR.append(np.array(self.rule7(obs_n)))
+        UR.append(np.array(self.rule8(obs_n)))
+        UR.append(np.array(self.rule9(obs_n)))
+        UR.append(np.array(self.rule10(obs_n)))
+
+        URLength = [np.linalg.norm(UR[i]) for i in range(10)]
+        threshold = sum(URLength) * 0.01
+
+        UD = np.array([0, 0])
+
+        for i in range(10):
+            if URLength[i] > threshold:
+                UD = UD + W[i] * UR[i] / URLength[i]
+            else:
+                pass
+
+        return UD
+
     def make_policy(self, obstacles, obs_n, step):
 
         if self.index < self.uav_num:  # uav policy
@@ -150,6 +181,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
                 for k, ba_k in enumerate(BA.BA):
                     BA_k = pheromonal * ba_k[0] + density * ba_k[1]
                     BEHAVIOR = [BA_k, k] if BEHAVIOR[0] < BA_k else BEHAVIOR
+                self.rule_summation(BEHAVIOR[1], obs_n)
             else:
                 pass
 
