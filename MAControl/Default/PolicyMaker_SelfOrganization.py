@@ -159,3 +159,56 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         opt = [self.opt_index, self.decision]
 
         return opt
+
+    # 每个 rule 是一个单独的函数 利于融合代码
+    # 输出为二维速度 输入可以修改
+
+    # @XJ >>>> Alignment
+    def rule1(self, obs):
+        UD = obs[self.index][0:2]
+        return UD
+
+    # @XJ >>>> Target Orbit
+    def rule2(self, obs):
+        UD = obs[self.index][0:2]
+        return UD
+
+    # @XJ >>>> Cohesion
+    def rule3(self, obs):
+        UD = obs[self.index][0:2]
+        return UD
+
+    # @KSB >>>> Separation
+    def rule4(self, obs):
+        UD = obs[self.index][0:2]
+        return UD
+
+    # @WZQ >>>> Weighted Target Attraction
+    def rule5(self, obs):
+        UD = obs[self.index][0:2]
+        return UD
+
+    # @WZQ >>>> Flat Target Repulsion
+    def rule6(self, obs):
+        UD = obs[self.index][0:2]
+        return UD
+
+    # @WZQ >>>> Weighted Target Repulsion
+    def rule7(self, obs):
+        UD = obs[self.index][0:2]
+        return UD
+
+    # @WZQ >>>> Flat Attraction
+    def rule8(self, obs):
+        UD = obs[self.index][0:2]
+        return UD
+
+    # @KSB >>>> Evasion
+    def rule9(self, obs):
+        UD = obs[self.index][0:2]
+        return UD
+
+    # @XJ >>>> Obstacle Avoidance
+    def rule10(self, obs):
+        UD = obs[self.index][0:2]
+        return UD
