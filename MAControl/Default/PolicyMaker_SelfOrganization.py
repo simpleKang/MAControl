@@ -164,6 +164,8 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             else:
                 pass
 
+        # 至此完成(5.31)
+        # 放弃实现(5.32) 如想限制速度上界 建议在 scenario6_AFIT.py 中写入约束
         return UD
 
     def make_policy(self, obstacles, obs_n, step):
