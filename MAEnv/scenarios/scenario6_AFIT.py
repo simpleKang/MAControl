@@ -29,6 +29,9 @@ class Scenario(BaseScenario):
             uav.size = 0.01  # 10米
             uav.movable = True
             uav.UAV = True
+            uav.H = T.UAV_H
+            uav.Dam = T.UAV_Dam
+            uav.w = T.UAV_w
 
         # add agents (targets)
         world.T_agents = [Agent() for i in range(num_targets)]
@@ -38,8 +41,9 @@ class Scenario(BaseScenario):
             if not T.target_movable[i]:
                 target.movable = False
             target.Target = True
-            target.H = T.target_defence[i]
-            target.w = T.target_value[i]
+            target.H = T.target_H[i]
+            target.Dam = T.target_Dam[i]
+            target.w = T.target_w[i]
 
         # agents summary
         world.agents = world.U_agents + world.T_agents
