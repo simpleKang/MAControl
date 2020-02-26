@@ -20,13 +20,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self.known_uavs = list()              # 视野+通信到的uav
         self.known_targets = list()           # 视野+通信到的target
         self.communication_range = 1
-        self.wait_step = -1                   # 决定开始决策前的等待步长
-        self.init_step = 300                  # 初始前XX步内不进行任何决策
-        self.after_decision_step = 100        # 决策后XX步内不进行任何决策
         self.uav_num = arglist.uav_num        # 小瓜子数量
-        self.is_decision = False
-        self.state = np.zeros(self.uav_num*2)
-        self.action_index = None
 
     def find_objects_in_sight(self, obs):
 
