@@ -3,11 +3,11 @@ import MAControl.Util.CreateWaypoint as CW
 
 
 class PathPlanner_EdgeWaypoint(PathPlanner):
-
     AGENT_ALIVE = list()
 
     def __init__(self, name, env, world, agent_index, arglist):
         super(PathPlanner_EdgeWaypoint, self).__init__(name, env, world, agent_index, arglist)
+        PathPlanner_EdgeWaypoint.AGENT_ALIVE.append(True)
         self.pointAi = (0, 0)         # A点坐标，即上一时刻已到达航点坐标
         self.pointBi = (0, 0)         # B点坐标，即此时待飞航点坐标
         self.edge = world.edge        # 区域边界，为一个象限的边长，即区域总边长为2×edge，单位km
@@ -19,19 +19,16 @@ class PathPlanner_EdgeWaypoint(PathPlanner):
         self.waypoint_list.append(CW.creat_veledge_point(world.agents[self.index].state.p_pos,
                                                          world.agents[self.index].state.p_vel, world.edge))
 
-        PathPlanner_EdgeWaypoint.AGENT_ALIVE.append(True)
-
     def planpath(self, para_list, obs, arrive_flag, step, obstacles):
 
+        # 执行决策结果
         if para_list[0] == 0:
             self.no_operation()
-
         elif para_list[0] == 1:
             self.new_decision_point(para_list[1], obs[2:4])
             self.pointAi = (obs[2], obs[3])
             self.pointBi = (self.waypoint_list[self.current_wplist][0],
                             self.waypoint_list[self.current_wplist][1])
-
         else:
             raise Exception('Unknown operation index. Please check your code.')
 
@@ -41,20 +38,22 @@ class PathPlanner_EdgeWaypoint(PathPlanner):
             self.pointBi = (self.waypoint_list[self.current_wplist][0],
                             self.waypoint_list[self.current_wplist][1])
             self.is_init = False
+        else:
+            pass
 
-        if arrive_flag and self.finished is False:
-
+        # 尚未全局结束且到达预设航点的时候 反射一下
+        if (arrive_flag is True) and (self.finished is False):
             self.get_new_reflection_point(obs[0:2])
             self.pointAi = (self.waypoint_list[self.current_wplist][0],
                             self.waypoint_list[self.current_wplist][1])
             self.pointBi = (self.waypoint_list[self.current_wplist + 1][0],
                             self.waypoint_list[self.current_wplist + 1][1])
             self.current_wplist += 1
-
             if self.current_wplist > self.arrivals_maximum:
                 self.finished = True
                 PathPlanner_EdgeWaypoint.AGENT_ALIVE[self.index] = False
-
+            else:
+                pass
         else:
             pass
 
