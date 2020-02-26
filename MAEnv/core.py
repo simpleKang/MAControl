@@ -20,8 +20,9 @@ class AgentState(EntityState):
         super(AgentState, self).__init__()
         # communication utterance
         self.c = None
+        # AFIT
         self.H = None  # 可承受攻击总量
-        self.h = None  # 已承受攻击量
+        self.Dam = None  # 单位攻击能力
         self.w = None  # 价值
 
 

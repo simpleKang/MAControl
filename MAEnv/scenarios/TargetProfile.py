@@ -2,6 +2,9 @@ import numpy as np
 
 # UAV
 UAV_color = np.array([0.47, 0.79, 0.79])
+UAV_H = 100
+UAV_Dam = 10
+UAV_w = 1000
 
 # target parameters
 num_targets = 5
@@ -19,8 +22,9 @@ target_pos = [[1.2,     1],
 target_movable = [True, True, True, False, False, False, False, False, False, False]
 movable_target_color = np.array([0, 0.8, 0])
 fixed_target_color = np.array([0.3, 0.2, 0])
-target_defence = [10, 10, 10, 10, 10, 8, 8, 8, 8, 8]
-target_value = [2, 2, 5, 2, 3, 2, 2, 5, 2, 3]
+target_H = [10, 10, 10, 10, 10, 8, 8, 8, 8, 8]
+target_Dam = [1, 2, 1, 5, 0, 1, 2, 1, 0, 1]
+target_w = [2, 2, 5, 2, 3, 2, 2, 5, 2, 3]
 
 # edge of the battle field
 edge = 2
