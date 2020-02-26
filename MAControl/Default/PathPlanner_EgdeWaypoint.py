@@ -1,7 +1,5 @@
 from MAControl.Base.PathPlanner import PathPlanner
 import MAControl.Util.CreateWaypoint as CW
-import numpy as np
-import math
 
 
 class PathPlanner_EgdeWaypoint(PathPlanner):
@@ -13,12 +11,11 @@ class PathPlanner_EgdeWaypoint(PathPlanner):
         self.pointAi = (0, 0)         # A点坐标，即上一时刻已到达航点坐标
         self.pointBi = (0, 0)         # B点坐标，即此时待飞航点坐标
         self.edge = world.edge        # 区域边界，为一个象限的边长，即区域总边长为2×edge，单位km
-        self.arrivals_maxium = 1000   # 最多到达多少次边界结束
+        self.arrivals_maximum = 1000   # 最多到达多少次边界结束
         self.current_wplist = 0       # 当前航点列表的索引
         self.is_init = True           # 判断是否为初始时刻
         self.finished = False         # 是否到达最大循环数
         self.waypoint_list = list()   # 1×2的航点信息，每新增一个航点则增加一个列表，每个列表只存储一个航点
-        self.attacking_target = list()
         self.waypoint_list.append(CW.creat_veledge_point(world.agents[self.index].state.p_pos,
                                                          world.agents[self.index].state.p_vel, world.edge))
 
@@ -55,7 +52,7 @@ class PathPlanner_EgdeWaypoint(PathPlanner):
                             self.waypoint_list[self.current_wplist + 1][1])
             self.current_wplist += 1
 
-            if self.current_wplist > self.arrivals_maxium:
+            if self.current_wplist > self.arrivals_maximum:
                 self.finished = True
                 PathPlanner_EgdeWaypoint.AGENT_ALIVE[self.index] = False
 
