@@ -22,6 +22,7 @@ class PathPlanner_EdgeWaypoint(PathPlanner):
         PathPlanner_EdgeWaypoint.AGENT_ALIVE.append(True)
 
     def planpath(self, para_list, obs, arrive_flag, step, obstacles):
+
         if para_list[0] == 0:
             self.no_operation()
 
@@ -32,8 +33,7 @@ class PathPlanner_EdgeWaypoint(PathPlanner):
                             self.waypoint_list[self.current_wplist][1])
 
         else:
-            pass
-            # raise Exception('Unknown operation index. Please check your code.')
+            raise Exception('Unknown operation index. Please check your code.')
 
         # 初始时刻输出A、B坐标
         if self.is_init is True:
