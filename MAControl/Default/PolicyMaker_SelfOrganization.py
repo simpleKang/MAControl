@@ -12,8 +12,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
 
     def __init__(self, name, env, world, agent_index, arglist):
         super(PolicyMaker_SelfOrganization, self).__init__(name, env, world, agent_index, arglist)
-        self.opt_index = 0                    # 操作数, 目前有0 / 1 / 10
-        self.decision = 0                     # 决策内容
+        self.UD = [0, 0]                      # 存储决策(rule->BA)得出的速度期望
         PolicyMaker_SelfOrganization.seen_uavs.append(())           # 个体视野中uav
         PolicyMaker_SelfOrganization.seen_targets.append(())        # 个体视野中target
         PolicyMaker_SelfOrganization.pheromonal.append(-1)     # agent 会将它更新为非负数. # 一直是 -1 表示自己是个target.
@@ -160,9 +159,11 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
 
         # 至此完成(5.31)
         # 放弃实现(5.32) 如想限制速度上界 建议在 scenario6_AFIT.py 中写入约束
-        return UD
+        self.UD = UD
 
     def make_policy(self, obstacles, obs_n, step):
+
+        _opt_index = 0
 
         if self.index < self.uav_num:  # uav policy
             if step % 10 == 9:
@@ -178,14 +179,14 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
                     BA_k = pheromonal * ba_k[0] + density * ba_k[1]
                     BEHAVIOR = [BA_k, k] if BEHAVIOR[0] < BA_k else BEHAVIOR
                 self.rule_summation(BEHAVIOR[1], obs_n)
+                _opt_index = 2
             else:
                 pass
 
         else:  # target policy
             pass
 
-        opt = [self.opt_index, self.decision]
-
+        opt = [_opt_index, self.UD]
         return opt
 
     # 每个 rule 是一个单独的函数 利于融合代码
