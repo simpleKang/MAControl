@@ -35,20 +35,9 @@ class PathPlanner_EgdeWaypoint(PathPlanner):
             self.pointBi = (self.waypoint_list[self.current_wplist][0],
                             self.waypoint_list[self.current_wplist][1])
 
-        elif para_list[0] == 10:
-            # 攻击状态切换只能进来一次哦～～
-            if self.is_attacking is False:
-                self.attack_replace(para_list[1])
-                self.pointAi = (obs[2], obs[3])
-                self.pointBi = (self.waypoint_list[self.current_wplist][0],
-                                self.waypoint_list[self.current_wplist][1])
-                self.is_attacking = True
-            else:
-                pass
-                # raise Exception('Target coord is changed again! This should not happen!!!')
-
         else:
-            raise Exception('Unknown operation index. Please check your code.')
+            pass
+            # raise Exception('Unknown operation index. Please check your code.')
 
         # 初始时刻输出A、B坐标
         if self.is_init is True:
@@ -84,12 +73,6 @@ class PathPlanner_EgdeWaypoint(PathPlanner):
     def new_decision_point(self, v, pos):
         self.waypoint_list.append(CW.creat_veledge_point(pos, v, self.edge))
         self.current_wplist += 1
-
-    # 操作数 = 10 攻击时刻的特殊操作，生成新的攻击列表，表中只有一行目标坐标
-    def attack_replace(self, coord):
-        self.waypoint_list.append([0 for i in range(2)])
-        self.current_wplist += 1
-        self.waypoint_list[-1] = [coord[0], coord[1]]
 
     # 随机生成新的航点
     def get_new_random_point(self):
