@@ -179,7 +179,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
                     BA_k = pheromonal * ba_k[0] + density * ba_k[1]
                     BEHAVIOR = [BA_k, k] if BEHAVIOR[0] < BA_k else BEHAVIOR
                 self.rule_summation(BEHAVIOR[1], obs_n)
-                _opt_index = 2
+                _opt_index = 1
             else:
                 pass
 
