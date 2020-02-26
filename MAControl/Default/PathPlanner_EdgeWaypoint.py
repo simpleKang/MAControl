@@ -44,7 +44,6 @@ class PathPlanner_EdgeWaypoint(PathPlanner):
 
         if arrive_flag and self.finished is False:
 
-            # self.get_new_random_point()
             self.get_new_reflection_point(obs[0:2])
             self.pointAi = (self.waypoint_list[self.current_wplist][0],
                             self.waypoint_list[self.current_wplist][1])
@@ -69,11 +68,6 @@ class PathPlanner_EdgeWaypoint(PathPlanner):
     def new_decision_point(self, v, pos):
         self.waypoint_list.append(CW.creat_veledge_point(pos, v, self.edge))
         self.current_wplist += 1
-
-    # 随机生成新的航点
-    def get_new_random_point(self):
-        self.waypoint_list.append([0 for i in range(2)])
-        self.waypoint_list[-1] = CW.creat_random_edgepoint(self.waypoint_list[-2], self.edge)
 
     # 生成反射航点
     def get_new_reflection_point(self, vel):
