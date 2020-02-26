@@ -2,12 +2,12 @@ from MAControl.Base.PathPlanner import PathPlanner
 import MAControl.Util.CreateWaypoint as CW
 
 
-class PathPlanner_EgdeWaypoint(PathPlanner):
+class PathPlanner_EdgeWaypoint(PathPlanner):
 
     AGENT_ALIVE = list()
 
     def __init__(self, name, env, world, agent_index, arglist):
-        super(PathPlanner_EgdeWaypoint, self).__init__(name, env, world, agent_index, arglist)
+        super(PathPlanner_EdgeWaypoint, self).__init__(name, env, world, agent_index, arglist)
         self.pointAi = (0, 0)         # A点坐标，即上一时刻已到达航点坐标
         self.pointBi = (0, 0)         # B点坐标，即此时待飞航点坐标
         self.edge = world.edge        # 区域边界，为一个象限的边长，即区域总边长为2×edge，单位km
@@ -19,7 +19,7 @@ class PathPlanner_EgdeWaypoint(PathPlanner):
         self.waypoint_list.append(CW.creat_veledge_point(world.agents[self.index].state.p_pos,
                                                          world.agents[self.index].state.p_vel, world.edge))
 
-        PathPlanner_EgdeWaypoint.AGENT_ALIVE.append(True)
+        PathPlanner_EdgeWaypoint.AGENT_ALIVE.append(True)
 
     def planpath(self, para_list, obs, arrive_flag, step, obstacles):
         if para_list[0] == 0:
@@ -54,7 +54,7 @@ class PathPlanner_EgdeWaypoint(PathPlanner):
 
             if self.current_wplist > self.arrivals_maximum:
                 self.finished = True
-                PathPlanner_EgdeWaypoint.AGENT_ALIVE[self.index] = False
+                PathPlanner_EdgeWaypoint.AGENT_ALIVE[self.index] = False
 
         else:
             pass

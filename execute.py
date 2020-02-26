@@ -6,7 +6,7 @@ import MAEnv.scenarios.TargetProfile as T
 
 import MAControl.Default.InnerController_PID as IC_P
 import MAControl.Default.MotionController_L1_TECS as MC_L
-import MAControl.Default.PathPlanner_EgdeWaypoint as PP_G
+import MAControl.Default.PathPlanner_EdgeWaypoint as PP_G
 import MAControl.Default.PolicyMaker_SelfOrganization as PM_S
 
 
