@@ -17,7 +17,6 @@ class PathPlanner_EgdeWaypoint(PathPlanner):
         self.current_wplist = 0       # 当前航点列表的索引
         self.is_init = True           # 判断是否为初始时刻
         self.finished = False         # 是否到达最大循环数
-        self.is_attacking = False     # 是否为正在执行
         self.waypoint_list = list()   # 1×2的航点信息，每新增一个航点则增加一个列表，每个列表只存储一个航点
         self.attacking_target = list()
         self.waypoint_list.append(CW.creat_veledge_point(world.agents[self.index].state.p_pos,
@@ -46,7 +45,7 @@ class PathPlanner_EgdeWaypoint(PathPlanner):
                             self.waypoint_list[self.current_wplist][1])
             self.is_init = False
 
-        if arrive_flag and self.is_attacking is False and self.finished is False:
+        if arrive_flag and self.finished is False:
 
             # self.get_new_random_point()
             self.get_new_reflection_point(obs[0:2])
@@ -63,7 +62,7 @@ class PathPlanner_EgdeWaypoint(PathPlanner):
         else:
             pass
 
-        return self.pointAi, self.pointBi, self.finished, self.is_attacking
+        return self.pointAi, self.pointBi, self.finished
 
     # 操作数 = 0 不进行任何操作，返回当前航点列表
     def no_operation(self):

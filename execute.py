@@ -88,7 +88,7 @@ def action(obs_n, step, ControllerSet, obstacles):
         list_i = ControllerSet[i][0].\
             make_policy(obstacles, obs_n, step)
 
-        pointAi, pointBi, finishedi, tempr = ControllerSet[i][1].\
+        pointAi, pointBi, finishedi = ControllerSet[i][1].\
             planpath(list_i, obs_n[i], ControllerSet[i][4], step, obstacles)
 
         acctEi, acclEi, ControllerSet[i][4] = ControllerSet[i][2]. \
