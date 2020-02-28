@@ -316,5 +316,43 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
 
     # @XJ >>>> Obstacle Avoidance
     def rule10(self, obs, obstacles):
-        UD = obstacles[0][0:2]
-        return UD
+
+        dUO = list()
+        R10part2 = list()
+        self_pos = np.array(obs[self.index][2:4])
+        for item in obstacles:
+            distance = np.linalg.norm(np.array(item[0:2])-self_pos)
+            dist = distance - item[3] if distance > item[3] else 0
+            dUO.append(self.uav_sensor_range - dist)
+            if dist < self.uav_sensor_range/2:
+                R10part2.append(np.array(item[0:2])-self_pos)
+                R10part2[-1] = R10part2[-1] / self.uav_sensor_range * (dist-self.uav_sensor_range)
+            else:
+                R10part2.append(0)
+        sumdUO = sum(dUO)
+
+        R10f = list()
+        R10part1 = list()
+        self_vel = np.array(obs[self.index][0:2])
+        for k, item in enumerate(obstacles):
+            vector1 = np.array(item[0:2])-self_pos
+            cos1 = np.dot(vector1, self_vel)/np.linalg.norm(vector1)/np.linalg.norm(self_vel)
+            if cos1 > 0:
+                vector2 = np.array([vector1[1], -1*vector1[0]])
+                vector3 = np.array([-1*vector1[1], vector1[0]])
+                cos2 = np.dot(vector2, self_vel)/np.linalg.norm(vector2)/np.linalg.norm(self_vel)
+                cos3 = np.dot(vector2, self_vel)/np.linalg.norm(vector3)/np.linalg.norm(self_vel)
+                if cos2 > cos3:
+                    R10part1.append(vector2)
+                    R10part1[-1] = R10part1[-1] * math.acos(cos2) * 2 / math.pi
+                else:
+                    R10part1.append(vector3)
+                    R10part1[-1] = R10part1[-1] * math.acos(cos3) * 2 / math.pi
+            else:
+                R10part1.append(0)
+            r10f = (np.array(R10part1[k]) + np.array(R10part2[k])) * dUO[k]
+            R10f.append(r10f)
+        sumR10f = sum(R10f)
+
+        R10 = sumR10f / sumdUO
+        return R10
