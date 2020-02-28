@@ -9,6 +9,7 @@ import MAControl.Default.InnerController_PID as IC_P
 import MAControl.Default.MotionController_L1_TECS as MC_L
 import MAControl.Default.PathPlanner_EdgeWaypoint as PP_G
 import MAControl.Default.PolicyMaker_SelfOrganization as PM_S
+_path = '/track/' if os.name == 'posix' else 'E:\\S-Projects\\Git-r\\MAControl\\track\\'
 
 
 def parse_args():
@@ -114,11 +115,11 @@ if __name__ == '__main__':
 
     for num in range(arglist.repeat_num):
 
-        with open(os.path.dirname(__file__) + '/track/para.txt', 'w') as f:
+        with open(os.path.dirname(__file__) + _path + 'para.txt', 'w') as f:
             f.write(str(T.edge) + ' ' + str(arglist.uav_num) + ' ' + str(arglist.step_max))
         # 为每个小瓜子创建状态文件
         for k in range(arglist.uav_num):
-            open(os.path.dirname(__file__) + '/track/uav_%d_track.txt' % k, 'w')
+            open(os.path.dirname(__file__) + _path + 'uav_%d_track.txt' % k, 'w')
 
         obs_n = env.reset()
         start = time.time()
@@ -137,7 +138,7 @@ if __name__ == '__main__':
 
             # 保存每个小瓜子每个step的状态信息
             for k in range(arglist.uav_num):
-                with open(os.path.dirname(__file__) + '/track/uav_%d_track.txt' % k, 'a') as f:
+                with open(os.path.dirname(__file__) + _path + 'uav_%d_track.txt' % k, 'a') as f:
                     f.write(str(obs_n[k][0]) + ' ' + str(obs_n[k][1]) + ' ' + str(obs_n[k][2]) + ' ' + str(
                         obs_n[k][3]) + '\n')
 

@@ -1,7 +1,7 @@
 from MAControl.Base.PathPlanner import PathPlanner
 import MAControl.Util.CreateWaypoint as CW
 import os
-
+_path = '/track/' if os.name == 'posix' else '\\track\\'
 
 class PathPlanner_EdgeWaypoint(PathPlanner):
 
@@ -18,7 +18,7 @@ class PathPlanner_EdgeWaypoint(PathPlanner):
         self.waypoint_list.append(CW.creat_veledge_point(world.agents[self.index].state.p_pos,
                                                          world.agents[self.index].state.p_vel,
                                                          world.agents[self.index].state.p_vel, world.edge))
-        open(os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + '/track/waypoint_%d.txt' % self.index, 'w')
+        open(os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + _path + 'waypoint_%d.txt' % self.index, 'w')
 
     def planpath(self, para_list, obs, arrive_flag, step, obstacles):
 
@@ -30,7 +30,7 @@ class PathPlanner_EdgeWaypoint(PathPlanner):
             self.pointAi = (obs[2], obs[3])
             self.pointBi = (self.waypoint_list[self.current_wplist][0],
                             self.waypoint_list[self.current_wplist][1])
-            with open(os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + '/track/waypoint_%d.txt' % self.index, 'a') as f:
+            with open(os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + _path + 'waypoint_%d.txt' % self.index, 'a') as f:
                 f.write(str(1) + ' ' + str(self.waypoint_list[self.current_wplist][0]) + ' ' +
                                      str(self.waypoint_list[self.current_wplist][1]) + '\n')
         else:
@@ -41,7 +41,7 @@ class PathPlanner_EdgeWaypoint(PathPlanner):
             self.pointAi = (obs[2], obs[3])
             self.pointBi = (self.waypoint_list[self.current_wplist][0],
                             self.waypoint_list[self.current_wplist][1])
-            with open(os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + '/track/waypoint_%d.txt' % self.index, 'a') as f:
+            with open(os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + _path + 'waypoint_%d.txt' % self.index, 'a') as f:
                 f.write(str(0) + ' ' + str(self.waypoint_list[self.current_wplist][0]) + ' ' +
                                        str(self.waypoint_list[self.current_wplist][1]) + '\n')
             self.is_init = False
@@ -56,7 +56,7 @@ class PathPlanner_EdgeWaypoint(PathPlanner):
             self.pointBi = (self.waypoint_list[self.current_wplist + 1][0],
                             self.waypoint_list[self.current_wplist + 1][1])
             self.current_wplist += 1
-            with open(os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + '/track/waypoint_%d.txt' % self.index, 'a') as f:
+            with open(os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + _path + 'waypoint_%d.txt' % self.index, 'a') as f:
                 f.write(str(2) + ' ' + str(self.waypoint_list[self.current_wplist][0]) + ' ' +
                                        str(self.waypoint_list[self.current_wplist][1]) + '\n')
             if self.current_wplist > self.arrivals_maximum:

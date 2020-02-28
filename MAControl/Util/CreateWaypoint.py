@@ -3,8 +3,9 @@ import os
 import numpy as np
 import operator
 import MAControl.Util.SignIsSame as sis
+_path_ = '/track/vel.txt' if os.name == 'posix' else '\\track\\vel.txt'
 
-open(os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + '/track/vel.txt', 'w')
+open(os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + _path_, 'w')
 
 
 def creat_snake_waypoint_list(waypoint_list, N, i, new_list_index, W=0.9, D=0.05, Edge=1):
@@ -72,7 +73,7 @@ def creat_veledge_point(pos, vel, cur_vel, edge):
             vel = cur_vel / np.linalg.norm(cur_vel)
         else:
             vel /= vel_length
-        with open(os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + '/track/vel.txt', 'a') as f:
+        with open(os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + _path_, 'a') as f:
             f.write(str(vel[0]) + ' ' + str(vel[1]) + '\n')
     except:
         print(vel)
