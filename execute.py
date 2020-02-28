@@ -2,6 +2,7 @@
 
 import argparse
 import time
+import os
 import MAEnv.scenarios.TargetProfile as T
 
 import MAControl.Default.InnerController_PID as IC_P
@@ -16,10 +17,9 @@ def parse_args():
 
     # Environment
     parser.add_argument("--scenario", type=str, default="scenario6_AFIT", help="name of the scenario script")
-    parser.add_argument("--uav-num", type=int, default=10, help="number of uav")
-    parser.add_argument("--step-max", type=int, default=1000, help="number of maximum steps")
-    parser.add_argument("--repeat-num", type=int, default=3, help="number of repeat runs")
-
+    parser.add_argument("--uav-num", type=int, default=1, help="number of uav")
+    parser.add_argument("--step-max", type=int, default=4000, help="number of maximum steps")
+    parser.add_argument("--repeat-num", type=int, default=1, help="number of repeat runs")
 
     return parser.parse_args()
 
@@ -114,19 +114,32 @@ if __name__ == '__main__':
 
     for num in range(arglist.repeat_num):
 
+        with open(os.path.dirname(__file__) + '/track/para.txt', 'w') as f:
+            f.write(str(T.edge) + ' ' + str(arglist.uav_num) + ' ' + str(arglist.step_max))
+        # 为每个小瓜子创建状态文件
+        for k in range(arglist.uav_num):
+            open(os.path.dirname(__file__) + '/track/uav_%d_track.txt' % k, 'w')
+
         obs_n = env.reset()
         start = time.time()
 
         for step in range(arglist.step_max):
 
             # 选择动作
-            action_Un = action(obs_n[0:arglist.uav_num], step, Controllers[0], obstacle_info)
+            # action_Un = action(obs_n[0:arglist.uav_num], step, Controllers[0], obstacle_info)
+            action_Un = action(obs_n, step, Controllers[0], obstacle_info)
             action_Tn = action(obs_n[arglist.uav_num:], step, Controllers[1], obstacle_info)
             action_n = action_Un + action_Tn
 
             new_obs_n, rew_n, done_n, info_n = env.step(action_n)
 
             obs_n = new_obs_n
+
+            # 保存每个小瓜子每个step的状态信息
+            for k in range(arglist.uav_num):
+                with open(os.path.dirname(__file__) + '/track/uav_%d_track.txt' % k, 'a') as f:
+                    f.write(str(obs_n[k][0]) + ' ' + str(obs_n[k][1]) + ' ' + str(obs_n[k][2]) + ' ' + str(
+                        obs_n[k][3]) + '\n')
 
             # 画图展示
             env.render()

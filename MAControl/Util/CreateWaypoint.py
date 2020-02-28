@@ -1,7 +1,10 @@
 import random
+import os
 import numpy as np
 import operator
 import MAControl.Util.SignIsSame as sis
+
+open(os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + '/track/vel.txt', 'w')
 
 
 def creat_snake_waypoint_list(waypoint_list, N, i, new_list_index, W=0.9, D=0.05, Edge=1):
@@ -59,15 +62,35 @@ def create_simple_waypoint_list(waypoint_list, new_list_index, init_point, Edge)
     new_list_index += 1
 
 
-def creat_veledge_point(pos, vel, edge):
+def creat_veledge_point(pos, vel, cur_vel, edge):
 
     waypoint_list = list(pos)
     delta = 0.2
+    try:
+        vel_length = np.linalg.norm(vel)
+        if vel_length == 0.:
+            vel = cur_vel / np.linalg.norm(cur_vel)
+        else:
+            vel /= vel_length
+        with open(os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + '/track/vel.txt', 'a') as f:
+            f.write(str(vel[0]) + ' ' + str(vel[1]) + '\n')
+    except:
+        print(vel)
     while True:
         waypoint_list[0] += delta * vel[0]
         waypoint_list[1] += delta * vel[1]
         if edge - abs(waypoint_list[0]) < 0.01 or edge - abs(waypoint_list[1]) < 0.01:
             waypoint_list = [round(waypoint_list[0], 3), round(waypoint_list[1], 3)]
+            if abs(waypoint_list[0]) > edge:
+                if waypoint_list[0] > 0:
+                    waypoint_list[0] = edge
+                else:
+                    waypoint_list[0] = -edge
+            if abs(waypoint_list[1]) > edge:
+                if waypoint_list[1] > 0:
+                    waypoint_list[1] = edge
+                else:
+                    waypoint_list[1] = -edge
             break
 
     return waypoint_list

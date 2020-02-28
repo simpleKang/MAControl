@@ -1,13 +1,12 @@
 from MAControl.Base.PathPlanner import PathPlanner
 import MAControl.Util.CreateWaypoint as CW
+import os
 
 
 class PathPlanner_EdgeWaypoint(PathPlanner):
-    AGENT_ALIVE = list()
 
     def __init__(self, name, env, world, agent_index, arglist):
         super(PathPlanner_EdgeWaypoint, self).__init__(name, env, world, agent_index, arglist)
-        PathPlanner_EdgeWaypoint.AGENT_ALIVE.append(True)
         self.pointAi = (0, 0)         # A点坐标，即上一时刻已到达航点坐标
         self.pointBi = (0, 0)         # B点坐标，即此时待飞航点坐标
         self.edge = world.edge        # 区域边界，为一个象限的边长，即区域总边长为2×edge，单位km
@@ -17,7 +16,9 @@ class PathPlanner_EdgeWaypoint(PathPlanner):
         self.finished = False         # 是否到达最大循环数
         self.waypoint_list = list()   # 1×2的航点信息，每新增一个航点则增加一个列表，每个列表只存储一个航点
         self.waypoint_list.append(CW.creat_veledge_point(world.agents[self.index].state.p_pos,
+                                                         world.agents[self.index].state.p_vel,
                                                          world.agents[self.index].state.p_vel, world.edge))
+        open(os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + '/track/waypoint_%d.txt' % self.index, 'w')
 
     def planpath(self, para_list, obs, arrive_flag, step, obstacles):
 
@@ -25,10 +26,13 @@ class PathPlanner_EdgeWaypoint(PathPlanner):
         if para_list[0] == 0:
             self.no_operation()
         elif para_list[0] == 1:
-            self.new_decision_point(para_list[1], obs[2:4])
+            self.new_decision_point(para_list[1], obs[2:4], obs[0:2])
             self.pointAi = (obs[2], obs[3])
             self.pointBi = (self.waypoint_list[self.current_wplist][0],
                             self.waypoint_list[self.current_wplist][1])
+            with open(os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + '/track/waypoint_%d.txt' % self.index, 'a') as f:
+                f.write(str(1) + ' ' + str(self.waypoint_list[self.current_wplist][0]) + ' ' +
+                                     str(self.waypoint_list[self.current_wplist][1]) + '\n')
         else:
             raise Exception('Unknown operation index. Please check your code.')
 
@@ -37,6 +41,9 @@ class PathPlanner_EdgeWaypoint(PathPlanner):
             self.pointAi = (obs[2], obs[3])
             self.pointBi = (self.waypoint_list[self.current_wplist][0],
                             self.waypoint_list[self.current_wplist][1])
+            with open(os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + '/track/waypoint_%d.txt' % self.index, 'a') as f:
+                f.write(str(0) + ' ' + str(self.waypoint_list[self.current_wplist][0]) + ' ' +
+                                       str(self.waypoint_list[self.current_wplist][1]) + '\n')
             self.is_init = False
         else:
             pass
@@ -49,9 +56,11 @@ class PathPlanner_EdgeWaypoint(PathPlanner):
             self.pointBi = (self.waypoint_list[self.current_wplist + 1][0],
                             self.waypoint_list[self.current_wplist + 1][1])
             self.current_wplist += 1
+            with open(os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + '/track/waypoint_%d.txt' % self.index, 'a') as f:
+                f.write(str(2) + ' ' + str(self.waypoint_list[self.current_wplist][0]) + ' ' +
+                                       str(self.waypoint_list[self.current_wplist][1]) + '\n')
             if self.current_wplist > self.arrivals_maximum:
                 self.finished = True
-                PathPlanner_EdgeWaypoint.AGENT_ALIVE[self.index] = False
             else:
                 pass
         else:
@@ -64,8 +73,8 @@ class PathPlanner_EdgeWaypoint(PathPlanner):
         pass
 
     # 操作数 = 1 根据速度方向进行延长，取与边界交点
-    def new_decision_point(self, v, pos):
-        self.waypoint_list.append(CW.creat_veledge_point(pos, v, self.edge))
+    def new_decision_point(self, v, pos, cur_vel):
+        self.waypoint_list.append(CW.creat_veledge_point(pos, v, cur_vel, self.edge))
         self.current_wplist += 1
 
     # 生成反射航点

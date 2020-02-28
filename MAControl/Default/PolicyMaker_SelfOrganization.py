@@ -19,6 +19,11 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self.known_uavs = list()              # 视野+通信到的uav
         self.known_targets = list()           # 视野+通信到的target
         self.communication_range = 1
+        self.uav_sensor_range = 0.8
+        self.target_sensor_range = 0.8
+        self.uav_engagement_range = 0.5
+        self.target_engagement_range = 0.5
+        self.r3 = 1.1
         self.uav_num = arglist.uav_num        # 小瓜子数量
 
     def find_objects_in_sight(self, obs):
@@ -28,9 +33,12 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         selfpos = np.array(obs[self.index][2:4])
         selfvelunit = selfvel / np.sqrt(np.dot(selfvel, selfvel))
         selfdir = math.atan2(selfvel[1], selfvel[0])
-        d1 = 0.1  # 轴向视场距离
-        d2 = 0.2  # 轴向视场宽度
-        d3 = 0.2  # 侧向视场宽度
+        # d1 = 0.1  # 轴向视场距离
+        # d2 = 0.2  # 轴向视场宽度
+        # d3 = 0.2  # 侧向视场宽度
+        d1 = 0
+        d2 = self.uav_sensor_range*2
+        d3 = self.uav_sensor_range*2
         xx1 = -d3 / 2 * math.cos(selfdir) - d2 / 2 * math.sin(selfdir) * -1
         xx2 = -d3 / 2 * math.cos(selfdir) + d2 / 2 * math.sin(selfdir) * -1
         xx3 = d3 / 2 * math.cos(selfdir) + d2 / 2 * math.sin(selfdir) * -1
@@ -171,7 +179,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             elif step % 10 == 0:
                 if step != 0:
                     self.extend_known_objects(obs_n)
-            elif step % 10 == 1:
+            elif (step % 10 == 1) and (step > 10):
                 pheromonal = PolicyMaker_SelfOrganization.pheromonal[self.index]
                 density = self.get_UAV_density(obs_n)
                 BEHAVIOR = [-10, -10]
@@ -180,6 +188,9 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
                     BEHAVIOR = [BA_k, k] if BEHAVIOR[0] < BA_k else BEHAVIOR
                 self.rule_summation(BEHAVIOR[1], obs_n)
                 _opt_index = 1
+
+                # self.UD = self.rule7(obs_n)
+
             else:
                 pass
 
@@ -214,23 +225,89 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
 
     # @WZQ >>>> Weighted Target Attraction
     def rule5(self, obs):
-        UD = obs[self.index][0:2]
-        return UD
+        R5_list = list()
+        self_pos = obs[self.index][2:4]
+        if self.known_targets:
+            for tar in self.known_targets:
+                tar_pos = obs[tar][2:4]
+                dist = np.linalg.norm(tar_pos - self_pos)
+                R5_list.append((tar_pos - self_pos) / dist**5)
+            R5 = sum(R5_list) / len(self.known_targets)
+        elif self.known_uavs:
+            for uav in self.known_uavs:
+                if PolicyMaker_SelfOrganization.pheromonal[uav] > 0:
+                    uav_pos = obs[uav][2:4]
+                    dist = np.linalg.norm(uav_pos - self_pos)
+                    R5_list.append(PolicyMaker_SelfOrganization.pheromonal[uav] * (uav_pos - self_pos) / dist)
+            if R5_list:
+                R5 = sum(R5_list) / len(self.known_uavs)
+            else:
+                R5 = obs[self.index][0:2]
+        else:
+            # raise Exception('No R5')
+            R5 = obs[self.index][0:2]
+        return R5
 
     # @WZQ >>>> Flat Target Repulsion
     def rule6(self, obs):
-        UD = obs[self.index][0:2]
-        return UD
+        R6_list = list()
+        self_pos = obs[self.index][2:4]
+        if self.known_uavs:
+            for tar in self.known_targets:
+                tar_pos = obs[tar][2:4]
+                dist = np.linalg.norm(tar_pos - self_pos)
+                if (dist < 0.9 * self.uav_sensor_range) or (dist < self.target_sensor_range):
+                    R6_list.append(self_pos - tar_pos)
+            if R6_list:
+                R6 = sum(R6_list) / len(self.known_targets)
+            else:
+                R6 = obs[self.index][0:2]
+        else:
+            R6 = obs[self.index][0:2]
+        return R6
 
     # @WZQ >>>> Weighted Target Repulsion
     def rule7(self, obs):
-        UD = obs[self.index][0:2]
-        return UD
+        R7_list = list()
+        self_pos = obs[self.index][2:4]
+        if self.known_targets:
+            for tar in self.known_targets:
+                tar_pos = obs[tar][2:4]
+                dist = np.linalg.norm(tar_pos - self_pos)
+                if (dist < self.r3 * self.uav_sensor_range) and (self.r3 * self.uav_sensor_range > self.target_engagement_range):
+                    R7_list.append((self_pos-tar_pos)/2*(self.r3*self.uav_sensor_range - dist))
+                elif dist < self.target_engagement_range:
+                    R7_list.append((self_pos-tar_pos)/2*(self.target_engagement_range - dist))
+            if R7_list:
+                R7 = sum(R7_list) / len(self.known_targets)
+            else:
+                R7 = obs[self.index][0:2]
+        else:
+            R7 = obs[self.index][0:2]
+        return R7
 
     # @WZQ >>>> Flat Attraction
     def rule8(self, obs):
-        UD = obs[self.index][0:2]
-        return UD
+        R8_list = list()
+        self_pos = obs[self.index][2:4]
+        if self.known_targets:
+            for tar in self.known_targets:
+                tar_pos = obs[tar][2:4]
+                dist = np.linalg.norm(tar_pos - self_pos)
+                if dist >= 0.8*self.uav_sensor_range:
+                    R8_list.append(tar_pos - self_pos)
+            if R8_list:
+                R8 = sum(R8_list)
+            else:
+                R8 = obs[self.index][0:2]
+        elif self.known_uavs:
+            for uav in self.known_uavs:
+                uav_pos = obs[uav][2:4]
+                R8_list.append(uav_pos - self_pos)
+            R8 = sum(R8_list)
+        else:
+            R8 = obs[self.index][0:2]
+        return R8
 
     # @KSB >>>> Evasion
     def rule9(self, obs):
