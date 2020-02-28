@@ -136,7 +136,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         _density = sum(item)
         return _density
 
-    def rule_summation(self, ba_index, obs_n):
+    def rule_summation(self, ba_index, obs_n, obstacles):
 
         W = BA.BA[ba_index][2:]
         W.append(2)
@@ -152,7 +152,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         UR.append(np.array(self.rule7(obs_n)))
         UR.append(np.array(self.rule8(obs_n)))
         UR.append(np.array(self.rule9(obs_n)))
-        UR.append(np.array(self.rule10(obs_n)))
+        UR.append(np.array(self.rule10(obs_n, obstacles)))
 
         URLength = [np.linalg.norm(UR[i]) for i in range(10)]
         threshold = sum(URLength) * 0.01
@@ -186,7 +186,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
                 for k, ba_k in enumerate(BA.BA):
                     BA_k = pheromonal * ba_k[0] + density * ba_k[1]
                     BEHAVIOR = [BA_k, k] if BEHAVIOR[0] < BA_k else BEHAVIOR
-                self.rule_summation(BEHAVIOR[1], obs_n)
+                self.rule_summation(BEHAVIOR[1], obs_n, obstacles)
                 _opt_index = 1
 
                 # self.UD = self.rule7(obs_n)
@@ -315,6 +315,6 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         return UD
 
     # @XJ >>>> Obstacle Avoidance
-    def rule10(self, obs):
-        UD = obs[self.index][0:2]
+    def rule10(self, obs, obstacles):
+        UD = obstacles[0][0:2]
         return UD
