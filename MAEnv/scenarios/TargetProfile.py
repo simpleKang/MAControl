@@ -7,10 +7,10 @@ UAV_Dam = 10
 UAV_w = 1000
 
 # target parameters
-num_targets = 5
+num_targets = 2
 target_size = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
-target_pos = [[1.2,     1],
-              [0.5,  -1.5],
+target_pos = [[1.6,   1.4],
+              [1.6,  -0.9],
               [-1.7,  0.4],
               [-1,    0.4],
               [-1.4,  1.6],
@@ -19,7 +19,7 @@ target_pos = [[1.2,     1],
               [-1.2, -0.8],
               [1.6,  -0.6],
               [0.6,  -1.2]]
-target_movable = [True, True, True, False, False, False, False, False, False, False]
+target_movable = [False, False, True, False, False, False, False, False, False, False]
 movable_target_color = np.array([0, 0.8, 0])
 fixed_target_color = np.array([0.3, 0.2, 0])
 target_H = [10, 10, 10, 10, 10, 8, 8, 8, 8, 8]
@@ -43,7 +43,7 @@ grid_obstacle = False
 # square (a kind of obstacle)
 num_square = 2
 square_size = 0.1
-square_pos = [[1.6, 1.8],  [1.6, -0.9]]
+square_pos = [[-0.4, 1.4],  [0.2, 0.0]]
 square_color = np.array([0.25, 0.49, 0.75])
 square_obstacle = True
 
