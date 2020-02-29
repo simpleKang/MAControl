@@ -339,11 +339,11 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self_pos = np.array(obs[self.index][2:4])
         for item in obstacles:
             distance = np.linalg.norm(np.array(item[0:2])-self_pos)
-            dist = distance - item[3] if distance > item[3] else 0
-            dUO.append(self.uav_sensor_range - dist)
-            if dist < self.uav_sensor_range/2:
+            dUO.append(self.uav_sensor_range + item[3]*3 - distance)
+            if (distance - item[3]*3) < self.uav_sensor_range/2:
                 R10part2.append(np.array(item[0:2])-self_pos)
-                R10part2[-1] = R10part2[-1] / self.uav_sensor_range * (dist-self.uav_sensor_range)
+                R10part2[-1] = R10part2[-1] / distance * (distance - item[3]*3)
+                R10part2[-1] = R10part2[-1] * dUO[-1] / self.uav_sensor_range * (-1)
             else:
                 R10part2.append(0)
         sumdUO = sum(dUO)
