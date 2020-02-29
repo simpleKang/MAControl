@@ -25,7 +25,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self.target_engagement_range = 0.5
         self.r3 = 1.1
         self.uav_num = arglist.uav_num        # 小瓜子数量
-        self.cycle = 10                       # 周期
+        self.cycle = 50                       # 周期
 
     def get_limited_vision(self, obs):  # 速度正常观测 # 位置未知>>>仅知方位
         limited_obs = list()
@@ -202,7 +202,11 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
                 self.rule_summation(BEHAVIOR[1], obs_n, obstacles)
                 _opt_index = 1
 
-                # self.UD = self.rule7(obs_n)
+                U5 = self.rule5(obs_n)
+                U10 = self.rule10(obs_n, obstacles)
+                self.UD = U5 / np.linalg.norm(U5)
+                # self.UD = U5 / np.linalg.norm(U5) + 2 * U10 / np.linalg.norm(U10)
+                self.UD = self.UD / np.linalg.norm(self.UD)
 
             else:
                 pass
@@ -216,17 +220,17 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
     # 每个 rule 是一个单独的函数 利于融合代码
     # 输出为二维速度 输入可以修改
 
-    # @XJ >>>> Alignment
+    # @KSB >>>> Alignment
     def rule1(self, obs):
         UD = obs[self.index][0:2]
         return UD
 
-    # @XJ >>>> Target Orbit
+    # @WZQ >>>> Target Orbit
     def rule2(self, obs):
         UD = obs[self.index][0:2]
         return UD
 
-    # @XJ >>>> Cohesion
+    # @KSB >>>> Cohesion
     def rule3(self, obs):
         UD = obs[self.index][0:2]
         return UD
