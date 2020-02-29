@@ -25,6 +25,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self.target_engagement_range = 0.5
         self.r3 = 1.1
         self.uav_num = arglist.uav_num        # 小瓜子数量
+        self.cycle = 10                       # 周期
 
     def get_limited_vision(self, obs):  # 速度正常观测 # 位置未知>>>仅知方位
         limited_obs = list()
@@ -186,12 +187,12 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         _opt_index = 0
 
         if self.index < self.uav_num:  # uav policy
-            if step % 10 == 9:
+            if step % self.cycle == (self.cycle - 1):
                 self.find_objects_in_sight(obs_n)
-            elif step % 10 == 0:
+            elif step % self.cycle == 0:
                 if step != 0:
                     self.extend_known_objects(obs_n)
-            elif (step % 10 == 1) and (step > 10):
+            elif (step % self.cycle == 1) and (step > self.cycle):
                 pheromonal = PolicyMaker_SelfOrganization.pheromonal[self.index]
                 density = self.get_UAV_density(obs_n)
                 BEHAVIOR = [-10, -10]
