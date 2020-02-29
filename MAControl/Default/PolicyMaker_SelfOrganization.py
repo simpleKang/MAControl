@@ -26,6 +26,18 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self.r3 = 1.1
         self.uav_num = arglist.uav_num        # 小瓜子数量
 
+    def get_limited_vision(self, obs):  # 速度正常观测 # 位置未知>>>仅知方位
+        limited_obs = list()
+        for i in range(obs.__len__()):
+            if i != self.index:
+                relative_pos = np.array(obs[i][2:4])-np.array(obs[self.index][2:4])
+                agent_bearing = relative_pos/np.linalg.norm(relative_pos)
+            else:
+                agent_bearing = np.array([0, 0])
+            limited_ob = np.concatenate([obs[i][0:2]]+[agent_bearing]+[obs[i][4:]])
+            limited_obs.append(limited_ob)
+        return limited_obs
+
     def find_objects_in_sight(self, obs):
 
         # 计算视场区域
