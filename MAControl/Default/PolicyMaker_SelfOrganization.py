@@ -358,13 +358,11 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
                 vector2 = np.array([vector1[1], -1*vector1[0]])
                 vector3 = np.array([-1*vector1[1], vector1[0]])
                 cos2 = np.dot(vector2, self_vel)/np.linalg.norm(vector2)/np.linalg.norm(self_vel)
-                cos3 = np.dot(vector2, self_vel)/np.linalg.norm(vector3)/np.linalg.norm(self_vel)
+                cos3 = np.dot(vector3, self_vel)/np.linalg.norm(vector3)/np.linalg.norm(self_vel)
                 if cos2 > cos3:
-                    R10part1.append(vector2)
-                    R10part1[-1] = R10part1[-1] * math.acos(cos2) * 2 / math.pi
+                    R10part1.append(vector2 * math.acos(cos1) * 2 / math.pi)
                 else:
-                    R10part1.append(vector3)
-                    R10part1[-1] = R10part1[-1] * math.acos(cos3) * 2 / math.pi
+                    R10part1.append(vector3 * math.acos(cos1) * 2 / math.pi)
             else:
                 R10part1.append(0)
             r10f = (np.array(R10part1[k]) + np.array(R10part2[k])) * dUO[k]
