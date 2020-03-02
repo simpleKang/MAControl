@@ -19,7 +19,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self.known_uavs = list()              # 视野+通信到的uav
         self.known_targets = list()           # 视野+通信到的target
         self.communication_range = 1
-        self.uav_sensor_range = 0.8
+        self.uav_sensor_range = 1.2
         self.target_sensor_range = 0.8
         self.uav_engagement_range = 0.5
         self.target_engagement_range = 0.5
@@ -339,7 +339,9 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self_pos = np.array(obs[self.index][2:4])
         for item in obstacles:
             distance = np.linalg.norm(np.array(item[0:2])-self_pos)
-            dUO.append(self.uav_sensor_range + item[2]*5 - distance)
+            d = self.uav_sensor_range + item[2]*5 - distance
+            d = d if d > 0.000001 else 0.000001
+            dUO.append(d)
             if (distance - item[2]*5) < self.uav_sensor_range/2:
                 R10part2.append(np.array(item[0:2])-self_pos)
                 R10part2[-1] = R10part2[-1] / distance * (distance - item[2]*5)
@@ -365,9 +367,11 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
                     R10part1.append(vector3 * math.acos(cos1) * 2 / math.pi)
             else:
                 R10part1.append([0, 0])
-            r10f = (np.array(R10part1[k]) + np.array(R10part2[k])) * dUO[k]
+            r10f = (np.array(R10part1[k]) + 0.01 * np.array(R10part2[k])) * dUO[k]
             R10f.append(r10f)
         sumR10f = sum(R10f)
 
         R10 = sumR10f / sumdUO
+        if np.linalg.norm(R10) == 0:
+            R10 = self_vel
         return R10
