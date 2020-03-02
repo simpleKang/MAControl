@@ -345,7 +345,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
                 R10part2[-1] = R10part2[-1] / distance * (distance - item[3]*5)
                 R10part2[-1] = R10part2[-1] * dUO[-1] / self.uav_sensor_range * (-1)
             else:
-                R10part2.append(0)
+                R10part2.append([0, 0])
         sumdUO = sum(dUO)
 
         R10f = list()
@@ -364,7 +364,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
                 else:
                     R10part1.append(vector3 * math.acos(cos1) * 2 / math.pi)
             else:
-                R10part1.append(0)
+                R10part1.append([0, 0])
             r10f = (np.array(R10part1[k]) + np.array(R10part2[k])) * dUO[k]
             R10f.append(r10f)
         sumR10f = sum(R10f)
