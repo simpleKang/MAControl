@@ -43,7 +43,7 @@ grid_obstacle = False
 # square (a kind of obstacle)
 num_square = 2
 square_size = 0.1
-square_pos = [[-0.4, 1.4],  [0.2, 0.0]]
+square_pos = [[-0.4, 1.2],  [0.2, 0.0]]
 square_color = np.array([0.25, 0.49, 0.75])
 square_obstacle = True
 
