@@ -205,8 +205,18 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
 
     # @XJ >>>> Alignment
     def rule1(self, obs):
-        UD = obs[self.index][0:2]
-        return UD
+        unit_kk_v = list()
+        for kk in self.known_uavs:
+            dist_k = math.sqrt(math.pow((obs[self.index][2] - obs[kk][2]), 2) +
+                               math.pow((obs[self.index][3] - obs[kk][3]), 2))
+            # length_kk_v=math.sqrt(math.pow(obs[kk][2],2)+math.pow(obs[kk][3],2))
+            unit_kk_v.append([obs[kk][2] / dist_k, obs[kk][3] / dist_k])
+
+        if len(unit_kk_v):
+            R1 = np.sum(unit_kk_v) / len(unit_kk_v)
+        else:
+            R1 = obs[self.index][0:2]
+        return R1
 
     # @XJ >>>> Target Orbit
     def rule2(self, obs):
@@ -215,13 +225,44 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
 
     # @XJ >>>> Cohesion
     def rule3(self, obs):
-        UD = obs[self.index][0:2]
-        return UD
+        r2 = 0.5
+        Sr = 0.2
+        R1F = list()
+        for kk in self.known_uavs:
+            dist_k = math.sqrt(math.pow((obs[self.index][2] - obs[kk][2]), 2) +
+                               math.pow((obs[self.index][3] - obs[kk][3]), 2))
+            if dist_k > 0.1:
+                R1F.append([(dist_k - 0.1) * (obs[kk][2] - obs[self.index][2]),
+                            (dist_k - 0.1) * (obs[kk][3] - obs[self.index][3])])
+        if len(R1F):
+            R3 = [np.sum(R1F) / len(R1F)]
+        else:
+            R3 = obs[self.index][0:2]
+        return R3
 
     # @KSB >>>> Separation
     def rule4(self, obs):
-        UD = obs[self.index][0:2]
-        return UD
+        r2 = 0.5
+        Sr = 0.2
+        v_1 = list()
+        v_2 = list()
+        v1 = 0
+        v2 = 0
+        a = self.known_uavs
+        for kk in self.known_uavs:
+            dist_k = math.sqrt(math.pow((obs[self.index][2] - obs[kk][2]), 2) +
+                               math.pow((obs[self.index][3] - obs[kk][3]), 2))
+            if dist_k < 0.1:
+                v_1.append((0.1 - dist_k) * (obs[self.index][2] - obs[kk][2]))
+                v_2.append((0.1 - dist_k) * (obs[self.index][3] - obs[kk][3]))
+        for i in range(len(v_1)):
+            v1 = v1 + v_1[i]
+            v2 = v2 + v_2[i]
+        if len(v_1):
+            R4 = [v1 / len(v_1), v2 / len(v_1)]
+        else:
+            R4 = obs[self.index][0:2]
+        return R4
 
     # @WZQ >>>> Weighted Target Attraction
     def rule5(self, obs):
@@ -311,8 +352,31 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
 
     # @KSB >>>> Evasion
     def rule9(self, obs):
-        UD = obs[self.index][0:2]
-        return UD
+        v_1 = list()
+        v_2 = list()
+        v1 = 0
+        v2 = 0
+        a = self.known_uavs
+        for kk in self.known_uavs:
+            dist_k = math.sqrt(math.pow((obs[self.index][2] - obs[kk][2]), 2) +
+                               math.pow((obs[self.index][3] - obs[kk][3]), 2))
+            if dist_k < 1:
+                ndist_k = 1
+            else:
+                ndist_k = dist_k
+            f_dist_k = math.sqrt(math.pow((obs[self.index][2] + obs[self.index][0] - obs[kk][2] - obs[kk][0]), 2) +
+                                 math.pow((obs[self.index][2] + obs[self.index][0] - obs[kk][2] - obs[kk][0]), 2))
+            if f_dist_k < 1 and f_dist_k < ndist_k:
+                v_1.append(ndist_k / 0.03 * (obs[self.index][2] - obs[kk][2]))
+                v_2.append(ndist_k / 0.03 * (obs[self.index][3] - obs[kk][3]))
+        for i in range(len(v_1)):
+            v1 = v1 + v_1[i]
+            v2 = v2 + v_2[i]
+        if len(v_1):
+            R9 = [v1 / len(v_1), v2 / len(v_1)]
+        else:
+            R9 = obs[self.index][0:2]
+        return R9
 
     # @XJ >>>> Obstacle Avoidance
     def rule10(self, obs, obstacles):
