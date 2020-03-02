@@ -49,7 +49,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         # d1 = 0.1  # 轴向视场距离
         # d2 = 0.2  # 轴向视场宽度
         # d3 = 0.2  # 侧向视场宽度
-        d1 = 0
+        d1 = self.uav_sensor_range*(-1)
         d2 = self.uav_sensor_range*2
         d3 = self.uav_sensor_range*2
         xx1 = -d3 / 2 * math.cos(selfdir) - d2 / 2 * math.sin(selfdir) * -1
