@@ -28,7 +28,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self.r3 = 1.1
         self.size = 0.03
         self.uav_num = arglist.uav_num        # 小瓜子数量
-        self.decision_frequency = 50                       # 周期
+        self.decision_frequency = 50
 
     def get_limited_vision(self, obs):  # 速度正常观测 # 位置未知>>>仅知方位
         limited_obs = list()
@@ -205,11 +205,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
                 self.rule_summation(BEHAVIOR[1], obs_n, obstacles)
                 _opt_index = 1
 
-                U5 = self.rule5(obs_n)
-                U10 = self.rule10(obs_n, obstacles)
-                # self.UD = U5 / np.linalg.norm(U5)
-                self.UD = U5 / np.linalg.norm(U5) + 2 * U10 / np.linalg.norm(U10)
-                self.UD = self.UD / np.linalg.norm(self.UD)
+                # self.UD = self.rule9(obs_n)
 
             else:
                 pass
