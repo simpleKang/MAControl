@@ -204,8 +204,8 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
 
                 U5 = self.rule5(obs_n)
                 U10 = self.rule10(obs_n, obstacles)
-                self.UD = U5 / np.linalg.norm(U5)
-                # self.UD = U5 / np.linalg.norm(U5) + 2 * U10 / np.linalg.norm(U10)
+                # self.UD = U5 / np.linalg.norm(U5)
+                self.UD = U5 / np.linalg.norm(U5) + 2 * U10 / np.linalg.norm(U10)
                 self.UD = self.UD / np.linalg.norm(self.UD)
 
             else:
@@ -339,12 +339,12 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self_pos = np.array(obs[self.index][2:4])
         for item in obstacles:
             distance = np.linalg.norm(np.array(item[0:2])-self_pos)
-            d = self.uav_sensor_range + item[2]*5 - distance
+            d = self.uav_sensor_range + item[2] - distance
             d = d if d > 0.000001 else 0.000001
             dUO.append(d)
-            if (distance - item[2]*5) < self.uav_sensor_range/2:
+            if (distance - item[2]) < self.uav_sensor_range/2:
                 R10part2.append(np.array(item[0:2])-self_pos)
-                R10part2[-1] = R10part2[-1] / distance * (distance - item[2]*5)
+                R10part2[-1] = R10part2[-1] / distance * (distance - item[2])
                 R10part2[-1] = R10part2[-1] * dUO[-1] / self.uav_sensor_range * (-1)
             else:
                 R10part2.append([0, 0])
@@ -367,7 +367,10 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
                     R10part1.append(vector3 * math.acos(cos1) * 2 / math.pi / np.linalg.norm(vector3))
             else:
                 R10part1.append([0, 0])
-            r10f = (np.array(R10part1[k]) + 0.01 * np.array(R10part2[k])) * dUO[k]
+            if np.linalg.norm(vector1) < self.uav_sensor_range:
+                r10f = (np.array(R10part1[k]) + 0.1 * np.array(R10part2[k])) * dUO[k]
+            else:
+                r10f = np.array([0, 0])
             R10f.append(r10f)
         sumR10f = sum(R10f)
 
