@@ -1,12 +1,9 @@
 import numpy as np
-import tensorflow as tf
 import operator
 import random
 import math
 import os
 import matplotlib.pyplot as plt
-import pandas as pd
-import MAControl.Util.Draw_box_plot as bp
 import MAControl.Util.SignIsSame as sis
 
 
@@ -20,9 +17,20 @@ import MAControl.Util.SignIsSame as sis
 # # plt.xlim(0, 4000)
 # plt.show()
 
-for i in range(20):
-    ran = random.randint(0, 7)
-    print(ran)
+
+uav_pos = np.array([1, 1])
+tar_pos = np.array([1, 2])
+
+uav_vel = np.array([0.01, 0.02])
+tar_vel = np.array([0.03, 0.05])
+
+dist = np.linalg.norm(tar_pos - uav_pos)
+
+a = 0.1
+
+print(uav_pos/(2*a))
+
+
 
 
 pass

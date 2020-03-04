@@ -3,6 +3,7 @@ import MAControl.Util.CreateWaypoint as CW
 import os
 _path = '/track/' if os.name == 'posix' else '\\track\\'
 
+
 class PathPlanner_EdgeWaypoint(PathPlanner):
 
     def __init__(self, name, env, world, agent_index, arglist):

@@ -13,7 +13,7 @@ num = int(para[1])
 
 track = []
 for i in range(num):
-    track.append(np.loadtxt(pardir + '/track/agent_%d_track.txt' % i))
+    track.append(np.loadtxt(pardir + '/track/uav_%d_track.txt' % i))
 
 # for k in range(-10, 1501, 25):
 
