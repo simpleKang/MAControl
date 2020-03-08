@@ -41,9 +41,13 @@ grid_obstacle = False
 # 环境里不存在自然斥力，必须由 agent 做出避障决策才会有避开障碍的效果
 
 # square (a kind of obstacle)
-num_square = 0
-square_size = 0.1
-square_pos = [[1.6, 1.8],  [1.6, -0.9]]
+num_square = 5
+square_size = 0.05
+square_pos = [[0., 0.],
+              [1., 1.],
+              [1., -1.],
+              [-1., 1.],
+              [-1., -1.]]
 square_color = np.array([0.25, 0.49, 0.75])
 square_obstacle = True
 

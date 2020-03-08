@@ -18,12 +18,12 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         PolicyMaker_SelfOrganization.pheromonal.append(-1)     # agent 会将它更新为非负数. # 一直是 -1 表示自己是个target.
         self.known_uavs = list()              # 视野+通信到的uav
         self.known_targets = list()           # 视野+通信到的target
-        self.communication_range = 2
-        self.uav_sensor_range = 1.2
+        self.communication_range = 1
+        self.uav_sensor_range = 0.3
         self.target_sensor_range = 0.8
         self.uav_engagement_range = 0.5
         self.target_engagement_range = 0.5
-        self.r1 = 0
+        self.r1 = 0.3
         self.r2 = 0
         self.r3 = 1.1
         self.size = 0.03
@@ -405,7 +405,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
                     n_dist = min_dist
                 f_uav_pos = uav_pos + uav_vel
                 f_dist = np.linalg.norm(f_self_pos - f_uav_pos)
-                if (f_dist < 3*self.size) and (f_dist < n_dist):
+                if (f_dist < 3 * self.size) and (f_dist < n_dist):
                     R9_list.append(n_dist * (self_pos - uav_pos) / (3 * self.size))
             if R9_list:
                 R9 = sum(R9_list) / len(self.known_uavs)
@@ -461,4 +461,6 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         R10 = sumR10f / sumdUO
         if np.linalg.norm(R10) == 0:
             R10 = self_vel
+
+        # R10 = obs[self.index][0:2]
         return R10

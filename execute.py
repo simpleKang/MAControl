@@ -4,6 +4,7 @@ import argparse
 import time
 import os
 import MAEnv.scenarios.TargetProfile as T
+import MAControl.Util.OfflineCoverRate as OCR
 
 import MAControl.Default.InnerController_PID as IC_P
 import MAControl.Default.MotionController_L1_TECS as MC_L
@@ -18,8 +19,8 @@ def parse_args():
 
     # Environment
     parser.add_argument("--scenario", type=str, default="scenario6_AFIT", help="name of the scenario script")
-    parser.add_argument("--uav-num", type=int, default=20, help="number of uav")
-    parser.add_argument("--step-max", type=int, default=4000, help="number of maximum steps")
+    parser.add_argument("--uav-num", type=int, default=10, help="number of uav")
+    parser.add_argument("--step-max", type=int, default=8000, help="number of maximum steps")
     parser.add_argument("--repeat-num", type=int, default=1, help="number of repeat runs")
 
     return parser.parse_args()
@@ -116,7 +117,7 @@ if __name__ == '__main__':
     for num in range(arglist.repeat_num):
 
         with open(os.path.dirname(__file__) + _path + 'para.txt', 'w') as f:
-            f.write(str(T.edge) + ' ' + str(arglist.uav_num) + ' ' + str(arglist.step_max))
+            f.write(str(arglist.uav_num) + ' ' + str(arglist.step_max))
         # 为每个小瓜子创建状态文件
         for k in range(arglist.uav_num):
             open(os.path.dirname(__file__) + _path + 'uav_%d_track.txt' % k, 'w')
@@ -143,11 +144,12 @@ if __name__ == '__main__':
                         obs_n[k][3]) + '\n')
 
             # 画图展示
-            env.render()
+            # env.render()
             print('>>> Num', num, '>>>> step', step)
             time.sleep(0.001)
 
         time.sleep(1)
+        OCR.calculate_coverage(arglist.uav_num, arglist.step_max, num)
         end = time.time()
         interval = round((end - start), 2)
         print('Time Interval ', interval)

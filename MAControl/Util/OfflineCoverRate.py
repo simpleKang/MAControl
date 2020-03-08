@@ -4,7 +4,7 @@ import MAControl.Util.OnlineCoverRate as CR
 import MAEnv.scenarios.TargetProfile as T
 
 
-def calculate_coverage(cell, num, step, loop=0):
+def calculate_coverage(num, step, loop=0):
 
     curdir = os.path.dirname(__file__)
     pardir = os.path.dirname(os.path.dirname(curdir))
@@ -12,10 +12,11 @@ def calculate_coverage(cell, num, step, loop=0):
     txt_name = '/cover_rate-%s-%s-%s.txt' % (str(num), str(step), str(loop))
     open(pardir + '/cover_rate_Folder' + txt_name, 'w')
 
+    cell = 200                     # 区域划分精度
     track = list()
     last_cover = list()
     for i in range(num):
-        track.append(np.loadtxt(pardir + '/track/agent_%d_track.txt' % i))
+        track.append(np.loadtxt(pardir + '/track/uav_%d_track.txt' % i))
         last_cover.append([])
 
     area = np.zeros((cell, cell))
@@ -76,8 +77,7 @@ if __name__ == '__main__':
     curdir_ = os.path.dirname(__file__)
     pardir_ = os.path.dirname(os.path.dirname(curdir_))
     para = np.loadtxt(pardir_ + '/track/para.txt')
-    cell_ = int(para[0])
-    num_ = int(para[1])
-    step_ = int(para[2])
+    num_ = int(para[0])
+    step_ = int(para[1])
 
-    calculate_coverage(cell_, num_, step_)
+    calculate_coverage(num_, step_)
