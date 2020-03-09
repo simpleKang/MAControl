@@ -3,8 +3,10 @@
 import argparse
 import time
 import os
+import numpy as np
 import MAEnv.scenarios.TargetProfile as T
 import MAControl.Util.OfflineCoverRate as OCR
+import GeneticAlgorithm.genetic_algorithm as ga
 
 import MAControl.Default.InnerController_PID as IC_P
 import MAControl.Default.MotionController_L1_TECS as MC_L
@@ -20,8 +22,18 @@ def parse_args():
     # Environment
     parser.add_argument("--scenario", type=str, default="scenario6_AFIT", help="name of the scenario script")
     parser.add_argument("--uav-num", type=int, default=10, help="number of uav")
-    parser.add_argument("--step-max", type=int, default=8000, help="number of maximum steps")
-    parser.add_argument("--repeat-num", type=int, default=1, help="number of repeat runs")
+    parser.add_argument("--step-max", type=int, default=50, help="number of maximum steps")
+
+    # GA
+    parser.add_argument("--pop-size", type=int, default=10, help="size of population")
+    parser.add_argument("--generation-num", type=int, default=3, help="number of generation")
+    parser.add_argument("--max-behavior-archetypes", type=int, default=3, help="number of behavior archetypes")
+    parser.add_argument("--collect-num", type=int, default=3, help="number of fitness score collection")
+
+    # Core parameters
+    parser.add_argument("--crossover-rate", type=float, default=0.1, help="crossover rate")
+    parser.add_argument("--mutation-rate", type=float, default=0.9, help="mutation rate")
+    parser.add_argument("--mutation-neighborhood", type=float, default=0.05, help="mutation neighborhood")
 
     return parser.parse_args()
 
@@ -42,6 +54,9 @@ def make_env(arglist):
     for k, landmark in enumerate(world_.landmarks):
         if landmark.obstacle:
             obstacle_info_.append([landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.size, k])
+
+    with open(os.path.dirname(__file__) + _path + 'para.txt', 'w') as f:
+        f.write(str(arglist.uav_num) + ' ' + str(arglist.step_max))
 
     return env_, world_, obstacle_info_
 
@@ -79,7 +94,7 @@ def get_controller(env, world, arglist):
     return uavController, targetController
 
 
-def action(obs_n, step, ControllerSet, obstacles):
+def action(obs_n, step, ControllerSet, obstacles, behavior_archetypes):
 
     # get action
     action_n = list()
@@ -88,7 +103,7 @@ def action(obs_n, step, ControllerSet, obstacles):
     for i in range(ControllerSet.__len__()):  # 提取ControllerSet的长度
 
         list_i = ControllerSet[i][0].\
-            make_policy(obstacles, obs_n, step)
+            make_policy(obstacles, obs_n, behavior_archetypes, step)
 
         pointAi, pointBi, finishedi = ControllerSet[i][1].\
             planpath(list_i, obs_n[i], ControllerSet[i][4], step, obstacles)
@@ -104,9 +119,52 @@ def action(obs_n, step, ControllerSet, obstacles):
     return action_n
 
 
+def run_simulation(arglist, behavior_archetypes, gen, ind, num):
+
+    # 为每个小瓜子创建状态文件
+    for k in range(arglist.uav_num):
+        open(os.path.dirname(__file__) + _path + 'uav_%d_track.txt' % k, 'w')
+
+    obs_n = env.reset()
+    start = time.time()
+
+    for step in range(arglist.step_max):
+
+        # 选择动作
+        action_Un = action(obs_n, step, Controllers[0], obstacle_info, behavior_archetypes)
+        action_Tn = action(obs_n[arglist.uav_num:], step, Controllers[1], obstacle_info, behavior_archetypes)
+        action_n = action_Un + action_Tn
+
+        new_obs_n, rew_n, done_n, info_n = env.step(action_n)
+
+        obs_n = new_obs_n
+
+        # 保存每个小瓜子每个step的状态信息
+        for k in range(arglist.uav_num):
+            with open(os.path.dirname(__file__) + _path + 'uav_%d_track.txt' % k, 'a') as f:
+                f.write(str(obs_n[k][0]) + ' ' + str(obs_n[k][1]) + ' ' + str(obs_n[k][2]) + ' ' + str(
+                    obs_n[k][3]) + '\n')
+
+        # 画图展示
+        # env.render()
+        print('>>> Generation', gen, '>>> Individual', ind, '>>> Collect', num, '>>> step', step)
+        time.sleep(0.001)
+
+    time.sleep(1)
+    # coverage = OCR.calculate_coverage(arglist.uav_num, arglist.step_max, num)
+    coverage = np.random.random()
+    end = time.time()
+    interval = round((end - start), 2)
+    print('Time Interval ', interval)
+
+    return coverage
+
+
 if __name__ == '__main__':
 
     arglist = parse_args()
+
+    ga = ga.GA(arglist)
 
     # Create environment
     env, world, obstacle_info = make_env(arglist)
@@ -114,42 +172,14 @@ if __name__ == '__main__':
     # Create Controller
     Controllers = get_controller(env, world, arglist)
 
-    for num in range(arglist.repeat_num):
+    for gen in range(arglist.generation_num):
+        for ind, individual in enumerate(ga.population):
+            for num in range(arglist.collect_num):
 
-        with open(os.path.dirname(__file__) + _path + 'para.txt', 'w') as f:
-            f.write(str(arglist.uav_num) + ' ' + str(arglist.step_max))
-        # 为每个小瓜子创建状态文件
-        for k in range(arglist.uav_num):
-            open(os.path.dirname(__file__) + _path + 'uav_%d_track.txt' % k, 'w')
+                score = run_simulation(arglist, individual, gen, ind, num)
+                ga.score[ind][num] = score
+            pass
 
-        obs_n = env.reset()
-        start = time.time()
+        ga.evolve()
+        pass
 
-        for step in range(arglist.step_max):
-
-            # 选择动作
-            # action_Un = action(obs_n[0:arglist.uav_num], step, Controllers[0], obstacle_info)
-            action_Un = action(obs_n, step, Controllers[0], obstacle_info)
-            action_Tn = action(obs_n[arglist.uav_num:], step, Controllers[1], obstacle_info)
-            action_n = action_Un + action_Tn
-
-            new_obs_n, rew_n, done_n, info_n = env.step(action_n)
-
-            obs_n = new_obs_n
-
-            # 保存每个小瓜子每个step的状态信息
-            for k in range(arglist.uav_num):
-                with open(os.path.dirname(__file__) + _path + 'uav_%d_track.txt' % k, 'a') as f:
-                    f.write(str(obs_n[k][0]) + ' ' + str(obs_n[k][1]) + ' ' + str(obs_n[k][2]) + ' ' + str(
-                        obs_n[k][3]) + '\n')
-
-            # 画图展示
-            # env.render()
-            print('>>> Num', num, '>>>> step', step)
-            time.sleep(0.001)
-
-        time.sleep(1)
-        OCR.calculate_coverage(arglist.uav_num, arglist.step_max, num)
-        end = time.time()
-        interval = round((end - start), 2)
-        print('Time Interval ', interval)

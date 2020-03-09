@@ -2,7 +2,6 @@ from MAControl.Base.PolicyMaker import PolicyMaker
 from MAControl.Util.PointInRec import point_in_rec
 import numpy as np
 import math
-import MAControl.Default.Behavior_Archetype as BA
 
 
 class PolicyMaker_SelfOrganization(PolicyMaker):
@@ -23,9 +22,6 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self.target_sensor_range = 0.8
         self.uav_engagement_range = 0.5
         self.target_engagement_range = 0.5
-        self.r1 = 0.3
-        self.r2 = 0
-        self.r3 = 1.1
         self.size = 0.03
         self.uav_num = arglist.uav_num        # 小瓜子数量
         self.decision_frequency = 50
@@ -152,20 +148,24 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         _density = sum(item)
         return _density
 
-    def rule_summation(self, ba_index, obs_n, obstacles):
+    def rule_summation(self, archetype, obs_n, obstacles):
 
-        W = BA.BA[ba_index][2:]
+        W = archetype[2:10]
         W.append(2)
         W.append(2)
+
+        r1 = archetype[-3]
+        r2 = archetype[-2]
+        r3 = archetype[-1]
 
         UR = list()
         UR.append(np.array(self.rule1(obs_n)))
         UR.append(np.array(self.rule2(obs_n)))
-        UR.append(np.array(self.rule3(obs_n)))
-        UR.append(np.array(self.rule4(obs_n)))
+        UR.append(np.array(self.rule3(obs_n, r1)))
+        UR.append(np.array(self.rule4(obs_n, r2)))
         UR.append(np.array(self.rule5(obs_n)))
         UR.append(np.array(self.rule6(obs_n)))
-        UR.append(np.array(self.rule7(obs_n)))
+        UR.append(np.array(self.rule7(obs_n, r3)))
         UR.append(np.array(self.rule8(obs_n)))
         UR.append(np.array(self.rule9(obs_n)))
         UR.append(np.array(self.rule10(obs_n, obstacles)))
@@ -185,7 +185,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         # 放弃实现(5.32) 如想限制速度上界 建议在 scenario6_AFIT.py 中写入约束
         self.UD = UD
 
-    def make_policy(self, obstacles, obs_n, step):
+    def make_policy(self, obstacles, obs_n, behavior_archetypes, step):
 
         _opt_index = 0
 
@@ -199,9 +199,9 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
                 pheromonal = PolicyMaker_SelfOrganization.pheromonal[self.index]
                 density = self.get_UAV_density(obs_n)
                 BEHAVIOR = [-10, -10]
-                for k, ba_k in enumerate(BA.BA):
+                for k, ba_k in enumerate(behavior_archetypes):
                     BA_k = pheromonal * ba_k[0] + density * ba_k[1]
-                    BEHAVIOR = [BA_k, k] if BEHAVIOR[0] < BA_k else BEHAVIOR
+                    BEHAVIOR = [BA_k, ba_k] if BEHAVIOR[0] < BA_k else BEHAVIOR
                 self.rule_summation(BEHAVIOR[1], obs_n, obstacles)
                 _opt_index = 1
 
@@ -266,15 +266,15 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         return R2
 
     # @KSB >>>> Cohesion
-    def rule3(self, obs):
+    def rule3(self, obs, r1):
         R3_list = list()
         self_pos = obs[self.index][2:4]
         if self.known_uavs:
             for uav in self.known_uavs:
                 uav_pos = obs[uav][2:4]
                 dist = np.linalg.norm(self_pos - uav_pos)
-                if dist > self.uav_sensor_range*self.r1:
-                    R3_list.append((uav_pos - self_pos) * (dist - self.uav_sensor_range * self.r1))
+                if dist > self.uav_sensor_range * r1:
+                    R3_list.append((uav_pos - self_pos) * (dist - self.uav_sensor_range * r1))
             if R3_list:
                 R3 = sum(R3_list) / len(self.known_uavs)
             else:
@@ -284,15 +284,15 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         return R3
 
     # @KSB >>>> Separation
-    def rule4(self, obs):
+    def rule4(self, obs, r2):
         R4_list = list()
         self_pos = obs[self.index][2:4]
         if self.known_uavs:
             for uav in self.known_uavs:
                 uav_pos = obs[uav][2:4]
                 dist = np.linalg.norm(self_pos - uav_pos)
-                if dist < self.uav_sensor_range * self.r2:
-                    R4_list.append((self_pos - uav_pos) * (self.uav_sensor_range * self.r2 - dist))
+                if dist < self.uav_sensor_range * r2:
+                    R4_list.append((self_pos - uav_pos) * (self.uav_sensor_range * r2 - dist))
             if R4_list:
                 R4 = sum(R4_list) / len(self.known_uavs)
             else:
@@ -344,16 +344,16 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         return R6
 
     # @WZQ >>>> Weighted Target Repulsion
-    def rule7(self, obs):
+    def rule7(self, obs, r3):
         R7_list = list()
         self_pos = obs[self.index][2:4]
         if self.known_targets:
             for tar in self.known_targets:
                 tar_pos = obs[tar][2:4]
                 dist = np.linalg.norm(tar_pos - self_pos)
-                if (dist < self.r3 * self.uav_sensor_range) and \
-                   (self.r3 * self.uav_sensor_range > self.target_engagement_range):
-                    R7_list.append((self_pos - tar_pos) / 2 * (self.r3 * self.uav_sensor_range - dist))
+                if (dist < r3 * self.uav_sensor_range) and \
+                   (r3 * self.uav_sensor_range > self.target_engagement_range):
+                    R7_list.append((self_pos - tar_pos) / 2 * (r3 * self.uav_sensor_range - dist))
                 elif dist < self.target_engagement_range:
                     R7_list.append((self_pos - tar_pos) / 2 * (self.target_engagement_range - dist))
             if R7_list:

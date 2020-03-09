@@ -61,15 +61,17 @@ def calculate_coverage(num, step, loop=0):
                         else:
                             raise Exception('Unexpected situation!!!')
         last_cover[:] = new_last[:]
-        print('>>> Round', loop, 'Total ', np.size(track[-1], 0), ' >>> step ', l)
+        print('>>> Collect', loop, 'Total ', np.size(track[-1], 0), ' >>> step ', l)
 
         cover_rate, overlap_rate = CR.cal_cover_rate(area)
-        with open(pardir + '/cover_rate_Folder' + txt_name, 'a') as c:
-            c.write(str(l) + ' ' + str(cover_rate) + ' ' + str(overlap_rate) + '\n')
+        # with open(pardir + '/cover_rate_Folder' + txt_name, 'a') as c:
+        #     c.write(str(l) + ' ' + str(cover_rate) + ' ' + str(overlap_rate) + '\n')
 
     # np.savetxt(pardir + '/cover_rate_Folder' + '/area.text', area, fmt='%d')
 
     print('Finished!')
+
+    return cover_rate
 
 
 if __name__ == '__main__':
