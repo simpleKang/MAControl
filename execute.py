@@ -22,13 +22,14 @@ def parse_args():
     # Environment
     parser.add_argument("--scenario", type=str, default="scenario6_AFIT", help="name of the scenario script")
     parser.add_argument("--uav-num", type=int, default=10, help="number of uav")
-    parser.add_argument("--step-max", type=int, default=50, help="number of maximum steps")
+    parser.add_argument("--step-max", type=int, default=4000, help="number of maximum steps")
 
     # GA
-    parser.add_argument("--pop-size", type=int, default=10, help="size of population")
-    parser.add_argument("--generation-num", type=int, default=3, help="number of generation")
-    parser.add_argument("--max-behavior-archetypes", type=int, default=3, help="number of behavior archetypes")
-    parser.add_argument("--collect-num", type=int, default=3, help="number of fitness score collection")
+    parser.add_argument("--pop-size", type=int, default=20, help="size of population")
+    parser.add_argument("--preserved-population", type=float, default=1, help="percentage of population selected")
+    parser.add_argument("--generation-num", type=int, default=10, help="number of generation")
+    parser.add_argument("--max-behavior-archetypes", type=int, default=1, help="number of behavior archetypes")
+    parser.add_argument("--collect-num", type=int, default=20, help="number of fitness score collection")
 
     # Core parameters
     parser.add_argument("--crossover-rate", type=float, default=0.1, help="crossover rate")
@@ -121,41 +122,41 @@ def action(obs_n, step, ControllerSet, obstacles, behavior_archetypes):
 
 def run_simulation(arglist, behavior_archetypes, gen, ind, num):
 
-    # 为每个小瓜子创建状态文件
-    for k in range(arglist.uav_num):
-        open(os.path.dirname(__file__) + _path + 'uav_%d_track.txt' % k, 'w')
-
-    obs_n = env.reset()
-    start = time.time()
-
-    for step in range(arglist.step_max):
-
-        # 选择动作
-        action_Un = action(obs_n, step, Controllers[0], obstacle_info, behavior_archetypes)
-        action_Tn = action(obs_n[arglist.uav_num:], step, Controllers[1], obstacle_info, behavior_archetypes)
-        action_n = action_Un + action_Tn
-
-        new_obs_n, rew_n, done_n, info_n = env.step(action_n)
-
-        obs_n = new_obs_n
-
-        # 保存每个小瓜子每个step的状态信息
-        for k in range(arglist.uav_num):
-            with open(os.path.dirname(__file__) + _path + 'uav_%d_track.txt' % k, 'a') as f:
-                f.write(str(obs_n[k][0]) + ' ' + str(obs_n[k][1]) + ' ' + str(obs_n[k][2]) + ' ' + str(
-                    obs_n[k][3]) + '\n')
-
-        # 画图展示
-        # env.render()
-        print('>>> Generation', gen, '>>> Individual', ind, '>>> Collect', num, '>>> step', step)
-        time.sleep(0.001)
-
-    time.sleep(1)
+    # # 为每个小瓜子创建状态文件
+    # for k in range(arglist.uav_num):
+    #     open(os.path.dirname(__file__) + _path + 'uav_%d_track.txt' % k, 'w')
+    #
+    # obs_n = env.reset()
+    # start = time.time()
+    #
+    # for step in range(arglist.step_max):
+    #
+    #     # 选择动作
+    #     action_Un = action(obs_n, step, Controllers[0], obstacle_info, behavior_archetypes)
+    #     action_Tn = action(obs_n[arglist.uav_num:], step, Controllers[1], obstacle_info, behavior_archetypes)
+    #     action_n = action_Un + action_Tn
+    #
+    #     new_obs_n, rew_n, done_n, info_n = env.step(action_n)
+    #
+    #     obs_n = new_obs_n
+    #
+    #     # 保存每个小瓜子每个step的状态信息
+    #     for k in range(arglist.uav_num):
+    #         with open(os.path.dirname(__file__) + _path + 'uav_%d_track.txt' % k, 'a') as f:
+    #             f.write(str(obs_n[k][0]) + ' ' + str(obs_n[k][1]) + ' ' + str(obs_n[k][2]) + ' ' + str(
+    #                 obs_n[k][3]) + '\n')
+    #
+    #     # 画图展示
+    #     # env.render()
+    #     print('>>> Generation', gen, '>>> Individual', ind, '>>> Collect', num, '>>> step', step)
+    #     time.sleep(0.001)
+    #
+    # time.sleep(1)
     # coverage = OCR.calculate_coverage(arglist.uav_num, arglist.step_max, num)
     coverage = np.random.random()
-    end = time.time()
-    interval = round((end - start), 2)
-    print('Time Interval ', interval)
+    # end = time.time()
+    # interval = round((end - start), 2)
+    # print('Time Interval ', interval)
 
     return coverage
 
@@ -172,14 +173,16 @@ if __name__ == '__main__':
     # Create Controller
     Controllers = get_controller(env, world, arglist)
 
-    for gen in range(arglist.generation_num):
+    for gen in range(arglist.generation_num + 1):
         for ind, individual in enumerate(ga.population):
             for num in range(arglist.collect_num):
-
                 score = run_simulation(arglist, individual, gen, ind, num)
                 ga.score[ind][num] = score
             pass
-
-        ga.evolve()
-        pass
+        if gen < arglist.generation_num:
+            ga.evolve()
+        elif gen == arglist.generation_num:
+            ga.save_pop()
+        else:
+            raise Exception('Oh my god! There is a bug!')
 
