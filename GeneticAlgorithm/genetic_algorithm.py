@@ -95,7 +95,10 @@ class GA():
                 mun_bit = int((self.bit*self.max_archetypes*(self.ba_c+self.ba_w+self.ba_r)) * self.mutation_neighborhood)
                 each_bit = random.sample(range(0, (self.bit*self.max_archetypes*(self.ba_c+self.ba_w+self.ba_r))), mun_bit)
                 for j in range(0, len(each_bit)):
-                    self.binary_population[i][each_bit[j]] = 1 if self.binary_population[i][each_bit[j]] == 0 else 0
+                    if self.binary_population[i][each_bit[j]] == 0:
+                        self.binary_population[i][each_bit[j]] = 1
+                    else:
+                        self.binary_population[i][each_bit[j]] = 0
 
 
     # 将新种群编码为二进制形式
