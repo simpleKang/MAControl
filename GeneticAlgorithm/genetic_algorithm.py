@@ -5,7 +5,7 @@ import os
 
 class GA():
     def __init__(self, arglist):
-        print('ga init')
+
         self.pop_size = arglist.pop_size
         self.generation_num = arglist.generation_num
         self.preserved_num = round(arglist.preserved_population*self.pop_size)
@@ -31,6 +31,7 @@ class GA():
         self.score = np.zeros((self.pop_size, self.collect_num))
         self.new_population = list()
         self.binary_population = list()
+        print('GA initiating')
 
     def evolve(self):
 
@@ -163,6 +164,7 @@ class GA():
 
             self.new_population.append(individual_arch)
 
+    # 进化完成后保存权重模型
     def save_pop(self):
 
         score_sum = list()

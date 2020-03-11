@@ -3,9 +3,8 @@
 import argparse
 import time
 import os
-import numpy as np
 import MAEnv.scenarios.TargetProfile as T
-import MAControl.Util.OfflineCoverRate as OCR
+import MAControl.Util.CalCoverage as cc
 import GeneticAlgorithm.genetic_algorithm as ga
 
 import MAControl.Default.InnerController_PID as IC_P
@@ -27,9 +26,9 @@ def parse_args():
     # GA
     parser.add_argument("--pop-size", type=int, default=20, help="size of population")
     parser.add_argument("--preserved-population", type=float, default=0.5, help="percentage of population selected")
-    parser.add_argument("--generation-num", type=int, default=10, help="number of generation")
+    parser.add_argument("--generation-num", type=int, default=30, help="number of generation")
     parser.add_argument("--max-behavior-archetypes", type=int, default=1, help="number of behavior archetypes")
-    parser.add_argument("--collect-num", type=int, default=20, help="number of fitness score collection")
+    parser.add_argument("--collect-num", type=int, default=10, help="number of fitness score collection")
 
     # Core parameters
     parser.add_argument("--crossover-rate", type=float, default=0.1, help="crossover rate")
@@ -152,7 +151,7 @@ def run_simulation(arglist, behavior_archetypes, gen, ind, num):
         time.sleep(0.001)
 
     time.sleep(1)
-    coverage = OCR.calculate_coverage(arglist.uav_num, arglist.step_max, num)
+    coverage = cc.calculate_coverage(arglist.uav_num, arglist.step_max, num)
     # coverage = np.random.random()
     # end = time.time()
     # interval = round((end - start), 2)
@@ -180,7 +179,8 @@ if __name__ == '__main__':
                 score = run_simulation(arglist, individual, gen, ind, num)
                 end = time.time()
                 interval = round((end - start), 2)
-                print('>>> Generation', gen, '>>> Individual', ind, '>>> Collect', num, 'time-consuming: ', interval)
+                print('>>> Generation', gen, '>>> Individual', ind, '>>> Collect', num,
+                      'time-consuming: ', interval, 'score: ', score)
                 ga.score[ind][num] = score
             pass
         if gen < arglist.generation_num:
