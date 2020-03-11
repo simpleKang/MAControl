@@ -122,38 +122,38 @@ def action(obs_n, step, ControllerSet, obstacles, behavior_archetypes):
 
 def run_simulation(arglist, behavior_archetypes, gen, ind, num):
 
-    # # 为每个小瓜子创建状态文件
-    # for k in range(arglist.uav_num):
-    #     open(os.path.dirname(__file__) + _path + 'uav_%d_track.txt' % k, 'w')
-    #
-    # obs_n = env.reset()
+    # 为每个小瓜子创建状态文件
+    for k in range(arglist.uav_num):
+        open(os.path.dirname(__file__) + _path + 'uav_%d_track.txt' % k, 'w')
+
+    obs_n = env.reset()
     # start = time.time()
-    #
-    # for step in range(arglist.step_max):
-    #
-    #     # 选择动作
-    #     action_Un = action(obs_n, step, Controllers[0], obstacle_info, behavior_archetypes)
-    #     action_Tn = action(obs_n[arglist.uav_num:], step, Controllers[1], obstacle_info, behavior_archetypes)
-    #     action_n = action_Un + action_Tn
-    #
-    #     new_obs_n, rew_n, done_n, info_n = env.step(action_n)
-    #
-    #     obs_n = new_obs_n
-    #
-    #     # 保存每个小瓜子每个step的状态信息
-    #     for k in range(arglist.uav_num):
-    #         with open(os.path.dirname(__file__) + _path + 'uav_%d_track.txt' % k, 'a') as f:
-    #             f.write(str(obs_n[k][0]) + ' ' + str(obs_n[k][1]) + ' ' + str(obs_n[k][2]) + ' ' + str(
-    #                 obs_n[k][3]) + '\n')
-    #
-    #     # 画图展示
-    #     # env.render()
-    #     print('>>> Generation', gen, '>>> Individual', ind, '>>> Collect', num, '>>> step', step)
-    #     time.sleep(0.001)
-    #
-    # time.sleep(1)
-    # coverage = OCR.calculate_coverage(arglist.uav_num, arglist.step_max, num)
-    coverage = np.random.random()
+
+    for step in range(arglist.step_max):
+
+        # 选择动作
+        action_Un = action(obs_n, step, Controllers[0], obstacle_info, behavior_archetypes)
+        action_Tn = action(obs_n[arglist.uav_num:], step, Controllers[1], obstacle_info, behavior_archetypes)
+        action_n = action_Un + action_Tn
+
+        new_obs_n, rew_n, done_n, info_n = env.step(action_n)
+
+        obs_n = new_obs_n
+
+        # 保存每个小瓜子每个step的状态信息
+        for k in range(arglist.uav_num):
+            with open(os.path.dirname(__file__) + _path + 'uav_%d_track.txt' % k, 'a') as f:
+                f.write(str(obs_n[k][0]) + ' ' + str(obs_n[k][1]) + ' ' + str(obs_n[k][2]) + ' ' + str(
+                    obs_n[k][3]) + '\n')
+
+        # 画图展示
+        # env.render()
+        # print('>>> Generation', gen, '>>> Individual', ind, '>>> Collect', num, '>>> step', step)
+        time.sleep(0.001)
+
+    time.sleep(1)
+    coverage = OCR.calculate_coverage(arglist.uav_num, arglist.step_max, num)
+    # coverage = np.random.random()
     # end = time.time()
     # interval = round((end - start), 2)
     # print('Time Interval ', interval)
@@ -176,7 +176,11 @@ if __name__ == '__main__':
     for gen in range(arglist.generation_num + 1):
         for ind, individual in enumerate(ga.population):
             for num in range(arglist.collect_num):
+                start = time.time()
                 score = run_simulation(arglist, individual, gen, ind, num)
+                end = time.time()
+                interval = round((end - start), 2)
+                print('>>> Generation', gen, '>>> Individual', ind, '>>> Collect', num, 'time-consuming: ', interval)
                 ga.score[ind][num] = score
             pass
         if gen < arglist.generation_num:

@@ -1,7 +1,6 @@
 import numpy as np
 import random
 import os
-import MAControl.Default.PolicyMaker_SelfOrganization as PM_S
 
 
 class GA():
@@ -71,59 +70,50 @@ class GA():
 
     # 交叉操作,交叉操作完成后，使得新种群数量与原种群保持一致
     def crossover(self):
-        if len(self.binary_population)== self.generation_num:
-            child = [[]] * (self.pop_size-self.preserved_num)
-            for i in range(0, (self.pop_size-self.preserved_num)):
+
+        if len(self.binary_population) < self.pop_size:
+            child = list()
+            for i in range(0, (self.pop_size - self.preserved_num)):
+
                 parent = random.sample(range(0, len(self.binary_population)), 2)
 
                 # 行为原型交叉
                 r1 = random.sample(range(0, (self.max_archetypes*self.ba_c)), 2)
-                if r1[0] > r1[1]:
-                    a = r1[0]
-                    r1[0] = r1[1]
-                    r1[1] = a
                 parent1_part1 = self.binary_population[parent[0]][0:(self.bit*self.max_archetypes*self.ba_c)]
                 parent2_part1 = self.binary_population[parent[1]][0:(self.bit*self.max_archetypes*self.ba_c)]
-                child1_part1 = parent2_part1[0:r1[0] * self.bit] + parent1_part1[r1[0] * self.bit:r1[1] * self.bit] + \
-                               parent2_part1[r1[1] * self.bit:]
-                child2_part1 = parent1_part1[0:r1[0] * self.bit] + parent2_part1[r1[0] * self.bit:r1[1] * self.bit] + \
-                               parent1_part1[r1[1] * self.bit:]
+                child1_part1 = parent2_part1[0:min(r1) * self.bit] + parent1_part1[min(r1) * self.bit:max(r1) * self.bit]\
+                               + parent2_part1[max(r1) * self.bit:]
+                child2_part1 = parent1_part1[0:min(r1) * self.bit] + parent2_part1[min(r1) * self.bit:max(r1) * self.bit]\
+                               + parent1_part1[max(r1) * self.bit:]
 
                 # 行为矩阵交叉
                 r2 = random.sample(range(0, (self.max_archetypes*(self.ba_w+self.ba_r))), 2)
-                if r2[0] > r2[1]:
-                    a = r2[0]
-                    r2[0] = r2[1]
-                    r2[1] = a
-                parent1_part2 = self.binary_population[parent[0]][(self.bit*self.max_archetypes*self.ba_c):
-                                                                  (self.bit*self.max_archetypes*(self.ba_c+self.ba_w+self.ba_r))]
-                parent2_part2 = self.binary_population[parent[1]][(self.bit*self.max_archetypes*self.ba_c):
-                                                                  (self.bit*self.max_archetypes*(self.ba_c+self.ba_w+self.ba_r))]
-                child1_part2 = parent2_part2[0:r2[0] * self.bit] + parent1_part2[r2[0] * self.bit:r2[1] * self.bit] + \
-                               parent2_part2[r2[1] * self.bit:]
-                child2_part2 = parent1_part2[0:r2[0] * self.bit] + parent2_part2[r2[0] * self.bit:r2[1] * self.bit] + \
-                               parent1_part2[r2[1] * self.bit:]
+                parent1_part2 = self.binary_population[parent[0]][(self.bit*self.max_archetypes*self.ba_c):]
+                parent2_part2 = self.binary_population[parent[1]][(self.bit*self.max_archetypes*self.ba_c):]
+                child1_part2 = parent2_part2[0:min(r2) * self.bit] + parent1_part2[min(r2) * self.bit:max(r2) * self.bit]\
+                               + parent2_part2[max(r2) * self.bit:]
+                child2_part2 = parent1_part2[0:min(r2) * self.bit] + parent2_part2[min(r2) * self.bit:max(r2) * self.bit]\
+                               + parent1_part2[max(r2) * self.bit:]
+
                 child1 = child1_part1 + child1_part2
                 child2 = child2_part1 + child2_part2
-                a = random.random()
-                if a < self.crossover_rate:
-                    child[i] = child1
+
+                if random.random() < self.crossover_rate:
+                    child.append(child1)
                 else:
-                    child[i] = child2
-            self.binary_population = self.binary_population + child
+                    child.append(child2)
+            self.binary_population += child
 
     # 变异操作,不改变种群数量
     def mutate(self):
+
         # 采用随机位变异
-        for i in range(0, len(self.binary_population)):
+        for individual in self.binary_population:
             if random.random() < self.mutation_rate:
-                mun_bit = int((self.bit*self.max_archetypes*(self.ba_c+self.ba_w+self.ba_r)) * self.mutation_neighborhood)
-                each_bit = random.sample(range(0, (self.bit*self.max_archetypes*(self.ba_c+self.ba_w+self.ba_r))), mun_bit)
-                for j in range(0, len(each_bit)):
-                    if self.binary_population[i][each_bit[j]] == 0:
-                        self.binary_population[i][each_bit[j]] = 1
-                    else:
-                        self.binary_population[i][each_bit[j]] = 0
+                mun_bit = int(len(individual) * self.mutation_neighborhood)
+                each_bit = random.sample(range(0, len(individual)), mun_bit)
+                for bit in each_bit:
+                    individual[bit] = 0 if individual[bit] == 1 else 1
 
     # 将新种群编码为二进制形式
     def encode(self):
@@ -141,7 +131,7 @@ class GA():
         for ind, individual in enumerate(self.binary_population):
             for arch in range(self.max_archetypes):
                 for c in range(self.ba_c):
-                    current_weight = round(self.new_population[ind][arch][c]*(2**self.bit))
+                    current_weight = round(self.new_population[ind][arch][c] * (2**self.bit - 1))
                     individual += dec2bin(current_weight)
             for arch in range(self.max_archetypes):
                 for wr in range(self.ba_w + self.ba_r):
@@ -157,7 +147,6 @@ class GA():
             result = int(result, 2)
             return result
 
-        # temp = self.new_population.copy()
         self.new_population.clear()
         for ind in range(len(self.binary_population)):
             individual = list()
