@@ -1,10 +1,39 @@
 # coding=utf-8
 
+#
+#                       _oo0oo_
+#                      o8888888o
+#                      88" . "88
+#                      (| -_- |)
+#                      0\  =  /0
+#                    ___/`---'\___
+#                  .' \\|     |// '.
+#                 / \\|||  :  |||// \
+#                / _||||| -:- |||||- \
+#               |   | \\\  -  /// |   |
+#               | \_|  ''\---/''  |_/ |
+#               \  .-\__  '-'  ___/-. /
+#             ___'. .'  /--.--\  `. .'___
+#          ."" '<  `.___\_<|>_/___.' >' "".
+#         | | :  `- \`.;`\ _ /`;.`/ - ` : | |
+#         \  \ `_.   \_ __\ /__ _/   .-` /  /
+#     =====`-.____`.___ \_____/___.-`___.-'=====
+#                       `=---='
+#
+#     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+#               佛祖保佑         永无BUG
+#
+
 import argparse
 import time
 import os
+import numpy as np
+from GeneticAlgorithm.BehaviorArchetypes import behavior
 import MAEnv.scenarios.TargetProfile as T
+import MAControl.Util.OfflineCoverRate as OCR
 import MAControl.Util.CalCoverage as cc
+import MAControl.Util.coverrate_by_image as coculate
 import GeneticAlgorithm.genetic_algorithm as ga
 
 import MAControl.Default.InnerController_PID as IC_P
@@ -21,19 +50,24 @@ def parse_args():
     # Environment
     parser.add_argument("--scenario", type=str, default="scenario6_AFIT", help="name of the scenario script")
     parser.add_argument("--uav-num", type=int, default=10, help="number of uav")
-    parser.add_argument("--step-max", type=int, default=4000, help="number of maximum steps")
+    parser.add_argument("--step-max", type=int, default=1000, help="number of maximum steps")
 
     # GA
-    parser.add_argument("--pop-size", type=int, default=20, help="size of population")
+    parser.add_argument("--pop-size", type=int, default=10, help="size of population")
     parser.add_argument("--preserved-population", type=float, default=0.5, help="percentage of population selected")
-    parser.add_argument("--generation-num", type=int, default=30, help="number of generation")
-    parser.add_argument("--max-behavior-archetypes", type=int, default=1, help="number of behavior archetypes")
+    parser.add_argument("--generation-num", type=int, default=10, help="number of generation")
+    parser.add_argument("--max-behavior-archetypes", type=int, default=3, help="number of behavior archetypes")
     parser.add_argument("--collect-num", type=int, default=5, help="number of fitness score collection")
 
     # Core parameters
     parser.add_argument("--crossover-rate", type=float, default=0.1, help="crossover rate")
     parser.add_argument("--mutation-rate", type=float, default=0.9, help="mutation rate")
     parser.add_argument("--mutation-neighborhood", type=float, default=0.05, help="mutation neighborhood")
+
+    # Evolve or Test
+    parser.add_argument("--evolve", action="store_false", default=True)
+    parser.add_argument("--test", action="store_true", default=False)
+    parser.add_argument("--repeat-num", type=int, default=2, help="number of repeat runs")
 
     return parser.parse_args()
 
@@ -120,14 +154,26 @@ def action(obs_n, step, ControllerSet, obstacles, behavior_archetypes):
 
 
 def run_simulation(arglist, behavior_archetypes, gen, ind, num):
-    import MAControl.Util.coverrate_by_image as coculate
+
+    # Create environment
+    env, world, obstacle_info = make_env(arglist)
+
+    # Create Controller
+    Controllers = get_controller(env, world, arglist)
+
+    with open(os.path.dirname(__file__) + _path + 'para.txt', 'w') as f:
+        f.write(str(arglist.uav_num) + ' ' + str(arglist.step_max))
+
     # 为每个小瓜子创建状态文件
-    os.makedirs(os.path.dirname(__file__) + _path + 'gen=%d/ind=%d/num=%d' % (gen, ind, num))
     for k in range(arglist.uav_num):
-        open(os.path.dirname(__file__) + _path + 'gen=%d/ind=%d/num=%d/uav_%d_track.txt'%(gen,ind,num,k), 'w')
+        open(os.path.dirname(__file__) + _path + 'uav_%d_track.txt' % k, 'w')
+
+    # # 为每个小瓜子创建状态文件
+    # os.makedirs(os.path.dirname(__file__) + _path + 'gen=%d/ind=%d/num=%d' % (gen, ind, num))
+    # for k in range(arglist.uav_num):
+    #     open(os.path.dirname(__file__) + _path + 'gen=%d/ind=%d/num=%d/uav_%d_track.txt'%(gen,ind,num,k), 'w')
 
     obs_n = env.reset()
-    # start = time.time()
 
     for step in range(arglist.step_max):
 
@@ -142,21 +188,23 @@ def run_simulation(arglist, behavior_archetypes, gen, ind, num):
 
         # 保存每个小瓜子每个step的状态信息
         for k in range(arglist.uav_num):
-            with open(os.path.dirname(__file__) + _path + 'gen=%d/ind=%d/num=%d/uav_%d_track.txt' %(gen,ind,num,k), 'a') as f:
-                f.write(str(obs_n[k][0]) + ' ' + str(obs_n[k][1]) + ' ' + str(obs_n[k][2]) + ' ' + str(
-                    obs_n[k][3]) + '\n')
+            # with open(os.path.dirname(__file__) + _path + 'gen=%d/ind=%d/num=%d/uav_%d_track.txt' %(gen,ind,num,k), 'a') as f:
+            #     f.write(str(obs_n[k][0]) + ' ' + str(obs_n[k][1]) + ' ' + str(obs_n[k][2]) + ' ' + str(
+            #         obs_n[k][3]) + '\n')
+
+            with open(os.path.dirname(__file__) + _path + 'uav_%d_track.txt' % k, 'a') as f:
+                f.write(str(obs_n[k][0]) + ' ' + str(obs_n[k][1]) + ' ' +
+                        str(obs_n[k][2]) + ' ' + str(obs_n[k][3]) + '\n')
 
         # 画图展示
-        # env.render()
-        # print('>>> Generation', gen, '>>> Individual', ind, '>>> Collect', num, '>>> step', step)
+        env.render()
         time.sleep(0.001)
 
-    time.sleep(1)
-    coverage = coculate.coverrate_k(gen,ind,num)
+    time.sleep(0.1)
+    # coverage = coculate.coverrate_k(gen,ind,num)
+    coverage = OCR.calculate_coverage(arglist.uav_num, arglist.step_max, num)
+    # coverage = cc.calculate_coverage(arglist.uav_num, arglist.step_max, num)
     # coverage = np.random.random()
-    # end = time.time()
-    # interval = round((end - start), 2)
-    # print('Time Interval ', interval)
 
     return coverage
 
@@ -165,36 +213,29 @@ if __name__ == '__main__':
 
     arglist = parse_args()
 
-    ga = ga.GA(arglist)
+    if arglist.evolve:
+        ga = ga.GA(arglist)
 
-    # # Create environment
-    # env, world, obstacle_info = make_env(arglist)
-    #
-    # # Create Controller
-    # Controllers = get_controller(env, world, arglist)
+        for gen in range(arglist.generation_num + 1):
+            for ind, individual in enumerate(ga.population):
 
-    for gen in range(arglist.generation_num + 1):
-        for ind, individual in enumerate(ga.population):
-            # Create environment
-            env, world, obstacle_info = make_env(arglist)
+                for num in range(arglist.collect_num):
+                    start = time.time()
+                    score = run_simulation(arglist, individual, gen, ind, num)
+                    end = time.time()
+                    interval = round((end - start), 2)
+                    print('>>> Generation', gen, '>>> Individual', ind, '>>> Collect', num,
+                          'time-consuming: ', interval, 'score: ', score)
+                    ga.score[ind][num] = score
 
-            # Create Controller
-            Controllers = get_controller(env, world, arglist)
-            for num in range(arglist.collect_num):
-                start = time.time()
-                score = run_simulation(arglist, individual, gen, ind, num)
-                end = time.time()
-                interval = round((end - start), 2)
-                print('>>> Generation', gen, '>>> Individual', ind, '>>> Collect', num,
-                      'time-consuming: ', interval, 'score: ', score)
-                ga.score[ind][num] = score
-                with open(os.path.dirname(__file__) + _path + 'gen=%d/ind=%d/num=%d/information.txt' % (gen, ind, num), 'a') as f:
-                    f.write(str(individual) +'    '+str(score))
-            pass
-        if gen < arglist.generation_num:
-            ga.evolve()
-        elif gen == arglist.generation_num:
-            ga.save_pop()
-        else:
-            raise Exception('Oh my god! There is a bug!')
+            ga.save_pop(gen)
+
+            if gen < arglist.generation_num:
+                ga.evolve()
+        print('All complete!')
+
+    if arglist.test:
+
+        for repeat in range(arglist.repeat_num):
+            score = run_simulation(arglist, behavior, 0, 0, repeat)
 

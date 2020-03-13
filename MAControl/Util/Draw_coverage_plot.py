@@ -22,7 +22,7 @@ plt.xlabel('step')
 plt.ylabel('Cover Rate / %')
 plt.title('Cover Rate')
 # plt.legend()
-plt.savefig('cover.png')
+# plt.savefig('cover.png')
 plt.show()
 
 line = plt.gca()

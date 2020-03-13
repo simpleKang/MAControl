@@ -27,3 +27,7 @@ execute.py
 
 # with open(os.path.dirname(__file__) + '/save_model/reward.txt', 'a') as f:
 #   f.write(str(episode_step)+' '+str(reward)+'\n')
+
+# 2020.03.13 KSB
+# with open(os.path.dirname(__file__) + _path + 'gen=%d/ind=%d/num=%d/information.txt' % (gen, ind, num), 'a') as f:
+                #     f.write(str(individual) +'    '+str(score))

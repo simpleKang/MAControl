@@ -24,7 +24,7 @@ def calculate_coverage(num, step, loop=0):
     scale = area_width/cell        # 离散度(比例尺)
     iter_range = 0.25              # 迭代区域大小
 
-    for l in range(0, np.size(track[-1], 0), 5):
+    for l in range(0, step, 5):
 
         new_last = list()
 
@@ -61,15 +61,13 @@ def calculate_coverage(num, step, loop=0):
                         else:
                             raise Exception('Unexpected situation!!!')
         last_cover[:] = new_last[:]
-        # print('>>> Collect', loop, 'Total ', np.size(track[-1], 0), ' >>> step ', l)
+        print('>>> Collect', loop, ' >>> step ', l)
 
         cover_rate, overlap_rate = CR.cal_cover_rate(area)
-        # with open(pardir + '/cover_rate_Folder' + txt_name, 'a') as c:
-        #     c.write(str(l) + ' ' + str(cover_rate) + ' ' + str(overlap_rate) + '\n')
+        with open(pardir + '/cover_rate_Folder' + txt_name, 'a') as c:
+            c.write(str(l) + ' ' + str(cover_rate) + ' ' + str(overlap_rate) + '\n')
 
     # np.savetxt(pardir + '/cover_rate_Folder' + '/area.text', area, fmt='%d')
-
-    print('Finished!')
 
     return cover_rate
 

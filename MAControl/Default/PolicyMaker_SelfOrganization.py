@@ -418,49 +418,49 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
     # @XJ >>>> Obstacle Avoidance
     def rule10(self, obs, obstacles):
 
-        dUO = list()
-        R10part2 = list()
-        self_pos = np.array(obs[self.index][2:4])
-        for item in obstacles:
-            distance = np.linalg.norm(np.array(item[0:2])-self_pos)
-            d = self.uav_sensor_range + item[2] - distance
-            d = d if d > 0.000001 else 0.000001
-            dUO.append(d)
-            if (distance - item[2]) < self.uav_sensor_range/2:
-                R10part2.append(np.array(item[0:2])-self_pos)
-                R10part2[-1] = R10part2[-1] / distance * (distance - item[2])
-                R10part2[-1] = R10part2[-1] * dUO[-1] / self.uav_sensor_range * (-1)
-            else:
-                R10part2.append([0, 0])
-        sumdUO = sum(dUO)
+        # dUO = list()
+        # R10part2 = list()
+        # self_pos = np.array(obs[self.index][2:4])
+        # for item in obstacles:
+        #     distance = np.linalg.norm(np.array(item[0:2])-self_pos)
+        #     d = self.uav_sensor_range + item[2] - distance
+        #     d = d if d > 0.000001 else 0.000001
+        #     dUO.append(d)
+        #     if (distance - item[2]) < self.uav_sensor_range/2:
+        #         R10part2.append(np.array(item[0:2])-self_pos)
+        #         R10part2[-1] = R10part2[-1] / distance * (distance - item[2])
+        #         R10part2[-1] = R10part2[-1] * dUO[-1] / self.uav_sensor_range * (-1)
+        #     else:
+        #         R10part2.append([0, 0])
+        # sumdUO = sum(dUO)
+        #
+        # R10f = list()
+        # R10part1 = list()
+        # self_vel = np.array(obs[self.index][0:2])
+        # for k, item in enumerate(obstacles):
+        #     vector1 = np.array(item[0:2])-self_pos
+        #     cos1 = np.dot(vector1, self_vel)/np.linalg.norm(vector1)/np.linalg.norm(self_vel)
+        #     if cos1 > 0:
+        #         vector2 = np.array([vector1[1], -1*vector1[0]])
+        #         vector3 = np.array([-1*vector1[1], vector1[0]])
+        #         cos2 = np.dot(vector2, self_vel)/np.linalg.norm(vector2)/np.linalg.norm(self_vel)
+        #         cos3 = np.dot(vector3, self_vel)/np.linalg.norm(vector3)/np.linalg.norm(self_vel)
+        #         if cos2 > cos3:
+        #             R10part1.append(vector2 * math.acos(cos1) * 2 / math.pi / np.linalg.norm(vector2))
+        #         else:
+        #             R10part1.append(vector3 * math.acos(cos1) * 2 / math.pi / np.linalg.norm(vector3))
+        #     else:
+        #         R10part1.append([0, 0])
+        #     if np.linalg.norm(vector1) < self.uav_sensor_range:
+        #         r10f = (np.array(R10part1[k]) + 0.1 * np.array(R10part2[k])) * dUO[k]
+        #     else:
+        #         r10f = np.array([0, 0])
+        #     R10f.append(r10f)
+        # sumR10f = sum(R10f)
+        #
+        # R10 = sumR10f / sumdUO
+        # if np.linalg.norm(R10) == 0:
+        #     R10 = self_vel
 
-        R10f = list()
-        R10part1 = list()
-        self_vel = np.array(obs[self.index][0:2])
-        for k, item in enumerate(obstacles):
-            vector1 = np.array(item[0:2])-self_pos
-            cos1 = np.dot(vector1, self_vel)/np.linalg.norm(vector1)/np.linalg.norm(self_vel)
-            if cos1 > 0:
-                vector2 = np.array([vector1[1], -1*vector1[0]])
-                vector3 = np.array([-1*vector1[1], vector1[0]])
-                cos2 = np.dot(vector2, self_vel)/np.linalg.norm(vector2)/np.linalg.norm(self_vel)
-                cos3 = np.dot(vector3, self_vel)/np.linalg.norm(vector3)/np.linalg.norm(self_vel)
-                if cos2 > cos3:
-                    R10part1.append(vector2 * math.acos(cos1) * 2 / math.pi / np.linalg.norm(vector2))
-                else:
-                    R10part1.append(vector3 * math.acos(cos1) * 2 / math.pi / np.linalg.norm(vector3))
-            else:
-                R10part1.append([0, 0])
-            if np.linalg.norm(vector1) < self.uav_sensor_range:
-                r10f = (np.array(R10part1[k]) + 0.1 * np.array(R10part2[k])) * dUO[k]
-            else:
-                r10f = np.array([0, 0])
-            R10f.append(r10f)
-        sumR10f = sum(R10f)
-
-        R10 = sumR10f / sumdUO
-        if np.linalg.norm(R10) == 0:
-            R10 = self_vel
-
-        # R10 = obs[self.index][0:2]
+        R10 = obs[self.index][0:2]
         return R10

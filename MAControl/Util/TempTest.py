@@ -1,5 +1,6 @@
 import numpy as np
 import operator
+import argparse
 import random
 import math
 import os
@@ -21,8 +22,18 @@ import MAControl.Util.SignIsSame as sis
 # uav_pos = np.array([1, 1])
 # tar_pos = np.array([1, 2])
 
+def parse_args():
+    parser = argparse.ArgumentParser("Control Experiments for Multi-Agent Environments")
+    parser.add_argument("--evolve", action="store_false", default=True)
+    parser.add_argument("--test", action="store_true", default=False)
+    return parser.parse_args()
 
 
+arglist = parse_args()
+if arglist.evolve:
+    print('Evolve')
+if arglist.test:
+    print('Test')
 
 
 pass

@@ -165,7 +165,7 @@ class GA():
             self.new_population.append(individual_arch)
 
     # 进化完成后保存权重模型
-    def save_pop(self):
+    def save_pop(self, gen):
 
         score_sum = list()
         score_sum_individual = np.sum(self.score, axis=1)
@@ -175,11 +175,11 @@ class GA():
             score_sum.append(individual_score)
         score_sum = sorted(score_sum, key=lambda x: x[1], reverse=True)
 
-        open(os.path.dirname(__file__) + '/weight_model.txt', 'w')
-        with open(os.path.dirname(__file__) + '/weight_model.txt', 'a') as f:
+        open(os.path.dirname(__file__) + '/weight_model_gen_%d.txt' % gen, 'w')
+        with open(os.path.dirname(__file__) + '/weight_model_gen_%d.txt' % gen, 'a') as f:
             for i in range(self.pop_size):
                 rank = score_sum[i][0]
-                f.write('Score: ' + str(score_sum[i][1]) + '\n')
+                f.write('Average Score: ' + str(round(score_sum[i][1]/self.collect_num, 5)) + '\n')
                 for arch in self.population[rank]:
                     f.write('Archetype: ')
                     for ele in arch:

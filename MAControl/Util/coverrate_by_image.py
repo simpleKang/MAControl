@@ -3,8 +3,9 @@ import os
 import matplotlib.pyplot as plt
 import MAEnv.scenarios.TargetProfile as T
 from PIL import Image
-import matplotlib.pyplot as plt
-def coverrate_k(gen,ind,num1):
+
+
+def coverrate_k(gen, ind, num1):
     plt.rcParams['figure.dpi'] = 200
 
     curdir = os.path.dirname(__file__)
@@ -15,7 +16,7 @@ def coverrate_k(gen,ind,num1):
 
     track = []
     for i in range(num):
-        track.append(np.loadtxt(pardir + '/track/gen=%d/ind=%d/num=%d/uav_%d_track.txt' %(gen,ind,num1,i)))
+        track.append(np.loadtxt(pardir + '/track/gen=%d/ind=%d/num=%d/uav_%d_track.txt' % (gen, ind, num1, i)))
 
     # for k in range(-10, 1501, 25):
 
