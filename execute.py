@@ -28,7 +28,7 @@ def parse_args():
     parser.add_argument("--preserved-population", type=float, default=0.5, help="percentage of population selected")
     parser.add_argument("--generation-num", type=int, default=30, help="number of generation")
     parser.add_argument("--max-behavior-archetypes", type=int, default=1, help="number of behavior archetypes")
-    parser.add_argument("--collect-num", type=int, default=10, help="number of fitness score collection")
+    parser.add_argument("--collect-num", type=int, default=5, help="number of fitness score collection")
 
     # Core parameters
     parser.add_argument("--crossover-rate", type=float, default=0.1, help="crossover rate")
@@ -120,10 +120,11 @@ def action(obs_n, step, ControllerSet, obstacles, behavior_archetypes):
 
 
 def run_simulation(arglist, behavior_archetypes, gen, ind, num):
-
+    import MAControl.Util.coverrate_by_image as coculate
     # 为每个小瓜子创建状态文件
+    os.makedirs(os.path.dirname(__file__) + _path + 'gen=%d/ind=%d/num=%d' % (gen, ind, num))
     for k in range(arglist.uav_num):
-        open(os.path.dirname(__file__) + _path + 'uav_%d_track.txt' % k, 'w')
+        open(os.path.dirname(__file__) + _path + 'gen=%d/ind=%d/num=%d/uav_%d_track.txt'%(gen,ind,num,k), 'w')
 
     obs_n = env.reset()
     # start = time.time()
@@ -141,7 +142,7 @@ def run_simulation(arglist, behavior_archetypes, gen, ind, num):
 
         # 保存每个小瓜子每个step的状态信息
         for k in range(arglist.uav_num):
-            with open(os.path.dirname(__file__) + _path + 'uav_%d_track.txt' % k, 'a') as f:
+            with open(os.path.dirname(__file__) + _path + 'gen=%d/ind=%d/num=%d/uav_%d_track.txt' %(gen,ind,num,k), 'a') as f:
                 f.write(str(obs_n[k][0]) + ' ' + str(obs_n[k][1]) + ' ' + str(obs_n[k][2]) + ' ' + str(
                     obs_n[k][3]) + '\n')
 
@@ -151,7 +152,7 @@ def run_simulation(arglist, behavior_archetypes, gen, ind, num):
         time.sleep(0.001)
 
     time.sleep(1)
-    coverage = cc.calculate_coverage(arglist.uav_num, arglist.step_max, num)
+    coverage = coculate.coverrate_k(gen,ind,num)
     # coverage = np.random.random()
     # end = time.time()
     # interval = round((end - start), 2)
@@ -166,14 +167,19 @@ if __name__ == '__main__':
 
     ga = ga.GA(arglist)
 
-    # Create environment
-    env, world, obstacle_info = make_env(arglist)
-
-    # Create Controller
-    Controllers = get_controller(env, world, arglist)
+    # # Create environment
+    # env, world, obstacle_info = make_env(arglist)
+    #
+    # # Create Controller
+    # Controllers = get_controller(env, world, arglist)
 
     for gen in range(arglist.generation_num + 1):
         for ind, individual in enumerate(ga.population):
+            # Create environment
+            env, world, obstacle_info = make_env(arglist)
+
+            # Create Controller
+            Controllers = get_controller(env, world, arglist)
             for num in range(arglist.collect_num):
                 start = time.time()
                 score = run_simulation(arglist, individual, gen, ind, num)
@@ -182,6 +188,8 @@ if __name__ == '__main__':
                 print('>>> Generation', gen, '>>> Individual', ind, '>>> Collect', num,
                       'time-consuming: ', interval, 'score: ', score)
                 ga.score[ind][num] = score
+                with open(os.path.dirname(__file__) + _path + 'gen=%d/ind=%d/num=%d/information.txt' % (gen, ind, num), 'a') as f:
+                    f.write(str(individual) +'    '+str(score))
             pass
         if gen < arglist.generation_num:
             ga.evolve()

@@ -6,12 +6,15 @@ from PIL import Image
 import matplotlib.pyplot as plt
 def coverrate_k():
     plt.rcParams['figure.dpi'] = 200
-
+    score=list()
     curdir = os.path.dirname(__file__)
     pardir = os.path.dirname(os.path.dirname(curdir))
-
-    para = np.loadtxt(pardir + '/track/para.txt')
-    num = int(para[0])
+    for gen in range(0,16):
+        for ind in range(0,20):
+            for num in range(0,5):
+                information = np.loadtxt(pardir + '/track/gen=%d/ind=%d/num=%d/information.txt'(%gen,ind,num))
+                score[num] = information[-1]
+            score[5]=num
 
     track = []
     for i in range(num):
@@ -21,7 +24,7 @@ def coverrate_k():
 
     plt.figure(facecolor='w')
     line = plt.gca()
-    line.set_aspect(1)
+    line.set_aspect(1):
     line.patch.set_facecolor('white')
     plt.xlim(-(T.edge+0.2), T.edge+0.2)
     plt.ylim(-(T.edge+0.2), T.edge+0.2)
