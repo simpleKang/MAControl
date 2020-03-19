@@ -9,6 +9,7 @@ import MAControl.Test_Auction.PolicyMaker_Auction as PM_A
 import logging
 
 # 运行 execute.py 需要补足参数，如 execute_all.py 中所示
+# logging.basicConfig(filename='/home/samantha/gitr/logs/paper/R/result_all.log', level=logging.INFO)
 logging.basicConfig(filename='/S-Projects/Git-r/logs/result1.log', level=logging.INFO)
 logging.info('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
 logging.info(time.strftime('%Y-%m-%d, %H:%M:%S'))
@@ -128,7 +129,6 @@ if __name__ == '__main__':
             PM_A.PolicyMaker_Auction.Remain_UAV_Set.append(i)
 
         obs_n = env.reset()
-        print("obs_n", obs_n)
         episode += 1
         step = 0
 
@@ -140,7 +140,6 @@ if __name__ == '__main__':
 
             # environment step
             new_obs_n, rew_n, done_n, info_n = env.step(action_n)
-            print("new_obs_n", new_obs_n)
             step += 1
             obs_n = new_obs_n
 
