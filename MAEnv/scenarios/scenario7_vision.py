@@ -118,7 +118,7 @@ class Scenario(BaseScenario):
         # 视场参数
         sensor_range1 = 0.1  # km
         sensor_range2 = 0.5  # km
-        sensor_angle = 120 /2 /180*math.pi # 半个视场角
+        sensor_angle = 120 /2 /180*math.pi  # 半个视场角
 
         # 描述自己
         selfpos = agent.state.p_pos
@@ -127,13 +127,14 @@ class Scenario(BaseScenario):
 
         # 使用极坐标描述其它个体
         bearings = []
-        for other in world.agents:
+        for i, other in enumerate(world.agents):
             if other is not agent:
                 relative_pos = other.state.p_pos - selfpos
                 relative_dis = np.linalg.norm(relative_pos)
                 relative_bearing = math.atan2(relative_pos[1], relative_pos[0])
                 if sensor_range1 < relative_dis < sensor_range2 and abs(relative_bearing - selfdir) < sensor_angle:
                     bearings.append(relative_bearing)
+                    bearings.append(i)
                 else:
                     pass
             else:
