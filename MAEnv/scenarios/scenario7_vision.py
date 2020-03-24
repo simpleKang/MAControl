@@ -4,6 +4,7 @@
 
 import numpy as np
 import random
+import math
 from MAEnv.core import World, Agent, Landmark
 from MAEnv.scenario import BaseScenario
 import MAEnv.scenarios.TargetProfile as T
@@ -113,6 +114,32 @@ class Scenario(BaseScenario):
         rew = agent.color[0] + world.edge
         return rew
 
+    def limited_view(self, agent, world):
+        # 视场参数
+        sensor_range1 = 0.1  # km
+        sensor_range2 = 0.5  # km
+        sensor_angle = 120 /2 /180*math.pi # 半个视场角
+
+        # 描述自己
+        selfpos = agent.state.p_pos
+        selfvel = agent.state.p_vel
+        selfdir = math.atan2(selfvel[1], selfvel[0])
+
+        # 使用极坐标描述其它个体
+        bearings = []
+        for other in world.agents:
+            if other is not agent:
+                relative_pos = other.state.p_pos - selfpos
+                relative_dis = np.linalg.norm(relative_pos)
+                relative_bearing = math.atan2(relative_pos[1], relative_pos[0])
+                if sensor_range1 < relative_dis < sensor_range2 and abs(relative_bearing - selfdir) < sensor_angle:
+                    bearings.append(relative_bearing)
+                else:
+                    pass
+            else:
+                pass
+        return bearings
+
     def observation(self, agent, world):
         a1 = agent.state.p_acc[0]
         a2 = agent.state.p_acc[1]
@@ -121,4 +148,5 @@ class Scenario(BaseScenario):
         vel_right_unit = np.array([agent.state.p_vel[1], -1 * agent.state.p_vel[0]]) / vel_size
         a_front = np.dot(a1, vel_front_unit) + np.dot(a2, vel_front_unit)
         a_right = np.dot(a2, vel_right_unit) + np.dot(a2, vel_right_unit)
-        return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + [a_front] + [a_right])
+        bearings = self.limited_view(agent, world)
+        return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + [a_front] + [a_right] + [bearings])
