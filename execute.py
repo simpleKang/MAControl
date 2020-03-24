@@ -136,6 +136,7 @@ if __name__ == '__main__':
             new_obs_n, rew_n, done_n, info_n = env.step(action_n)
 
             obs_n = new_obs_n
+            # print(obs_n[0].__len__(), obs_n[1].__len__(), obs_n[2].__len__())
 
             # 保存每个小瓜子每个step的状态信息
             for k in range(arglist.uav_num):

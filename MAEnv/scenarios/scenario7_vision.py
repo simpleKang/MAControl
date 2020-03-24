@@ -146,7 +146,7 @@ class Scenario(BaseScenario):
         vel_size = np.sqrt(np.square(agent.state.p_vel[0]) + np.square(agent.state.p_vel[1]))
         vel_front_unit = agent.state.p_vel / vel_size
         vel_right_unit = np.array([agent.state.p_vel[1], -1 * agent.state.p_vel[0]]) / vel_size
-        a_front = np.dot(a1, vel_front_unit) + np.dot(a2, vel_front_unit)
-        a_right = np.dot(a2, vel_right_unit) + np.dot(a2, vel_right_unit)
+        a_front = np.dot([a1, 0], vel_front_unit) + np.dot([0, a2], vel_front_unit)
+        a_right = np.dot([a1, 0], vel_right_unit) + np.dot([0, a2], vel_right_unit)
         bearings = self.limited_view(agent, world)
-        return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + [a_front] + [a_right] + [bearings])
+        return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + [[a_front]] + [[a_right]] + [bearings])
