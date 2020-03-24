@@ -19,7 +19,7 @@ def parse_args():
 
     # Environment
     parser.add_argument("--scenario", type=str, default="scenario7_vision", help="name of the scenario script")
-    parser.add_argument("--uav-num", type=int, default=10, help="number of uav")
+    parser.add_argument("--uav-num", type=int, default=3, help="number of uav")
     parser.add_argument("--step-max", type=int, default=8000, help="number of maximum steps")
     parser.add_argument("--repeat-num", type=int, default=1, help="number of repeat runs")
 
@@ -128,9 +128,8 @@ if __name__ == '__main__':
         for step in range(arglist.step_max):
 
             # 选择动作
-            # action_Un = action(obs_n[0:arglist.uav_num], step, Controllers[0], obstacle_info)
             action_Un = action(obs_n, step, Controllers[0], obstacle_info)
-            action_Tn = action(obs_n[arglist.uav_num:], step, Controllers[1], obstacle_info)
+            action_Tn = action(obs_n, step, Controllers[1], obstacle_info)
             action_n = action_Un + action_Tn
 
             new_obs_n, rew_n, done_n, info_n = env.step(action_n)
@@ -145,7 +144,7 @@ if __name__ == '__main__':
                         obs_n[k][3]) + '\n')
 
             # 画图展示
-            # env.render()
+            env.render()
             print('>>> Num', num, '>>>> step', step)
             time.sleep(0.001)
 
