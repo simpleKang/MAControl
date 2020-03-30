@@ -78,53 +78,6 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         PolicyMaker_SelfOrganization.seen_uavs[self.index] = _seen_uavs
         PolicyMaker_SelfOrganization.seen_targets[self.index] = _seen_targets
 
-    def find_communication_mates(self, obs):
-        _COMMates = list()
-
-        self_pos = np.array(obs[self.index][2:4])
-        for i in range(self.uav_num):
-            uav_pos = np.array(obs[i][2:4])
-            distance = np.linalg.norm(uav_pos-self_pos)
-            if distance < self.communication_range:
-                _COMMates.append(i)
-
-        _COMMates.remove(self.index)
-        return _COMMates
-
-    def extend_known_objects(self, obs):
-        _known_uavs = PolicyMaker_SelfOrganization.seen_uavs[self.index]
-        _known_targets = PolicyMaker_SelfOrganization.seen_targets[self.index]
-        _neighbor_pheromone = list()
-
-        for k in self.find_communication_mates(obs):
-            if k not in _known_uavs:
-                _known_uavs.append(k)
-            else:
-                pass
-
-            targets_k = PolicyMaker_SelfOrganization.seen_targets[k]
-            _neighbor_pheromone.append(PolicyMaker_SelfOrganization.pheromonal[k])
-
-            for t in targets_k:
-                if t not in _known_targets:
-                    _known_targets.append(t)
-                else:
-                    pass
-
-        self.known_uavs = _known_uavs
-        self.known_targets = _known_targets
-
-        if PolicyMaker_SelfOrganization.pheromonal[self.index] != 1:
-            _neighbor_pheromone.append(0)
-            result = max(_neighbor_pheromone)/2
-            result = 0 if result < 0.001 else result
-            if self.index < self.uav_num:
-                PolicyMaker_SelfOrganization.pheromonal[self.index] = result
-            else:
-                pass
-        else:
-            pass
-
     def get_UAV_density(self, obs):
         item = list()
 
