@@ -116,7 +116,7 @@ class Scenario(BaseScenario):
 
     def limited_view(self, agent, world):
         # 视场参数
-        sensor_range1 = 0.1  # km
+        sensor_range1 = 0.0  # km
         sensor_range2 = 0.5  # km
         sensor_angle = 120 /2 /180*math.pi  # 半个视场角
 
@@ -132,7 +132,7 @@ class Scenario(BaseScenario):
                 relative_pos = other.state.p_pos - selfpos
                 relative_dis = np.linalg.norm(relative_pos)
                 relative_bearing = math.atan2(relative_pos[1], relative_pos[0])
-                if sensor_range1 < relative_dis < sensor_range2 and abs(relative_bearing - selfdir) < sensor_angle:
+                if sensor_range1 <= relative_dis <= sensor_range2 and abs(relative_bearing - selfdir) <= sensor_angle:
                     bearings.append(relative_bearing)
                     bearings.append(i)
                 else:
@@ -150,4 +150,6 @@ class Scenario(BaseScenario):
         a_front = np.dot([a1, 0], vel_front_unit) + np.dot([0, a2], vel_front_unit)
         a_right = np.dot([a1, 0], vel_right_unit) + np.dot([0, a2], vel_right_unit)
         bearings = self.limited_view(agent, world)
+        # temp = np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + [[a_front]] + [[a_right]] + [bearings])
+        # print(temp)
         return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + [[a_front]] + [[a_right]] + [bearings])
