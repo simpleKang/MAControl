@@ -27,31 +27,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self.uav_num = arglist.uav_num        # 小瓜子数量
         self.decision_frequency = 50
 
-    def find_objects_in_sight(self, obs):
-
-        # 计算视场区域
-        selfvel = np.array(obs[self.index][0:2])
-        selfpos = np.array(obs[self.index][2:4])
-        selfvelunit = selfvel / np.sqrt(np.dot(selfvel, selfvel))
-        selfdir = math.atan2(selfvel[1], selfvel[0])
-        # d1 = 0.1  # 轴向视场距离
-        # d2 = 0.2  # 轴向视场宽度
-        # d3 = 0.2  # 侧向视场宽度
-        d1 = self.uav_sensor_range*(-1)
-        d2 = self.uav_sensor_range*2
-        d3 = self.uav_sensor_range*2
-        xx1 = -d3 / 2 * math.cos(selfdir) - d2 / 2 * math.sin(selfdir) * -1
-        xx2 = -d3 / 2 * math.cos(selfdir) + d2 / 2 * math.sin(selfdir) * -1
-        xx3 = d3 / 2 * math.cos(selfdir) + d2 / 2 * math.sin(selfdir) * -1
-        xx4 = d3 / 2 * math.cos(selfdir) - d2 / 2 * math.sin(selfdir) * -1
-        yy1 = -d3 / 2 * math.sin(selfdir) - d2 / 2 * math.cos(selfdir)
-        yy2 = -d3 / 2 * math.sin(selfdir) + d2 / 2 * math.cos(selfdir)
-        yy3 = d3 / 2 * math.sin(selfdir) + d2 / 2 * math.cos(selfdir)
-        yy4 = d3 / 2 * math.sin(selfdir) - d2 / 2 * math.cos(selfdir)
-        selfview1 = selfpos + selfvelunit * (d1 + d2 / 2) + np.array([xx1, yy1])
-        selfview2 = selfpos + selfvelunit * (d1 + d2 / 2) + np.array([xx2, yy2])
-        selfview3 = selfpos + selfvelunit * (d1 + d2 / 2) + np.array([xx3, yy3])
-        selfview4 = selfpos + selfvelunit * (d1 + d2 / 2) + np.array([xx4, yy4])
+    def get_objects_in_sight(self, obs):
 
         _seen_uavs = list()
         _seen_targets = list()
