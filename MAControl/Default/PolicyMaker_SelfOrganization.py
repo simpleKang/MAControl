@@ -16,9 +16,6 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         PolicyMaker_SelfOrganization.seen_uavs.append(())           # 个体视野中uav
         PolicyMaker_SelfOrganization.seen_targets.append(())        # 个体视野中target
         PolicyMaker_SelfOrganization.pheromonal.append(-1)     # agent 会将它更新为非负数. # 一直是 -1 表示自己是个target.
-        self.known_uavs = list()              # 视野+通信到的uav
-        self.known_targets = list()           # 视野+通信到的target
-        self.communication_range = 1
         self.uav_sensor_range = 0.3
         self.target_sensor_range = 0.8
         self.uav_engagement_range = 0.5
@@ -29,18 +26,6 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self.size = 0.03
         self.uav_num = arglist.uav_num        # 小瓜子数量
         self.decision_frequency = 50
-
-    def get_limited_vision(self, obs):  # 速度正常观测 # 位置未知>>>仅知方位
-        limited_obs = list()
-        for i in range(obs.__len__()):
-            if i != self.index:
-                relative_pos = np.array(obs[i][2:4])-np.array(obs[self.index][2:4])
-                agent_bearing = relative_pos/np.linalg.norm(relative_pos)
-            else:
-                agent_bearing = np.array([0, 0])
-            limited_ob = np.concatenate([obs[i][0:2]]+[agent_bearing]+[obs[i][4:]])
-            limited_obs.append(limited_ob)
-        return limited_obs
 
     def find_objects_in_sight(self, obs):
 
