@@ -92,8 +92,6 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             else:
                 pass
 
-        # 至此完成(5.31)
-        # 放弃实现(5.32) 如想限制速度上界 建议在 scenario6_AFIT.py 中写入约束
         self.UD = UD
 
     def make_policy(self, obstacles, obs_n, step):
@@ -102,12 +100,9 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
 
         if self.index < self.uav_num:  # uav policy
             if step % self.decision_frequency == self.decision_frequency-1:
-                self.find_objects_in_sight(obs_n)
-            elif step % self.decision_frequency == 0:
-                if step != 0:
-                    self.extend_known_objects(obs_n)
+                self.get_objects_in_sight(obs_n)
             elif (step % self.decision_frequency == 1) and (step > self.decision_frequency):
-                pheromonal = PolicyMaker_SelfOrganization.pheromonal[self.index]
+                pheromonal = self.pheromonal
                 density = self.get_UAV_density(obs_n)
                 BEHAVIOR = [-10, -10]
                 for k, ba_k in enumerate(BA.BA):
@@ -115,9 +110,6 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
                     BEHAVIOR = [BA_k, k] if BEHAVIOR[0] < BA_k else BEHAVIOR
                 self.rule_summation(BEHAVIOR[1], obs_n, obstacles)
                 _opt_index = 1
-
-                # self.UD = self.rule9(obs_n)
-
             else:
                 pass
 
