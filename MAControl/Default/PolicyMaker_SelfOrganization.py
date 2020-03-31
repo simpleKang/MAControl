@@ -141,24 +141,21 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self_vel = obs[self.index][0:2]
         d1 = math.pi/2
         d2 = math.pi*3/2
-        if self.known_targets:
-            for tar in self.known_targets:
-                tar_pos = obs[tar][2:4]
-                dist = np.linalg.norm(tar_pos - self_pos)
-                if dist >= 0.3*self.uav_sensor_range:
-                    pos_vec = tar_pos - self_pos
-                    d1_vec = np.array([pos_vec[0] * math.cos(d1) + pos_vec[1] * math.sin(d1),
-                                       pos_vec[1] * math.cos(d1) - pos_vec[0] * math.sin(d1)])
-                    d2_vec = np.array([pos_vec[0] * math.cos(d2) + pos_vec[1] * math.sin(d2),
-                                       pos_vec[1] * math.cos(d2) - pos_vec[0] * math.sin(d2)])
-                    dot_d1 = np.vdot(self_vel, d1_vec)
-                    dot_d2 = np.vdot(self_vel, d2_vec)
-                    if dot_d1 >= dot_d2:
-                        R2_list.append(d1_vec)
-                    else:
-                        R2_list.append(d2_vec)
+        if self.seen_targets:
+            for tar in self.seen_targets:
+                pos_vec = tar_pos - self_pos
+                d1_vec = np.array([pos_vec[0] * math.cos(d1) + pos_vec[1] * math.sin(d1),
+                                   pos_vec[1] * math.cos(d1) - pos_vec[0] * math.sin(d1)])
+                d2_vec = np.array([pos_vec[0] * math.cos(d2) + pos_vec[1] * math.sin(d2),
+                                   pos_vec[1] * math.cos(d2) - pos_vec[0] * math.sin(d2)])
+                dot_d1 = np.vdot(self_vel, d1_vec)
+                dot_d2 = np.vdot(self_vel, d2_vec)
+                if dot_d1 >= dot_d2:
+                    R2_list.append(d1_vec)
+                else:
+                    R2_list.append(d2_vec)
             if R2_list:
-                R2 = sum(R2_list) / len(self.known_targets)
+                R2 = sum(R2_list) / len(self.seen_targets)
             else:
                 R2 = 0
         else:
