@@ -125,12 +125,9 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
     # @KSB >>>> Alignment
     def rule1(self, obs):
         R1_list = list()
-        self_pos = obs[self.index][2:4]
-        for uav in self.known_uavs:
-            uav_pos = obs[uav][2:4]
-            uav_vel = obs[uav][0:2]
-            dist = np.linalg.norm(self_pos - uav_pos)
-            R1_list.append(uav_vel / dist)
+        for uav in self.seen_uavs:
+            uav_vel = uav[1:]
+            R1_list.append(uav_vel)
         if R1_list:
             R1 = sum(R1_list) / len(R1_list)
         else:
