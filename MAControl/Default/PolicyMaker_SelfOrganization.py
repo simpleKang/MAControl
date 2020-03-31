@@ -54,14 +54,11 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self.seen_uavs = _seen_uavs
         self.seen_targets = _seen_targets
 
-    def get_UAV_density(self, obs):
+    def get_UAV_density(self, obs):  # further bearing -> lesser density
         item = list()
 
-        self_pos = np.array(obs[self.index][2:4])
-        for i in self.known_uavs:
-            uav_pos = np.array(obs[i][2:4])
-            distance = np.linalg.norm(uav_pos-self_pos)
-            item.append(1/distance)
+        for uav in self.seen_uavs:
+            item.append(1/uav[0])
 
         _density = sum(item)
         return _density
