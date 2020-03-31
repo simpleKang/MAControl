@@ -1,21 +1,17 @@
 from MAControl.Base.PolicyMaker import PolicyMaker
-from MAControl.Util.PointInRec import point_in_rec
 import numpy as np
 import math
 import MAControl.Default.Behavior_Archetype as BA
 
 
 class PolicyMaker_SelfOrganization(PolicyMaker):
-    seen_targets = list()
-    seen_uavs = list()
-    pheromonal = list()
 
     def __init__(self, name, env, world, agent_index, arglist):
         super(PolicyMaker_SelfOrganization, self).__init__(name, env, world, agent_index, arglist)
         self.UD = [0, 0]                      # 存储决策(rule->BA)得出的速度期望
-        PolicyMaker_SelfOrganization.seen_uavs.append(())           # 个体视野中uav
-        PolicyMaker_SelfOrganization.seen_targets.append(())        # 个体视野中target
-        PolicyMaker_SelfOrganization.pheromonal.append(-1)     # agent 会将它更新为非负数. # 一直是 -1 表示自己是个target.
+        self.seen_uavs = list()               # 个体视野中uav
+        self.seen_targets = list()            # 个体视野中target
+        self.pheromonal = -1                  # agent 会将它更新为非负数. # 一直是 -1 表示自己是个target.
         self.uav_sensor_range = 0.3
         self.target_sensor_range = 0.8
         self.uav_engagement_range = 0.5
