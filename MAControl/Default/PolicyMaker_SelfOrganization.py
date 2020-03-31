@@ -32,19 +32,20 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         _seen_uavs = list()
         _seen_targets = list()
 
-        # 寻找视场内uav
-        for i in range(self.uav_num):
-            uav_pos = np.array(obs[i][2:4])
-            if point_in_rec(selfview1, selfview2, selfview3, selfview4, uav_pos):
-                if i != self.index:
-                    _seen_uavs.append(i)
+        length = obs[self.index].__len__()
+        num = (length-4)/2
 
-        # 寻找视场内target
-        for i in range(obs.__len__() - self.uav_num):
-            target_pos = np.array(obs[i+self.uav_num][2:4])
-            if point_in_rec(selfview1, selfview2, selfview3, selfview4, target_pos):
-                if i != (self.index - self.uav_num):
-                    _seen_targets.append(i+self.uav_num)
+        # 从环境里拿到的 observation 是 [bearing + index] 的形式
+        # bearing 是真正的观测所得，而距离是未知的
+        # index 作为接口来读取 agent 性质(target?UAV?)及其它认为可观测的量(vel)
+
+        for i in range(num):
+            bearing = obs[self.index][4+i*2]
+            index = obs[self.index][5+i*2]
+            if index < self.uav_num:
+                _seen_uavs.append([bearing, obs[index][0], obs[index][1]])
+            else:
+                _seen_targets.append([bearing, obs[index][0], obs[index][1]])
 
         if (_seen_targets.__len__() != 0) and (self.index < self.uav_num):
             PolicyMaker_SelfOrganization.pheromonal[self.index] = 1
