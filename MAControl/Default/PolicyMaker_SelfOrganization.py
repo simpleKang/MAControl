@@ -11,7 +11,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self.UD = [0, 0]                      # 存储决策(rule->BA)得出的速度期望
         self.seen_uavs = list()               # 个体视野中uav
         self.seen_targets = list()            # 个体视野中target
-        self.pheromonal = -1                  # agent 会将它更新为非负数. # 一直是 -1 表示自己是个target.
+        self.pheromonal = -1                  # uav 会将它更新为非负数. # 一直是 -1 表示自己是个target.
         self.uav_sensor_range = 0.3
         self.target_sensor_range = 0.8
         self.uav_engagement_range = 0.5
@@ -43,11 +43,16 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             else:
                 _seen_targets.append([bearing, obs[index][0], obs[index][1]])
 
-        if (_seen_targets.__len__() != 0) and (self.index < self.uav_num):
-            PolicyMaker_SelfOrganization.pheromonal[self.index] = 1
+        if self.index < self.uav_num:
+            if _seen_targets.__len__() != 0:
+                self.pheromonal = 1
+            else:
+                self.pheromonal = 0
+        else:
+            pass
 
-        PolicyMaker_SelfOrganization.seen_uavs[self.index] = _seen_uavs
-        PolicyMaker_SelfOrganization.seen_targets[self.index] = _seen_targets
+        self.seen_uavs = _seen_uavs
+        self.seen_targets = _seen_targets
 
     def get_UAV_density(self, obs):
         item = list()
