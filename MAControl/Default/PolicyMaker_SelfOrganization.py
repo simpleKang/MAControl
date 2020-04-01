@@ -170,19 +170,14 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
     # >>>> Separation
     def rule4(self, obs):
         R4_list = list()
-        self_pos = obs[self.index][2:4]
-        if self.known_uavs:
-            for uav in self.known_uavs:
-                uav_pos = obs[uav][2:4]
-                dist = np.linalg.norm(self_pos - uav_pos)
-                if dist < self.uav_sensor_range * self.r2:
-                    R4_list.append((self_pos - uav_pos) * (self.uav_sensor_range * self.r2 - dist))
-            if R4_list:
-                R4 = sum(R4_list) / len(self.known_uavs)
-            else:
-                R4 = 0
+        for uav in self.seen_uavs:
+            bearing = uav[0]
+            R4_list.append(bearing)
+        if R4_list:
+            R4_ = sum(R4_list) / len(R4_list)
+            R4 = [-1*math.cos(R4_), -1*math.sin(R4_)]
         else:
-            R4 = 0
+            R4 = [0, 0]
         return R4
 
     # >>>> Flat Target Repulsion
