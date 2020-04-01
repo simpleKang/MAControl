@@ -188,7 +188,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             R6_list.append(bearing)
         if R6_list:
             R6_ = sum(R6_list) / len(R6_list)
-            R6 = [math.cos(R6_), math.sin(R6_)]
+            R6 = [-1*math.cos(R6_), -1*math.sin(R6_)]
         else:
             R6 = [0, 0]
         return R6
@@ -201,7 +201,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             R8_list.append(bearing)
         if R8_list:
             R8_ = sum(R8_list) / len(R8_list)
-            R8 = [-1*math.cos(R8_), -1*math.sin(R8_)]
+            R8 = [math.cos(R8_), math.sin(R8_)]
         else:
             R8 = [0, 0]
         return R8
