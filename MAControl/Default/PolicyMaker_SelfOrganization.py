@@ -139,19 +139,16 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         R2_list = list()
         self_vel = obs[self.index][0:2]
         vel_bearing = math.atan2(self_vel[1], self_vel[0])
-        if self.seen_targets:
-            for tar in self.seen_targets:
-                bearing = tar[0]
-                d1_vec = bearing + math.pi/2
-                d2_vec = bearing - math.pi/2
-                if abs(d1_vec-vel_bearing) <= abs(d1_vec-vel_bearing):
-                    R2_list.append(d1_vec)
-                else:
-                    R2_list.append(d2_vec)
-            if R2_list:
-                R2 = sum(R2_list) / len(self.seen_targets)
+        for tar in self.seen_targets:
+            bearing = tar[0]
+            d1_vec = bearing + math.pi/2
+            d2_vec = bearing - math.pi/2
+            if abs(d1_vec-vel_bearing) <= abs(d1_vec-vel_bearing):
+                R2_list.append(d1_vec)
             else:
-                R2 = 0
+                R2_list.append(d2_vec)
+        if R2_list:
+            R2 = sum(R2_list) / len(R2_list)
         else:
             R2 = 0
         return R2
