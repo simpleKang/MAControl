@@ -157,19 +157,14 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
     # @KSB >>>> Cohesion
     def rule3(self, obs):
         R3_list = list()
-        self_pos = obs[self.index][2:4]
-        if self.known_uavs:
-            for uav in self.known_uavs:
-                uav_pos = obs[uav][2:4]
-                dist = np.linalg.norm(self_pos - uav_pos)
-                if dist > self.uav_sensor_range*self.r1:
-                    R3_list.append((uav_pos - self_pos) * (dist - self.uav_sensor_range * self.r1))
-            if R3_list:
-                R3 = sum(R3_list) / len(self.known_uavs)
-            else:
-                R3 = 0
+        for uav in self.seen_uavs:
+            bearing = uav[0]
+            R3_list.append(bearing)
+        if R3_list:
+            R3_ = sum(R3_list) / len(R3_list)
+            R3 = [math.cos(R3_), math.sin(R3_)]
         else:
-            R3 = 0
+            R3 = [0, 0]
         return R3
 
     # @KSB >>>> Separation
