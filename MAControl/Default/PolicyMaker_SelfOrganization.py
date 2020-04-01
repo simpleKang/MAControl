@@ -131,7 +131,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         if R1_list:
             R1 = sum(R1_list) / len(R1_list)
         else:
-            R1 = 0
+            R1 = [0, 0]
         return R1
 
     # @WZQ >>>> Target Orbit
@@ -148,9 +148,10 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             else:
                 R2_list.append(d2_vec)
         if R2_list:
-            R2 = sum(R2_list) / len(R2_list)
+            R2_ = sum(R2_list) / len(R2_list)
+            R2 = [math.cos(R2_), math.sin(R2_)]
         else:
-            R2 = 0
+            R2 = [0, 0]
         return R2
 
     # @KSB >>>> Cohesion
