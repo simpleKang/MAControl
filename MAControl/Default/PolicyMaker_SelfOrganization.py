@@ -183,42 +183,27 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
     # >>>> Flat Target Repulsion
     def rule6(self, obs):
         R6_list = list()
-        self_pos = obs[self.index][2:4]
-        if self.known_uavs:
-            for tar in self.known_targets:
-                tar_pos = obs[tar][2:4]
-                dist = np.linalg.norm(tar_pos - self_pos)
-                if (dist < 0.9 * self.uav_sensor_range) or (dist < self.target_sensor_range):
-                    R6_list.append(self_pos - tar_pos)
-            if R6_list:
-                R6 = sum(R6_list) / len(self.known_targets)
-            else:
-                R6 = 0
+        for tar in self.seen_targets:
+            bearing = tar[0]
+            R6_list.append(bearing)
+        if R6_list:
+            R6_ = sum(R6_list) / len(R6_list)
+            R6 = [math.cos(R6_), math.sin(R6_)]
         else:
-            R6 = 0
+            R6 = [0, 0]
         return R6
 
     # >>>> Flat Attraction
     def rule8(self, obs):
         R8_list = list()
-        self_pos = obs[self.index][2:4]
-        if self.known_targets:
-            for tar in self.known_targets:
-                tar_pos = obs[tar][2:4]
-                dist = np.linalg.norm(tar_pos - self_pos)
-                if dist >= 0.8*self.uav_sensor_range:
-                    R8_list.append(tar_pos - self_pos)
-            if R8_list:
-                R8 = sum(R8_list)
-            else:
-                R8 = 0
-        elif self.known_uavs:
-            for uav in self.known_uavs:
-                uav_pos = obs[uav][2:4]
-                R8_list.append(uav_pos - self_pos)
-            R8 = sum(R8_list)
+        for tar in self.seen_targets:
+            bearing = tar[0]
+            R8_list.append(bearing)
+        if R8_list:
+            R8_ = sum(R8_list) / len(R8_list)
+            R8 = [-1*math.cos(R8_), -1*math.sin(R8_)]
         else:
-            R8 = 0
+            R8 = [0, 0]
         return R8
 
     # >>>> Evasion
