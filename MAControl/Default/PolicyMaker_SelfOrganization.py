@@ -137,20 +137,14 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
     # @WZQ >>>> Target Orbit
     def rule2(self, obs):
         R2_list = list()
-        self_pos = obs[self.index][2:4]
         self_vel = obs[self.index][0:2]
-        d1 = math.pi/2
-        d2 = math.pi*3/2
+        vel_bearing = math.atan2(self_vel[1], self_vel[0])
         if self.seen_targets:
             for tar in self.seen_targets:
-                pos_vec = tar_pos - self_pos
-                d1_vec = np.array([pos_vec[0] * math.cos(d1) + pos_vec[1] * math.sin(d1),
-                                   pos_vec[1] * math.cos(d1) - pos_vec[0] * math.sin(d1)])
-                d2_vec = np.array([pos_vec[0] * math.cos(d2) + pos_vec[1] * math.sin(d2),
-                                   pos_vec[1] * math.cos(d2) - pos_vec[0] * math.sin(d2)])
-                dot_d1 = np.vdot(self_vel, d1_vec)
-                dot_d2 = np.vdot(self_vel, d2_vec)
-                if dot_d1 >= dot_d2:
+                bearing = tar[0]
+                d1_vec = bearing + math.pi/2
+                d2_vec = bearing - math.pi/2
+                if abs(d1_vec-vel_bearing) <= abs(d1_vec-vel_bearing):
                     R2_list.append(d1_vec)
                 else:
                     R2_list.append(d2_vec)
