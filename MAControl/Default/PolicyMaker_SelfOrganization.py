@@ -122,7 +122,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
     # 每个 rule 是一个单独的函数 利于融合代码
     # 输出为二维速度 输入可以修改
 
-    # @KSB >>>> Alignment
+    # >>>> Alignment
     def rule1(self, obs):
         R1_list = list()
         for uav in self.seen_uavs:
@@ -134,7 +134,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             R1 = [0, 0]
         return R1
 
-    # @WZQ >>>> Target Orbit
+    # >>>> Target Orbit
     def rule2(self, obs):
         R2_list = list()
         self_vel = obs[self.index][0:2]
@@ -154,7 +154,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             R2 = [0, 0]
         return R2
 
-    # @KSB >>>> Cohesion
+    # >>>> Cohesion
     def rule3(self, obs):
         R3_list = list()
         for uav in self.seen_uavs:
@@ -167,7 +167,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             R3 = [0, 0]
         return R3
 
-    # @KSB >>>> Separation
+    # >>>> Separation
     def rule4(self, obs):
         R4_list = list()
         self_pos = obs[self.index][2:4]
@@ -185,31 +185,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             R4 = 0
         return R4
 
-    # @WZQ >>>> Weighted Target Attraction
-    def rule5(self, obs):
-        R5_list = list()
-        self_pos = obs[self.index][2:4]
-        if self.known_targets:
-            for tar in self.known_targets:
-                tar_pos = obs[tar][2:4]
-                dist = np.linalg.norm(tar_pos - self_pos)
-                R5_list.append((tar_pos - self_pos) / dist**5)
-            R5 = sum(R5_list) / len(self.known_targets)
-        elif self.known_uavs:
-            for uav in self.known_uavs:
-                if PolicyMaker_SelfOrganization.pheromonal[uav] > 0:
-                    uav_pos = obs[uav][2:4]
-                    dist = np.linalg.norm(uav_pos - self_pos)
-                    R5_list.append(PolicyMaker_SelfOrganization.pheromonal[uav] * (uav_pos - self_pos) / dist)
-            if R5_list:
-                R5 = sum(R5_list) / len(self.known_uavs)
-            else:
-                R5 = 0
-        else:
-            R5 = 0
-        return R5
-
-    # @WZQ >>>> Flat Target Repulsion
+    # >>>> Flat Target Repulsion
     def rule6(self, obs):
         R6_list = list()
         self_pos = obs[self.index][2:4]
@@ -227,28 +203,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             R6 = 0
         return R6
 
-    # @WZQ >>>> Weighted Target Repulsion
-    def rule7(self, obs):
-        R7_list = list()
-        self_pos = obs[self.index][2:4]
-        if self.known_targets:
-            for tar in self.known_targets:
-                tar_pos = obs[tar][2:4]
-                dist = np.linalg.norm(tar_pos - self_pos)
-                if (dist < self.r3 * self.uav_sensor_range) and \
-                   (self.r3 * self.uav_sensor_range > self.target_engagement_range):
-                    R7_list.append((self_pos - tar_pos) / 2 * (self.r3 * self.uav_sensor_range - dist))
-                elif dist < self.target_engagement_range:
-                    R7_list.append((self_pos - tar_pos) / 2 * (self.target_engagement_range - dist))
-            if R7_list:
-                R7 = sum(R7_list) / len(self.known_targets)
-            else:
-                R7 = 0
-        else:
-            R7 = 0
-        return R7
-
-    # @WZQ >>>> Flat Attraction
+    # >>>> Flat Attraction
     def rule8(self, obs):
         R8_list = list()
         self_pos = obs[self.index][2:4]
@@ -271,7 +226,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             R8 = 0
         return R8
 
-    # @KSB >>>> Evasion
+    # >>>> Evasion
     def rule9(self, obs):
         R9_list = list()
         min_dist = 0.5
@@ -299,7 +254,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             R9 = 0
         return R9
 
-    # @XJ >>>> Obstacle Avoidance
+    # >>>> Obstacle Avoidance
     def rule10(self, obs, obstacles):
 
         dUO = list()
