@@ -66,12 +66,12 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         UR.append(np.array(self.rule2(obs_n)))
         UR.append(np.array(self.rule3(obs_n)))
         UR.append(np.array(self.rule4(obs_n)))
-        UR.append(np.array(self.rule5(obs_n)))
+        UR.append(np.array([0, 0]))
         UR.append(np.array(self.rule6(obs_n)))
-        UR.append(np.array(self.rule7(obs_n)))
+        UR.append(np.array([0, 0]))
         UR.append(np.array(self.rule8(obs_n)))
         UR.append(np.array(self.rule9(obs_n)))
-        UR.append(np.array(self.rule10(obs_n, obstacles)))
+        UR.append(np.array([0, 0]))
 
         URLength = [np.linalg.norm(UR[i]) for i in range(10)]
         threshold = sum(URLength) * 0.01
