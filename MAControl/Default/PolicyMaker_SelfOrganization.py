@@ -29,15 +29,15 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         _seen_targets = list()
 
         length = obs[self.index].__len__()
-        num = (length-4)/2
+        num = int((length-6)/2)
 
         # 从环境里拿到的 observation 是 [bearing + index] 的形式
         # bearing 是真正的观测所得，而距离是未知的
         # index 作为接口来读取 agent 性质(target?UAV?)及其它认为可观测的量(vel)
 
         for i in range(num):
-            bearing = obs[self.index][4+i*2]
-            index = obs[self.index][5+i*2]
+            bearing = obs[self.index][6+i*2]
+            index = int(obs[self.index][7+i*2])
             if index < self.uav_num:
                 _seen_uavs.append([bearing, obs[index][0], obs[index][1]])
             else:
