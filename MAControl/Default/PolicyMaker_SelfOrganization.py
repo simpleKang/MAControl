@@ -209,23 +209,16 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
     # >>>> Evasion
     def rule9(self, obs):
         R9_list = list()
-        self_pos = obs[self.index][2:4]
-        self_vel = obs[self.index][0:2]
-        f_self_pos = self_pos + self_vel
-        if self.seen_uavs:
-            for uav in self.seen_uavs:
-                uav_pos = obs[uav][2:4]
-                uav_vel = obs[uav][0:2]
-                dist = np.linalg.norm(self_pos - uav_pos)
-                n_dist = dist
-                f_uav_pos = uav_pos + uav_vel
-                f_dist = np.linalg.norm(f_self_pos - f_uav_pos)
-                if (f_dist < 3 * self.size) and (f_dist < n_dist):
-                    R9_list.append(n_dist * (self_pos - uav_pos) / (3 * self.size))
-            if R9_list:
-                R9 = sum(R9_list) / len(self.seen_uavs)
+        for uav in self.seen_uavs:
+            bearing = uav[0]
+            uav_vel = uav[1:]
+            dot = np.dot([-1*math.cos(bearing), -1*math.sin(bearing)], uav_vel)
+            if dot >= 0.2:
+                R9_list.append([math.cos(bearing)*dot, math.sin(bearing)*dot])
             else:
-                R9 = 0
+                pass
+        if R9_list:
+            R9 = sum(R9_list) / len(R9_list)
         else:
-            R9 = 0
+            R9 = [0, 0]
         return R9
