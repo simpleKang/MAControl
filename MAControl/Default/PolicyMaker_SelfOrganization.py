@@ -121,7 +121,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             uav_vel = uav[1:]
             R1_list.append(uav_vel)
         if R1_list:
-            R1 = sum(R1_list) / len(R1_list)
+            R1 = sum(np.array(R1_list)) / len(R1_list)
         else:
             R1 = [0, 0]
         return R1
@@ -140,7 +140,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             else:
                 R2_list.append(d2_vec)
         if R2_list:
-            R2_ = sum(R2_list) / len(R2_list)
+            R2_ = sum(np.array(R2_list)) / len(R2_list)
             R2 = [math.cos(R2_), math.sin(R2_)]
         else:
             R2 = [0, 0]
@@ -153,7 +153,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             bearing = uav[0]
             R3_list.append(bearing)
         if R3_list:
-            R3_ = sum(R3_list) / len(R3_list)
+            R3_ = sum(np.array(R3_list)) / len(R3_list)
             R3 = [math.cos(R3_), math.sin(R3_)]
         else:
             R3 = [0, 0]
@@ -166,7 +166,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             bearing = uav[0]
             R4_list.append(bearing)
         if R4_list:
-            R4_ = sum(R4_list) / len(R4_list)
+            R4_ = sum(np.array(R4_list)) / len(R4_list)
             R4 = [-1*math.cos(R4_), -1*math.sin(R4_)]
         else:
             R4 = [0, 0]
@@ -179,7 +179,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             bearing = tar[0]
             R6_list.append(bearing)
         if R6_list:
-            R6_ = sum(R6_list) / len(R6_list)
+            R6_ = sum(np.array(R6_list)) / len(R6_list)
             R6 = [-1*math.cos(R6_), -1*math.sin(R6_)]
         else:
             R6 = [0, 0]
@@ -192,7 +192,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             bearing = tar[0]
             R8_list.append(bearing)
         if R8_list:
-            R8_ = sum(R8_list) / len(R8_list)
+            R8_ = sum(np.array(R8_list)) / len(R8_list)
             R8 = [math.cos(R8_), math.sin(R8_)]
         else:
             R8 = [0, 0]
@@ -210,7 +210,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             else:
                 pass
         if R9_list:
-            R9 = sum(R9_list) / len(R9_list)
+            R9 = sum(np.array(R9_list)) / len(R9_list)
         else:
             R9 = [0, 0]
         return R9
