@@ -12,14 +12,6 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self.seen_uavs = list()               # 个体视野中uav
         self.seen_targets = list()            # 个体视野中target
         self.pheromonal = -1                  # uav 会将它更新为非负数. # 一直是 -1 表示自己是个target.
-        self.uav_sensor_range = 0.3
-        self.target_sensor_range = 0.8
-        self.uav_engagement_range = 0.5
-        self.target_engagement_range = 0.5
-        self.r1 = 0.3
-        self.r2 = 0
-        self.r3 = 1.1
-        self.size = 0.03
         self.uav_num = arglist.uav_num        # 小瓜子数量
         self.decision_frequency = 50
 
