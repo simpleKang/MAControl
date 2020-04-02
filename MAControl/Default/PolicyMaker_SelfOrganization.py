@@ -214,7 +214,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             uav_vel = uav[1:]
             dot = np.dot([-1*math.cos(bearing), -1*math.sin(bearing)], uav_vel)
             if dot >= 0.2:
-                R9_list.append([math.cos(bearing)*dot, math.sin(bearing)*dot])
+                R9_list.append([-1*dot*math.cos(bearing), -1*dot*math.sin(bearing)])
             else:
                 pass
         if R9_list:
