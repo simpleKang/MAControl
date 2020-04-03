@@ -46,13 +46,15 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self.seen_uavs = _seen_uavs
         self.seen_targets = _seen_targets
 
-    def get_UAV_density(self, obs):  # further bearing -> lesser density
-        item = list()
+    def get_UAV_density(self, obs):
 
-        for uav in self.seen_uavs:
-            item.append(1/uav[0])
+        # item = list()
+        # for uav in self.seen_uavs:
+        #    item.append(1/uav[0])  # further bearing -> lesser density
+        # _density = sum(item)
 
-        _density = sum(item)
+        _density = len(self.seen_uavs)
+
         return _density
 
     def rule_summation(self, ba_index, obs_n, obstacles):
