@@ -191,7 +191,7 @@ class GA(object):
                 for arch in self.population[rank]:
                     f.write('Archetype: ')
                     for ele in arch:
-                        f.write(str(round(ele, 3)) + ' ')
+                        f.write(str(round(ele, 3)) + ', ')
                     f.write('\n')
                 f.write('\n' + '\n')
         pass
