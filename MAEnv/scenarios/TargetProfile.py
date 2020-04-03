@@ -3,15 +3,15 @@ import numpy as np
 # UAV
 UAV_color = np.array([0.47, 0.79, 0.79])
 UAV_H = 100
-UAV_Dam = 10
+UAV_Dam = 1
 UAV_w = 1000
 
 # target parameters
-num_targets = 0
+num_targets = 1
 target_size = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
-target_pos = [[0,   0],
-              [1,  -1.5],
-              [1,  -1.5],
+target_pos = [[0,  0],
+              [1,  -1],
+              [1.1,  -1.5],
               [-1,    0.4],
               [-1.4,  1.6],
               [-0.4,    1],
@@ -22,7 +22,7 @@ target_pos = [[0,   0],
 target_movable = [False, False, False, False, False, False, False, False, False, False]
 movable_target_color = np.array([0, 0.8, 0])
 fixed_target_color = np.array([0.3, 0.2, 0])
-target_H = [10, 10, 10, 10, 10, 8, 8, 8, 8, 8]
+target_H = [3, 3, 3, 1, 1, 1, 1, 1, 1, 1]
 target_Dam = [1, 2, 1, 5, 0, 1, 2, 1, 0, 1]
 target_w = [2, 2, 5, 2, 3, 2, 2, 5, 2, 3]
 
@@ -41,7 +41,7 @@ grid_obstacle = False
 # 环境里不存在自然斥力，必须由 agent 做出避障决策才会有避开障碍的效果
 
 # square (a kind of obstacle)
-num_square = 5
+num_square = 0
 square_size = 0.05
 square_pos = [[0., 0.],
               [1., 1.],

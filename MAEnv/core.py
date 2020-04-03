@@ -21,9 +21,9 @@ class AgentState(EntityState):
         # communication utterance
         self.c = None
         # AFIT
-        self.H = None  # 可承受攻击总量
-        self.Dam = None  # 单位攻击能力
-        self.w = None  # 价值
+        self.H = None     # 可承受攻击总量
+        self.Dam = None   # 单位攻击能力
+        self.w = None     # 价值
 
 
 # action of the agent
@@ -97,6 +97,10 @@ class Agent(Entity):
         self.action = Action()
         # script behavior to execute
         self.action_callback = None
+        # attacking
+        self.attacking = False
+        # current used behavior
+        self.behavior = None
 
 
 # multi-agent world

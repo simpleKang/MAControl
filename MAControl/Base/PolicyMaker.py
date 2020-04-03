@@ -11,5 +11,5 @@ class PolicyMaker(ABC):
         self.arglist = arglist
 
     @abstractmethod
-    def make_policy(self, obstacles, obs_n, behavior_archetypes, step):
+    def make_policy(self, world, obstacles, obs_n, behavior_archetypes, step):
         raise NotImplementedError

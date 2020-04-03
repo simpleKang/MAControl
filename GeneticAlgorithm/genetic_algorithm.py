@@ -2,8 +2,10 @@ import numpy as np
 import random
 import os
 
+pardir = os.path.dirname(os.path.dirname(__file__))
 
-class GA():
+
+class GA(object):
     def __init__(self, arglist):
 
         self.pop_size = arglist.pop_size
@@ -20,20 +22,24 @@ class GA():
         self.ba_w = 9
         self.ba_r = 3
 
-        # 初始化随机种群
-        self.population = [[] for i in range(self.pop_size)]
-        for individual in self.population:
-            for ba_arch in range(self.max_archetypes):
-                individual.append([])
-                for weight in range(self.ba_c+self.ba_w+self.ba_r):
-                    individual[-1].append(np.random.random())
+        if arglist.restore:
+            self.load_model()
+            print('Loading existing model.')
+        else:
+            # 初始化随机种群
+            self.population = [[] for i in range(self.pop_size)]
+            for individual in self.population:
+                for ba_arch in range(self.max_archetypes):
+                    individual.append([])
+                    for weight in range(self.ba_c+self.ba_w+self.ba_r):
+                        individual[-1].append(np.random.random())
 
         self.score = np.zeros((self.pop_size, self.collect_num))
         self.new_population = list()
         self.binary_population = list()
-        print('GA initiating')
+        print('GA initiation complete')
 
-    def evolve(self):
+    def evolve(self, gen):
 
         self.select()
 
@@ -46,11 +52,13 @@ class GA():
         self.decode()
 
         if len(self.new_population) == self.pop_size:
-            print('Evolution completed!')
+            print('Generation: ', gen, ' Evolution completed!')
         else:
             raise Exception('Evolution failed! Check the population.')
 
         self.population = self.new_population.copy()
+
+        self.save_model(gen)
 
     # 选出部分个体进入下一代
     def select(self):
@@ -132,11 +140,11 @@ class GA():
         for ind, individual in enumerate(self.binary_population):
             for arch in range(self.max_archetypes):
                 for c in range(self.ba_c):
-                    current_weight = round(self.new_population[ind][arch][c] * (2**self.bit - 1))
+                    current_weight = int(round(self.new_population[ind][arch][c] * (2**self.bit - 1)))
                     individual += dec2bin(current_weight)
             for arch in range(self.max_archetypes):
                 for wr in range(self.ba_w + self.ba_r):
-                    current_weight = round(self.new_population[ind][arch][self.ba_c + wr] * (2**self.bit - 1))
+                    current_weight = int(round(self.new_population[ind][arch][self.ba_c + wr] * (2**self.bit - 1)))
                     individual += dec2bin(current_weight)
 
     # 解码操作,将二进制编码解码为权重形式
@@ -164,7 +172,7 @@ class GA():
 
             self.new_population.append(individual_arch)
 
-    # 进化完成后保存权重模型
+    # 进化完成后保存权重模型(可读性高的存储方式)
     def save_pop(self, gen):
 
         score_sum = list()
@@ -187,3 +195,31 @@ class GA():
                     f.write('\n')
                 f.write('\n' + '\n')
         pass
+
+    # 载入模型
+    def load_model(self):
+
+        model = np.loadtxt(pardir + '/GeneticAlgorithm/model/model.txt')
+
+        self.population = list()
+        x, y = model.shape
+        if (x == self.pop_size*self.max_archetypes) and (y == self.ba_c + self.ba_w + self.ba_r):
+            for i in range(self.pop_size):
+                self.population.append(list())
+                for j in range(self.max_archetypes):
+                    self.population[i].append(list())
+                    for k in range(self.ba_c + self.ba_w + self.ba_r):
+                        self.population[i][j].append(model[i * self.max_archetypes + j][k])
+        else:
+            raise Exception('Check parameters.')
+
+    # 存储模型(方便载入)
+    def save_model(self, gen):
+
+        open(pardir + '/GeneticAlgorithm/model/model_%d.txt' % gen, 'w')
+        with open(pardir + '/GeneticAlgorithm/model/model_%d.txt' % gen, 'a') as f:
+            for ind in self.population:
+                for arch in ind:
+                    for wei in arch:
+                        f.write(str(wei) + ' ')
+                    f.write('\n')

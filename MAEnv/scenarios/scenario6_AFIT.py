@@ -76,7 +76,7 @@ class Scenario(BaseScenario):
         uav_count = 0
         for i, agent in enumerate(world.agents):
             if agent.UAV:
-                agent.state.p_pos = np.random.uniform(-1.6, -1.9, world.dim_p)
+                agent.state.p_pos = np.random.uniform(-0.5, 0.5, world.dim_p)
                 # agent.state.p_pos = np.array([-0.5+i*0.5, 0])
                 # agent.state.p_pos = np.array([-0.5, -0.5])
                 agent.state.p_vel = np.random.uniform(-0.05, 0.05, world.dim_p)  # 50 米/秒

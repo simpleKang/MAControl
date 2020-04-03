@@ -31,3 +31,17 @@ execute.py
 # 2020.03.13 KSB
 # with open(os.path.dirname(__file__) + _path + 'gen=%d/ind=%d/num=%d/information.txt' % (gen, ind, num), 'a') as f:
                 #     f.write(str(individual) +'    '+str(score))
+
+# # 为每个小瓜子创建状态文件
+    # os.makedirs(os.path.dirname(__file__) + _path + 'gen=%d/ind=%d/num=%d' % (gen, ind, num))
+    # for k in range(arglist.uav_num):
+    #     open(os.path.dirname(__file__) + _path + 'gen=%d/ind=%d/num=%d/uav_%d_track.txt'%(gen,ind,num,k), 'w')
+
+# with open(os.path.dirname(__file__)+_path+'gen=%d/ind=%d/num=%d/uav_%d_track.txt'%(gen,ind,num,k),'a') as f:
+            #     f.write(str(obs_n[k][0])+' '+str(obs_n[k][1])+' '+str(obs_n[k][2])+' '+str(obs_n[k][3])+'\n')
+
+
+# PathPlanner_EdgeWaypoint
+# with open(os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + _path + 'waypoint_%d.txt' % self.index, 'a') as f:
+#     f.write(str(1) + ' ' + str(self.waypoint_list[self.current_wplist][0]) + ' ' +
+#                          str(self.waypoint_list[self.current_wplist][1]) + '\n')

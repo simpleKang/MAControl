@@ -33,7 +33,7 @@ from GeneticAlgorithm.BehaviorArchetypes import behavior
 import MAEnv.scenarios.TargetProfile as T
 import MAControl.Util.OfflineCoverRate as OCR
 import MAControl.Util.CalCoverage as cc
-import MAControl.Util.coverrate_by_image as coculate
+import MAControl.Util.coverrate_by_image as calculate
 import GeneticAlgorithm.genetic_algorithm as ga
 
 import MAControl.Default.InnerController_PID as IC_P
@@ -49,14 +49,14 @@ def parse_args():
 
     # Environment
     parser.add_argument("--scenario", type=str, default="scenario6_AFIT", help="name of the scenario script")
-    parser.add_argument("--uav-num", type=int, default=10, help="number of uav")
-    parser.add_argument("--step-max", type=int, default=1000, help="number of maximum steps")
+    parser.add_argument("--uav-num", type=int, default=5, help="number of uav")
+    parser.add_argument("--step-max", type=int, default=3000, help="number of maximum steps")
 
     # GA
-    parser.add_argument("--pop-size", type=int, default=10, help="size of population")
+    parser.add_argument("--pop-size", type=int, default=20, help="size of population")
     parser.add_argument("--preserved-population", type=float, default=0.5, help="percentage of population selected")
-    parser.add_argument("--generation-num", type=int, default=10, help="number of generation")
-    parser.add_argument("--max-behavior-archetypes", type=int, default=3, help="number of behavior archetypes")
+    parser.add_argument("--generation-num", type=int, default=30, help="number of generation")
+    parser.add_argument("--max-behavior-archetypes", type=int, default=2, help="number of behavior archetypes")
     parser.add_argument("--collect-num", type=int, default=5, help="number of fitness score collection")
 
     # Core parameters
@@ -67,7 +67,8 @@ def parse_args():
     # Evolve or Test
     parser.add_argument("--evolve", action="store_false", default=True)
     parser.add_argument("--test", action="store_true", default=False)
-    parser.add_argument("--repeat-num", type=int, default=2, help="number of repeat runs")
+    parser.add_argument("--restore", action="store_true", default=False)
+    parser.add_argument("--repeat-num", type=int, default=1, help="number of repeat runs")
 
     return parser.parse_args()
 
@@ -109,6 +110,9 @@ def get_controller(env, world, arglist):
         control.append(MC_L.MotionController_L1_TECS("uav_%d" % i, env, world, i, arglist))
         control.append(IC_P.InnerController_PID("uav_%d" % i, env, world, i, arglist))
         control.append(False)  # Arriveflag
+        control.append(0)      # Isattacking
+        control.append(None)   # AttackingTarget
+        control.append(None)   # Current Behavior
 
         uavController.append(control)
 
@@ -122,13 +126,16 @@ def get_controller(env, world, arglist):
         control.append(MC_L.MotionController_L1_TECS("target_%d" % i, env, world, i+arglist.uav_num, arglist))
         control.append(IC_P.InnerController_PID("target_%d" % i, env, world, i+arglist.uav_num, arglist))
         control.append(False)  # Arriveflag
+        control.append(0)      # Isattacking(为了和小瓜子保持维度一致，没有实际意义)
+        control.append(None)   # AttackingTarget(为了和小瓜子保持维度一致，没有实际意义)
+        control.append(None)   # Current Behavior(为了和小瓜子保持维度一致，没有实际意义)
 
         targetController.append(control)
 
     return uavController, targetController
 
 
-def action(obs_n, step, ControllerSet, obstacles, behavior_archetypes):
+def action(world, obs_n, step, ControllerSet, obstacles, behavior_archetypes):
 
     # get action
     action_n = list()
@@ -136,10 +143,10 @@ def action(obs_n, step, ControllerSet, obstacles, behavior_archetypes):
     # 小瓜子或小花生的运动
     for i in range(ControllerSet.__len__()):  # 提取ControllerSet的长度
 
-        list_i = ControllerSet[i][0].\
-            make_policy(obstacles, obs_n, behavior_archetypes, step)
+        list_i, ControllerSet[i][7] = ControllerSet[i][0].\
+            make_policy(world, obstacles, obs_n, behavior_archetypes, step)
 
-        pointAi, pointBi, finishedi = ControllerSet[i][1].\
+        pointAi, pointBi, finishedi, ControllerSet[i][5], ControllerSet[i][6] = ControllerSet[i][1].\
             planpath(list_i, obs_n[i], ControllerSet[i][4], step, obstacles)
 
         acctEi, acclEi, ControllerSet[i][4] = ControllerSet[i][2]. \
@@ -153,6 +160,87 @@ def action(obs_n, step, ControllerSet, obstacles, behavior_archetypes):
     return action_n
 
 
+def augment_view(arglist, world, Controller, obs, step):
+
+    # for i in range(arglist.uav_num):
+    #     if world.agents[i].movable:
+    #         if Controller[i][5] == 0:
+    #             world.agents[i].attacking = False
+    #         elif Controller[i][5] == 1:
+    #             world.agents[i].attacking = True
+    #         elif Controller[i][5] == 2:
+    #             world.agents[i].movable = False
+    #             world.agents[i].H = 0
+    #             world.agents[Controller[i][6]].H -= T.UAV_Dam
+    #             with open(os.path.dirname(__file__) + _path + 'target_attacking.txt', 'a') as f:
+    #                 f.write(str(step) + ' ' + str(Controller[i][6]) + ' ' + str(world.agents[Controller[i][6]].H) + '\n')
+    #         else:
+    #             raise Exception('Unexpected uac state!')
+    #     else:
+    #         pass
+
+    for i in range(arglist.uav_num):
+        if world.agents[i].movable:
+            uav_pos = obs[i][2:4]
+            world.agents[i].behavior = Controller[i][7]
+            # for tar in range(T.num_targets):
+            #     tar_pos = np.array(T.target_pos[tar])
+            #     if world.agents[arglist.uav_num+tar].H > 0:
+            #         mis_dis = np.linalg.norm(uav_pos - tar_pos)
+            #         if mis_dis < 0.05:
+            #             world.agents[i].movable = False
+            #             world.agents[i].H = 0
+            #             world.agents[arglist.uav_num+tar].H -= T.UAV_Dam
+            #             with open(os.path.dirname(__file__) + _path + 'target_attacking.txt', 'a') as f:
+            #                 f.write(str(step) + ' ' + str(arglist.uav_num+tar) + ' ' +
+            #                         str(world.agents[arglist.uav_num+tar].H) + '\n')
+
+
+def get_score(arglist, gen, ind, num):
+
+    # 不使用特定评分，仅给出随机分数
+    # _score = np.random.random()
+
+    # KSB 像素计算覆盖率
+    # _score = calculate.coverrate_k(gen, ind, num)
+
+    # WZQ 完整计算覆盖率方式
+    # _score = OCR.calculate_coverage(arglist.uav_num, arglist.step_max, num)
+
+    # WZQ 简易计算覆盖率方式
+    # _score = cc.calculate_coverage(arglist.uav_num, arglist.step_max, num)
+
+    # WZQ 最小化攻击时间间隔作为评分
+    # target = np.loadtxt(os.path.dirname(__file__) + _path + 'target_attacking.txt')
+    # if target.size > 3:
+    #     x, y = target.shape
+    #     if target[x-1][y-1] == 0:
+    #         _score = target[0][0] - target[x-1][0]
+    #     else:
+    #         _score = -arglist.step_max
+    # else:
+    #     _score = -arglist.step_max
+
+    # WZQ 计算目标处于UAV感知范围内的时间
+    # _score = round(sum(PM_S.PolicyMaker_SelfOrganization.target_in_sight) / arglist.uav_num, 2)
+    # PM_S.PolicyMaker_SelfOrganization.target_in_sight.clear()
+
+    # WZQ 有限数量目标吸引，多于排斥
+    target_seen_step = np.array(PM_S.PolicyMaker_SelfOrganization.target_in_sight[:arglist.uav_num])
+    step_sum = np.sum(target_seen_step, axis=0)
+    reward = 0
+    punish = 0
+    for i in range(step_sum.size):
+        if step_sum[i] > 0:
+            reward += 1
+            if step_sum[i] > T.target_H[0]:
+                punish += 1
+    _score = reward - punish
+    PM_S.PolicyMaker_SelfOrganization.target_in_sight.clear()
+
+    return _score
+
+
 def run_simulation(arglist, behavior_archetypes, gen, ind, num):
 
     # Create environment
@@ -161,6 +249,7 @@ def run_simulation(arglist, behavior_archetypes, gen, ind, num):
     # Create Controller
     Controllers = get_controller(env, world, arglist)
 
+    open(os.path.dirname(__file__) + _path + 'target_attacking.txt', 'w')
     with open(os.path.dirname(__file__) + _path + 'para.txt', 'w') as f:
         f.write(str(arglist.uav_num) + ' ' + str(arglist.step_max))
 
@@ -168,18 +257,13 @@ def run_simulation(arglist, behavior_archetypes, gen, ind, num):
     for k in range(arglist.uav_num):
         open(os.path.dirname(__file__) + _path + 'uav_%d_track.txt' % k, 'w')
 
-    # # 为每个小瓜子创建状态文件
-    # os.makedirs(os.path.dirname(__file__) + _path + 'gen=%d/ind=%d/num=%d' % (gen, ind, num))
-    # for k in range(arglist.uav_num):
-    #     open(os.path.dirname(__file__) + _path + 'gen=%d/ind=%d/num=%d/uav_%d_track.txt'%(gen,ind,num,k), 'w')
-
     obs_n = env.reset()
 
     for step in range(arglist.step_max):
 
         # 选择动作
-        action_Un = action(obs_n, step, Controllers[0], obstacle_info, behavior_archetypes)
-        action_Tn = action(obs_n[arglist.uav_num:], step, Controllers[1], obstacle_info, behavior_archetypes)
+        action_Un = action(world, obs_n, step, Controllers[0], obstacle_info, behavior_archetypes)
+        action_Tn = action(world, obs_n[arglist.uav_num:], step, Controllers[1], obstacle_info, behavior_archetypes)
         action_n = action_Un + action_Tn
 
         new_obs_n, rew_n, done_n, info_n = env.step(action_n)
@@ -188,25 +272,21 @@ def run_simulation(arglist, behavior_archetypes, gen, ind, num):
 
         # 保存每个小瓜子每个step的状态信息
         for k in range(arglist.uav_num):
-            # with open(os.path.dirname(__file__) + _path + 'gen=%d/ind=%d/num=%d/uav_%d_track.txt' %(gen,ind,num,k), 'a') as f:
-            #     f.write(str(obs_n[k][0]) + ' ' + str(obs_n[k][1]) + ' ' + str(obs_n[k][2]) + ' ' + str(
-            #         obs_n[k][3]) + '\n')
-
             with open(os.path.dirname(__file__) + _path + 'uav_%d_track.txt' % k, 'a') as f:
                 f.write(str(obs_n[k][0]) + ' ' + str(obs_n[k][1]) + ' ' +
                         str(obs_n[k][2]) + ' ' + str(obs_n[k][3]) + '\n')
 
+        # print('>>> Step ', step, PM_S.PolicyMaker_SelfOrganization.target_in_sight)
+
         # 画图展示
-        env.render()
+        augment_view(arglist, world, Controllers[0], obs_n, step)
+        # env.render()
         time.sleep(0.001)
 
     time.sleep(0.1)
-    # coverage = coculate.coverrate_k(gen,ind,num)
-    coverage = OCR.calculate_coverage(arglist.uav_num, arglist.step_max, num)
-    # coverage = cc.calculate_coverage(arglist.uav_num, arglist.step_max, num)
-    # coverage = np.random.random()
+    _score = get_score(arglist, gen, ind, num)
 
-    return coverage
+    return _score
 
 
 if __name__ == '__main__':
@@ -218,24 +298,26 @@ if __name__ == '__main__':
 
         for gen in range(arglist.generation_num + 1):
             for ind, individual in enumerate(ga.population):
-
                 for num in range(arglist.collect_num):
+
                     start = time.time()
                     score = run_simulation(arglist, individual, gen, ind, num)
                     end = time.time()
-                    interval = round((end - start), 2)
                     print('>>> Generation', gen, '>>> Individual', ind, '>>> Collect', num,
-                          'time-consuming: ', interval, 'score: ', score)
+                          'time-consuming: ', round((end - start), 2), 'score: ', score)
                     ga.score[ind][num] = score
 
             ga.save_pop(gen)
 
             if gen < arglist.generation_num:
-                ga.evolve()
-        print('All complete!')
+                ga.evolve(gen)
+
+        print('All finished!')
 
     if arglist.test:
 
+        print('Test with specific behavior archetypes.')
         for repeat in range(arglist.repeat_num):
             score = run_simulation(arglist, behavior, 0, 0, repeat)
+            print('score ', score)
 

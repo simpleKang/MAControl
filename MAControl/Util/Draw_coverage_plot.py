@@ -11,10 +11,15 @@ num = int(para[0])
 step = int(para[1])
 
 data = np.loadtxt(pardir + '/cover_rate_Folder/cover_rate-%d-%d-0.txt' % (num, step))
+target = np.loadtxt(pardir + '/track/target_attacking.txt')
 
 plt.figure()
 line = plt.gca()
 line.plot(data[:, 0], data[:, 1], 'c--')
+
+for t in range(target.__len__()):
+    plt.vlines(target[t][0], 0, 1, color='r')
+
 plt.yticks([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])
 plt.xlim(0, step)
 # plt.ylim(0, 1)
@@ -22,7 +27,7 @@ plt.xlabel('step')
 plt.ylabel('Cover Rate / %')
 plt.title('Cover Rate')
 # plt.legend()
-# plt.savefig('cover.png')
+plt.savefig('cover.png')
 plt.show()
 
 line = plt.gca()
