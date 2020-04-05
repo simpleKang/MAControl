@@ -57,9 +57,9 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
 
         return _density
 
-    def rule_summation(self, ba_index, obs_n, obstacles):
+    def rule_summation(self, archetype, obs_n):
 
-        W = BA.BA[ba_index][2:]
+        W = archetype[2:]
         W.append(2)
         W.append(2)
 
@@ -102,7 +102,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
                 for k, ba_k in enumerate(BA.BA):
                     BA_k = pheromonal * ba_k[0] + density * ba_k[1]
                     BEHAVIOR = [BA_k, k] if BEHAVIOR[0] < BA_k else BEHAVIOR
-                self.rule_summation(BEHAVIOR[1], obs_n, obstacles)
+                self.rule_summation(BA.BA[BEHAVIOR[1]], obs_n)
                 _opt_index = 1
             else:
                 pass
