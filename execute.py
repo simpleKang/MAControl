@@ -59,7 +59,8 @@ def get_controller(env, world, arglist):
         control.append(PP_G.PathPlanner_EdgeWaypoint("uav_%d" % i, env, world, i, arglist))
         control.append(MC_L.MotionController_L1_TECS("uav_%d" % i, env, world, i, arglist))
         control.append(IC_P.InnerController_PID("uav_%d" % i, env, world, i, arglist))
-        control.append(False)  # Arriveflag
+        control.append(False)  # Arrive-Flag
+        control.append([0, 0])  # Rule-Flag
 
         uavController.append(control)
 
@@ -72,7 +73,8 @@ def get_controller(env, world, arglist):
         control.append(PP_G.PathPlanner_EdgeWaypoint("target_%d" % i, env, world, i+arglist.uav_num, arglist))
         control.append(MC_L.MotionController_L1_TECS("target_%d" % i, env, world, i+arglist.uav_num, arglist))
         control.append(IC_P.InnerController_PID("target_%d" % i, env, world, i+arglist.uav_num, arglist))
-        control.append(False)  # Arriveflag
+        control.append(False)  # Arrive-Flag
+        control.append([0, 0])  # Rule-Flag
 
         targetController.append(control)
 
@@ -89,6 +91,8 @@ def action(obs_n, step, ControllerSet, obstacles):
 
         list_i = ControllerSet[i][0].\
             make_policy(obstacles, obs_n, step)
+
+        ControllerSet[i][5] = list_i[2]
 
         pointAi, pointBi, finishedi = ControllerSet[i][1].\
             planpath(list_i, obs_n[i], ControllerSet[i][4], step, obstacles)
