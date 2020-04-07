@@ -264,6 +264,15 @@ class MultiAgentEnv(gym.Env):
                     vy = entity.state.p_vel[1]
                     rot = math.atan2(vy, vx) - math.pi/2
                     self.render_geoms_xform[e].set_rotation(rot)
+                if 'uav' in entity.name:
+                    if entity.rule == 'draw':
+                        self.render_geoms[e].set_color(1, 0, 0, 0.8)
+                    elif entity.rule == 'repel':
+                        self.render_geoms[e].set_color(0, 1, 0, 0.8)
+                    elif entity.rule == 'both':
+                        self.render_geoms[e].set_color(1, 1, 0, 0.8)
+                    else:
+                        pass
             # render to display or array
             results.append(self.viewers[i].render(return_rgb_array=mode == 'rgb_array'))
 
