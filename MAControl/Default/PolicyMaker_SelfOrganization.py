@@ -14,6 +14,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self.pheromone = -1                   # uav 会将它更新为非负数. # 一直是 -1 表示自己是个target.
         self.uav_num = arglist.uav_num        # 小瓜子数量
         self.decision_frequency = 50
+        self.rule_act = [0, 0]                # 记录目标相关规则的触发与否，1-触发，0-未触发，[吸引,排斥]
 
     def get_objects_in_sight(self, obs):
 
@@ -118,7 +119,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         else:  # target policy
             pass
 
-        opt = [_opt_index, self.UD]
+        opt = [_opt_index, self.UD, self.rule_act]
         return opt
 
     # 每个 rule 是一个单独的函数 利于融合代码
@@ -192,8 +193,10 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         if R6_list:
             R6_ = sum(np.array(R6_list)) / len(R6_list)
             R6 = [-1*math.cos(R6_), -1*math.sin(R6_)]
+            self.rule_act[1] = 1
         else:
             R6 = [0, 0]
+            self.rule_act[1] = 0
         return R6
 
     # >>>> Flat Attraction
@@ -206,8 +209,10 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         if R8_list:
             R8_ = sum(np.array(R8_list)) / len(R8_list)
             R8 = [math.cos(R8_), math.sin(R8_)]
+            self.rule_act[0] = 1
         else:
             R8 = [0, 0]
+            self.rule_act[0] = 0
         return R8
 
     # >>>> Evasion
