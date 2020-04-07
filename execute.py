@@ -108,6 +108,18 @@ def action(obs_n, step, ControllerSet, obstacles):
     return action_n
 
 
+def augment_view(world, uavController):
+    for i in range(uavController.__len__()):
+        if uavController[i][5] == [1, 0]:
+            world.agents[i].rule = 'draw'
+        elif uavController[i][5] == [0, 1]:
+            world.agents[i].rule = 'repel'
+        elif uavController[i][5] == [1, 1]:
+            world.agents[i].rule = 'both'
+        else:
+            pass
+
+
 if __name__ == '__main__':
 
     arglist = parse_args()
@@ -148,6 +160,7 @@ if __name__ == '__main__':
                         obs_n[k][3]) + '\n')
 
             # 画图展示
+            augment_view(world, Controllers[0])
             env.render()
             print('>>> Num', num, '>>>> step', step)
             time.sleep(0.001)

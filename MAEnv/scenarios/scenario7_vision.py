@@ -33,6 +33,7 @@ class Scenario(BaseScenario):
             uav.H = T.UAV_H
             uav.Dam = T.UAV_Dam
             uav.w = T.UAV_w
+            uav.rule = 'default'
 
         # add agents (targets)
         world.T_agents = [Agent() for i in range(num_targets)]
