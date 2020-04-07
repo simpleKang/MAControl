@@ -11,7 +11,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self.UD = [0, 0]                      # 存储决策(rule->BA)得出的速度期望
         self.seen_uavs = list()               # 个体视野中uav
         self.seen_targets = list()            # 个体视野中target
-        self.pheromone = -1                  # uav 会将它更新为非负数. # 一直是 -1 表示自己是个target.
+        self.pheromone = -1                   # uav 会将它更新为非负数. # 一直是 -1 表示自己是个target.
         self.uav_num = arglist.uav_num        # 小瓜子数量
         self.decision_frequency = 50
 
@@ -33,7 +33,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             if index < self.uav_num:
                 _seen_uavs.append([bearing, obs[index][0], obs[index][1]])
             else:
-                _seen_targets.append([bearing, obs[index][0], obs[index][1]])
+                _seen_targets.append([bearing, obs[index][0], obs[index][1], self.world.agents[index].H])
 
         if self.index < self.uav_num:
             if _seen_targets.__len__() != 0:
@@ -107,6 +107,8 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
 
                 # rule 1+3+4+9
                 behavior = [0.88, 0.88, 1.00, 0.00, 1.00, 0.50, 0.00, 0.00, 0.00, 0.00]
+                # rule 1+3+4+9+8
+                behavior = [0.88, 0.88, 1.00, 0.00, 1.00, 0.50, 0.00, 0.00, 0.00, 1.00]
                 self.rule_summation(behavior, obs_n)
 
                 _opt_index = 1
@@ -185,7 +187,8 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         R6_list = list()
         for tar in self.seen_targets:
             bearing = tar[0]
-            R6_list.append(bearing)
+            if tar[3] < len(self.seen_uavs):
+                R6_list.append(bearing)
         if R6_list:
             R6_ = sum(np.array(R6_list)) / len(R6_list)
             R6 = [-1*math.cos(R6_), -1*math.sin(R6_)]
@@ -198,7 +201,8 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         R8_list = list()
         for tar in self.seen_targets:
             bearing = tar[0]
-            R8_list.append(bearing)
+            if tar[3] > len(self.seen_uavs):
+                R8_list.append(bearing)
         if R8_list:
             R8_ = sum(np.array(R8_list)) / len(R8_list)
             R8 = [math.cos(R8_), math.sin(R8_)]

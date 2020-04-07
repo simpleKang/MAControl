@@ -19,7 +19,7 @@ def parse_args():
 
     # Environment
     parser.add_argument("--scenario", type=str, default="scenario7_vision", help="name of the scenario script")
-    parser.add_argument("--uav-num", type=int, default=21, help="number of uav")
+    parser.add_argument("--uav-num", type=int, default=40, help="number of uav")
     parser.add_argument("--step-max", type=int, default=8000, help="number of maximum steps")
     parser.add_argument("--repeat-num", type=int, default=1, help="number of repeat runs")
 

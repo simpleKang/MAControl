@@ -7,13 +7,13 @@ UAV_Dam = 10
 UAV_w = 1000
 
 # target parameters
-num_targets = 3
+num_targets = 5
 target_size = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
 target_pos = [[-0.2,   0],
-              [-0.5,  1.5],
+              [-0.8,  1.5],
               [1,  -1.5],
-              [-1,    0.4],
-              [-1.4,  1.6],
+              [1,    0.4],
+              [-1.4,  -0.8],
               [-0.4,    1],
               [-0.6, -0.2],
               [-1.2, -0.8],
@@ -22,7 +22,7 @@ target_pos = [[-0.2,   0],
 target_movable = [False, False, False, False, False, False, False, False, False, False]
 movable_target_color = np.array([0, 0.8, 0])
 fixed_target_color = np.array([0.3, 0.2, 0])
-target_H = [10, 10, 10, 10, 10, 8, 8, 8, 8, 8]
+target_H = [5, 4, 2, 2, 5, 8, 8, 8, 8, 8]
 target_Dam = [1, 2, 1, 5, 0, 1, 2, 1, 0, 1]
 target_w = [2, 2, 5, 2, 3, 2, 2, 5, 2, 3]
 
