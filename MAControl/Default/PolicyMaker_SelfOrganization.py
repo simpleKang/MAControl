@@ -11,7 +11,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self.UD = [0, 0]                      # 存储决策(rule->BA)得出的速度期望
         self.seen_uavs = list()               # 个体视野中uav
         self.seen_targets = list()            # 个体视野中target
-        self.pheromonal = -1                  # uav 会将它更新为非负数. # 一直是 -1 表示自己是个target.
+        self.pheromone = -1                  # uav 会将它更新为非负数. # 一直是 -1 表示自己是个target.
         self.uav_num = arglist.uav_num        # 小瓜子数量
         self.decision_frequency = 50
 
@@ -37,9 +37,9 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
 
         if self.index < self.uav_num:
             if _seen_targets.__len__() != 0:
-                self.pheromonal = 1
+                self.pheromone = 1
             else:
-                self.pheromonal = 0
+                self.pheromone = 0
         else:
             pass
 
@@ -96,13 +96,19 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             if step % self.decision_frequency == self.decision_frequency-1:
                 self.get_objects_in_sight(obs_n)
             elif (step % self.decision_frequency == 1) and (step > self.decision_frequency):
-                pheromonal = self.pheromonal
+                pheromone = self.pheromone
                 density = self.get_UAV_density(obs_n)
-                BEHAVIOR = [-10, -10]
-                for k, ba_k in enumerate(BA.BA):
-                    BA_k = pheromonal * ba_k[0] + density * ba_k[1]
-                    BEHAVIOR = [BA_k, k] if BEHAVIOR[0] < BA_k else BEHAVIOR
-                self.rule_summation(BA.BA[BEHAVIOR[1]], obs_n)
+
+                # BEHAVIOR = [-10, -10]
+                # for k, ba_k in enumerate(BA.BA):
+                #     BA_k = pheromone * ba_k[0] + density * ba_k[1]
+                #     BEHAVIOR = [BA_k, k] if BEHAVIOR[0] < BA_k else BEHAVIOR
+                # self.rule_summation(BA.BA[BEHAVIOR[1]], obs_n)
+
+                # rule 1+3+4+9
+                behavior = [0.88, 0.88, 1.00, 0.00, 1.00, 0.50, 0.00, 0.00, 0.00, 0.00]
+                self.rule_summation(behavior, obs_n)
+
                 _opt_index = 1
             else:
                 pass
