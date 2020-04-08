@@ -108,8 +108,8 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
 
                 # rule 1+3+4+9
                 behavior = [0.88, 0.88, 1.00, 0.00, 1.00, 0.50, 0.00, 0.00, 0.00, 0.00]
-                # rule 1+3+4+9+8
-                behavior = [0.88, 0.88, 1.00, 0.00, 1.00, 0.50, 0.00, 0.00, 0.00, 1.00]
+                # rule 1+3+4+9 8+6+2
+                behavior = [0.88, 0.88, 1.00, 0.95, 1.00, 0.50, 0.00, 0.55, 0.00, 0.95]
                 self.rule_summation(behavior, obs_n)
 
                 _opt_index = 1
