@@ -69,7 +69,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         UR.append(np.array(self.rule2(obs_n)))
         UR.append(np.array(self.rule3(obs_n)))
         UR.append(np.array(self.rule4(obs_n)))
-        UR.append(np.array([0, 0]))
+        UR.append(np.array(self.rule5(obs_n)))
         UR.append(np.array(self.rule6(obs_n)))
         UR.append(np.array([0, 0]))
         UR.append(np.array(self.rule8(obs_n)))
@@ -110,6 +110,8 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
                 behavior = [0.88, 0.88, 1.00, 0.00, 1.00, 0.50, 0.00, 0.00, 0.00, 0.00]
                 # rule 1+3+4+9 8+6+2
                 behavior = [0.88, 0.88, 1.00, 0.95, 1.00, 0.50, 0.00, 0.55, 0.00, 0.95]
+                # rule 5+8
+                behavior = [0.88, 0.88, 0.00, 0.00, 0.00, 0.00, 1.00, 0.00, 0.00, 1.00]
                 self.rule_summation(behavior, obs_n)
 
                 _opt_index = 1
@@ -182,6 +184,15 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         else:
             R4 = [0, 0]
         return R4
+
+    # >>>> Take turns when seeing nothing
+    def rule5(self, obs):
+        if (not self.seen_targets) and (not self.seen_uavs):
+            self_vel = obs[self.index][0:2]
+            R5 = [self_vel[1], -1*self_vel[0]]
+        else:
+            R5 = [0, 0]
+        return R5
 
     # >>>> Flat Target Repulsion
     def rule6(self, obs):
