@@ -269,8 +269,8 @@ class MultiAgentEnv(gym.Env):
                         self.render_geoms[e].set_color(1, 0, 0, 0.8)
                     elif entity.rule == 'repel':
                         self.render_geoms[e].set_color(0, 1, 0, 0.8)
-                    elif entity.rule == 'both':
-                        self.render_geoms[e].set_color(1, 1, 0, 0.8)
+                    elif entity.rule == 'turn':
+                        self.render_geoms[e].set_color(1, 0.9, 0, 1.0)
                     else:
                         self.render_geoms[e].set_color(0, 1, 1, 0.8)
             # render to display or array

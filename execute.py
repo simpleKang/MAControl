@@ -110,14 +110,15 @@ def action(obs_n, step, ControllerSet, obstacles):
 
 def augment_view(world, uavController):
     for i in range(uavController.__len__()):
-        if uavController[i][5] == [1, 0]:
+        if uavController[i][5][0:2] == [1, 0]:
             world.agents[i].rule = 'draw'
-        elif uavController[i][5] == [0, 1]:
+        elif uavController[i][5][0:2] == [0, 1]:
             world.agents[i].rule = 'repel'
-        elif uavController[i][5] == [1, 1]:
-            world.agents[i].rule = 'both'
         else:
-            world.agents[i].rule = 'default'
+            if uavController[i][5][2] == 1:
+                world.agents[i].rule = 'turn'
+            else:
+                world.agents[i].rule = 'default'
 
 
 if __name__ == '__main__':
