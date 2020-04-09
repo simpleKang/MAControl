@@ -117,7 +117,7 @@ def augment_view(world, uavController):
         elif uavController[i][5] == [1, 1]:
             world.agents[i].rule = 'both'
         else:
-            pass
+            world.agents[i].rule = 'default'
 
 
 if __name__ == '__main__':

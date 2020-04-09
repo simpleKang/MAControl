@@ -272,7 +272,7 @@ class MultiAgentEnv(gym.Env):
                     elif entity.rule == 'both':
                         self.render_geoms[e].set_color(1, 1, 0, 0.8)
                     else:
-                        pass
+                        self.render_geoms[e].set_color(0.47, 0.79, 0.79, 0.5)
             # render to display or array
             results.append(self.viewers[i].render(return_rgb_array=mode == 'rgb_array'))
 
