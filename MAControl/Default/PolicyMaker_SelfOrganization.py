@@ -110,8 +110,8 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
                 behavior = [0.88, 0.88, 1.00, 0.00, 1.00, 0.50, 0.00, 0.00, 0.00, 0.00]
                 # rule 1+3+4+9 8+6+2
                 behavior = [0.88, 0.88, 1.00, 0.95, 1.00, 0.50, 0.00, 0.55, 0.00, 0.95]
-                # rule 5+8
-                behavior = [0.88, 0.88, 0.00, 0.00, 0.00, 0.00, 1.00, 0.00, 0.00, 1.00]
+                # rule 1+3+4+9 8+6+5
+                behavior = [0.88, 0.88, 1.00, 0.00, 1.00, 0.20, 0.95, 0.15, 0.00, 0.95]
                 self.rule_summation(behavior, obs_n)
 
                 _opt_index = 1
@@ -185,11 +185,13 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             R4 = [0, 0]
         return R4
 
-    # >>>> Take turns when seeing nothing
+    # >>>> Take turns with no targets in sight
     def rule5(self, obs):
-        if (not self.seen_targets) and (not self.seen_uavs):
+        if not self.seen_targets:
             self_vel = obs[self.index][0:2]
-            R5 = [self_vel[1], -1*self_vel[0]]
+            vel_bearing = math.atan2(self_vel[1], self_vel[0])
+            new_dir = vel_bearing - math.pi/3
+            R5 = [np.linalg.norm(self_vel)*math.cos(new_dir), np.linalg.norm(self_vel)*math.sin(new_dir)]
         else:
             R5 = [0, 0]
         return R5

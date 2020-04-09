@@ -22,7 +22,7 @@ target_pos = [[-0.2,   0],
 target_movable = [False, False, False, False, False, False, False, False, False, False]
 movable_target_color = np.array([0, 0.8, 0])
 fixed_target_color = np.array([0.3, 0.2, 0])
-target_H = [5, 4, 2, 2, 5, 8, 8, 8, 8, 8]
+target_H = [3, 3, 3, 3, 3, 8, 8, 8, 8, 8]
 target_Dam = [1, 2, 1, 5, 0, 1, 2, 1, 0, 1]
 target_w = [2, 2, 5, 2, 3, 2, 2, 5, 2, 3]
 
