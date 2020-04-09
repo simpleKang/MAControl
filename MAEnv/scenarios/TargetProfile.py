@@ -1,7 +1,7 @@
 import numpy as np
 
 # UAV
-UAV_color = np.array([0.47, 0.79, 0.79])
+UAV_color = np.array([0, 1, 1])
 UAV_H = 100
 UAV_Dam = 10
 UAV_w = 1000

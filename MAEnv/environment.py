@@ -231,7 +231,7 @@ class MultiAgentEnv(gym.Env):
                     geom = rendering.make_house(entity.size)
                 xform = rendering.Transform()
                 if 'uav' in entity.name:
-                    geom.set_color(*entity.color, alpha=0.5)
+                    geom.set_color(*entity.color, alpha=0.8)
                 elif 'square' in entity.name:
                     geom.set_color(*entity.color, alpha=0.3)
                 else:
@@ -272,7 +272,7 @@ class MultiAgentEnv(gym.Env):
                     elif entity.rule == 'both':
                         self.render_geoms[e].set_color(1, 1, 0, 0.8)
                     else:
-                        self.render_geoms[e].set_color(0.47, 0.79, 0.79, 0.5)
+                        self.render_geoms[e].set_color(0, 1, 1, 0.8)
             # render to display or array
             results.append(self.viewers[i].render(return_rgb_array=mode == 'rgb_array'))
 
