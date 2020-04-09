@@ -15,6 +15,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self.uav_num = arglist.uav_num        # 小瓜子数量
         self.decision_frequency = 50
         self.rule_act = [0, 0]                # 记录目标相关规则的触发与否，1-触发，0-未触发，[吸引,排斥]
+        self.target_sense = 0                 # 0 是默认状况 # 被吸引过就会变成1 # 被排斥过就会变回0 # 其它时候保持记忆
 
     def get_objects_in_sight(self, obs):
 
@@ -185,9 +186,9 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             R4 = [0, 0]
         return R4
 
-    # >>>> Take turns with no targets in sight
+    # >>>> Take turns when losing sight of target
     def rule5(self, obs):
-        if not self.seen_targets:
+        if (not self.seen_targets) and self.target_sense:
             self_vel = obs[self.index][0:2]
             vel_bearing = math.atan2(self_vel[1], self_vel[0])
             new_dir = vel_bearing - math.pi/3
@@ -207,6 +208,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             R6_ = sum(np.array(R6_list)) / len(R6_list)
             R6 = [-1*math.cos(R6_), -1*math.sin(R6_)]
             self.rule_act[1] = 1
+            self.target_sense = 0
         else:
             R6 = [0, 0]
             self.rule_act[1] = 0
@@ -223,6 +225,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             R8_ = sum(np.array(R8_list)) / len(R8_list)
             R8 = [math.cos(R8_), math.sin(R8_)]
             self.rule_act[0] = 1
+            self.target_sense = 1
         else:
             R8 = [0, 0]
             self.rule_act[0] = 0
