@@ -14,7 +14,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self.pheromone = -1                   # uav 会将它更新为非负数. # 一直是 -1 表示自己是个target.
         self.uav_num = arglist.uav_num        # 小瓜子数量
         self.decision_frequency = 50
-        self.rule_act = [0, 0]                # 记录目标相关规则的触发与否，1-触发，0-未触发，[吸引,排斥]
+        self.rule_act = [0, 0, 0]             # 记录目标相关规则的触发与否，1-触发，0-未触发，[吸引,排斥,回转]
         self.target_sense = 0                 # 0 是默认状况 # 被吸引过就会变成1 # 被排斥过就会变回0 # 其它时候保持记忆
 
     def get_objects_in_sight(self, obs):
@@ -193,8 +193,10 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             vel_bearing = math.atan2(self_vel[1], self_vel[0])
             new_dir = vel_bearing - math.pi/3
             R5 = [np.linalg.norm(self_vel)*math.cos(new_dir), np.linalg.norm(self_vel)*math.sin(new_dir)]
+            self.rule_act[2] = 1
         else:
             R5 = [0, 0]
+            self.rule_act[2] = 0
         return R5
 
     # >>>> Flat Target Repulsion
@@ -202,7 +204,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         R6_list = list()
         for tar in self.seen_targets:
             bearing = tar[0]
-            if tar[3] < len(self.seen_uavs):
+            if tar[3] <= len(self.seen_uavs):
                 R6_list.append(bearing)
         if R6_list:
             R6_ = sum(np.array(R6_list)) / len(R6_list)
