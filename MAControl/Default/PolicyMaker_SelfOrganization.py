@@ -100,12 +100,13 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             elif (step % self.decision_frequency == 1) and (step > self.decision_frequency):
                 pheromone = self.pheromone
                 density = self.get_UAV_density(obs_n)
+                neednum = sum([self.seen_targets[i][3] for i in range(len(self.seen_targets))])
 
-                # BEHAVIOR = [-10, -10]
-                # for k, ba_k in enumerate(BA.BA):
-                #     BA_k = pheromone * ba_k[0] + density * ba_k[1]
-                #     BEHAVIOR = [BA_k, k] if BEHAVIOR[0] < BA_k else BEHAVIOR
-                # self.rule_summation(BA.BA[BEHAVIOR[1]], obs_n)
+                BEHAVIOR = [0, 0]
+                for k, ba_k in enumerate(BA.SYS):
+                    BA_k = pheromone * ba_k[0] + density * ba_k[1] + neednum * ba_k[2]
+                    BEHAVIOR = [BA_k, k] if BEHAVIOR[0] < BA_k else BEHAVIOR
+                self.rule_summation(BA.SYS[BEHAVIOR[1]], obs_n)
 
                 # self.rule_summation(behavior, obs_n)
 
