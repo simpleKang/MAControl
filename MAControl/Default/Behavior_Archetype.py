@@ -1,9 +1,15 @@
-# BA_b = [b.C1  b.C2  b.W1  b.W2  b.W3  b.W4  b.W5  b.W6  b.W7  b.W8]
-# seen_uav # rule1 rule3 rule4 rule9 # 列队 靠近 远离 预判远离
-# seen_target # rule2 rule6 rule8 # 切向 排斥 吸引
+# BA_b = [b.C1  b.C2  b.C3 b.W1  b.W2  b.W3  b.W4  b.W5  b.W6  b.W7  b.W8]
+# seen_uav     # rule1 rule3 rule4 rule9  # 列队 靠近 远离 预判远离
+# seen_target  # rule2 rule6 rule8        # 切向 排斥 吸引
+# self         # rule5                    # 改变方向
+
+SYS = list()
+#                              w1    w2    w3    w4    w5    w6    w7    w8
+SYS.append([0.99, 0.99, 0.99, 1.00, 0.00, 1.00, 0.50, 1.00, 0.00, 0.00, 0.00])  # rule5^^
+SYS.append([0.88, 0.88, 0.88, 1.00, 0.00, 1.00, 0.50, 0.00, 1.00, 0.00, 0.00])  # rule6^^
+SYS.append([0.77, 0.77, 0.77, 1.00, 0.00, 1.00, 0.50, 0.00, 0.00, 0.00, 1.00])  # rule8^^
 
 BA = list()
-
 #                       w1    w2    w3    w4    w5    w6    w7    w8
 BA.append([0.08, 0.08, 1.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00])  # rule1
 BA.append([0.07, 0.07, 0.00, 0.00, 1.00, 0.00, 0.00, 0.00, 0.00, 0.00])  # rule3
