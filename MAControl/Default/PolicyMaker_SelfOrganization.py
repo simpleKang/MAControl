@@ -188,15 +188,12 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
 
     # >>>> Take turns when losing sight of target
     def rule5(self, obs):
-        if (not self.seen_targets) and self.target_sense:
-            self_vel = obs[self.index][0:2]
-            vel_bearing = math.atan2(self_vel[1], self_vel[0])
-            new_dir = vel_bearing - math.pi/3
-            R5 = [np.linalg.norm(self_vel)*math.cos(new_dir), np.linalg.norm(self_vel)*math.sin(new_dir)]
-            self.rule_act[2] = 1
-        else:
-            R5 = [0, 0]
-            self.rule_act[2] = 0
+        # if (not self.seen_targets) and self.target_sense:
+        self_vel = obs[self.index][0:2]
+        vel_bearing = math.atan2(self_vel[1], self_vel[0])
+        new_dir = vel_bearing - math.pi/3
+        R5 = [np.linalg.norm(self_vel)*math.cos(new_dir), np.linalg.norm(self_vel)*math.sin(new_dir)]
+        # else:
         return R5
 
     # >>>> Flat Target Repulsion
@@ -204,16 +201,13 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         R6_list = list()
         for tar in self.seen_targets:
             bearing = tar[0]
-            if tar[3] <= len(self.seen_uavs):
-                R6_list.append(bearing)
+            # if tar[3] <= len(self.seen_uavs):
+            R6_list.append(bearing)
         if R6_list:
             R6_ = sum(np.array(R6_list)) / len(R6_list)
             R6 = [-1*math.cos(R6_), -1*math.sin(R6_)]
-            self.rule_act[1] = 1
-            self.target_sense = 0
         else:
             R6 = [0, 0]
-            self.rule_act[1] = 0
         return R6
 
     # >>>> Flat Attraction
@@ -221,16 +215,13 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         R8_list = list()
         for tar in self.seen_targets:
             bearing = tar[0]
-            if tar[3] > len(self.seen_uavs):
-                R8_list.append(bearing)
+            # if tar[3] > len(self.seen_uavs):
+            R8_list.append(bearing)
         if R8_list:
             R8_ = sum(np.array(R8_list)) / len(R8_list)
             R8 = [math.cos(R8_), math.sin(R8_)]
-            self.rule_act[0] = 1
-            self.target_sense = 1
         else:
             R8 = [0, 0]
-            self.rule_act[0] = 0
         return R8
 
     # >>>> Evasion
