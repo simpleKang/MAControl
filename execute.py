@@ -29,17 +29,21 @@ import argparse
 import time
 import os
 import numpy as np
+import GeneticAlgorithm.genetic_algorithm as ga
 from GeneticAlgorithm.BehaviorArchetypes import behavior
+from GeneticAlgorithm.BehaviorArchetypes_vision import behavior_v
+
 import MAEnv.scenarios.TargetProfile as T
 import MAControl.Util.OfflineCoverRate as OCR
 import MAControl.Util.CalCoverage as cc
 import MAControl.Util.coverrate_by_image as calculate
-import GeneticAlgorithm.genetic_algorithm as ga
 
 import MAControl.Default.InnerController_PID as IC_P
 import MAControl.Default.MotionController_L1_TECS as MC_L
 import MAControl.Default.PathPlanner_EdgeWaypoint as PP_G
-import MAControl.Default.PolicyMaker_SelfOrganization as PM_S
+import MAControl.Default.PolicyMaker_SelfOrganization_comm as PM_C
+import MAControl.Default.PolicyMaker_SelfOrganization_vision as PM_V
+
 _path = '/track/' if os.name == 'posix' else 'E:\\S-Projects\\Git-r\\MAControl\\track\\'
 
 
@@ -48,15 +52,15 @@ def parse_args():
     parser = argparse.ArgumentParser("Control Experiments for Multi-Agent Environments")
 
     # Environment
-    parser.add_argument("--scenario", type=str, default="scenario6_AFIT", help="name of the scenario script")
-    parser.add_argument("--uav-num", type=int, default=5, help="number of uav")
-    parser.add_argument("--step-max", type=int, default=3000, help="number of maximum steps")
+    parser.add_argument("--scenario", type=str, default="scenario7_vision", help="name of the scenario script")
+    parser.add_argument("--uav-num", type=int, default=10, help="number of uav")
+    parser.add_argument("--step-max", type=int, default=4000, help="number of maximum steps")
 
     # GA
     parser.add_argument("--pop-size", type=int, default=20, help="size of population")
     parser.add_argument("--preserved-population", type=float, default=0.5, help="percentage of population selected")
     parser.add_argument("--generation-num", type=int, default=30, help="number of generation")
-    parser.add_argument("--max-behavior-archetypes", type=int, default=2, help="number of behavior archetypes")
+    parser.add_argument("--max-behavior-archetypes", type=int, default=3, help="number of behavior archetypes")
     parser.add_argument("--collect-num", type=int, default=5, help="number of fitness score collection")
 
     # Core parameters
@@ -105,7 +109,7 @@ def get_controller(env, world, arglist):
     for i in range(arglist.uav_num):
         control = list()
 
-        control.append(PM_S.PolicyMaker_SelfOrganization("uav_%d" % i, env, world, i, arglist))
+        control.append(PM_V.PolicyMaker_SelfOrganization("uav_%d" % i, env, world, i, arglist))
         control.append(PP_G.PathPlanner_EdgeWaypoint("uav_%d" % i, env, world, i, arglist))
         control.append(MC_L.MotionController_L1_TECS("uav_%d" % i, env, world, i, arglist))
         control.append(IC_P.InnerController_PID("uav_%d" % i, env, world, i, arglist))
@@ -121,7 +125,7 @@ def get_controller(env, world, arglist):
         control = list()
 
         # i 是作为target的编号 # i+arglist.uav_num 是作为agent的编号
-        control.append(PM_S.PolicyMaker_SelfOrganization("target_%d" % i, env, world, i+arglist.uav_num, arglist))
+        control.append(PM_V.PolicyMaker_SelfOrganization("target_%d" % i, env, world, i+arglist.uav_num, arglist))
         control.append(PP_G.PathPlanner_EdgeWaypoint("target_%d" % i, env, world, i+arglist.uav_num, arglist))
         control.append(MC_L.MotionController_L1_TECS("target_%d" % i, env, world, i+arglist.uav_num, arglist))
         control.append(IC_P.InnerController_PID("target_%d" % i, env, world, i+arglist.uav_num, arglist))
@@ -226,17 +230,28 @@ def get_score(arglist, gen, ind, num):
     # PM_S.PolicyMaker_SelfOrganization.target_in_sight.clear()
 
     # WZQ 有限数量目标吸引，多于排斥
-    target_seen_step = np.array(PM_S.PolicyMaker_SelfOrganization.target_in_sight[:arglist.uav_num])
+    # target_seen_step = np.array(PM_S.PolicyMaker_SelfOrganization.target_in_sight[:arglist.uav_num])
+    # step_sum = np.sum(target_seen_step, axis=0)
+    # reward = 0
+    # punish = 0
+    # for i in range(step_sum.size):
+    #     if step_sum[i] > 0:
+    #         reward += 1
+    #         if step_sum[i] > T.target_H[0]:
+    #             punish += 1
+    # _score = reward - punish
+    # PM_S.PolicyMaker_SelfOrganization.target_in_sight.clear()
+
+    # WZQ 目标吸引加权得分，排斥扣分
+    target_seen_step = np.array(PM_C.PolicyMaker_SelfOrganization.target_in_sight[:arglist.uav_num])
     step_sum = np.sum(target_seen_step, axis=0)
-    reward = 0
-    punish = 0
+    _score = 0
     for i in range(step_sum.size):
-        if step_sum[i] > 0:
-            reward += 1
-            if step_sum[i] > T.target_H[0]:
-                punish += 1
-    _score = reward - punish
-    PM_S.PolicyMaker_SelfOrganization.target_in_sight.clear()
+        if 0 < step_sum[i] <= T.target_H[0]:
+            _score += 1 - 0.3*(T.target_H[0] - step_sum[i])
+        elif step_sum[i] > T.target_H[0]:
+            _score -= 1
+    PM_C.PolicyMaker_SelfOrganization.target_in_sight.clear()
 
     return _score
 
@@ -249,13 +264,13 @@ def run_simulation(arglist, behavior_archetypes, gen, ind, num):
     # Create Controller
     Controllers = get_controller(env, world, arglist)
 
-    open(os.path.dirname(__file__) + _path + 'target_attacking.txt', 'w')
-    with open(os.path.dirname(__file__) + _path + 'para.txt', 'w') as f:
-        f.write(str(arglist.uav_num) + ' ' + str(arglist.step_max))
+    # open(os.path.dirname(__file__) + _path + 'target_attacking.txt', 'w')
+    # with open(os.path.dirname(__file__) + _path + 'para.txt', 'w') as f:
+    #     f.write(str(arglist.uav_num) + ' ' + str(arglist.step_max))
 
-    # 为每个小瓜子创建状态文件
-    for k in range(arglist.uav_num):
-        open(os.path.dirname(__file__) + _path + 'uav_%d_track.txt' % k, 'w')
+    # # 为每个小瓜子创建状态文件
+    # for k in range(arglist.uav_num):
+    #     open(os.path.dirname(__file__) + _path + 'uav_%d_track.txt' % k, 'w')
 
     obs_n = env.reset()
 
@@ -263,24 +278,24 @@ def run_simulation(arglist, behavior_archetypes, gen, ind, num):
 
         # 选择动作
         action_Un = action(world, obs_n, step, Controllers[0], obstacle_info, behavior_archetypes)
-        action_Tn = action(world, obs_n[arglist.uav_num:], step, Controllers[1], obstacle_info, behavior_archetypes)
+        action_Tn = action(world, obs_n, step, Controllers[1], obstacle_info, behavior_archetypes)
         action_n = action_Un + action_Tn
 
         new_obs_n, rew_n, done_n, info_n = env.step(action_n)
 
         obs_n = new_obs_n
 
-        # 保存每个小瓜子每个step的状态信息
-        for k in range(arglist.uav_num):
-            with open(os.path.dirname(__file__) + _path + 'uav_%d_track.txt' % k, 'a') as f:
-                f.write(str(obs_n[k][0]) + ' ' + str(obs_n[k][1]) + ' ' +
-                        str(obs_n[k][2]) + ' ' + str(obs_n[k][3]) + '\n')
+        # # 保存每个小瓜子每个step的状态信息
+        # for k in range(arglist.uav_num):
+        #     with open(os.path.dirname(__file__) + _path + 'uav_%d_track.txt' % k, 'a') as f:
+        #         f.write(str(obs_n[k][0]) + ' ' + str(obs_n[k][1]) + ' ' +
+        #                 str(obs_n[k][2]) + ' ' + str(obs_n[k][3]) + '\n')
 
-        # print('>>> Step ', step, PM_S.PolicyMaker_SelfOrganization.target_in_sight)
+        # print('>>> Step ', step)
 
         # 画图展示
         augment_view(arglist, world, Controllers[0], obs_n, step)
-        # env.render()
+        env.render()
         time.sleep(0.001)
 
     time.sleep(0.1)
@@ -318,6 +333,6 @@ if __name__ == '__main__':
 
         print('Test with specific behavior archetypes.')
         for repeat in range(arglist.repeat_num):
-            score = run_simulation(arglist, behavior, 0, 0, repeat)
+            score = run_simulation(arglist, behavior_v, 0, 0, repeat)
             print('score ', score)
 

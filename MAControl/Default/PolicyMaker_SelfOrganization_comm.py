@@ -20,8 +20,8 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         PolicyMaker_SelfOrganization.target_in_sight.append([])
         self.known_uavs = list()              # 视野+通信到的uav
         self.known_targets = list()           # 视野+通信到的target
-        self.communication_range = 0.4
-        self.uav_sensor_range = 0.4
+        self.communication_range = 0.6
+        self.uav_sensor_range = 0.6
         self.uav_engagement_range = 0.4
         self.target_sensor_range = 0.2
         self.target_engagement_range = 0.2
