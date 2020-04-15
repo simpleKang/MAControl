@@ -14,7 +14,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self.pheromone = -1                   # uav 会将它更新为非负数. # 一直是 -1 表示自己是个target.
         self.uav_num = arglist.uav_num        # 小瓜子数量
         self.decision_frequency = 50
-        self.rule_act = [0, 0, 0]             # 记录目标相关规则的触发与否，1-触发，0-未触发，[吸引,排斥,回转]
+        self.rule_act = 0                     # 记录选中的行为原型序号 0-默认 1-主回转 2-主排斥 3-主吸引
         self.target_sense = 0                 # 0 是默认状况 # 被吸引过就会变成1 # 被排斥过就会变回0 # 其它时候保持记忆
 
     def get_objects_in_sight(self, obs):
@@ -90,6 +90,14 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
 
         self.UD = UD
 
+    def update_sense(self):
+        if self.rule_act == 3:
+            self.target_sense = 1
+        elif self.rule_act == 2:
+            self.target_sense = 0
+        else:
+            pass
+
     def make_policy(self, obstacles, obs_n, step):
 
         _opt_index = 0
@@ -108,6 +116,8 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
                     BA_k = pheromone * ba_k[0] + density * ba_k[1] + neednum * ba_k[2] + sense * ba_k[3]
                     BEHAVIOR = [BA_k, k] if BEHAVIOR[0] < BA_k else BEHAVIOR
                 self.rule_summation(BA.SYS[BEHAVIOR[1]], obs_n)
+                self.rule_act = BEHAVIOR[1]
+                self.update_sense()
 
                 # self.rule_summation(behavior, obs_n)
 
