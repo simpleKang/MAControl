@@ -61,7 +61,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
 
     def rule_summation(self, archetype, obs_n):
 
-        W = archetype[2:]
+        W = archetype[4:]
         W.append(2)
         W.append(2)
 
