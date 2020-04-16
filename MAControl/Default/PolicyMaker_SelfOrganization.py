@@ -197,7 +197,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         # if (not self.seen_targets) and self.target_sense:
         self_vel = obs[self.index][0:2]
         vel_bearing = math.atan2(self_vel[1], self_vel[0])
-        new_dir = vel_bearing - math.pi/3
+        new_dir = vel_bearing - math.pi/2
         R5 = [np.linalg.norm(self_vel)*math.cos(new_dir), np.linalg.norm(self_vel)*math.sin(new_dir)]
         # else:
         return R5
