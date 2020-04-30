@@ -1,4 +1,5 @@
 import numpy as np
+import MAControl.Util.get_random_state as rs
 
 # UAV
 UAV_color = np.array([0.47, 0.79, 0.79])
@@ -9,11 +10,11 @@ UAV_w = 1000
 # target parameters
 num_targets = 1
 target_size = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
-target_pos = [[0,  0],
-              [1,  -1],
-              [1.1,  -1.5],
-              [-1,    0.4],
-              [-1.4,  1.6],
+target_pos = [[0,    0],
+              [-0.8,  1.5],
+              [1.0,  -1.2],
+              [1.0,   0.4],
+              [0.8,   1.4],
               [-0.4,    1],
               [-0.6, -0.2],
               [-1.2, -0.8],
@@ -22,12 +23,12 @@ target_pos = [[0,  0],
 target_movable = [False, False, False, False, False, False, False, False, False, False]
 movable_target_color = np.array([0, 0.8, 0])
 fixed_target_color = np.array([0.3, 0.2, 0])
-target_H = [3, 3, 3, 1, 1, 1, 1, 1, 1, 1]
+target_H = [3, 5, 5, 5, 1, 1, 1, 1, 1, 1]
 target_Dam = [1, 2, 1, 5, 0, 1, 2, 1, 0, 1]
 target_w = [2, 2, 5, 2, 3, 2, 2, 5, 2, 3]
 
 # edge of the battle field (a kind of non-obstacle)
-edge = 2
+edge = 1.5
 num_grids = 5
 grid_size = 0.005
 grid_pos = [[0, 0], [edge, edge], [-edge, edge], [-edge, -edge], [edge, -edge]]
@@ -51,5 +52,4 @@ square_pos = [[0., 0.],
 square_color = np.array([0.25, 0.49, 0.75])
 square_obstacle = True
 
-
-
+init_state = None

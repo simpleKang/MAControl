@@ -5,6 +5,9 @@ import math
 
 class PolicyMaker_SelfOrganization(PolicyMaker):
 
+    uav_in_sight = list()
+    target_in_sight = list()
+
     def __init__(self, name, env, world, agent_index, arglist):
         super(PolicyMaker_SelfOrganization, self).__init__(name, env, world, agent_index, arglist)
         self.UD = [0, 0]                      # 存储决策(rule->BA)得出的速度期望
@@ -13,9 +16,12 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self.pheromone = -1                   # uav 会将它更新为非负数. # 一直是 -1 表示自己是个target.
         self.uav_num = arglist.uav_num        # 小瓜子数量
         self.decision_frequency = 50
-        self.rule_act = [0, 0, 0]             # 记录目标相关规则的触发与否，1-触发，0-未触发，[吸引,排斥,回转]
-        self.target_sense = 0                 # 0 是默认状况 # 被吸引过就会变成1 # 被排斥过就会变回0 # 其它时候保持记忆
+        self.rule_act = 0                     # 记录选中的行为原型序号 0-默认 1-主回转 2-主排斥 3-主吸引
+        self.target_sense = 0
+        self.sense_count = -1
         self.current_behavior = None
+        PolicyMaker_SelfOrganization.uav_in_sight.append([])
+        PolicyMaker_SelfOrganization.target_in_sight.append([])
 
     def get_objects_in_sight(self, obs):
 
@@ -63,17 +69,17 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
 
         W = archetype[2:]
         W.append(2)
-        W.append(2)
+        # W.append(2)
 
         UR = list()
         UR.append(np.array(self.rule1(obs_n)))
-        # UR.append(np.array(self.rule2(obs_n)))
+        UR.append(np.array(self.rule2(obs_n)))
         UR.append(np.array(self.rule3(obs_n)))
         UR.append(np.array(self.rule4(obs_n)))
-        # UR.append(np.array(self.rule5(obs_n)))
-        # UR.append(np.array(self.rule6(obs_n)))
+        UR.append(np.array(self.rule5(obs_n)))
+        UR.append(np.array(self.rule6(obs_n)))
         # UR.append(np.array([0, 0]))
-        # UR.append(np.array(self.rule8(obs_n)))
+        UR.append(np.array(self.rule8(obs_n)))
         UR.append(np.array(self.rule9(obs_n)))
         # UR.append(np.array([0, 0]))
 
@@ -90,6 +96,17 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
 
         self.UD = UD
 
+    def update_sense(self):
+        if self.seen_targets:
+            self.target_sense = 0
+            self.sense_count = 10
+        else:
+            self.sense_count -= 1
+            self.target_sense = 0
+            pass
+        if 0 < self.sense_count < 10:
+            self.target_sense = 1
+
     def make_policy(self, world, obstacles, obs_n, behavior_archetypes, step):
 
         _opt_index = 0
@@ -98,18 +115,33 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             if step % self.decision_frequency == self.decision_frequency-1:
                 self.get_objects_in_sight(obs_n)
             elif (step % self.decision_frequency == 1) and (step > self.decision_frequency):
+
+                self.update_sense()
                 pheromone = self.pheromone
                 density = self.get_UAV_density(obs_n)
+                neednum = sum([self.seen_targets[i][3] for i in range(len(self.seen_targets))])
+                sense = self.target_sense
 
-                BEHAVIOR = [-10, -10]
+                BEHAVIOR = [-10, 0, 0]
                 for k, ba_k in enumerate(behavior_archetypes):
-                    BA_k = pheromone * ba_k[0] + density * ba_k[1]
+                    BA_k = pheromone * ba_k[0] + density * ba_k[1] + neednum * ba_k[2] + sense * ba_k[3]
+                    # BA_k = pheromone * ba_k[0] + density * ba_k[1]
                     BEHAVIOR = [BA_k, ba_k, k] if BEHAVIOR[0] < BA_k else BEHAVIOR
-
                 self.rule_summation(BEHAVIOR[1], obs_n)
+
+                # if self.seen_uavs:
+                #     PolicyMaker_SelfOrganization.uav_in_sight[self.index].append(1)
+                # else:
+                #     PolicyMaker_SelfOrganization.uav_in_sight[self.index].append(0)
+                if self.seen_targets:
+                    PolicyMaker_SelfOrganization.target_in_sight[self.index].append(1)
+                else:
+                    PolicyMaker_SelfOrganization.target_in_sight[self.index].append(0)
+
                 self.current_behavior = BEHAVIOR[2]
 
                 _opt_index = 1
+
             else:
                 pass
 
@@ -182,15 +214,13 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
 
     # >>>> Take turns when losing sight of target
     def rule5(self, obs):
-        if (not self.seen_targets) and self.target_sense:
+        if self.target_sense:
             self_vel = obs[self.index][0:2]
             vel_bearing = math.atan2(self_vel[1], self_vel[0])
-            new_dir = vel_bearing - math.pi/3
+            new_dir = vel_bearing - math.pi/2
             R5 = [np.linalg.norm(self_vel)*math.cos(new_dir), np.linalg.norm(self_vel)*math.sin(new_dir)]
-            self.rule_act[2] = 1
         else:
             R5 = [0, 0]
-            self.rule_act[2] = 0
         return R5
 
     # >>>> Flat Target Repulsion
@@ -198,16 +228,13 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         R6_list = list()
         for tar in self.seen_targets:
             bearing = tar[0]
-            if tar[3] <= len(self.seen_uavs):
-                R6_list.append(bearing)
+            # if tar[3] <= len(self.seen_uavs):
+            R6_list.append(bearing)
         if R6_list:
             R6_ = sum(np.array(R6_list)) / len(R6_list)
             R6 = [-1*math.cos(R6_), -1*math.sin(R6_)]
-            self.rule_act[1] = 1
-            self.target_sense = 0
         else:
             R6 = [0, 0]
-            self.rule_act[1] = 0
         return R6
 
     # >>>> Flat Attraction
@@ -215,16 +242,13 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         R8_list = list()
         for tar in self.seen_targets:
             bearing = tar[0]
-            if tar[3] > len(self.seen_uavs):
-                R8_list.append(bearing)
+            # if tar[3] > len(self.seen_uavs):
+            R8_list.append(bearing)
         if R8_list:
             R8_ = sum(np.array(R8_list)) / len(R8_list)
             R8 = [math.cos(R8_), math.sin(R8_)]
-            self.rule_act[0] = 1
-            self.target_sense = 1
         else:
             R8 = [0, 0]
-            self.rule_act[0] = 0
         return R8
 
     # >>>> Evasion

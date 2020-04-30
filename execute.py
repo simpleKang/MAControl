@@ -34,9 +34,11 @@ from GeneticAlgorithm.BehaviorArchetypes import behavior
 from GeneticAlgorithm.BehaviorArchetypes_vision import behavior_v
 
 import MAEnv.scenarios.TargetProfile as T
+import MAControl.Util.get_random_state as rs
 import MAControl.Util.OfflineCoverRate as OCR
 import MAControl.Util.CalCoverage as cc
 import MAControl.Util.coverrate_by_image as calculate
+import MAControl.Util.coverrate_vision as cv
 
 import MAControl.Default.InnerController_PID as IC_P
 import MAControl.Default.MotionController_L1_TECS as MC_L
@@ -54,14 +56,14 @@ def parse_args():
     # Environment
     parser.add_argument("--scenario", type=str, default="scenario7_vision", help="name of the scenario script")
     parser.add_argument("--uav-num", type=int, default=10, help="number of uav")
-    parser.add_argument("--step-max", type=int, default=4000, help="number of maximum steps")
+    parser.add_argument("--step-max", type=int, default=3000, help="number of maximum steps")
 
     # GA
     parser.add_argument("--pop-size", type=int, default=20, help="size of population")
     parser.add_argument("--preserved-population", type=float, default=0.5, help="percentage of population selected")
-    parser.add_argument("--generation-num", type=int, default=30, help="number of generation")
-    parser.add_argument("--max-behavior-archetypes", type=int, default=3, help="number of behavior archetypes")
-    parser.add_argument("--collect-num", type=int, default=5, help="number of fitness score collection")
+    parser.add_argument("--generation-num", type=int, default=20, help="number of generation")
+    parser.add_argument("--max-behavior-archetypes", type=int, default=1, help="number of behavior archetypes")
+    parser.add_argument("--collect-num", type=int, default=7, help="number of fitness score collection")
 
     # Core parameters
     parser.add_argument("--crossover-rate", type=float, default=0.1, help="crossover rate")
@@ -203,10 +205,13 @@ def augment_view(arglist, world, Controller, obs, step):
 def get_score(arglist, gen, ind, num):
 
     # 不使用特定评分，仅给出随机分数
-    # _score = np.random.random()
+    _score = np.random.random()
 
     # KSB 像素计算覆盖率
     # _score = calculate.coverrate_k(gen, ind, num)
+
+    # KSB 像素计算覆盖率 - 视觉
+    # _score = cv.calculate_coverage(arglist.uav_num, arglist.step_max, num)
 
     # WZQ 完整计算覆盖率方式
     # _score = OCR.calculate_coverage(arglist.uav_num, arglist.step_max, num)
@@ -243,20 +248,29 @@ def get_score(arglist, gen, ind, num):
     # PM_S.PolicyMaker_SelfOrganization.target_in_sight.clear()
 
     # WZQ 目标吸引加权得分，排斥扣分
-    target_seen_step = np.array(PM_C.PolicyMaker_SelfOrganization.target_in_sight[:arglist.uav_num])
-    step_sum = np.sum(target_seen_step, axis=0)
-    _score = 0
-    for i in range(step_sum.size):
-        if 0 < step_sum[i] <= T.target_H[0]:
-            _score += 1 - 0.3*(T.target_H[0] - step_sum[i])
-        elif step_sum[i] > T.target_H[0]:
-            _score -= 1
-    PM_C.PolicyMaker_SelfOrganization.target_in_sight.clear()
+    # target_seen_step = np.array(PM_V.PolicyMaker_SelfOrganization.target_in_sight[:arglist.uav_num])
+    # step_sum = np.sum(target_seen_step, axis=0)
+    # _score = 0
+    # for i in range(step_sum.size):
+    #     if 0 < step_sum[i] <= T.target_H[0]:
+    #         _score += 1 - 0.3*(T.target_H[0] - step_sum[i])
+    #     elif step_sum[i] > T.target_H[0]:
+    #         _score -= 1
+    # PM_V.PolicyMaker_SelfOrganization.target_in_sight.clear()
+
+    # WZQ 视觉列队飞行
+    # uav_seen_step = np.array(PM_V.PolicyMaker_SelfOrganization.uav_in_sight[:arglist.uav_num])
+    # step_sum = np.sum(uav_seen_step, axis=0)
+    # _score = sum(step_sum)
+    # PM_V.PolicyMaker_SelfOrganization.uav_in_sight.clear()
 
     return _score
 
 
 def run_simulation(arglist, behavior_archetypes, gen, ind, num):
+
+    with open(os.path.dirname(__file__) + _path + 'para.txt', 'w') as f:
+        f.write(str(arglist.uav_num) + ' ' + str(arglist.step_max) + ' ' + str(num))
 
     # Create environment
     env, world, obstacle_info = make_env(arglist)
@@ -264,13 +278,11 @@ def run_simulation(arglist, behavior_archetypes, gen, ind, num):
     # Create Controller
     Controllers = get_controller(env, world, arglist)
 
-    # open(os.path.dirname(__file__) + _path + 'target_attacking.txt', 'w')
-    # with open(os.path.dirname(__file__) + _path + 'para.txt', 'w') as f:
-    #     f.write(str(arglist.uav_num) + ' ' + str(arglist.step_max))
+    open(os.path.dirname(__file__) + _path + 'target_attacking.txt', 'w')
 
-    # # 为每个小瓜子创建状态文件
-    # for k in range(arglist.uav_num):
-    #     open(os.path.dirname(__file__) + _path + 'uav_%d_track.txt' % k, 'w')
+    # 为每个小瓜子创建状态文件
+    for k in range(arglist.uav_num):
+        open(os.path.dirname(__file__) + _path + 'uav_%d_track.txt' % k, 'w')
 
     obs_n = env.reset()
 
@@ -285,11 +297,11 @@ def run_simulation(arglist, behavior_archetypes, gen, ind, num):
 
         obs_n = new_obs_n
 
-        # # 保存每个小瓜子每个step的状态信息
-        # for k in range(arglist.uav_num):
-        #     with open(os.path.dirname(__file__) + _path + 'uav_%d_track.txt' % k, 'a') as f:
-        #         f.write(str(obs_n[k][0]) + ' ' + str(obs_n[k][1]) + ' ' +
-        #                 str(obs_n[k][2]) + ' ' + str(obs_n[k][3]) + '\n')
+        # 保存每个小瓜子每个step的状态信息
+        for k in range(arglist.uav_num):
+            with open(os.path.dirname(__file__) + _path + 'uav_%d_track.txt' % k, 'a') as f:
+                f.write(str(obs_n[k][0]) + ' ' + str(obs_n[k][1]) + ' ' +
+                        str(obs_n[k][2]) + ' ' + str(obs_n[k][3]) + '\n')
 
         # print('>>> Step ', step)
 
@@ -307,6 +319,8 @@ def run_simulation(arglist, behavior_archetypes, gen, ind, num):
 if __name__ == '__main__':
 
     arglist = parse_args()
+    r_state = rs.RandomState(arglist.collect_num, arglist.uav_num)
+    T.init_state = r_state
 
     if arglist.evolve:
         ga = ga.GA(arglist)
