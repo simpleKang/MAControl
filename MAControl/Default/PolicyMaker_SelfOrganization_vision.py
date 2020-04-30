@@ -67,9 +67,9 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
 
     def rule_summation(self, archetype, obs_n):
 
-        W = archetype[2:]
+        W = archetype[2:-2]
         W.append(2)
-        # W.append(2)
+        W.append(archetype[-1])
 
         UR = list()
         UR.append(np.array(self.rule1(obs_n)))
@@ -81,6 +81,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         # UR.append(np.array([0, 0]))
         UR.append(np.array(self.rule8(obs_n)))
         UR.append(np.array(self.rule9(obs_n)))
+        UR.append(np.array(self.rule10(obs_n)))
         # UR.append(np.array([0, 0]))
 
         URLength = [np.linalg.norm(UR[i]) for i in range(len(UR))]
@@ -267,3 +268,32 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         else:
             R9 = [0, 0]
         return R9
+
+    # >>>> 斜列编队
+    def rule10(self, obs):
+        R10_list = list()
+        signal = 0
+        angle_self_v = math.atan2(obs[self.index][1], obs[self.index][0])
+        for uav in self.seen_uavs:
+            angle_u_v = math.atan2(uav[2], uav[1])
+            if abs(angle_self_v - angle_u_v) <= math.pi/2:
+                signal = 1
+                bearing = uav[0]
+                R10_list.append(bearing)
+            else:
+                signal = 0
+                break
+
+        if R10_list and signal == 1:
+            R10_ = sum(np.array(R10_list)) / len(R10_list)
+            angle_v = math.atan2(obs[self.index][1], obs[self.index][0])
+            angle = angle_v - R10_
+            if angle > 0 and angle <= math.pi/4:
+                R10 = [-obs[self.index][1], obs[self.index][0]]
+            elif angle <= 0 and angle >= -math.pi/4:
+                R10 = [obs[self.index][1], -obs[self.index][0]]
+            else:
+                R10 = [0, 0]
+        else:
+            R10 = [0, 0]
+        return R10
