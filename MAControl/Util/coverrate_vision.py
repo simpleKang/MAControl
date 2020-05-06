@@ -38,8 +38,8 @@ def calculate_coverage(num, step, loop=0):
             y = round((track[k][l][3]+T.edge)/scale)
             v = [track[k][l][0], track[k][l][1]]
             angle1 = math.atan2(track[k][l][1], track[k][l][0])
-            angle_max = angle1 + math.pi/6
-            angle_min = angle1 - math.pi / 6
+            angle_max = angle1 + math.pi/3
+            angle_min = angle1 - math.pi / 3
             for j in range(40):
                 if (angle_min+j/25) <angle_max:
                     angle_list.append(angle_min+j/25)
