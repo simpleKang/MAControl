@@ -2,10 +2,10 @@
 
 import argparse
 import time
-import MAControl.Test_Auction.InnerController_PID as IC_P
-import MAControl.Test_Auction.MotionController_L1_TECS as MC_L
-import MAControl.Test_Auction.PathPlanner_Simple as PP_S
-import MAControl.Test_Auction.PolicyMaker_Auction as PM_A
+import MAControl.PTMA.InnerController_PID as IC_P
+import MAControl.PTMA.MotionController_L1_TECS as MC_L
+import MAControl.PTMA.PathPlanner_Simple as PP_S
+import MAControl.PTMA.PolicyMaker_Auction as PM_A
 import logging
 
 # 运行 execute.py 需要补足参数，如 execute_all.py 中所示
