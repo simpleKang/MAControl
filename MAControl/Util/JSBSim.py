@@ -20,7 +20,7 @@
 # this program; if not, see <http://www.gnu.org/licenses/>
 #
 
-import xml.etree.ElementTree as et
+import xml.etree.ElementTree as ET
 import argparse
 import sys
 import os
@@ -54,18 +54,18 @@ args = parser.parse_args()
 sleep_period = 0.01
 
 
-def CheckXMLFile(f):
+def CheckXMLFile(fi):
     # Is f a file ?
-    if not os.path.isfile(f):
+    if not os.path.isfile(fi):
         return None
 
     # Is f an XML file ?
     try:
-        tree = et.parse(f)
-    except et.ParseError:
+        tRee = ET.parse(fi)
+    except ET.ParseError:
         return None
 
-    return tree
+    return tRee
 
 
 if args.input:
