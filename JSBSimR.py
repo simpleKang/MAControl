@@ -1,6 +1,6 @@
 #! /usr/bin/python
 #
-# JSBSim.py
+# JSBSimR.py [R]
 #
 # Standalone version of JSBSim in Python language.
 #
