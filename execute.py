@@ -10,7 +10,7 @@ import logging
 
 # 运行 execute.py 需要补足参数，如 execute_all.py 中所示
 # logging.basicConfig(filename='/home/samantha/gitr/logs/paper/R/result_all.log', level=logging.INFO)
-logging.basicConfig(filename='/S-Projects/Git-r/logs/result1.log', level=logging.INFO)
+logging.basicConfig(filename='/S-Projects/s-logs/result1.log', level=logging.INFO)
 logging.info('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
 logging.info(time.strftime('%Y-%m-%d, %H:%M:%S'))
 logging.info('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
