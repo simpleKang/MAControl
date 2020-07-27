@@ -1,6 +1,14 @@
 import argparse
 import jsbsim
 
+fdm = jsbsim.FGFDMExec('.', None)
+fdm.load_script('scripts/c1721.xml')
+fdm.run_ic()
+
+while fdm.run():
+    pass
+
+
 def parse_args():
     parser = argparse.ArgumentParser("Control Experiments for Multi-Agent Environments")
     parser.add_argument("--scenario", type=str, default="scenario_paper", help="name of the scenario script")
@@ -29,10 +37,3 @@ print('q2:          ', result.q2)
 print('q3:          ', result.q3)
 print('typeT:       ', result.typeT)
 
-
-fdm = jsbsim.FGFDMExec('.', None)
-fdm.load_script('scripts/c1721.xml')
-fdm.run_ic()
-
-while fdm.run():
-    pass
