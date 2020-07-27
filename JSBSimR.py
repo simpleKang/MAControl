@@ -35,11 +35,11 @@ parser.add_argument("--outputlogfile", action="append", metavar="<filename>",
                     help="sets (overrides) the name of a data output file")
 parser.add_argument("--logdirectivefile", action="append", metavar="<filename>",
                     help="specifies the name of a data logging directives file")
-parser.add_argument("--root", default='.', metavar="<path>",
+parser.add_argument("--root", default='E:\\S-Projects\\JSBSim\\jsbsim-Release_Candidate_v1.0.0\\', metavar="<path>",
                     help="specifies the JSBSim root directory (where aircraft/, engine/, etc. reside)")
 parser.add_argument("--aircraft", metavar="<filename>",
                     help="specifies the name of the aircraft to be modeled")
-parser.add_argument("--script", metavar="<filename>",
+parser.add_argument("--script", default='scripts\\weather-balloon.xml', metavar="<filename>",
                     help="specifies a script to run")
 parser.add_argument("--initfile", metavar="<filename>",
                     help="specifies an initialization file")
