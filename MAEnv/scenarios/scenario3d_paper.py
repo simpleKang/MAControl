@@ -6,7 +6,7 @@ import random
 from MAEnv.core import World, Agent, Landmark
 from MAEnv.scenario import BaseScenario
 import MAEnv.scenarios.TargetProfile as T
-
+from Mini0jsbsim.simulation import Simulation
 
 
 class Scenario(BaseScenario, ABC):
