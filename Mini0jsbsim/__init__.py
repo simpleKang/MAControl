@@ -1,8 +1,8 @@
 import gym.envs.registration
 import enum
-from gym_jsbsim.tasks import Task, HeadingControlTask, TurnHeadingControlTask
-from gym_jsbsim.aircraft import Aircraft, cessna172P
-from gym_jsbsim import utils
+from Mini0jsbsim.tasks import Task, HeadingControlTask, TurnHeadingControlTask
+from Mini0jsbsim.aircraft import Aircraft, cessna172P
+from Mini0jsbsim import utils
 
 """
 This script registers all combinations of task, aircraft, shaping settings

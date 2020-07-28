@@ -1,12 +1,12 @@
 import collections
 import copy
 
-from gym_jsbsim import rewards
-from gym_jsbsim.tasks import FlightTask
-from gym_jsbsim.rewards import State, Reward, RewardComponent
-from gym_jsbsim.assessors import Assessor
-from gym_jsbsim.simulation import Simulation
-import gym_jsbsim.properties as prp
+from Mini0jsbsim import rewards
+from Mini0jsbsim.tasks import FlightTask
+from Mini0jsbsim.rewards import State, Reward, RewardComponent
+from Mini0jsbsim.assessors import Assessor
+from Mini0jsbsim.simulation import Simulation
+import Mini0jsbsim.properties as prp
 from typing import Tuple, NamedTuple, Iterable, Dict
 
 

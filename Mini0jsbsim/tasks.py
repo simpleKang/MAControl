@@ -7,11 +7,11 @@ import enum
 import warnings
 from collections import namedtuple
 import Mini0jsbsim.properties as prp
-from gym_jsbsim import assessors, rewards, utils
-from gym_jsbsim.simulation import Simulation
-from gym_jsbsim.properties import BoundedProperty, Property
-from gym_jsbsim.aircraft import Aircraft
-from gym_jsbsim.rewards import RewardStub
+from Mini0jsbsim import assessors, rewards, utils
+from Mini0jsbsim.simulation import Simulation
+from Mini0jsbsim.properties import BoundedProperty, Property
+from Mini0jsbsim.aircraft import Aircraft
+from Mini0jsbsim.rewards import RewardStub
 from abc import ABC, abstractmethod
 from typing import Optional, Sequence, Dict, Tuple, NamedTuple, Type
 

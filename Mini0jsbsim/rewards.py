@@ -1,7 +1,7 @@
-import gym_jsbsim.properties as prp
+import Mini0jsbsim.properties as prp
 from abc import ABC, abstractmethod
 from typing import Tuple, Union
-from gym_jsbsim.utils import reduce_reflex_angle_deg
+from Mini0jsbsim.utils import reduce_reflex_angle_deg
 
 State = 'tasks.FlightTask.State'  # alias for type hint
 
