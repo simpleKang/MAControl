@@ -10,6 +10,10 @@ class BaseScenario(object):
     def make_s_world(self, agent_num, target_type):
         raise NotImplementedError()
 
+    # create elements of the jsbsim-theme world
+    def make_js_world(self, agent_num, target_type):
+        raise NotADirectoryError()
+
     # create initial conditions of the world
     def reset_world(self, world):
         raise NotImplementedError()

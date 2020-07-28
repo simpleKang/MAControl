@@ -10,7 +10,7 @@ from Mini0jsbsim.simulation import Simulation
 
 
 class Scenario(BaseScenario, ABC):
-    def make_s_world(self, agent_num, target_type):
+    def make_js_world(self, agent_num, target_type):
         world = World()
         # set any world properties first
         world.damping = 0  # 取消第一种阻尼计算方式

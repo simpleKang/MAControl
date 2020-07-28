@@ -12,7 +12,7 @@ class Simulation(object):
     A class which wraps an instance of JSBSim and manages communication with it.
     """
     encoding = 'utf-8'  # encoding of bytes returned by JSBSim Cython funcs
-    ROOT_DIR = os.path.abspath('/home/gordon/apps/jsbsim')
+    ROOT_DIR = os.path.abspath('E:\\S-Projects\\JSBSim\\jsbsim-Release_Candidate_v1.0.0\\')
     OUTPUT_FILE = 'flightgear.xml'
     LONGITUDINAL = 'longitudinal'
     FULL = 'full'
@@ -21,7 +21,7 @@ class Simulation(object):
                  sim_frequency_hz: float = 60.0,
                  aircraft: Aircraft = cessna172P,
                  init_conditions: Dict[prp.Property, float] = None,
-                 allow_flightgear_output: bool = True):
+                 allow_flightgear_output: bool = False):
         """
         Constructor. Creates an instance of JSBSim and sets initial conditions.
 
