@@ -139,7 +139,6 @@ class Simulation(object):
         self.load_model(model_name)
         self.jsbsim.set_dt(dt)
         # extract set of legal property names for this aircraft
-        # TODO: can translate the .split(" ")[0] once JSBSim bug has been fixed (in progress)
 
         # now that IC object is created in JSBSim, specify own conditions
         self.set_custom_initial_conditions(init_conditions)
@@ -148,8 +147,7 @@ class Simulation(object):
         if not success:
             raise RuntimeError('JSBSim failed to init simulation conditions.')
 
-    def set_custom_initial_conditions(self,
-                                      init_conditions: Dict['prp.Property', float] = None) -> None:
+    def set_custom_initial_conditions(self, init_conditions: Dict['prp.Property', float] = None) -> None:
         if init_conditions is not None:
             for prop, value in init_conditions.items():
                 self[prop] = value
