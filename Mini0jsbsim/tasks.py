@@ -6,7 +6,7 @@ import math
 import enum
 import warnings
 from collections import namedtuple
-import gym_jsbsim.properties as prp
+import Mini0jsbsim.properties as prp
 from gym_jsbsim import assessors, rewards, utils
 from gym_jsbsim.simulation import Simulation
 from gym_jsbsim.properties import BoundedProperty, Property

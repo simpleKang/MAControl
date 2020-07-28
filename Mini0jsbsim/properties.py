@@ -1,6 +1,6 @@
 import math
 import collections
-from gym_jsbsim import utils
+from Mini0jsbsim import utils
 
 
 class BoundedProperty(collections.namedtuple('BoundedProperty', ['name', 'description', 'min', 'max'])):
