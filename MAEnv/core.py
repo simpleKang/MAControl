@@ -96,6 +96,7 @@ class World(object):
     def __init__(self):
         # list of agents and entities (can change at execution-time!)
         self.agents = []
+        self.targets = []
         self.landmarks = []
         # communication channel dimensionality
         self.dim_c = 0

@@ -7,26 +7,19 @@ from MAEnv.core import World, Agent, Landmark
 from MAEnv.scenario import BaseScenario
 import MAEnv.scenarios.TargetProfile as T
 from Mini0jsbsim.simulation import Simulation
+from Mini0jsbsim.aircraft import Aircraft
 
 
 class Scenario(BaseScenario, ABC):
     def make_js_world(self, agent_num, target_type):
         world = World()
-        # set any world properties first
-        world.damping = 0  # 取消第一种阻尼计算方式
-        world.damping2 = 10  # 调整第二种阻尼计算方式的参数
-        # set nums
+        # set agents = UAVs (in air)
         num_agents = agent_num
+        world.swarm = [Aircraft('c172p', 'c172p', 'Cessna172P', 120) for i in range(num_agents)]
+        # set other entities (on ground)
         num_targets = T.num_targets
         num_obstacles = 0
         num_grids = 5
-        # add agents
-        world.agents = [Agent() for i in range(num_agents)]
-        for i, agent in enumerate(world.agents):
-            agent.name = 'agent %d' % i
-            agent.collide = False
-            agent.silent = True
-            agent.size = 0.01  # 10米
         # add landmarks
         world.targets = [Landmark() for i in range(num_targets)]
         VALUE = [2, 10, 5]
