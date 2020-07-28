@@ -29,7 +29,7 @@ def parse_args():
     parser.add_argument("--q1", action='append', type=float, dest='q1', default=[], help="Q: Line One")
     parser.add_argument("--q2", action='append', type=float, dest='q2', default=[], help="Q: Line Two")
     parser.add_argument("--q3", action='append', type=float, dest='q3', default=[], help="Q: Line Three")
-    parser.add_argument("--numU", type=int, default=20, help="how many UAVs")
+    parser.add_argument("--numU", type=int, default=2, help="how many UAVs")
     parser.add_argument("--typeT", action='append', type=int, dest='typeT', default=[], help="target types")
     return parser.parse_args()
 

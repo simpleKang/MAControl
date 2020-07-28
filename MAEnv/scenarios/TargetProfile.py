@@ -1,6 +1,6 @@
 import numpy as np
 
-num_targets = 10
+num_targets = 2
 
 target_size = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2]  # 大小相同
 target_pos = [list((np.random.choice(200, 2)-100)/100) for i in range(10)]
