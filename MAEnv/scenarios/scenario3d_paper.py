@@ -1,4 +1,5 @@
 # 环境长度 1 = 实际长度 1000 米 = 1 千米
+from abc import ABC
 
 import numpy as np
 import random
@@ -7,7 +8,8 @@ from MAEnv.scenario import BaseScenario
 import MAEnv.scenarios.TargetProfile as T
 
 
-class Scenario(BaseScenario):
+
+class Scenario(BaseScenario, ABC):
     def make_s_world(self, agent_num, target_type):
         world = World()
         # set any world properties first
