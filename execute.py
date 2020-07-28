@@ -35,7 +35,8 @@ def parse_args():
 
 
 def make_env(arglist):
-    from MAEnv.environment import MultiAgentEnv
+    from MAEnv.environment import NoFGJsbSimEnv
+    from gym_jsbsim.tests.stubs import BasicFlightTask
     import MAEnv.scenarios as scenarios
 
     # load scenario from script
@@ -43,7 +44,7 @@ def make_env(arglist):
 
     # create world and env
     world = scenario.make_s_world(arglist.numU, arglist.typeT)
-    env = MultiAgentEnv(world, scenario.reset_world, scenario.reward, scenario.observation)
+    env = NoFGJsbSimEnv(world, scenario.reset_world, scenario.reward, scenario.observation, task_type=BasicFlightTask)
     return env, world
 
 

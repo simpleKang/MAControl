@@ -348,7 +348,7 @@ class BatchMultiAgentEnv(gym.Env):
 
 
 # copy from gym-jsbsim
-class JsbSimEnv(gym.Env):
+class JsbSimEnv(MultiAgentEnv):
     """
     A class wrapping the JSBSim flight dynamics module (FDM) for simulating
     aircraft as an RL environment conforming to the OpenAI Gym Env
@@ -364,8 +364,12 @@ class JsbSimEnv(gym.Env):
     JSBSIM_DT_HZ: int = 60  # JSBSim integration frequency
     metadata = {'render.modes': ['human', 'flightgear']}
 
-    def __init__(self, task_type: Type[HeadingControlTask], aircraft: Aircraft = cessna172P,
-                 agent_interaction_freq: int = 5, shaping: Shaping=Shaping.STANDARD):
+    def __init__(self, World, Reset, Reward, Observation,
+                 task_type: Type[HeadingControlTask], aircraft: Aircraft = cessna172P,
+                 agent_interaction_freq: int = 5, shaping: Shaping = Shaping.STANDARD):
+        super(JsbSimEnv, self).__init__(World, reset_callback=Reset, reward_callback=Reward,
+                                        observation_callback=Observation, info_callback=None,
+                                        done_callback=None, shared_viewer=True)
         """
         Constructor. Inits some internal state, but JsbSimEnv.reset() must be
         called first before interacting with environment.
