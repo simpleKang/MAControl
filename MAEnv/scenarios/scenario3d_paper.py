@@ -3,11 +3,10 @@ from abc import ABC
 
 import numpy as np
 import random
-from MAEnv.core import World, Agent, Landmark
+from MAEnv.core import World, Landmark
 from MAEnv.scenario import BaseScenario
 import MAEnv.scenarios.TargetProfile as T
 from Mini0jsbsim.simulation import Simulation
-from Mini0jsbsim.aircraft import Aircraft
 
 
 class Scenario(BaseScenario, ABC):
@@ -15,7 +14,9 @@ class Scenario(BaseScenario, ABC):
         world = World()
         # set agents = UAVs (in air)
         num_agents = agent_num
-        world.swarm = [Aircraft('c172p', 'c172p', 'Cessna172P', 120) for i in range(num_agents)]
+        world.agents = [Simulation() for i in range(num_agents)]
+        for i, agent in enumerate(world.agents):
+            agent.name = 'agent %d' % i
         # set other entities (on ground)
         num_targets = T.num_targets
         num_obstacles = 0
@@ -55,9 +56,7 @@ class Scenario(BaseScenario, ABC):
     def reset_world(self, world):
 
         for i, agent in enumerate(world.agents):
-            agent.state.p_pos = np.random.uniform(T.agent_pos_init[0], T.agent_pos_init[1], world.dim_p)
-            agent.state.p_vel = np.array([0, 0.05])  # 50 米/秒
-            agent.state.p_acc = np.array([0, 0])
+            agent.reinitialise()
             agent.color = T.agent_color
             agent.attacking = False
             agent.attacking_to = -1
