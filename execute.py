@@ -139,7 +139,7 @@ if __name__ == '__main__':
             action_n = update_action(env, world, obs_n, step, NewController)
 
             # environment step
-            new_obs_n, rew_n, done_n, info_n = env.step(action_n)
+            new_obs_n, rew_n, done_n, info_n = env.jstep()
             step += 1
             obs_n = new_obs_n
 

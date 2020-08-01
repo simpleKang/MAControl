@@ -5,6 +5,7 @@ import numpy as np
 from MAEnv.multi_discrete import MultiDiscrete
 import math
 
+
 # environment for all agents in the multiagent world
 # currently code assumes that no agents will be created/destroyed at runtime!
 class MultiAgentEnv(gym.Env):
@@ -102,6 +103,9 @@ class MultiAgentEnv(gym.Env):
             reward_n = [reward] * self.n
 
         return np.array(obs_n), np.array([reward_n]), done_n, info_n
+
+    def jstep(self):
+        pass
 
     def reset(self):
         # reset world
