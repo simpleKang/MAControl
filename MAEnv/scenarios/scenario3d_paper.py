@@ -7,6 +7,7 @@ from MAEnv.core import World, Landmark
 from MAEnv.scenario import BaseScenario
 import MAEnv.scenarios.TargetProfile as T
 from Mini0jsbsim.simulation import Simulation
+import Mini0jsbsim.properties as prp
 
 
 class Scenario(BaseScenario, ABC):
@@ -17,6 +18,12 @@ class Scenario(BaseScenario, ABC):
         world.agents = [Simulation() for i in range(num_agents)]
         for i, agent in enumerate(world.agents):
             agent.name = 'agent %d' % i
+            agent.action_callback = [agent.__getitem__(prp.aileron_left),
+                                     agent.__getitem__(prp.aileron_right),
+                                     agent.__getitem__(prp.elevator),
+                                     agent.__getitem__(prp.rudder),
+                                     agent.__getitem__(prp.throttle),
+                                     agent.__getitem__(prp.gear)]
         # set other entities (on ground)
         num_targets = T.num_targets
         num_obstacles = 0
