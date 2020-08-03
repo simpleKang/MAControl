@@ -104,8 +104,30 @@ class MultiAgentEnv(gym.Env):
 
         return np.array(obs_n), np.array([reward_n]), done_n, info_n
 
-    def jstep(self):
-        pass
+    def jstep(self, action_n):
+        obs_n = []
+        reward_n = []
+        done_n = []
+        info_n = {'n': []}
+        self.agents = self.world.policy_agents
+        # set action for each agent
+        for i, agent in enumerate(self.agents):
+            self._set_action(action_n[i], agent, self.action_space[i])
+        # advance world state
+        self.world.step()
+        # record observation for each agent
+        for agent in self.agents:
+            obs_n.append(self._get_obs(agent))
+            reward_n.append(self._get_reward(agent))
+            done_n.append(self._get_done(agent))
+            info_n['n'].append(self._get_info(agent))
+
+        # all agents get total reward in cooperative case
+        reward = np.sum(reward_n)
+        if self.shared_reward:
+            reward_n = [reward] * self.n
+
+        return np.array(obs_n), np.array([reward_n]), done_n, info_n
 
     def reset(self):
         # reset world
