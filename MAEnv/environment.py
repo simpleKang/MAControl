@@ -4,6 +4,7 @@ from gym.envs.registration import EnvSpec
 import numpy as np
 from MAEnv.multi_discrete import MultiDiscrete
 import math
+import Mini0jsbsim.properties as prp
 
 
 # environment for all agents in the multiagent world
@@ -112,9 +113,14 @@ class MultiAgentEnv(gym.Env):
         self.agents = self.world.policy_agents
         # set action for each agent
         for i, agent in enumerate(self.agents):
-            self._set_action(action_n[i], agent, self.action_space[i])
+            agent.action = [agent.__setitem__(prp.aileron_left, action_n[0]),
+                            agent.__setitem__(prp.aileron_right, action_n[1]),
+                            agent.__setitem__(prp.elevator, action_n[2]),
+                            agent.__setitem__(prp.rudder, action_n[3]),
+                            agent.__setitem__(prp.throttle, action_n[4]),
+                            agent.__setitem__(prp.gear, action_n[5])]
         # advance world state
-        self.world.step()
+        self.jsbsim()
         # record observation for each agent
         for agent in self.agents:
             obs_n.append(self._get_obs(agent))
@@ -128,6 +134,9 @@ class MultiAgentEnv(gym.Env):
             reward_n = [reward] * self.n
 
         return np.array(obs_n), np.array([reward_n]), done_n, info_n
+
+    def jsbsim(self):
+        pass
 
     def reset(self):
         # reset world

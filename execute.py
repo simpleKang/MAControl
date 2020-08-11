@@ -21,7 +21,7 @@ logging.info('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 def parse_args():
     parser = argparse.ArgumentParser("Control Experiments for Multi-Agent Environments")
     parser.add_argument("--scenario", type=str, default="scenario3d_paper", help="name of the scenario script")
-    parser.add_argument("--step-max", type=int, default=500, help="maximum steps")
+    parser.add_argument("--step-max", type=int, default=8000, help="maximum steps")
     parser.add_argument("--episode-max", type=int, default=200, help="maximum episodes")
     parser.add_argument("--p1", action='append', type=float, dest='p1', default=[], help="P: Line one")
     parser.add_argument("--p2", action='append', type=float, dest='p2', default=[], help="P: Line Two")
@@ -139,7 +139,7 @@ if __name__ == '__main__':
             action_n = update_action(env, world, obs_n, step, NewController)
 
             # environment step
-            new_obs_n, rew_n, done_n, info_n = env.jstep()
+            new_obs_n, rew_n, done_n, info_n = env.jstep(action_n)
             step += 1
             obs_n = new_obs_n
 
