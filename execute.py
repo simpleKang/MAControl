@@ -22,7 +22,7 @@ def parse_args():
     parser = argparse.ArgumentParser("Control Experiments for Multi-Agent Environments")
     parser.add_argument("--scenario", type=str, default="scenario3d_paper", help="name of the scenario script")
     parser.add_argument("--step-max", type=int, default=8000, help="maximum steps")
-    parser.add_argument("--episode-max", type=int, default=200, help="maximum episodes")
+    parser.add_argument("--episode-max", type=int, default=10, help="maximum episodes")
     parser.add_argument("--p1", action='append', type=float, dest='p1', default=[], help="P: Line one")
     parser.add_argument("--p2", action='append', type=float, dest='p2', default=[], help="P: Line Two")
     parser.add_argument("--p3", action='append', type=float, dest='p3', default=[], help="P: Line Three")
@@ -154,12 +154,13 @@ if __name__ == '__main__':
                 for i in range(env.n):
                     pairing.append(world.agents[i].attacking_to)
                 print('pairing: ', pairing)
-                print('reward:', rew_n[0][0])
+                # print('reward:', rew_n[0][0])
                 timing = round(time.time() - t_start, 3)
                 t_start = time.time()
                 print('timing: ', timing)
-                if episode == 1:
-                    logging.info('EPISODE | PAIRING                                               REWARD          TIME')
-                logging.info([episode]+pairing+[rew_n[0][0]]+[timing])
-                if episode == arglist.episode_max:
-                    logging.info('\n')
+                time.sleep(1)
+                # if episode == 1:
+                #    logging.info('EPISODE | PAIRING                                             REWARD          TIME')
+                # logging.info([episode]+pairing+[rew_n[0][0]]+[timing])
+                # if episode == arglist.episode_max:
+                #    logging.info('\n')
