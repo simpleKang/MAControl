@@ -116,12 +116,13 @@ class MultiAgentEnv(gym.Env):
                             agent.__setitem__(prp.rudder, action_n[3]),
                             agent.__setitem__(prp.throttle, action_n[4]),
                             agent.__setitem__(prp.gear, action_n[5])]
+
         # advance world state
-        kk = self.jsbsim()
+        kk = self.jsbsimk()
 
         return kk
 
-    def jsbsim(self):
+    def jsbsimk(self):
         obs_n = []
         reward_n = []
         done_n = []
@@ -129,11 +130,20 @@ class MultiAgentEnv(gym.Env):
 
         # record observation for each agent
         for agent in self.agents:
-            obs_n.append(self._get_obs(agent))
+            obs_n = [agent.__getitem__(prp.altitude_sl_ft),
+                     agent.__getitem__(prp.pitch_rad),
+                     agent.__getitem__(prp.roll_rad),
+                     agent.__getitem__(prp.u_fps),
+                     agent.__getitem__(prp.v_fps),
+                     agent.__getitem__(prp.w_fps),
+                     agent.__getitem__(prp.p_radps),
+                     agent.__getitem__(prp.q_radps),
+                     agent.__getitem__(prp.r_radps)]
             reward_n.append(self._get_reward(agent))
             done_n.append(self._get_done(agent))
             info_n['n'].append(self._get_info(agent))
 
+        print('obs_n', obs_n)
         return np.array(obs_n), np.array([reward_n]), done_n, info_n
 
     def reset(self):
