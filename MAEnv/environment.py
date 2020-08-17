@@ -86,11 +86,14 @@ class MultiAgentEnv(gym.Env):
         done_n = []
         info_n = {'n': []}
         self.agents = self.world.policy_agents
+
         # set action for each agent
         for i, agent in enumerate(self.agents):
             self._set_action(action_n[i], agent, self.action_space[i])
+
         # advance world state
         self.world.step()
+
         # record observation for each agent
         for agent in self.agents:
             obs_n.append(self._get_obs(agent))
@@ -106,7 +109,7 @@ class MultiAgentEnv(gym.Env):
         return np.array(obs_n), np.array([reward_n]), done_n, info_n
 
     def jstep(self, action_n):
-        self.agents = self.world.policy_agents
+        self.agents = self.world.scripted_agents
 
         # set action for each agent
         for i, agent in enumerate(self.agents):
