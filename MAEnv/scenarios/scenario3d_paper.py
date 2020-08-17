@@ -119,11 +119,9 @@ class Scenario(BaseScenario, ABC):
         return rew
 
     def observation(self, agent, world):
-        a1 = agent.state.p_acc[0]
-        a2 = agent.state.p_acc[1]
-        vel_size = np.sqrt(np.square(agent.state.p_vel[0]) + np.square(agent.state.p_vel[1]))
-        vel_front_unit = agent.state.p_vel / vel_size
-        vel_right_unit = np.array([agent.state.p_vel[1], -1 * agent.state.p_vel[0]]) / vel_size
-        a_front = np.dot(a1, vel_front_unit) + np.dot(a2, vel_front_unit)
-        a_right = np.dot(a2, vel_right_unit) + np.dot(a2, vel_right_unit)
-        return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + [a_front] + [a_right])
+        agent.obs = [agent.__getitem__(prp.altitude_sl_ft), agent.__getitem__(prp.pitch_rad),
+                     agent.__getitem__(prp.roll_rad), agent.__getitem__(prp.u_fps),
+                     agent.__getitem__(prp.v_fps), agent.__getitem__(prp.w_fps),
+                     agent.__getitem__(prp.p_radps), agent.__getitem__(prp.q_radps),
+                     agent.__getitem__(prp.r_radps)]
+        return agent.obs
