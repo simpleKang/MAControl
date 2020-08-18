@@ -3,7 +3,7 @@
 import argparse
 import time
 import MAControl.PTMA.InnerController_PID as IC_P
-import MAControl.PTMA.MotionController_L1_TECS as MC_L
+import MAControl.PTMA.MotionController_L1_TECS_6DOF as MC_L
 import MAControl.PTMA.PathPlanner_Simple as PP_S
 import MAControl.PTMA.PolicyMaker_Auction as PM_A
 import logging
