@@ -156,7 +156,7 @@ class MultiAgentEnv(gym.Env):
         self._reset_render()
         # record observations for each agent
         obs_n = []
-        self.agents = self.world.policy_agents
+        self.agents = self.world.scripted_agents
         for agent in self.agents:
             obs_n.append(self._get_obs(agent))
         return np.array(obs_n)
