@@ -7,6 +7,7 @@ import MAControl.PTMA.MotionController_L1_TECS as MC_L
 import MAControl.PTMA.PathPlanner_Simple as PP_S
 import MAControl.PTMA.PolicyMaker_Auction as PM_A
 import logging
+import numpy as np
 
 # 运行 execute.py 需要补足参数，如 execute_all.py 中所示
 # logging.basicConfig(filename='/home/samantha/gitr/logs/paper/R/result_all.log', level=logging.INFO)
@@ -68,6 +69,7 @@ def update_action(env, world, obs_n, step, NewController):
 
     WorldTarget = []
     for i, landmark in enumerate(world.targets):
+
         WorldTarget.append([landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.state.p_vel[0],
                             landmark.state.p_vel[1], landmark.value, landmark.defence, landmark.type, i])
 
@@ -89,6 +91,11 @@ def update_action(env, world, obs_n, step, NewController):
             get_action(obs_n[i], acctEi, acclEi, step, finishedi)
 
         action_n.append(actioni)
+
+    for i in range(arglist.numU):
+
+        action = np.random.random_sample(6) * 2 - 1
+        action_n.append(action)
 
     return action_n
 
@@ -137,6 +144,7 @@ if __name__ == '__main__':
             # get action
             print('>>> step ', step)
             action_n = update_action(env, world, obs_n, step, NewController)
+            print('action_n', action_n, 'obs_n', obs_n)
 
             # environment step
             new_obs_n, rew_n, done_n, info_n = env.jstep(action_n)

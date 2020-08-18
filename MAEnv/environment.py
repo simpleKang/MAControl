@@ -113,12 +113,12 @@ class MultiAgentEnv(gym.Env):
 
         # set action for each agent
         for i, agent in enumerate(self.agents):
-            agent.action = [agent.__setitem__(prp.aileron_left, action_n[0]),
-                            agent.__setitem__(prp.aileron_right, action_n[1]),
-                            agent.__setitem__(prp.elevator, action_n[2]),
-                            agent.__setitem__(prp.rudder, action_n[3]),
-                            agent.__setitem__(prp.throttle, action_n[4]),
-                            agent.__setitem__(prp.gear, action_n[5])]
+            agent.action = [agent.__setitem__(prp.aileron_left, action_n[i][0]),
+                            agent.__setitem__(prp.aileron_right, action_n[i][1]),
+                            agent.__setitem__(prp.elevator, action_n[i][2]),
+                            agent.__setitem__(prp.rudder, action_n[i][3]),
+                            agent.__setitem__(prp.throttle, action_n[i][4]),
+                            agent.__setitem__(prp.gear, action_n[i][5])]
 
         # advance world state
         kk = self.jsbsimk()
