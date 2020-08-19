@@ -2,6 +2,8 @@ from MAControl.Base.MotionController import MotionController
 import numpy as np
 import math
 from MAControl.Util.Constrain import constrain
+# Flight Control # Reference #
+# https://github.com/PX4/Firmware/blob/master/src/modules/fw_pos_control_l1/FixedwingPositionControl.cpp #
 
 
 class MotionController_L1_TECS(MotionController):
