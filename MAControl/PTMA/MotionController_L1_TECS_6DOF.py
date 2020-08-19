@@ -28,11 +28,33 @@ class MotionController_L1_TECS(MotionController):
         motion_pace = 5
 
         # set L1 params
+        L1_damping = 0
+        L1_period = 0
+        L1_roll_limit = 0  # radians
+        roll_slew_rate = 0  # .
         L1_ratio = 0.1  # (当v=0.05则L1=0.005km=50m)
         BP_range = 0.1  # (0.1km=100m)
         K_L1 = 0.1  # (系数)
 
         # set tecs params
+        max_climb_rate = 0
+        max_sink_rate = 0
+        speed_weight = 0
+        indicated_airspeed_min = 0
+        indicated_airspeed_max = 0
+        time_const_throt = 0
+        time_const = 0
+        min_sink_rate = 0
+        throttle_damp = 0
+        integrator_gain = 0
+        throttle_slewrate = 0
+        vertical_accel_limit = 0
+        speed_comp_filter_omega = 0
+        roll_throttle_compensation = 0
+        pitch_damping = 0
+        heightrate_p = 0
+        heightrate_ff = 0
+        speedrate_p = 0
         TAS_setpoint = 0.05  # (km/s)
         throttle_c = 0  # (%)
         throttle_setpoint_max = 100  # (%)
