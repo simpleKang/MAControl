@@ -1,6 +1,9 @@
 import math
 import collections
 from Mini0jsbsim import utils
+# Property # Reference #
+# https://jsbsim-team.github.io/jsbsim-reference-manual/mypages/user-manual-frames-of-reference/ #
+# https://jsbsim-team.github.io/jsbsim/FGAuxiliary_8cpp_source.html #
 
 
 class BoundedProperty(collections.namedtuple('BoundedProperty', ['name', 'description', 'min', 'max'])):
@@ -34,6 +37,9 @@ p_radps = BoundedProperty('velocities/p-rad_sec', 'roll rate [rad/s]', -2 * math
 q_radps = BoundedProperty('velocities/q-rad_sec', 'pitch rate [rad/s]', -2 * math.pi, 2 * math.pi)
 r_radps = BoundedProperty('velocities/r-rad_sec', 'yaw rate [rad/s]', -2 * math.pi, 2 * math.pi)
 altitude_rate_fps = Property('velocities/h-dot-fps', 'Rate of altitude change [ft/s]')
+u_aero_fps = BoundedProperty('velocities/u-aero-fps', 'body frame aero-ish x-axis velocity [ft/s]', -2200, 2200)
+v_aero_fps = BoundedProperty('velocities/v-aero-fps', 'body frame aero-ish y-axis velocity [ft/s]', -2200, 2200)
+w_aero_fps = BoundedProperty('velocities/w-aero-fps', 'body frame aero-ish z-axis velocity [ft/s]', -2200, 2200)
 
 # controls state
 aileron_left = BoundedProperty('fcs/left-aileron-pos-norm', 'left aileron position, normalised', -1, 1)
