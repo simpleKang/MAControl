@@ -71,6 +71,9 @@ class MotionController_L1_TECS(MotionController):
         Kp_STE = 0.1   # (系数)
         Kd_STE = 0.0   # (系数)
 
+        # if flag_init # then create waypoint from heading and distance
+        # else # create waypoint from line and dist
+
         # compute BP
         vector_BP = pointPi - pointBi
         dist_BP = np.sqrt(np.square(vector_BP[0]) + np.square(vector_BP[1]))
@@ -79,6 +82,20 @@ class MotionController_L1_TECS(MotionController):
 
         # set motion_pace
         if step == 0 or step % motion_pace == 0:
+
+            # groundspeed undershoot
+            yaw_norm = [math.cos(obs[3]/180*math.pi), math.sin(obs[3]/180*math.pi)]
+            ground_speed = obs[10:12]
+            ground_speed_body = yaw_norm[0] * ground_speed[0] + yaw_norm[1] * ground_speed[1]
+            # if ground_speed_body < param_fw_spd_min # then airspeed_demand + # (?)
+
+            # airspeed valid
+            air_angle = math.atan2(obs[8], obs[7])
+            ground_angle = math.atan2(obs[5], obs[4])
+            if abs(air_angle - ground_angle) > math.pi/2 or ground_speed < 3:
+                nav_speed_2d = obs[7:9]
+            else:
+                nav_speed_2d = ground_speed
 
             # # # # # tecs # # # # #
 
