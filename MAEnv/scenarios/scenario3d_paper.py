@@ -124,9 +124,11 @@ class Scenario(BaseScenario, ABC):
                      agent.__getitem__(prp.u_fps), agent.__getitem__(prp.v_fps), agent.__getitem__(prp.w_fps),
                      agent.__getitem__(prp.u_aero_fps), agent.__getitem__(prp.v_aero_fps), agent.__getitem__(prp.w_aero_fps),
                      agent.__getitem__(prp.v_north_fps), agent.__getitem__(prp.v_east_fps),
-                     agent.__getitem__(prp.p_radps), agent.__getitem__(prp.q_radps), agent.__getitem__(prp.r_radps)]
+                     agent.__getitem__(prp.p_radps), agent.__getitem__(prp.q_radps), agent.__getitem__(prp.r_radps),
+                     agent.__getitem__(prp.lat_geod_deg), agent.__getitem__(prp.lng_geoc_deg)]
         # [0] altitude [1] pitch [2] roll [3] heading(yaw)
         # [4] u [5] v [6] w
         # [7] u-aero [8] v-aero [9] w-aero [10] v-north [11] v-east
         # [12] p [13] q [14] r
+        # [15] lat [16] lon
         return agent.obs

@@ -139,7 +139,8 @@ class MultiAgentEnv(gym.Env):
                    agent.__getitem__(prp.u_fps), agent.__getitem__(prp.v_fps), agent.__getitem__(prp.w_fps),
                    agent.__getitem__(prp.u_aero_fps), agent.__getitem__(prp.v_aero_fps), agent.__getitem__(prp.w_aero_fps),
                    agent.__getitem__(prp.v_north_fps), agent.__getitem__(prp.v_east_fps),
-                   agent.__getitem__(prp.p_radps), agent.__getitem__(prp.q_radps), agent.__getitem__(prp.r_radps)]
+                   agent.__getitem__(prp.p_radps), agent.__getitem__(prp.q_radps), agent.__getitem__(prp.r_radps),
+                   agent.__getitem__(prp.lat_geod_deg), agent.__getitem__(prp.lng_geoc_deg)]
             obs_n.append(obs)
             reward_n.append(self._get_reward(agent))
             done_n.append(self._get_done(agent))

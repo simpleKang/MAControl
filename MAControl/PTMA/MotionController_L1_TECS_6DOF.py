@@ -97,6 +97,43 @@ class MotionController_L1_TECS(MotionController):
             else:
                 nav_speed_2d = ground_speed
 
+            throttle_max = 1
+            was_circle_mode = False
+            curr_wp = obs[15:17]
+            prev_wp = [0, 0]  # pointA ? pointB ?
+            att_sp_roll_reset_integral = False
+            att_sp_pitch_reset_integral = False
+            att_sp_yaw_reset_integral = False
+            mission_airspeed = 30
+            mission_throttle = 0.7
+
+            # type #
+
+            pos_sp_curr_type = 'position'
+            if pos_sp_curr_type == 'idle':
+                att_sp_thrust_body_0 = 0
+                att_sp_roll_body = 0
+                att_sp_pitch_body = 0
+            elif pos_sp_curr_type == 'position':
+                # l1_control_navigate_waypoints()
+                att_sp_roll_body = 0.5  # l1 control
+                att_sp_yaw_body = 0.5  # l1 control
+                # tecs_update_pitch_throttle()
+            elif pos_sp_curr_type == 'loiter':
+                loiter_radius = 10  # pos_sp_curr
+                loiter_direction = [0, 1]  # pos_sp_curr
+                # l1_control_navigate_loiter()
+                att_sp_roll_body = 0.5  # l1 control
+                att_sp_yaw_body = 0.5  # l1 control
+                # tecs_update_pitch_throttle()
+                pass
+            else:
+                # copy thrust and pitch values from tecs
+                # att_sp.thrust_body_0 = min(get_tecs_thrust(), throttle_max)
+                pass
+
+            use_tecs_pitch = True
+
             # # # # # tecs # # # # #
 
             # compute rate setpoints
