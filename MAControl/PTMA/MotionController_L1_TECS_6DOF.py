@@ -18,17 +18,6 @@ class MotionController_L1_TECS(MotionController):
         self.lateral_acc = 0
 
     def get_expected_action(self, obs, pointAi, pointBi, step, finishedi):
-        # print("motion control")
-        vel_vector = np.array(obs[0:2])
-        vel_vector[0] = round(vel_vector[0], 4)
-        vel_vector[1] = round(vel_vector[1], 4)
-        pointPi = np.array(obs[2:4])
-        pointPi[0] = round(pointPi[0], 3)
-        pointPi[1] = round(pointPi[1], 3)
-        pointAi = np.array(pointAi)
-        pointBi = np.array(pointBi)
-        motion_pace = 5
-
         # parameters update
         set_L1 = True
         if set_L1:
@@ -68,6 +57,22 @@ class MotionController_L1_TECS(MotionController):
             K_V = 1  # (系数)
             K_acct = 0.01  # (系数)
 
+        # airspeed + attitude poll
+        speed = obs[4:7]
+        airspeed = obs[7:10]
+        roll = obs[2]  # rad
+        pitch = obs[1]  # rad
+        yaw = obs[3]  # deg
+
+        # get waypoint heading distance
+
+        pointPi = np.array(obs[2:4])
+        pointPi[0] = round(pointPi[0], 3)
+        pointPi[1] = round(pointPi[1], 3)
+        pointAi = np.array(pointAi)
+        pointBi = np.array(pointBi)
+        motion_pace = 5
+
         # p-i-d
         Ki_STE = 0.01  # (系数)
         Kp_STE = 0.1   # (系数)
@@ -84,12 +89,6 @@ class MotionController_L1_TECS(MotionController):
 
         # set motion_pace
         if step == 0 or step % motion_pace == 0:
-
-            # groundspeed undershoot
-            yaw_norm = [math.cos(obs[3]/180*math.pi), math.sin(obs[3]/180*math.pi)]
-            ground_speed = obs[10:12]
-            ground_speed_body = yaw_norm[0] * ground_speed[0] + yaw_norm[1] * ground_speed[1]
-            # if ground_speed_body < param_fw_spd_min # then airspeed_demand + # (?)
 
             # airspeed valid
             air_angle = math.atan2(obs[8], obs[7])
