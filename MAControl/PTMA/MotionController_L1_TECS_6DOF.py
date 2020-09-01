@@ -133,6 +133,22 @@ class MotionController_L1_TECS(MotionController):
                 pass
 
             use_tecs_pitch = True
+            if use_tecs_pitch:
+                pass
+                # att_sp_pitch_body = get_tecs_pitch() # tecs_get_pitch_setpoint
+
+            # tecs_get_throttle_setpoint
+
+            curr_lat = obs[15]
+            curr_lon = obs[16]
+            curr_alt = obs[0]
+
+            param_fw_rsp_off = 0.2  # radians
+            param_fw_psp_off = 0.2  # radians
+
+            att_sp_roll_body = att_sp_roll_body + param_fw_rsp_off
+            att_sp_pitch_body = att_sp_pitch_body + param_fw_psp_off
+            att_sp_q_d = [att_sp_roll_body, att_sp_pitch_body, att_sp_yaw_body]
 
             # # # # # tecs # # # # #
 
@@ -222,4 +238,25 @@ class MotionController_L1_TECS(MotionController):
                 arrive_flag = False
 
         return self.tangent_acc, self.lateral_acc, arrive_flag
+
+    def tecs_update_pitch_throttle(self):
+        hrt_abstime = 0
+        alt_sp = 0
+        airspeed_sp = 0
+        pitch_min_rad = 0
+        pitch_max_rad = 0
+        throttle_min = 0
+        throttle_max = 0
+        throttle_cruise = 0
+        climbout_mode = 0
+        climbout_pitch_min_rad = 0
+        mode = 0
+
+        param_fw_rsp_off = 0.2  # radians
+        param_fw_psp_off = 0.2  # radians
+        pitch = 0
+
+        pitch_for_tecs = pitch - param_fw_psp_off
+
+        return None
 
