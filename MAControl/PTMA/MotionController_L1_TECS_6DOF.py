@@ -64,13 +64,70 @@ class MotionController_L1_TECS(MotionController):
         pitch = obs[1]  # rad
         yaw = obs[3]  # deg
 
-        # get waypoint heading distance
+        # get waypoint heading distance /lat /lon /alt
+        setpoint_prev = pointAi[0:2]
+        setpoint_next = pointBi[0:2]
+        setpoint_hold = obs[15:17]
+        setpoint_prev.append(obs[0])
+        setpoint_next.append(obs[0])
+        setpoint_hold.append(obs[0])
 
-        pointPi = np.array(obs[2:4])
-        pointPi[0] = round(pointPi[0], 3)
-        pointPi[1] = round(pointPi[1], 3)
-        pointAi = np.array(pointAi)
-        pointBi = np.array(pointBi)
+        # control position
+        dt = self.world.dt
+        setpoint = True
+        att_sp_fw_control_yaw = False
+        # # airspeed valid
+        air_angle = math.atan2(obs[8], obs[7])
+        ground_angle = math.atan2(obs[5], obs[4])
+        ground_speed = np.sqrt(obs[10]*obs[10]+obs[11]*obs[11])
+        if abs(air_angle - ground_angle) > math.pi / 2 or ground_speed < 3:
+            nav_speed_2d = obs[7:9]
+        else:
+            nav_speed_2d = obs[4:6]
+        throttle_max = 1
+        was_in_air = True
+        # # autonomous flight
+        hold_alt = obs[0]
+        hdg_hold_yaw = obs[3]
+        was_circle_mode = False
+        curr_wp = [0, 0]
+        prev_wp = [0, 0]
+        curr_wp = setpoint_hold[0:2]  # unsure
+        prep_wp = setpoint_prev[0:2]
+        att_sp_roll_reset_integral = False
+        att_sp_pitch_reset_integral = False
+        att_sp_yaw_reset_integral = False
+        mission_airspeed = 30  # pos_sp_curr_cruising_speed
+        mission_throttle = 0.7  # pos_sp_curr_cruising_throttle
+        pos_sp_curr_type = 'position'
+        if pos_sp_curr_type == 'idle':
+            att_sp_thrust_body_0 = 0
+            att_sp_roll_body = 0
+            att_sp_pitch_body = 0
+        elif pos_sp_curr_type == 'position':
+            # l1_control_navigate_waypoints()
+            # TBD right here
+
+
+            att_sp_roll_body = 0.5  # l1 control
+            att_sp_yaw_body = 0.5  # l1 control
+            # tecs_update_pitch_throttle()
+        elif pos_sp_curr_type == 'loiter':
+            loiter_radius = 10  # pos_sp_curr
+            loiter_direction = [0, 1]  # pos_sp_curr
+            # l1_control_navigate_loiter()
+            att_sp_roll_body = 0.5  # l1 control
+            att_sp_yaw_body = 0.5  # l1 control
+            # tecs_update_pitch_throttle()
+            pass
+        else:
+            # copy thrust and pitch values from tecs
+            # att_sp.thrust_body_0 = min(get_tecs_thrust(), throttle_max)
+            pass
+
+
+
+
         motion_pace = 5
 
         # p-i-d
@@ -90,48 +147,11 @@ class MotionController_L1_TECS(MotionController):
         # set motion_pace
         if step == 0 or step % motion_pace == 0:
 
-            # airspeed valid
-            air_angle = math.atan2(obs[8], obs[7])
-            ground_angle = math.atan2(obs[5], obs[4])
-            if abs(air_angle - ground_angle) > math.pi/2 or ground_speed < 3:
-                nav_speed_2d = obs[7:9]
-            else:
-                nav_speed_2d = ground_speed
 
-            throttle_max = 1
-            was_circle_mode = False
-            curr_wp = obs[15:17]
-            prev_wp = [0, 0]  # pointA ? pointB ?
-            att_sp_roll_reset_integral = False
-            att_sp_pitch_reset_integral = False
-            att_sp_yaw_reset_integral = False
-            mission_airspeed = 30
-            mission_throttle = 0.7
 
             # type #
 
-            pos_sp_curr_type = 'position'
-            if pos_sp_curr_type == 'idle':
-                att_sp_thrust_body_0 = 0
-                att_sp_roll_body = 0
-                att_sp_pitch_body = 0
-            elif pos_sp_curr_type == 'position':
-                # l1_control_navigate_waypoints()
-                att_sp_roll_body = 0.5  # l1 control
-                att_sp_yaw_body = 0.5  # l1 control
-                # tecs_update_pitch_throttle()
-            elif pos_sp_curr_type == 'loiter':
-                loiter_radius = 10  # pos_sp_curr
-                loiter_direction = [0, 1]  # pos_sp_curr
-                # l1_control_navigate_loiter()
-                att_sp_roll_body = 0.5  # l1 control
-                att_sp_yaw_body = 0.5  # l1 control
-                # tecs_update_pitch_throttle()
-                pass
-            else:
-                # copy thrust and pitch values from tecs
-                # att_sp.thrust_body_0 = min(get_tecs_thrust(), throttle_max)
-                pass
+
 
             use_tecs_pitch = True
             if use_tecs_pitch:
