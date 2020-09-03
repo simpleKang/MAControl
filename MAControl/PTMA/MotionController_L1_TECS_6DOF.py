@@ -25,7 +25,6 @@ class MotionController_L1_TECS(MotionController):
             L1_period = 0
             L1_roll_limit = 0  # radians
             roll_slew_rate = 0  # .
-            L1_ratio = 0.1  # (当v=0.05则L1=0.005km=50m)
             BP_range = 0.1  # (0.1km=100m)
             K_L1 = 0.1  # (系数)
         set_tecs = True
@@ -58,7 +57,6 @@ class MotionController_L1_TECS(MotionController):
             K_acct = 0.01  # (系数)
 
         # airspeed + attitude poll
-        speed = obs[4:7]
         airspeed = obs[7:10]
         roll = obs[2]  # rad
         pitch = obs[1]  # rad
@@ -79,8 +77,8 @@ class MotionController_L1_TECS(MotionController):
         # # airspeed valid
         air_angle = math.atan2(obs[8], obs[7])
         ground_angle = math.atan2(obs[5], obs[4])
-        ground_speed = np.sqrt(obs[10]*obs[10]+obs[11]*obs[11])
-        if abs(air_angle - ground_angle) > math.pi / 2 or ground_speed < 3:
+        ground_vel = np.sqrt(obs[4]*obs[4]+obs[5]*obs[5])
+        if abs(air_angle - ground_angle) > math.pi / 2 or ground_vel < 3:
             nav_speed_2d = obs[7:9]
         else:
             nav_speed_2d = obs[4:6]
@@ -201,26 +199,35 @@ class MotionController_L1_TECS(MotionController):
         return self.tangent_acc, self.lateral_acc, arrive_flag
 
     def l1_control_navigate_waypoints(self, vectorA, vectorB, vectorP, vectorVel):
+        L1_ratio = 0.1  # (当v=0.05则L1=0.005km=50m)
 
         # /* this follows the logic presented in [1] */ #
         eta = 0.0
         xtrack_vel = 0.0
         ltrack_vel = 0.0
 
+        # compute PB
+        vector_PB = vectorB - vectorP
+        dist_PB = np.sqrt(vector_PB[0]*vector_PB[0] + vector_PB[1]*vector_PB[1])
+        dist_PB = max(dist_PB, 0.000000001)
+        target_bearing = vector_PB_unit = vector_PB / dist_PB
 
-        L1_distance = speed * L1_ratio
+        nav_speed = np.sqrt(vectorVel[0]*vectorVel[0] + vectorVel[1]*vectorVel[1])
+        nav_speed = max(nav_speed, 0.1)
+        L1_distance = L1_ratio * nav_speed
 
-        # compute AB
-        vector_AB = pointBi - pointAi
-        dist_AB = np.sqrt(np.square(vector_AB[0]) + np.square(vector_AB[1]))
+        # /* calculate vector from A to B */ #
+        vector_AB = vectorB - vectorA
+        dist_AB = np.sqrt(vector_AB[0]*vector_AB[0] + vector_AB[1]*vector_AB[1])
         dist_AB = max(dist_AB, 0.000000001)
         vector_AB_unit = vector_AB / dist_AB
 
-        # compute AP
-        vector_AP = pointPi - pointAi
-        dist_AP = np.sqrt(np.square(vector_AP[0]) + np.square(vector_AP[1]))
+        # /* calculate the vector from waypoint A to the aircraft */ #
+        vector_AP = vectorP - vectorA
+        dist_AP = np.sqrt(vector_AP[0]*vector_AP[0] + vector_AP[1]*vector_AP[1])
         dist_AP = max(dist_AP, 0.000000001)
         vector_AP_unit = vector_AP / dist_AP
+
 
         # extra computation
         alongTrackDist = np.dot(vector_AP, vector_AB_unit)
