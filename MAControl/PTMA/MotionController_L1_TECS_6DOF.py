@@ -90,10 +90,9 @@ class MotionController_L1_TECS(MotionController):
         hold_alt = obs[0]
         hdg_hold_yaw = obs[3]
         was_circle_mode = False
-        curr_wp = [0, 0]
-        prev_wp = [0, 0]
         curr_wp = setpoint_hold[0:2]  # unsure
-        prep_wp = setpoint_prev[0:2]
+        prev_wp = setpoint_prev[0:2]
+        next_wp = setpoint_next[0:2]
         att_sp_roll_reset_integral = False
         att_sp_pitch_reset_integral = False
         att_sp_yaw_reset_integral = False
@@ -105,8 +104,8 @@ class MotionController_L1_TECS(MotionController):
             att_sp_roll_body = 0
             att_sp_pitch_body = 0
         elif pos_sp_curr_type == 'position':
-            # l1_control_navigate_waypoints()
-            # TBD right here
+            self.l1_control_navigate_waypoints(prev_wp, next_wp, curr_wp, nav_speed_2d)  # key
+
 
 
             att_sp_roll_body = 0.5  # l1 control
@@ -128,7 +127,7 @@ class MotionController_L1_TECS(MotionController):
 
 
 
-        motion_pace = 5
+
 
         # p-i-d
         Ki_STE = 0.01  # (系数)
@@ -145,13 +144,8 @@ class MotionController_L1_TECS(MotionController):
         vector_BP_unit = vector_BP / dist_BP
 
         # set motion_pace
+        motion_pace = 5
         if step == 0 or step % motion_pace == 0:
-
-
-
-            # type #
-
-
 
             use_tecs_pitch = True
             if use_tecs_pitch:
@@ -194,60 +188,6 @@ class MotionController_L1_TECS(MotionController):
             # tangent_acc
             self.tangent_acc = throttle_setpoint * K_acct
 
-            # # # # # L1 # # # # #
-
-            # compute L1
-            L1_distance = speed * L1_ratio
-
-            # compute AB
-            vector_AB = pointBi-pointAi
-            dist_AB = np.sqrt(np.square(vector_AB[0]) + np.square(vector_AB[1]))
-            dist_AB = max(dist_AB, 0.000000001)
-            vector_AB_unit = vector_AB/dist_AB
-
-            # compute AP
-            vector_AP = pointPi-pointAi
-            dist_AP = np.sqrt(np.square(vector_AP[0]) + np.square(vector_AP[1]))
-            dist_AP = max(dist_AP, 0.000000001)
-            vector_AP_unit = vector_AP/dist_AP
-
-            # extra computation
-            alongTrackDist = np.dot(vector_AP, vector_AB_unit)
-            AB_to_BP_bearing = math.acos(constrain(np.dot(vector_AB_unit, vector_BP_unit), -1, 1))
-
-            if dist_AP > L1_distance and alongTrackDist/dist_AP < -0.707:
-                # calculate eta to fly to waypoint A
-                eta = math.acos(constrain(np.dot(-1 * vector_AP_unit, vel_vector/speed), -1, 1))
-
-            elif abs(AB_to_BP_bearing) < math.radians(100):
-                # calculate eta to fly to waypoint B
-                eta = math.acos(constrain(np.dot(-1 * vector_BP_unit, vel_vector/speed), -1, 1))
-
-            else:
-                # calculate eta to fly along the line between A and B
-                eta2 = math.acos(constrain(np.dot(vector_AB_unit, vel_vector/speed), -1, 1))
-                beta = math.acos(constrain(np.dot(vector_AP_unit, vector_AB_unit), -1, 1))
-                xtrackErr = dist_AP * math.sin(beta)
-                eta1 = math.asin(constrain(xtrackErr / L1_distance, -0.7071, 0.7071))
-                eta = eta1 + eta2
-
-            # eta
-            eta = constrain(eta, -1.5708, 1.5708)
-            lateral_acc_size = speed * speed / L1_distance * math.sin(eta) * K_L1
-
-            # pointC
-            vector_CB = np.dot(-1 * vector_BP, vector_AB_unit) * vector_AB_unit
-            pointCi = pointBi - vector_CB
-            vector_PC = pointCi - pointPi
-
-            # lateral_acc
-            lateral_acc_unit = np.array([vel_vector[1], -1*vel_vector[0]])/speed
-            if -0.008 < np.dot(lateral_acc_unit, vector_PC) < 0.008:  # <a1,PC>直角
-                lateral_acc_dir = np.sign(np.dot(lateral_acc_unit, vector_AB))
-            else:
-                lateral_acc_dir = np.sign(np.dot(lateral_acc_unit, vector_PC))
-            self.lateral_acc = lateral_acc_size * lateral_acc_dir
-
         if finishedi:
             arrive_flag = True
             self.tangent_acc = 0
@@ -259,6 +199,66 @@ class MotionController_L1_TECS(MotionController):
                 arrive_flag = False
 
         return self.tangent_acc, self.lateral_acc, arrive_flag
+
+    def l1_control_navigate_waypoints(self, vectorA, vectorB, vectorP, vectorVel):
+
+        # /* this follows the logic presented in [1] */ #
+        eta = 0.0
+        xtrack_vel = 0.0
+        ltrack_vel = 0.0
+
+
+        L1_distance = speed * L1_ratio
+
+        # compute AB
+        vector_AB = pointBi - pointAi
+        dist_AB = np.sqrt(np.square(vector_AB[0]) + np.square(vector_AB[1]))
+        dist_AB = max(dist_AB, 0.000000001)
+        vector_AB_unit = vector_AB / dist_AB
+
+        # compute AP
+        vector_AP = pointPi - pointAi
+        dist_AP = np.sqrt(np.square(vector_AP[0]) + np.square(vector_AP[1]))
+        dist_AP = max(dist_AP, 0.000000001)
+        vector_AP_unit = vector_AP / dist_AP
+
+        # extra computation
+        alongTrackDist = np.dot(vector_AP, vector_AB_unit)
+        AB_to_BP_bearing = math.acos(constrain(np.dot(vector_AB_unit, vector_BP_unit), -1, 1))
+
+        if dist_AP > L1_distance and alongTrackDist / dist_AP < -0.707:
+            # calculate eta to fly to waypoint A
+            eta = math.acos(constrain(np.dot(-1 * vector_AP_unit, vel_vector / speed), -1, 1))
+
+        elif abs(AB_to_BP_bearing) < math.radians(100):
+            # calculate eta to fly to waypoint B
+            eta = math.acos(constrain(np.dot(-1 * vector_BP_unit, vel_vector / speed), -1, 1))
+
+        else:
+            # calculate eta to fly along the line between A and B
+            eta2 = math.acos(constrain(np.dot(vector_AB_unit, vel_vector / speed), -1, 1))
+            beta = math.acos(constrain(np.dot(vector_AP_unit, vector_AB_unit), -1, 1))
+            xtrackErr = dist_AP * math.sin(beta)
+            eta1 = math.asin(constrain(xtrackErr / L1_distance, -0.7071, 0.7071))
+            eta = eta1 + eta2
+
+        # eta
+        eta = constrain(eta, -1.5708, 1.5708)
+        lateral_acc_size = speed * speed / L1_distance * math.sin(eta) * K_L1
+
+        # pointC
+        vector_CB = np.dot(-1 * vector_BP, vector_AB_unit) * vector_AB_unit
+        pointCi = pointBi - vector_CB
+        vector_PC = pointCi - pointPi
+
+        # lateral_acc
+        lateral_acc_unit = np.array([vel_vector[1], -1 * vel_vector[0]]) / speed
+        if -0.008 < np.dot(lateral_acc_unit, vector_PC) < 0.008:  # <a1,PC>直角
+            lateral_acc_dir = np.sign(np.dot(lateral_acc_unit, vector_AB))
+        else:
+            lateral_acc_dir = np.sign(np.dot(lateral_acc_unit, vector_PC))
+        self.lateral_acc = lateral_acc_size * lateral_acc_dir
+        return None
 
     def tecs_update_pitch_throttle(self):
         hrt_abstime = 0
