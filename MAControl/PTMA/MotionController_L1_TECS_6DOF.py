@@ -4,6 +4,8 @@ import math
 from MAControl.Util.Constrain import constrain
 # Flight Control # Reference #
 # https://github.com/PX4/Firmware/blob/master/src/modules/fw_pos_control_l1/FixedwingPositionControl.cpp #
+# https://github.com/PX4/Firmware/blob/master/src/lib/tecs/TECS.cpp #
+# https://github.com/PX4/Firmware/blob/master/src/lib/l1/ECL_L1_Pos_Controller.cpp #
 
 
 class MotionController_L1_TECS(MotionController):
@@ -17,7 +19,12 @@ class MotionController_L1_TECS(MotionController):
         self.tangent_acc = 0
         self.lateral_acc = 0
 
+        # key values
+        self.roll_setpoint = 0
+        self.nav_bearing = 0
+
     def get_expected_action(self, obs, pointAi, pointBi, step, finishedi):
+
         # parameters update
         set_L1 = True
         if set_L1:
@@ -206,14 +213,14 @@ class MotionController_L1_TECS(MotionController):
         xtrack_vel = 0.0
         ltrack_vel = 0.0
 
-        # compute PB
+        # /* get the direction between the last (visited) and next waypoint */ #
         vector_PB = vectorB - vectorP
         dist_PB = np.sqrt(vector_PB[0]*vector_PB[0] + vector_PB[1]*vector_PB[1])
         dist_PB = max(dist_PB, 0.000000001)
         target_bearing = vector_PB_unit = vector_PB / dist_PB
 
         nav_speed = np.sqrt(vectorVel[0]*vectorVel[0] + vectorVel[1]*vectorVel[1])
-        nav_speed = max(nav_speed, 0.1)
+        nav_speed = max(nav_speed, 0.000000001)
         L1_distance = L1_ratio * nav_speed
 
         # /* calculate vector from A to B */ #
@@ -228,43 +235,52 @@ class MotionController_L1_TECS(MotionController):
         dist_AP = max(dist_AP, 0.000000001)
         vector_AP_unit = vector_AP / dist_AP
 
+        crosstrack_error = np.cross(vector_AB_unit, vector_AP)
+        alongTrackDist = np.dot(vector_AB_unit, vector_AP)
 
-        # extra computation
-        alongTrackDist = np.dot(vector_AP, vector_AB_unit)
-        AB_to_BP_bearing = math.acos(constrain(np.dot(vector_AB_unit, vector_BP_unit), -1, 1))
+        # /* calculate angle of airplane position vector relative to line) */ #
+        AB_to_BP_bearing = math.atan2(np.cross(-1*vector_PB_unit, vector_AB_unit),
+                                      np.dot(-1*vector_PB_unit, vector_AB_unit))
 
         if dist_AP > L1_distance and alongTrackDist / dist_AP < -0.707:
+
             # calculate eta to fly to waypoint A
-            eta = math.acos(constrain(np.dot(-1 * vector_AP_unit, vel_vector / speed), -1, 1))
+            xtrack_vel = np.cross(vectorVel, -1*vector_AP_unit)
+            ltrack_vel = np.dot(vectorVel, -1*vector_AP_unit)
+            eta = math.atan2(xtrack_vel, ltrack_vel)
+            self.nav_bearing = math.atan2(-1*vector_AP_unit[1], -1*vector_AP_unit[0])
+            # If the AB vector and the vector from B to airplane point in the same direction,
+            # we have missed the waypoint. At +- 90 degrees we are just passing it.
 
         elif abs(AB_to_BP_bearing) < math.radians(100):
+
             # calculate eta to fly to waypoint B
-            eta = math.acos(constrain(np.dot(-1 * vector_BP_unit, vel_vector / speed), -1, 1))
+            xtrack_vel = np.cross(vectorVel, vector_PB_unit)
+            ltrack_vel = np.dot(vectorVel, vector_PB_unit)
+            eta = math.atan2(xtrack_vel, ltrack_vel)
+            self.nav_bearing = math.atan2(vector_PB_unit[1], vector_PB_unit[0])
 
         else:
+
             # calculate eta to fly along the line between A and B
-            eta2 = math.acos(constrain(np.dot(vector_AB_unit, vel_vector / speed), -1, 1))
-            beta = math.acos(constrain(np.dot(vector_AP_unit, vector_AB_unit), -1, 1))
-            xtrackErr = dist_AP * math.sin(beta)
+            xtrack_vel = np.cross(vectorVel, vector_AB_unit)
+            ltrack_vel = np.dot(vectorVel, vector_AB_unit)
+            eta2 = math.atan2(xtrack_vel, ltrack_vel)
+            xtrackErr = np.cross(vector_AP, vector_AB)
             eta1 = math.asin(constrain(xtrackErr / L1_distance, -0.7071, 0.7071))
             eta = eta1 + eta2
+            self.nav_bearing = math.atan2(vector_AB[1], vector_AB[0]) + eta1
+            # bearing from current position to L1 point
 
-        # eta
-        eta = constrain(eta, -1.5708, 1.5708)
-        lateral_acc_size = speed * speed / L1_distance * math.sin(eta) * K_L1
+        eta = constrain(eta, -1*math.pi/2, math.pi/2)
+        lateral_accel = nav_speed * nav_speed / L1_distance * math.sin(eta)
+        circle_mode = False
+        bearing_error = eta
 
-        # pointC
-        vector_CB = np.dot(-1 * vector_BP, vector_AB_unit) * vector_AB_unit
-        pointCi = pointBi - vector_CB
-        vector_PC = pointCi - pointPi
+        # update roll setpoint
+        roll_new = math.atan(lateral_accel * 1.0 / 9.81551)
+        self.roll_setpoint = roll_new
 
-        # lateral_acc
-        lateral_acc_unit = np.array([vel_vector[1], -1 * vel_vector[0]]) / speed
-        if -0.008 < np.dot(lateral_acc_unit, vector_PC) < 0.008:  # <a1,PC>直角
-            lateral_acc_dir = np.sign(np.dot(lateral_acc_unit, vector_AB))
-        else:
-            lateral_acc_dir = np.sign(np.dot(lateral_acc_unit, vector_PC))
-        self.lateral_acc = lateral_acc_size * lateral_acc_dir
         return None
 
     def tecs_update_pitch_throttle(self):
