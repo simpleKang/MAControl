@@ -62,6 +62,9 @@ class MotionController_L1_TECS(MotionController):
             STE_rate_min = -0.025
             K_V = 1  # (系数)
             K_acct = 0.01  # (系数)
+        param_fw_airspd_trim = 30
+        param_fw_thr_min = 0.2
+        param_fw_thr_cruise = 0.5
 
         # airspeed + attitude poll
         airspeed = obs[7:10]
@@ -109,7 +112,10 @@ class MotionController_L1_TECS(MotionController):
             att_sp_roll_body = 0
             att_sp_pitch_body = 0
         elif pos_sp_curr_type == 'position':
-            self.l1_control_navigate_waypoints(prev_wp, next_wp, curr_wp, nav_speed_2d)  # key
+            self.l1_control_navigate_waypoints(prev_wp, next_wp, curr_wp, nav_speed_2d)
+            att_sp_roll_body = self.roll_setpoint
+            att_sp_yaw_body = self.nav_bearing
+            self.tecs_update_pitch_throttle(obs, curr_wp[2], param_fw_airspd_trim, param_fw_thr_min, param_fw_thr_cruise)
 
 
 
@@ -142,11 +148,6 @@ class MotionController_L1_TECS(MotionController):
         # if flag_init # then create waypoint from heading and distance
         # else # create waypoint from line and dist
 
-        # compute BP
-        vector_BP = pointPi - pointBi
-        dist_BP = np.sqrt(np.square(vector_BP[0]) + np.square(vector_BP[1]))
-        dist_BP = max(dist_BP, 0.000000001)
-        vector_BP_unit = vector_BP / dist_BP
 
         # set motion_pace
         motion_pace = 5
@@ -173,7 +174,7 @@ class MotionController_L1_TECS(MotionController):
             # # # # # tecs # # # # #
 
             # compute rate setpoints
-            tas_state = speed = np.sqrt(np.square(vel_vector[0]) + np.square(vel_vector[1]))
+            tas_state = speed = np.sqrt(np.square(airspeed[0]) + np.square(airspeed[1]))
             TAS_rate_setpoint = (TAS_setpoint - tas_state) * K_V
             STE_error = 0.5 * (TAS_setpoint * TAS_setpoint - tas_state * tas_state)
             STE_rate_setpoint = constrain(tas_state * TAS_rate_setpoint, STE_rate_min, STE_rate_max)
@@ -198,6 +199,7 @@ class MotionController_L1_TECS(MotionController):
             self.tangent_acc = 0
             self.lateral_acc = 0
         else:
+            dist_BP = 1
             if dist_BP < BP_range:
                 arrive_flag = True
             else:
@@ -283,7 +285,61 @@ class MotionController_L1_TECS(MotionController):
 
         return None
 
-    def tecs_update_pitch_throttle(self):
+    def tecs_update_pitch_throttle(self, obs, sp_alt, airspd_trim, thr_min, thr_cruise):
+
+        dt = self.world.dt
+        throttle_setpoint_max = 0.95
+        throttle_setpoint_min = thr_min
+        pitch_setpoint_max = 0.9
+        pitch_setpoint_min = -0.5
+
+        # initialize states
+        vert_vel_state = 0.0
+        vert_pos_state = obs[0]
+        tas_rate_state = 0.0
+        TAS_setpoint_adj = TAS_setpoint_last = tas_state = obs[7:10]
+        throttle_integ_state = 0.0
+        pitch_integ_state = 0.0
+        last_throttle_setpoint = thr_cruise
+        pitch_setpoint_unc = last_pitch_setpoint = obs[1]
+        underspeed_detected = False
+        uncommanded_descent_recovery = False
+        STE_rate_error = 0.0
+        states_initialized = True
+
+        # // Update the true airspeed state estimate
+        # 	_update_speed_states(EAS_setpoint, indicated_airspeed, eas_to_tas);
+        #
+        # 	// Calculate rate limits for specific total energy
+        # 	_update_STE_rate_lim();
+        #
+        # 	// Detect an underspeed condition
+        # 	_detect_underspeed();
+        #
+        # 	// Detect an uncommanded descent caused by an unachievable airspeed demand
+        # 	_detect_uncommanded_descent();
+        #
+        # 	// Calculate the demanded true airspeed
+        # 	_update_speed_setpoint();
+        #
+        # 	// Calculate the demanded height
+        # 	_update_height_setpoint(hgt_setpoint, baro_altitude);
+        #
+        # 	// Calculate the specific energy values required by the control loop
+        # 	_update_energy_estimates();
+        #
+        # 	// Calculate the throttle demand
+        # 	_update_throttle_setpoint(throttle_cruise, rotMat);
+        #
+        # 	// Calculate the pitch demand
+        # 	_update_pitch_setpoint();
+        #
+        # 	// Update time stamps
+        # 	_pitch_update_timestamp = now;
+
+
+
+
         hrt_abstime = 0
         alt_sp = 0
         airspeed_sp = 0
@@ -295,6 +351,8 @@ class MotionController_L1_TECS(MotionController):
         climbout_mode = 0
         climbout_pitch_min_rad = 0
         mode = 0
+
+
 
         param_fw_rsp_off = 0.2  # radians
         param_fw_psp_off = 0.2  # radians
