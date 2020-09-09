@@ -29,8 +29,6 @@ class MotionController_L1_TECS(MotionController):
         # parameters update
         set_L1 = True
         if set_L1:
-            L1_damping = 0
-            L1_period = 0
             L1_roll_limit = 0  # radians
             roll_slew_rate = 0  # .
             BP_range = 0.1  # (0.1km=100m)
@@ -122,7 +120,7 @@ class MotionController_L1_TECS(MotionController):
             if abs(loiter_radius) < FLT_EPSILON:
                 loiter_radius = param_nav_loiter_rad = math.pi
                 loiter_direction = 1
-            self.l1_control_navigate_loiter(obs, next_wp, curr_wp, loiter_radius, loiter_direction, nav_speed_2d)
+            self.l1_control_navigate_loiter(prev_wp, next_wp, loiter_radius, loiter_direction, nav_speed_2d)
             att_sp_roll_body = self.roll_setpoint
             att_sp_yaw_body = self.nav_bearing
             alt_sp = pos_sp_curr_alt = 1000
@@ -387,3 +385,13 @@ class MotionController_L1_TECS(MotionController):
         last_pitch_setpoint = pitch_setpoint
 
         return [pitch_setpoint, throttle_setpoint]
+
+    def l1_control_navigate_loiter(self, vectorA, vectorB, loiter_radius, loiter_direction, vectorVel):
+        L1_period = 0.5
+        L1_damping = 0.7
+
+        omega = 2.0 * math.pi / L1_period
+        K_crosstrack = omega * omega
+        K_velocity = 2.0 * L1_damping * omega
+
+        return self.throttle_setpoint
