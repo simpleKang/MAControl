@@ -64,6 +64,7 @@ class MotionController_L1_TECS(MotionController):
         param_fw_airspd_trim = 30
         param_fw_thr_min = 0.2
         param_fw_thr_cruise = 0.5
+        FLT_EPSILON = 0.0001
 
         # airspeed + attitude poll
         airspeed = obs[7:10]
@@ -114,97 +115,22 @@ class MotionController_L1_TECS(MotionController):
             self.l1_control_navigate_waypoints(prev_wp, next_wp, curr_wp, nav_speed_2d)
             att_sp_roll_body = self.roll_setpoint
             att_sp_yaw_body = self.nav_bearing
-            self.tecs_update_pitch_throttle(obs, curr_wp[2], param_fw_airspd_trim, param_fw_thr_min, param_fw_thr_cruise)
-
-
-
-            att_sp_roll_body = 0.5  # l1 control
-            att_sp_yaw_body = 0.5  # l1 control
-            # tecs_update_pitch_throttle()
+            self.tecs_update_pitch_throttle(obs, curr_wp[2], param_fw_thr_min, param_fw_thr_cruise)
         elif pos_sp_curr_type == 'loiter':
             loiter_radius = 10  # pos_sp_curr
             loiter_direction = [0, 1]  # pos_sp_curr
-            # l1_control_navigate_loiter()
-            att_sp_roll_body = 0.5  # l1 control
-            att_sp_yaw_body = 0.5  # l1 control
-            # tecs_update_pitch_throttle()
-            pass
+            if abs(loiter_radius) < FLT_EPSILON:
+                loiter_radius = param_nav_loiter_rad = math.pi
+                loiter_direction = 1
+            self.l1_control_navigate_loiter(obs, next_wp, curr_wp, loiter_radius, loiter_direction, nav_speed_2d)
+            att_sp_roll_body = self.roll_setpoint
+            att_sp_yaw_body = self.nav_bearing
+            alt_sp = pos_sp_curr_alt = 1000
+            self.tecs_update_pitch_throttle(obs, curr_wp[2], param_fw_thr_min, param_fw_thr_cruise)
         else:
-            # copy thrust and pitch values from tecs
-            # att_sp.thrust_body_0 = min(get_tecs_thrust(), throttle_max)
             pass
 
-
-
-
-
-
-        # p-i-d
-        Ki_STE = 0.01  # (系数)
-        Kp_STE = 0.1   # (系数)
-        Kd_STE = 0.0   # (系数)
-
-        # if flag_init # then create waypoint from heading and distance
-        # else # create waypoint from line and dist
-
-
-        # set motion_pace
-        motion_pace = 5
-        if step == 0 or step % motion_pace == 0:
-
-            use_tecs_pitch = True
-            if use_tecs_pitch:
-                pass
-                # att_sp_pitch_body = get_tecs_pitch() # tecs_get_pitch_setpoint
-
-            # tecs_get_throttle_setpoint
-
-            curr_lat = obs[15]
-            curr_lon = obs[16]
-            curr_alt = obs[0]
-
-            param_fw_rsp_off = 0.2  # radians
-            param_fw_psp_off = 0.2  # radians
-
-            att_sp_roll_body = att_sp_roll_body + param_fw_rsp_off
-            att_sp_pitch_body = att_sp_pitch_body + param_fw_psp_off
-            att_sp_q_d = [att_sp_roll_body, att_sp_pitch_body, att_sp_yaw_body]
-
-            # # # # # tecs # # # # #
-
-            # compute rate setpoints
-            tas_state = speed = np.sqrt(np.square(airspeed[0]) + np.square(airspeed[1]))
-            TAS_rate_setpoint = (TAS_setpoint - tas_state) * K_V
-            STE_error = 0.5 * (TAS_setpoint * TAS_setpoint - tas_state * tas_state)
-            STE_rate_setpoint = constrain(tas_state * TAS_rate_setpoint, STE_rate_min, STE_rate_max)
-
-            # compute throttle_p
-            if STE_rate_setpoint >= 0:
-                throttle_p = throttle_c + STE_rate_setpoint / STE_rate_max * (throttle_setpoint_max - throttle_c)
-            else:
-                throttle_p = throttle_c + STE_rate_setpoint / STE_rate_min * (throttle_setpoint_min - throttle_c)
-
-            # compute throttle_setpoint
-            self.STE_rate_error = self.STE_rate_error * 0.8 + STE_rate_setpoint * 0.2
-            self.throttle_integ_s = self.throttle_integ_s + STE_error * Ki_STE
-            throttle_setpoint = throttle_p + (STE_error + self.STE_rate_error * Kd_STE) * Kp_STE + self.throttle_integ_s
-            throttle_setpoint = constrain(throttle_setpoint, throttle_setpoint_min, throttle_setpoint_max)
-
-            # tangent_acc
-            self.tangent_acc = throttle_setpoint * K_acct
-
-        if finishedi:
-            arrive_flag = True
-            self.tangent_acc = 0
-            self.lateral_acc = 0
-        else:
-            dist_BP = 1
-            if dist_BP < BP_range:
-                arrive_flag = True
-            else:
-                arrive_flag = False
-
-        return self.tangent_acc, self.lateral_acc, arrive_flag
+        return self.tangent_acc, self.lateral_acc, False
 
     def l1_control_navigate_waypoints(self, vectorA, vectorB, vectorP, vectorVel):
         L1_ratio = 0.1  # (当v=0.05则L1=0.005km=50m)
@@ -284,7 +210,7 @@ class MotionController_L1_TECS(MotionController):
 
         return None
 
-    def tecs_update_pitch_throttle(self, obs, sp_alt, airspd_trim, thr_min, thr_cruise):
+    def tecs_update_pitch_throttle(self, obs, sp_alt, thr_min, thr_cruise):
         CONSTANTS_ONE_G = 9.81551
 
         dt = self.world.dt
@@ -461,4 +387,3 @@ class MotionController_L1_TECS(MotionController):
         last_pitch_setpoint = pitch_setpoint
 
         return [pitch_setpoint, throttle_setpoint]
-
