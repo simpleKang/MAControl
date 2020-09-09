@@ -32,7 +32,6 @@ class MotionController_L1_TECS(MotionController):
             L1_roll_limit = 0  # radians
             roll_slew_rate = 0  # .
             BP_range = 0.1  # (0.1km=100m)
-            K_L1 = 0.1  # (系数)
         set_tecs = True
         if set_tecs:
             speed_weight = 0
@@ -120,7 +119,7 @@ class MotionController_L1_TECS(MotionController):
             if abs(loiter_radius) < FLT_EPSILON:
                 loiter_radius = param_nav_loiter_rad = math.pi
                 loiter_direction = 1
-            self.l1_control_navigate_loiter(prev_wp, next_wp, loiter_radius, loiter_direction, nav_speed_2d)
+            self.l1_control_navigate_loiter(prev_wp, curr_wp, loiter_radius, loiter_direction, nav_speed_2d)
             att_sp_roll_body = self.roll_setpoint
             att_sp_yaw_body = self.nav_bearing
             alt_sp = pos_sp_curr_alt = 1000
@@ -386,12 +385,46 @@ class MotionController_L1_TECS(MotionController):
 
         return [pitch_setpoint, throttle_setpoint]
 
-    def l1_control_navigate_loiter(self, vectorA, vectorB, loiter_radius, loiter_direction, vectorVel):
+    def l1_control_navigate_loiter(self, vectorA, vectorP, loiter_radius, loiter_direction, vectorVel):
         L1_period = 0.5
         L1_damping = 0.7
+        L1_ratio = 0.2
+        K_L1 = 0.1  # (系数)
 
         omega = 2.0 * math.pi / L1_period
         K_crosstrack = omega * omega
         K_velocity = 2.0 * L1_damping * omega
+
+        # /* update bearing to next waypoint */ #
+        vector_PA = vectorA - vectorP
+        dist_PA = np.sqrt(vector_PA[0]*vector_PA[0] + vector_PA[1]*vector_PA[1])
+        dist_PA = max(dist_PA, 0.000000001)
+        target_bearing = vector_PA_unit = vector_PA / dist_PA
+
+        nav_speed = np.sqrt(vectorVel[0]*vectorVel[0] + vectorVel[1]*vectorVel[1])
+        nav_speed = max(nav_speed, 0.000000001)
+        L1_distance = L1_ratio * nav_speed
+
+        # /* calculate eta angle towards the loiter center */ #
+        xtrack_vel_center = np.cross(-1 * vector_PA_unit, vectorVel)
+        ltrack_vel_center = np.dot(vector_PA_unit, vectorVel)
+        eta = math.atan2(xtrack_vel_center, ltrack_vel_center)
+        eta = constrain(eta, -0.5 * math.pi, 0.5 * math.pi)
+
+        lateral_accel_sp_center = K_L1 * nav_speed * nav_speed / L1_distance * math.sin(eta)
+        xtrack_vel_circle = -1 * ltrack_vel_center
+        xtrack_err_circle = dist_PA - loiter_radius
+        crosstrack_error = xtrack_err_circle
+
+        lateral_accel_sp_circle_pd = (xtrack_err_circle * K_crosstrack + xtrack_vel_circle * K_velocity)
+        tangent_vel = xtrack_vel_center * loiter_direction
+        if tangent_vel < 0.0:
+            lateral_accel_sp_circle_pd = max(lateral_accel_sp_circle_pd, 0.0)
+
+        max1 = max(0.5 * loiter_radius, loiter_radius + xtrack_err_circle)
+        lateral_accel_sp_circle_centripetal = tangent_vel * tangent_vel / max1
+        lateral_accel_sp_circle = loiter_direction * (lateral_accel_sp_circle_pd + lateral_accel_sp_circle_centripetal)
+
+        # TBC
 
         return self.throttle_setpoint
