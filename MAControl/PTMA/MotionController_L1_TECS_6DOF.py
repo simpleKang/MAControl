@@ -20,8 +20,9 @@ class MotionController_L1_TECS(MotionController):
         self.lateral_acc = 0
 
         # key values
-        self.roll_setpoint = 0
-        self.nav_bearing = 0
+        self.roll_setpoint = 0.0
+        self.nav_bearing = 0.0
+        self.throttle_setpoint = 0.0
 
     def get_expected_action(self, obs, pointAi, pointBi, step, finishedi):
 
@@ -36,8 +37,6 @@ class MotionController_L1_TECS(MotionController):
             K_L1 = 0.1  # (系数)
         set_tecs = True
         if set_tecs:
-            max_climb_rate = 0
-            max_sink_rate = 0
             speed_weight = 0
             indicated_airspeed_min = 0
             indicated_airspeed_max = 0
@@ -286,12 +285,17 @@ class MotionController_L1_TECS(MotionController):
         return None
 
     def tecs_update_pitch_throttle(self, obs, sp_alt, airspd_trim, thr_min, thr_cruise):
+        CONSTANTS_ONE_G = 9.81551
 
         dt = self.world.dt
         throttle_setpoint_max = 0.95
         throttle_setpoint_min = thr_min
         pitch_setpoint_max = 0.9
         pitch_setpoint_min = -0.5
+        max_climb_rate = 0
+        max_sink_rate = 0
+        min_sink_rate = 0
+        climbout_mode_active = False
 
         # initialize states
         vert_vel_state = 0.0
@@ -302,63 +306,159 @@ class MotionController_L1_TECS(MotionController):
         pitch_integ_state = 0.0
         last_throttle_setpoint = thr_cruise
         pitch_setpoint_unc = last_pitch_setpoint = obs[1]
+        hgt_setpoint_in_prev = hgt_setpoint_prev = hgt_setpoint_adj = hgt_setpoint_adj_prev = obs[0]
         underspeed_detected = False
         uncommanded_descent_recovery = False
         STE_rate_error = 0.0
         states_initialized = True
 
         # // Update the true airspeed state estimate
-        # 	_update_speed_states(EAS_setpoint, indicated_airspeed, eas_to_tas);
-        #
+        TAS_setpoint = 0.7
+        TAS_max = 0.9
+        TAS_min = 0.2
+        tas_error = 0.1  # 这里要改变一下记录连续变化
+        tas_estimate_freq = 0.01
+        tas_rate_state_input = tas_error * tas_estimate_freq * tas_estimate_freq
+        if tas_state < 3.1:
+            tas_rate_state_input = max(tas_rate_state_input, 0.0)
+        tas_rate_state = tas_rate_state + tas_rate_state_input * dt
+        speed_derivative = tas_error  # 这个可能有问题
+        tas_state_input = tas_rate_state + speed_derivative + tas_error * tas_estimate_freq * 1.4142
+        tas_state = tas_state + tas_state_input * dt
+        tas_state = max(tas_state, 3.0)
+
         # 	// Calculate rate limits for specific total energy
-        # 	_update_STE_rate_lim();
-        #
+        STE_rate_max = max_climb_rate * CONSTANTS_ONE_G
+        STE_rate_min = min_sink_rate * CONSTANTS_ONE_G
+
         # 	// Detect an underspeed condition
-        # 	_detect_underspeed();
-        #
+        if tas_state < TAS_min * 0.9 and self.throttle_setpoint >= throttle_setpoint_max * 0.95:
+            underspeed_detected = True
+        else:
+            underspeed_detected = False
+
         # 	// Detect an uncommanded descent caused by an unachievable airspeed demand
         # 	_detect_uncommanded_descent();
-        #
+        #   // 似乎是循环进行相关步骤 这里才能有东西可用啊 迷惑 暂时放下
+
         # 	// Calculate the demanded true airspeed
-        # 	_update_speed_setpoint();
-        #
+        if underspeed_detected or uncommanded_descent_recovery:
+            TAS_setpoint = TAS_min
+        TAS_setpoint = constrain(TAS_setpoint, TAS_min, TAS_max)
+        velRateMax = 0.5 * STE_rate_max / tas_state
+        velRateMin = 0.5 * STE_rate_min / tas_state
+        TAS_setpoint_adj = constrain(TAS_setpoint, TAS_min, TAS_max)
+        speed_error_gain = 0.1
+        TAS_rate_setpoint = (TAS_setpoint_adj - tas_state) * speed_error_gain
+        TAS_rate_setpoint = constrain(TAS_rate_setpoint, velRateMin, velRateMax)
+
         # 	// Calculate the demanded height
-        # 	_update_height_setpoint(hgt_setpoint, baro_altitude);
-        #
+        desired = hgt_setpoint = 100.0  # 尚且不清楚这是怎么来的
+        if hgt_setpoint_in_prev < 0.1:
+            hgt_setpoint_in_prev = desired
+        hgt_setpoint = 0.5 * (desired + hgt_setpoint_in_prev)
+        hgt_setpoint_in_prev = hgt_setpoint
+        if (hgt_setpoint - hgt_setpoint_prev) > max_climb_rate * dt:
+            hgt_setpoint = hgt_setpoint_prev + max_climb_rate * dt
+        elif (hgt_setpoint - hgt_setpoint_prev) < max_sink_rate * dt:
+            hgt_setpoint = hgt_setpoint_prev - max_sink_rate * dt
+        hgt_setpoint_prev = hgt_setpoint
+        hgt_setpoint_adj = 0.1 * hgt_setpoint + 0.9 * hgt_setpoint_adj_prev
+        height_error_gain = 0.2
+        height_setpoint_gain_ff = 0.02
+        hgt_rate_setpoint = (hgt_setpoint_adj - obs[0]) * height_error_gain + height_setpoint_gain_ff * \
+                            (hgt_setpoint_adj - hgt_setpoint_adj_prev) / dt
+        hgt_setpoint_adj_prev = hgt_setpoint_adj
+        if hgt_rate_setpoint > max_climb_rate:
+            hgt_rate_setpoint = max_climb_rate
+        elif hgt_rate_setpoint < -1 * max_sink_rate:
+            hgt_rate_setpoint = -1 * max_sink_rate
+
         # 	// Calculate the specific energy values required by the control loop
-        # 	_update_energy_estimates();
-        #
+        # specific energy demands in units of (m**2/sec**2) #
+        SPE_setpoint = hgt_setpoint_adj * CONSTANTS_ONE_G  # potential #
+        SKE_setpoint = 0.5 * TAS_setpoint_adj * TAS_setpoint_adj  # kinetic #
+        # specific energy rate demands in units of (m**2/sec**3) #
+        SPE_rate_setpoint = hgt_rate_setpoint * CONSTANTS_ONE_G
+        SKE_rate_setpoint = tas_state * TAS_rate_setpoint
+        # specific energies in units of (m**2/sec**2) #
+        SPE_estimate = vert_pos_state * CONSTANTS_ONE_G
+        SKE_estimate = 0.5 * tas_state * tas_state
+        # specific energy rates in units of (m**2/sec**3) #
+        SPE_rate = vert_vel_state * CONSTANTS_ONE_G
+        SKE_rate = tas_state * speed_derivative
+
         # 	// Calculate the throttle demand
-        # 	_update_throttle_setpoint(throttle_cruise, rotMat);
-        #
+        STE_error = SPE_setpoint - SPE_estimate + SKE_setpoint - SKE_estimate
+        STE_rate_setpoint = SPE_rate_setpoint + SKE_rate_setpoint
+        STE_rate_setpoint = constrain(STE_rate_setpoint, STE_rate_min, STE_rate_max)
+        STE_rate_error = 0.2 * (STE_rate_setpoint - SPE_rate - SKE_rate) + 0.8 * STE_rate_error
+        if underspeed_detected:
+            throttle_setpoint = 1.0
+        else:
+            load_factor = 1.0 / constrain(math.cos(obs[2]), 0.1, 1.0) - 1.0
+            load_factor_correction = 0.2
+            STE_rate_setpoint = STE_rate_setpoint + load_factor_correction * load_factor
+        throttle_predicted = 0.0
+        if STE_rate_setpoint >= 0:  # throttle is between cruise and maximum
+            throttle_predicted = thr_cruise + STE_rate_setpoint / STE_rate_max * (throttle_setpoint_max - thr_cruise)
+        else:  # throttle is between cruise and minimum
+            throttle_predicted = thr_cruise + STE_rate_setpoint / STE_rate_min * (throttle_setpoint_min - thr_cruise)
+        throttle_time_constant = 0.01
+        throttle_damping_gain = 0.7
+        STE_to_throttle = 1.0 / (throttle_time_constant * (STE_rate_max - STE_rate_min))
+        throttle_setpoint = (STE_error + STE_rate_error * throttle_damping_gain) * STE_to_throttle + throttle_predicted
+        throttle_setpoint = constrain(throttle_setpoint, throttle_setpoint_min, throttle_setpoint_max)
+        last_throttle_setpoint = throttle_setpoint
+        integrator_gain = 0.2
+        if integrator_gain > 0.0:
+            integ_state_max = throttle_setpoint_max - throttle_setpoint + 0.1
+            integ_state_min = throttle_setpoint_min - throttle_setpoint - 0.1
+            throttle_integ_state = throttle_integ_state + (STE_error * integrator_gain) * dt * STE_to_throttle
+            if climbout_mode_active:
+                throttle_integ_state = integ_state_max
+            else:
+                throttle_integ_state = constrain(throttle_integ_state, integ_state_min, integ_state_max)
+        else:
+            throttle_integ_state = 0.0
+        throttle_setpoint = throttle_setpoint + throttle_integ_state
+        throttle_setpoint = constrain(throttle_setpoint, throttle_setpoint_min, throttle_setpoint_max)
+
         # 	// Calculate the pitch demand
-        # 	_update_pitch_setpoint();
-        #
-        # 	// Update time stamps
-        # 	_pitch_update_timestamp = now;
+        SKE_weighting = 1.0  # 0.0 <= SKE_weighting <= 2.0
+        if underspeed_detected or climbout_mode_active:
+            SKE_weighting = 2.0
+        SPE_weighting = 2.0 - SKE_weighting
+        SEB_setpoint = SPE_setpoint * SPE_weighting - SKE_setpoint * SKE_weighting  # specific energy balance demand
+        SEB_rate_setpoint = SPE_rate_setpoint * SPE_weighting - SKE_rate_setpoint * SKE_weighting
+        SEB_error = SEB_setpoint - (SPE_estimate * SPE_weighting - SKE_estimate * SKE_weighting)
+        SEB_rate_error = SEB_rate_setpoint - (SPE_rate * SPE_weighting - SKE_rate * SKE_weighting)
+        pitch_time_constant = 0.2
+        climb_angle_to_SEB_rate = tas_state * pitch_time_constant * CONSTANTS_ONE_G
+        if integrator_gain > 0.0:
+            pitch_integ_input = SEB_error * integrator_gain
+            if pitch_setpoint_unc > pitch_setpoint_max:
+                edge = (pitch_setpoint_max - pitch_setpoint_unc) * climb_angle_to_SEB_rate / pitch_time_constant
+                pitch_integ_input = min(pitch_integ_input, min(edge, 0.0))
+            elif pitch_setpoint_unc < pitch_setpoint_min:
+                edge = (pitch_setpoint_min - pitch_setpoint_unc) * climb_angle_to_SEB_rate / pitch_time_constant
+                pitch_integ_input = max(pitch_integ_input, max(edge, 0.0))
+            pitch_integ_state = pitch_integ_state + pitch_integ_input * dt
+        else:
+            pitch_integ_state = 0.0
+        pitch_damping_gain = 0.01
+        SEB_correction = SEB_error + SEB_rate_error * pitch_damping_gain + SEB_rate_setpoint * pitch_time_constant
+        if climbout_mode_active:
+            SEB_correction += pitch_setpoint_min * climb_angle_to_SEB_rate
+        pitch_setpoint_unc = (SEB_correction + pitch_integ_state) / climb_angle_to_SEB_rate
+        pitch_setpoint = constrain(pitch_setpoint_unc, pitch_setpoint_min, pitch_setpoint_max)
+        vert_accel_limit = 0.2
+        ptchRateIncr = dt * vert_accel_limit / tas_state
+        if pitch_setpoint - last_pitch_setpoint > ptchRateIncr:
+            pitch_setpoint = last_pitch_setpoint + ptchRateIncr
+        elif pitch_setpoint - last_pitch_setpoint < -1 * ptchRateIncr:
+            pitch_setpoint = last_pitch_setpoint - ptchRateIncr
+        last_pitch_setpoint = pitch_setpoint
 
-
-
-
-        hrt_abstime = 0
-        alt_sp = 0
-        airspeed_sp = 0
-        pitch_min_rad = 0
-        pitch_max_rad = 0
-        throttle_min = 0
-        throttle_max = 0
-        throttle_cruise = 0
-        climbout_mode = 0
-        climbout_pitch_min_rad = 0
-        mode = 0
-
-
-
-        param_fw_rsp_off = 0.2  # radians
-        param_fw_psp_off = 0.2  # radians
-        pitch = 0
-
-        pitch_for_tecs = pitch - param_fw_psp_off
-
-        return None
+        return [pitch_setpoint, throttle_setpoint]
 
