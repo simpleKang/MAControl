@@ -425,6 +425,26 @@ class MotionController_L1_TECS(MotionController):
         lateral_accel_sp_circle_centripetal = tangent_vel * tangent_vel / max1
         lateral_accel_sp_circle = loiter_direction * (lateral_accel_sp_circle_pd + lateral_accel_sp_circle_centripetal)
 
-        # TBC
+        # /* Switch between circle (loiter) and capture (towards waypoint center) mode when
+        # 	 * the commands switch over. Only fly towards waypoint if outside the circle. */
+        if (lateral_accel_sp_center < lateral_accel_sp_circle and loiter_direction > 0.0 and xtrack_err_circle > 0.0) \
+                or \
+           (lateral_accel_sp_center > lateral_accel_sp_circle and loiter_direction < 0.0 and xtrack_err_circle < 0.0):
+            lateral_accel = lateral_accel_sp_center
+            circle_mode = False
+            # /* angle between requested and current velocity vector */ #
+            bearing_error = eta
+            # /* bearing from current position to L1 point */ #
+            nav_bearing = math.atan2(vector_PA_unit[1], vector_PA_unit[0])
+        else:
+            lateral_accel = lateral_accel_sp_circle
+            circle_mode = True
+            bearing_error = 0.0
+            # /* bearing from current position to L1 point */ #
+            nav_bearing = math.atan2(vector_PA_unit[1], vector_PA_unit[0])
 
-        return self.throttle_setpoint
+        # update roll setpoint
+        roll_new = math.atan(lateral_accel * 1.0 / 9.81551)
+        self.roll_setpoint = roll_new
+
+        return None
