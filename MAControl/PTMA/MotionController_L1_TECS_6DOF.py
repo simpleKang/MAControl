@@ -23,6 +23,7 @@ class MotionController_L1_TECS(MotionController):
         self.roll_setpoint = 0.0
         self.nav_bearing = 0.0
         self.throttle_setpoint = 0.0
+        self.circle_mode = False
 
     def get_expected_action(self, obs, pointAi, pointBi, step, finishedi):
 
@@ -127,6 +128,9 @@ class MotionController_L1_TECS(MotionController):
         else:
             pass
 
+        if was_circle_mode and (not self.circle_mode):
+            att_sp_roll_reset_integral = True
+
         return self.tangent_acc, self.lateral_acc, False
 
     def l1_control_navigate_waypoints(self, vectorA, vectorB, vectorP, vectorVel):
@@ -198,7 +202,7 @@ class MotionController_L1_TECS(MotionController):
 
         eta = constrain(eta, -1*math.pi/2, math.pi/2)
         lateral_accel = nav_speed * nav_speed / L1_distance * math.sin(eta)
-        circle_mode = False
+        self.circle_mode = False
         bearing_error = eta
 
         # update roll setpoint
@@ -431,14 +435,14 @@ class MotionController_L1_TECS(MotionController):
                 or \
            (lateral_accel_sp_center > lateral_accel_sp_circle and loiter_direction < 0.0 and xtrack_err_circle < 0.0):
             lateral_accel = lateral_accel_sp_center
-            circle_mode = False
+            self.circle_mode = False
             # /* angle between requested and current velocity vector */ #
             bearing_error = eta
             # /* bearing from current position to L1 point */ #
             nav_bearing = math.atan2(vector_PA_unit[1], vector_PA_unit[0])
         else:
             lateral_accel = lateral_accel_sp_circle
-            circle_mode = True
+            self.circle_mode = True
             bearing_error = 0.0
             # /* bearing from current position to L1 point */ #
             nav_bearing = math.atan2(vector_PA_unit[1], vector_PA_unit[0])
