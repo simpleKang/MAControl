@@ -21,6 +21,7 @@ class MotionController_L1_TECS(MotionController):
 
         # key values
         self.roll_setpoint = 0.0
+        self.pitch_setpoint = 0.0
         self.nav_bearing = 0.0
         self.throttle_setpoint = 0.0
         self.circle_mode = False
@@ -82,7 +83,7 @@ class MotionController_L1_TECS(MotionController):
         dt = self.world.dt
         setpoint = True
         att_sp_fw_control_yaw = False
-        # # airspeed valid
+        # —— —— —— airspeed valid —— —— —— #
         air_angle = math.atan2(obs[8], obs[7])
         ground_angle = math.atan2(obs[5], obs[4])
         ground_vel = np.sqrt(obs[4]*obs[4]+obs[5]*obs[5])
@@ -92,7 +93,7 @@ class MotionController_L1_TECS(MotionController):
             nav_speed_2d = obs[4:6]
         throttle_max = 1
         was_in_air = True
-        # # autonomous flight
+        # —— —— —— autonomous flight —— —— —— #
         hold_alt = obs[0]
         hdg_hold_yaw = obs[3]
         was_circle_mode = False
@@ -127,11 +128,15 @@ class MotionController_L1_TECS(MotionController):
             self.tecs_update_pitch_throttle(obs, curr_wp[2], param_fw_thr_min, param_fw_thr_cruise)
         else:
             pass
-
         if was_circle_mode and (not self.circle_mode):
             att_sp_roll_reset_integral = True
+        # —— —— —— copy thrust output for publication  —— —— —— #
+        att_sp_thrust_body_0 = 0.0
+        use_tecs_pitch = True
+        if use_tecs_pitch:
+            att_sp_pitch_body = self.pitch_setpoint
 
-        return self.tangent_acc, self.lateral_acc, False
+        return self.roll_setpoint, self.pitch_setpoint, self.throttle_setpoint
 
     def l1_control_navigate_waypoints(self, vectorA, vectorB, vectorP, vectorVel):
         L1_ratio = 0.1  # (当v=0.05则L1=0.005km=50m)
@@ -378,16 +383,16 @@ class MotionController_L1_TECS(MotionController):
         if climbout_mode_active:
             SEB_correction += pitch_setpoint_min * climb_angle_to_SEB_rate
         pitch_setpoint_unc = (SEB_correction + pitch_integ_state) / climb_angle_to_SEB_rate
-        pitch_setpoint = constrain(pitch_setpoint_unc, pitch_setpoint_min, pitch_setpoint_max)
+        self.pitch_setpoint = constrain(pitch_setpoint_unc, pitch_setpoint_min, pitch_setpoint_max)
         vert_accel_limit = 0.2
         ptchRateIncr = dt * vert_accel_limit / tas_state
-        if pitch_setpoint - last_pitch_setpoint > ptchRateIncr:
-            pitch_setpoint = last_pitch_setpoint + ptchRateIncr
-        elif pitch_setpoint - last_pitch_setpoint < -1 * ptchRateIncr:
-            pitch_setpoint = last_pitch_setpoint - ptchRateIncr
-        last_pitch_setpoint = pitch_setpoint
+        if self.pitch_setpoint - last_pitch_setpoint > ptchRateIncr:
+            self.pitch_setpoint = last_pitch_setpoint + ptchRateIncr
+        elif self.pitch_setpoint - last_pitch_setpoint < -1 * ptchRateIncr:
+            self.pitch_setpoint = last_pitch_setpoint - ptchRateIncr
+        last_pitch_setpoint = self.pitch_setpoint
 
-        return [pitch_setpoint, throttle_setpoint]
+        return [self.pitch_setpoint, throttle_setpoint]
 
     def l1_control_navigate_loiter(self, vectorA, vectorP, loiter_radius, loiter_direction, vectorVel):
         L1_period = 0.5
