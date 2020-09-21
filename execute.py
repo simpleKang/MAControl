@@ -53,12 +53,10 @@ def get_controller(env, world, arglist):
 
     for i in range(env.n):
         control = []
-        control.append(PM_P.PolicyMaker_Auction("agent_%d" % i, env, world, i, arglist))
+        control.append(PM_P.PolicyMaker_Probability("agent_%d" % i, env, world, i, arglist))
         control.append(PP_S.PathPlanner_Simple("agent_%d" % i, env, world, i, arglist))
         control.append(MC_L.MotionController_L1_TECS("agent_%d" % i, env, world, i, arglist))
         control.append(IC_P.InnerController_PID("agent_%d" % i, env, world, i, arglist))
-        control.append(False)  # Arriveflag
-        control.append(False)  # Isattacking
         control.append(-1)  # which target is it attacking
         ControllerSet.append(control)
 
@@ -124,16 +122,16 @@ if __name__ == '__main__':
         NewController = get_controller(env, world, arglist)
 
         # Rest Controller (重置类变量)
-        PM_P.PolicyMaker_Auction.Found_Target_Set = []
-        PM_P.PolicyMaker_Auction.Found_Target_Info = []
-        PM_P.PolicyMaker_Auction.Attacked_Target_Index = []
-        PM_P.PolicyMaker_Auction.Remain_UAV_Set = []
-        PM_P.PolicyMaker_Auction.Remain_Target_Set = []
-        PM_P.PolicyMaker_Auction.Current_Target_Index = -1
-        PM_P.PolicyMaker_Auction.Current_Price_Set = []
-        PM_P.PolicyMaker_Auction.Current_Price_Result = []
+        PM_P.PolicyMaker_Probability.Found_Target_Set = []
+        PM_P.PolicyMaker_Probability.Found_Target_Info = []
+        PM_P.PolicyMaker_Probability.Attacked_Target_Index = []
+        PM_P.PolicyMaker_Probability.Remain_UAV_Set = []
+        PM_P.PolicyMaker_Probability.Remain_Target_Set = []
+        PM_P.PolicyMaker_Probability.Current_Target_Index = -1
+        PM_P.PolicyMaker_Probability.Current_Price_Set = []
+        PM_P.PolicyMaker_Probability.Current_Price_Result = []
         for i in range(env.n):
-            PM_P.PolicyMaker_Auction.Remain_UAV_Set.append(i)
+            PM_P.PolicyMaker_Probability.Remain_UAV_Set.append(i)
 
         obs_n = env.reset()
         episode += 1
