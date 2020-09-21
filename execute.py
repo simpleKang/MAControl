@@ -5,7 +5,7 @@ import time
 import MAControl.PTMA.InnerController_PID as IC_P
 import MAControl.PTMA.MotionController_L1_TECS_6DOF as MC_L
 import MAControl.PTMA.PathPlanner_Simple as PP_S
-import MAControl.PTMA.PolicyMaker_Auction as PM_A
+import MAControl.PTMA.PolicyMaker_Probability as PM_P
 import logging
 import numpy as np
 
@@ -53,7 +53,7 @@ def get_controller(env, world, arglist):
 
     for i in range(env.n):
         control = []
-        control.append(PM_A.PolicyMaker_Auction("agent_%d" % i, env, world, i, arglist))
+        control.append(PM_P.PolicyMaker_Auction("agent_%d" % i, env, world, i, arglist))
         control.append(PP_S.PathPlanner_Simple("agent_%d" % i, env, world, i, arglist))
         control.append(MC_L.MotionController_L1_TECS("agent_%d" % i, env, world, i, arglist))
         control.append(IC_P.InnerController_PID("agent_%d" % i, env, world, i, arglist))
@@ -124,16 +124,16 @@ if __name__ == '__main__':
         NewController = get_controller(env, world, arglist)
 
         # Rest Controller (重置类变量)
-        PM_A.PolicyMaker_Auction.Found_Target_Set = []
-        PM_A.PolicyMaker_Auction.Found_Target_Info = []
-        PM_A.PolicyMaker_Auction.Attacked_Target_Index = []
-        PM_A.PolicyMaker_Auction.Remain_UAV_Set = []
-        PM_A.PolicyMaker_Auction.Remain_Target_Set = []
-        PM_A.PolicyMaker_Auction.Current_Target_Index = -1
-        PM_A.PolicyMaker_Auction.Current_Price_Set = []
-        PM_A.PolicyMaker_Auction.Current_Price_Result = []
+        PM_P.PolicyMaker_Auction.Found_Target_Set = []
+        PM_P.PolicyMaker_Auction.Found_Target_Info = []
+        PM_P.PolicyMaker_Auction.Attacked_Target_Index = []
+        PM_P.PolicyMaker_Auction.Remain_UAV_Set = []
+        PM_P.PolicyMaker_Auction.Remain_Target_Set = []
+        PM_P.PolicyMaker_Auction.Current_Target_Index = -1
+        PM_P.PolicyMaker_Auction.Current_Price_Set = []
+        PM_P.PolicyMaker_Auction.Current_Price_Result = []
         for i in range(env.n):
-            PM_A.PolicyMaker_Auction.Remain_UAV_Set.append(i)
+            PM_P.PolicyMaker_Auction.Remain_UAV_Set.append(i)
 
         obs_n = env.reset()
         episode += 1

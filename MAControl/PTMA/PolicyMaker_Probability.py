@@ -6,7 +6,7 @@ from MAControl.Util.Constrain import constrain
 import math
 
 
-class PolicyMaker_Auction(PolicyMaker):
+class PolicyMaker_Probability(PolicyMaker):
 
     #                                       (Step2<=)&(<Step3)
     # 搜索目标[阶段] | 排序目标[步] | 选择目标[步] | 出价[阶段] | 统计价格[步] | 分道扬镳[步] | 重置[步] >>>> 搜索目标[阶段] ....
