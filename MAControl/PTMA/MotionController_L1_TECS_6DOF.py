@@ -131,12 +131,39 @@ class MotionController_L1_TECS(MotionController):
         if was_circle_mode and (not self.circle_mode):
             att_sp_roll_reset_integral = True
         # —— —— —— copy thrust output for publication  —— —— —— #
-        att_sp_thrust_body_0 = 0.0
-        use_tecs_pitch = True
-        if use_tecs_pitch:
-            att_sp_pitch_body = self.pitch_setpoint
+        att_sp_thrust_body_0 = min(self.throttle_setpoint, throttle_max)
+        att_sp_pitch_body = self.pitch_setpoint
 
-        return self.roll_setpoint, self.pitch_setpoint, self.throttle_setpoint
+        # FixedwingPositionControl::Run() # Procedure #
+        # parameter_update_s pupdate;
+        # _parameter_update_sub.copy(&pupdate);
+        # parameters_update();
+        # vehicle_global_position_s gpos;
+        # _current_latitude = gpos.lat;
+        # _current_longitude = gpos.lon;
+        # _current_altitude = -_local_pos.z + _local_pos.ref_alt;
+        # _hdg_hold_enabled = false;
+        # _alt_reset_counter = _local_pos.vz_reset_counter;
+        # _pos_reset_counter = _local_pos.vxy_reset_counter;
+        # airspeed_poll();
+        # _pos_sp_triplet_sub.update(&_pos_sp_triplet);
+        # vehicle_attitude_poll();
+        # vehicle_control_mode_poll();
+        # _vehicle_status_sub.update(&_vehicle_status);
+        # _vehicle_acceleration_sub.update();
+        # _vehicle_rates_sub.update();
+        # Vector2f curr_pos((float)_current_latitude, (float)_current_longitude);
+        # Vector2f ground_speed(_local_pos.vx, _local_pos.vy);
+        # // Convert Local setpoints to global setpoints.
+        # _att_sp.roll_body += radians(_param_fw_rsp_off.get());
+        # _att_sp.pitch_body += radians(_param_fw_psp_off.get());
+        # const Quatf q(Eulerf(_att_sp.roll_body, _att_sp.pitch_body, _att_sp.yaw_body));
+        # q.copyTo(_att_sp.q_d);
+        # _att_sp.timestamp = hrt_absolute_time();
+        # _attitude_sp_pub.publish(_att_sp);
+        # status_publish();
+
+        return None
 
     def l1_control_navigate_waypoints(self, vectorA, vectorB, vectorP, vectorVel):
         L1_ratio = 0.1  # (当v=0.05则L1=0.005km=50m)
