@@ -1,3 +1,5 @@
+import random
+
 
 def creat_snake_waypoint_list(waypoint_list, N, i, new_list_index, W=0.9, D=0.05, Edge=1):
 
@@ -8,6 +10,21 @@ def creat_snake_waypoint_list(waypoint_list, N, i, new_list_index, W=0.9, D=0.05
     Wide1 = round(D * (2 * (N - i) - 1), 3)
     Wide2 = round(D * (2 * i + 1), 3)
     new_waypoint_list = snake_single(Up, Down, Wide1, Wide2, Edge, W, D, i)
+    waypoint_list[-1][0:len(new_waypoint_list)] = new_waypoint_list[:]
+    new_list_index += 1
+
+    return waypoint_list, new_list_index
+
+
+def create_random_waypoint_list(waypoint_list, new_list_index):
+
+    waypoint_list.append([[0 for j in range(3)] for k in range(256)])
+
+    new_waypoint_list = []
+    for i in range(20):
+        point = [random.random(), random.random(), 1]
+        new_waypoint_list.append(point)
+
     waypoint_list[-1][0:len(new_waypoint_list)] = new_waypoint_list[:]
     new_list_index += 1
 
