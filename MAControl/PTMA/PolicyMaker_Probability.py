@@ -34,7 +34,7 @@ class PolicyMaker_Probability(PolicyMaker):
     Current_Price_Result = []  # {UAV_INDEX,UAV_PRICE}
 
     def __init__(self, name, env, world, agent_index, arglist):
-        super(PolicyMaker_Auction, self).__init__(name, env, world, agent_index, arglist)
+        super(PolicyMaker_Probability, self).__init__(name, env, world, agent_index, arglist)
         self.opt_index = 0
         self.x = 0
         self.y = 0

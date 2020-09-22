@@ -57,21 +57,15 @@ def get_controller(env, world, arglist):
         control.append(PP_S.PathPlanner_Simple("agent_%d" % i, env, world, i, arglist))
         control.append(MC_L.MotionController_L1_TECS("agent_%d" % i, env, world, i, arglist))
         control.append(IC_P.InnerController_PID("agent_%d" % i, env, world, i, arglist))
-        control.append(-1)  # which target is it attacking
         ControllerSet.append(control)
 
     return ControllerSet
 
 
-def update_action(env, world, obs_n, step, NewController):
-
-    WorldTarget = []
-    for i, landmark in enumerate(world.targets):
-
-        WorldTarget.append([landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.state.p_vel[0],
-                            landmark.state.p_vel[1], landmark.value, landmark.defence, landmark.type, i])
+def update_action(obs_n, WorldTarget, step, NewController):
 
     action_n = []
+
     for i in range(env.n):
 
         list_i = NewController[i][0]. \
@@ -112,6 +106,10 @@ if __name__ == '__main__':
 
     # Create environment
     env, world = make_env(arglist)
+    WorldTarget = []
+    for i, landmark in enumerate(world.targets):
+        WorldTarget.append([landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.state.p_vel[0],
+                            landmark.state.p_vel[1], landmark.value, landmark.defence, landmark.type, i])
 
     episode = 0
     t_start = time.time()
@@ -141,7 +139,7 @@ if __name__ == '__main__':
 
             # get action
             print('>>> step ', step)
-            action_n = update_action(env, world, obs_n, step, NewController)
+            action_n = update_action(obs_n, WorldTarget, step, NewController)
 
             # environment step
             new_obs_n, rew_n, done_n, info_n = env.jstep(action_n)
