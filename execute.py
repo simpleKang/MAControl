@@ -86,7 +86,7 @@ def update_action(obs_n, WorldTarget, step, NewController):
 
     for i in range(arglist.numU):
 
-        action = np.random.random_sample(6) * 2 - 1
+        action = np.random.random_sample(5) * 2 - 1
         action_n.append(action)
 
     return action_n

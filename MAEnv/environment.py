@@ -117,8 +117,7 @@ class MultiAgentEnv(gym.Env):
                             agent.__setitem__(prp.aileron_right, action_n[i][1]),
                             agent.__setitem__(prp.elevator, action_n[i][2]),
                             agent.__setitem__(prp.rudder, action_n[i][3]),
-                            agent.__setitem__(prp.throttle, action_n[i][4]),
-                            agent.__setitem__(prp.gear, action_n[i][5])]
+                            agent.__setitem__(prp.throttle, action_n[i][4])]
 
         # advance world state
         kk = self.jsbsimk()

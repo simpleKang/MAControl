@@ -26,8 +26,7 @@ class Scenario(BaseScenario, ABC):
                                      agent.__getitem__(prp.aileron_right),
                                      agent.__getitem__(prp.elevator),
                                      agent.__getitem__(prp.rudder),
-                                     agent.__getitem__(prp.throttle),
-                                     agent.__getitem__(prp.gear)]
+                                     agent.__getitem__(prp.throttle)]
         # set other entities (on ground)
         num_targets = T.num_targets
         num_obstacles = 0
@@ -60,7 +59,7 @@ class Scenario(BaseScenario, ABC):
             landmark.size = 0.005
             landmark.attacking = False
         world.landmarks = world.targets + world.obstacles + world.grids
-        # make initial conditions
+        # initial conditions
         self.reset_world(world)
         return world
 
