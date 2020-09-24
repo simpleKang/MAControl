@@ -64,8 +64,8 @@ class Scenario(BaseScenario, ABC):
 
     def reset_world(self, world):
 
-        ref_lon_deg = 39.966791   # 经度 (BIT)
-        ref_lat_deg = 116.323202  # 纬度 (BIT)
+        ref_lon_deg = 39.965376   # 经度 (BIT)
+        ref_lat_deg = 116.325657  # 纬度 (BIT)
         ref_alt_m = 58.809239     # 海拔 (BIT)
 
         for i, agent in enumerate(world.agents):
@@ -127,8 +127,8 @@ class Scenario(BaseScenario, ABC):
     @staticmethod
     def globallocalconverter(lat, lon, x, y, getxy=True):
         CONSTANTS_RADIUS_OF_EARTH = 6378137  # m # Equatorial
-        ref_lon_rad = 39.966791 / 180 * math.pi
-        ref_lat_rad = 116.323202 / 180 * math.pi
+        ref_lon_rad = 39.965376 / 180 * math.pi
+        ref_lat_rad = 116.325657 / 180 * math.pi
         ref_sin_lat = math.sin(ref_lat_rad)
         ref_cos_lat = math.cos(ref_lat_rad)
 
