@@ -1,5 +1,9 @@
 # Environment # Reference #
 # https://github.com/PX4/ecl/blob/master/geo/geo.cpp #
+#  MAE - Aircraft [lon, lat, alt]
+#  MAE - Entity   (x,y)=(0,0) 对应 (lon,lat) = (39.965376,116.325657)
+#                 (z) === 0   对应 (alt) = 58.809239
+
 
 from abc import ABC
 import numpy as np
@@ -28,7 +32,6 @@ class Scenario(BaseScenario, ABC):
                                      agent.__getitem__(prp.throttle)]
         # set other entities (on ground)
         num_targets = T.num_targets
-        num_obstacles = 0
         num_grids = 5
         # add landmarks
         world.targets = [Landmark() for i in range(num_targets)]
@@ -43,13 +46,6 @@ class Scenario(BaseScenario, ABC):
             landmark.defence = DEFENCE[target_type[i]-1]
             landmark.attacking = False
             landmark.type = target_type[i]
-        world.obstacles = [Landmark() for i in range(num_obstacles)]
-        for i, landmark in enumerate(world.obstacles):
-            landmark.name = 'obstacle %d' % i
-            landmark.collide = False
-            landmark.movable = False
-            landmark.size = np.ceil(random.random()*10)*0.01
-            landmark.attacking = False
         world.grids = [Landmark() for i in range(num_grids)]
         for i, landmark in enumerate(world.grids):
             landmark.name = 'grid %d' % i
@@ -57,16 +53,12 @@ class Scenario(BaseScenario, ABC):
             landmark.movable = False
             landmark.size = 0.005
             landmark.attacking = False
-        world.landmarks = world.targets + world.obstacles + world.grids
+        world.landmarks = world.targets + world.grids
         # initial conditions
         self.reset_world(world)
         return world
 
     def reset_world(self, world):
-
-        ref_lon_deg = 39.965376   # 经度 (BIT)
-        ref_lat_deg = 116.325657  # 纬度 (BIT)
-        ref_alt_m = 58.809239     # 海拔 (BIT)
 
         for i, agent in enumerate(world.agents):
             agent.reinitialise()
