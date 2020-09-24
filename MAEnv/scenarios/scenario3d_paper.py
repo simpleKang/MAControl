@@ -1,13 +1,13 @@
 # Environment # Reference #
 # https://github.com/PX4/ecl/blob/master/geo/geo.cpp #
 #  MAE - Aircraft [lon, lat, alt]
-#  MAE - Entity   (x,y)=(0,0) 对应 (lon,lat) = (39.965376,116.325657)
+#  MAE - Entity   (x,y)=(0,0) 对应 (lat,lon) = (39.965376,116.325657)
 #                 (z) === 0   对应 (alt) = 58.809239
+#  lon/deg, lat/deg, alt/m, x/km, y/km, z/km
 
 
 from abc import ABC
 import numpy as np
-import random
 import math
 from MAControl.Util.Constrain import constrain
 from MAEnv.core import World, Landmark
@@ -59,8 +59,8 @@ class Scenario(BaseScenario, ABC):
         return world
 
     def reset_world(self, world):
-        ref_lon_deg = 39.965376   # 经度 (BIT)
-        ref_lat_deg = 116.325657  # 纬度 (BIT)
+        ref_lat_deg = 39.965376   # 经度 (BIT)
+        ref_lon_deg = 116.325657  # 纬度 (BIT)
         ref_alt_m = 58.809239     # 海拔 (BIT)
 
         for i, agent in enumerate(world.agents):
@@ -127,8 +127,8 @@ class Scenario(BaseScenario, ABC):
     @staticmethod
     def globallocalconverter(lat, lon, x, y, getxy):
         CONSTANTS_RADIUS_OF_EARTH = 6378137  # m # Equatorial
-        ref_lon_rad = 39.965376 / 180 * math.pi
-        ref_lat_rad = 116.325657 / 180 * math.pi
+        ref_lat_rad = 39.965376 / 180 * math.pi
+        ref_lon_rad = 116.325657 / 180 * math.pi
         ref_sin_lat = math.sin(ref_lat_rad)
         ref_cos_lat = math.cos(ref_lat_rad)
 
@@ -143,12 +143,12 @@ class Scenario(BaseScenario, ABC):
             k = 1.0
             if abs(c) > 0.0:
                 k = c / math.sin(c)
-            x = (k * (ref_cos_lat * sin_lat - ref_sin_lat * cos_lat * cos_d_lon) * CONSTANTS_RADIUS_OF_EARTH)
-            y = (k * cos_lat * math.sin(lon_rad - ref_lon_rad) * CONSTANTS_RADIUS_OF_EARTH)
+            x = (k * (ref_cos_lat * sin_lat - ref_sin_lat * cos_lat * cos_d_lon) * CONSTANTS_RADIUS_OF_EARTH) / 1000
+            y = (k * cos_lat * math.sin(lon_rad - ref_lon_rad) * CONSTANTS_RADIUS_OF_EARTH) / 1000
 
         else:
-            x_rad = x / CONSTANTS_RADIUS_OF_EARTH
-            y_rad = y / CONSTANTS_RADIUS_OF_EARTH
+            x_rad = x * 1000 / CONSTANTS_RADIUS_OF_EARTH
+            y_rad = y * 1000 / CONSTANTS_RADIUS_OF_EARTH
             c = math.sqrt(x_rad * x_rad + y_rad * y_rad)
             if abs(c) > 0:
                 sin_c = math.sin(c)
