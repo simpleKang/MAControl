@@ -1,8 +1,12 @@
-# 环境长度 1 = 实际长度 1000 米 = 1 千米
-from abc import ABC
+# Environment # Reference #
+# https://github.com/PX4/ecl/blob/master/geo/geo.cpp #
+# For simplicity, we consider the Earth a perfect sphere of radius 6,378,100m.
 
+from abc import ABC
 import numpy as np
 import random
+import math
+from MAControl.Util.Constrain import constrain
 from MAEnv.core import World, Landmark
 from MAEnv.scenario import BaseScenario
 import MAEnv.scenarios.TargetProfile as T
@@ -117,6 +121,40 @@ class Scenario(BaseScenario, ABC):
         for t, target in enumerate(world.targets):
             rew += target.value * res5[t]
         return rew
+
+    def globallocalconverter(self, lat_deg, lon_deg):
+        CONSTANTS_RADIUS_OF_EARTH = 6378100  # m
+        lat_rad = lat_deg * math.pi / 180
+        lon_rad = lon_deg * math.pi / 180
+        sin_lat = math.sin(lat_rad)
+        cos_lat = math.cos(lat_rad)
+        ref_lon_rad = 1.0  # this is not true
+        ref_lat_rad = 1.0  # this is not true
+        ref_sin_lat = 1.0  # this is not true
+        ref_cos_lat = 1.0  # this is not true
+        cos_d_lon = math.cos(lon_rad - ref_lon_rad)
+        arg = constrain(ref_sin_lat * sin_lat + ref_cos_lat * cos_lat * cos_d_lon, -1.0, 1.0)
+        c = math.acos(arg)
+        k = 1.0
+        if abs(c) > 0.0:
+            k = c / math.sin(c)
+        x = (k * (ref_cos_lat * sin_lat - ref_sin_lat * cos_lat * cos_d_lon) * CONSTANTS_RADIUS_OF_EARTH)
+        y = (k * cos_lat * math.sin(lon_rad - ref_lon_rad) * CONSTANTS_RADIUS_OF_EARTH)
+        x_rad = x / CONSTANTS_RADIUS_OF_EARTH
+        y_rad = y / CONSTANTS_RADIUS_OF_EARTH
+        c = math.sqrt(x_rad * x_rad + y_rad * y_rad)
+        if abs(c) > 0:
+            sin_c = math.sin(c)
+            cos_c = math.cos(c)
+            lat_rad = math.asin(cos_c * ref_sin_lat + (x_rad * sin_c * ref_cos_lat) / c)
+            lon_rad = (ref_lon_rad + math.atan2(y_rad * sin_c, c * ref_cos_lat * cos_c - x_rad * ref_sin_lat * sin_c))
+            lat_deg = lat_rad / math.pi * 180
+            lon_deg = lon_rad / math.pi * 180
+        else:
+            lat_deg = ref_lat_rad / math.pi * 180
+            lon_deg = ref_lon_rad / math.pi * 180
+
+        return None
 
     def observation(self, agent, world):
         agent.obs = [agent.__getitem__(prp.altitude_sl_ft),
