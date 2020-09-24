@@ -59,6 +59,9 @@ class Scenario(BaseScenario, ABC):
         return world
 
     def reset_world(self, world):
+        ref_lon_deg = 39.965376   # 经度 (BIT)
+        ref_lat_deg = 116.325657  # 纬度 (BIT)
+        ref_alt_m = 58.809239     # 海拔 (BIT)
 
         for i, agent in enumerate(world.agents):
             agent.reinitialise()
@@ -71,6 +74,11 @@ class Scenario(BaseScenario, ABC):
             if i < len(world.targets):
                 landmark.color = np.random.uniform(0, 1, 3)
                 landmark.state.p_pos = np.array(T.target_pos[i])
+                kkk = self.globallocalconverter(ref_lat_deg, ref_lon_deg, landmark.state.p_pos[0],
+                                                landmark.state.p_pos[1], getxy=False)
+                landmark.lat = kkk[0]
+                landmark.lon = kkk[1]
+                landmark.alt = ref_alt_m
             else:
                 landmark.color = T.grid_color
                 landmark.state.p_pos = np.array(T.grid_pos[i-len(world.targets)])
@@ -117,7 +125,7 @@ class Scenario(BaseScenario, ABC):
         return rew
 
     @staticmethod
-    def globallocalconverter(lat, lon, x, y, getxy=True):
+    def globallocalconverter(lat, lon, x, y, getxy):
         CONSTANTS_RADIUS_OF_EARTH = 6378137  # m # Equatorial
         ref_lon_rad = 39.965376 / 180 * math.pi
         ref_lat_rad = 116.325657 / 180 * math.pi
