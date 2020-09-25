@@ -172,9 +172,11 @@ class Scenario(BaseScenario, ABC):
                      agent.__getitem__(prp.v_north_fps), agent.__getitem__(prp.v_east_fps),
                      agent.__getitem__(prp.p_radps), agent.__getitem__(prp.q_radps), agent.__getitem__(prp.r_radps),
                      agent.__getitem__(prp.lat_geod_deg), agent.__getitem__(prp.lng_geoc_deg)]
+        xy = list(self.globallocalconverter(agent.obs[15], agent.obs[16], 0.0, 0.0, True))[2:]
+        agent.obs = agent.obs + xy
         # [0] altitude [1] pitch [2] roll [3] heading(yaw)
         # [4] u [5] v [6] w
         # [7] u-aero [8] v-aero [9] w-aero [10] v-north [11] v-east
         # [12] p [13] q [14] r
-        # [15] lat [16] lon
+        # [15] lat [16] lon [17] 'x' [18] 'y'
         return agent.obs

@@ -133,13 +133,7 @@ class MultiAgentEnv(gym.Env):
         # record observation for each agent
         for agent in self.agents:
             agent.run()
-            obs = [agent.__getitem__(prp.altitude_sl_ft),
-                   agent.__getitem__(prp.pitch_rad), agent.__getitem__(prp.roll_rad), agent.__getitem__(prp.heading_deg),
-                   agent.__getitem__(prp.u_fps), agent.__getitem__(prp.v_fps), agent.__getitem__(prp.w_fps),
-                   agent.__getitem__(prp.u_aero_fps), agent.__getitem__(prp.v_aero_fps), agent.__getitem__(prp.w_aero_fps),
-                   agent.__getitem__(prp.v_north_fps), agent.__getitem__(prp.v_east_fps),
-                   agent.__getitem__(prp.p_radps), agent.__getitem__(prp.q_radps), agent.__getitem__(prp.r_radps),
-                   agent.__getitem__(prp.lat_geod_deg), agent.__getitem__(prp.lng_geoc_deg)]
+            obs = self.observation_callback(agent, self.world)
             obs_n.append(obs)
             reward_n.append(self._get_reward(agent))
             done_n.append(self._get_done(agent))
