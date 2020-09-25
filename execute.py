@@ -108,8 +108,9 @@ if __name__ == '__main__':
     env, world = make_env(arglist)
     WorldTarget = []
     for i, landmark in enumerate(world.targets):
-        WorldTarget.append([landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.state.p_vel[0],
-                            landmark.state.p_vel[1], landmark.value, landmark.defence, landmark.type, i])
+        WorldTarget.append([landmark.state.p_pos[0], landmark.state.p_pos[1],
+                            landmark.lon, landmark.lat, landmark.alt,
+                            landmark.value, landmark.defence, landmark.type, i])
 
     episode = 0
     t_start = time.time()

@@ -18,7 +18,7 @@ class PolicyMaker_Probability(PolicyMaker):
     #                                                                     攻击[阶段]
 
     # 在搜索目标阶段(<Step0)操作，只增不减
-    Found_Target_Set = []  # {target_pos, target_vel, target_value, target_defence, target_type, T_INDEX}
+    Found_Target_Set = []  # {target_pos/xy, target_pos/lla, target_value, target_defence, target_type, T_INDEX}
     Found_Target_Info = []  # {TARGET:UAV_INDEX}
 
     # 在重置步(==Step5)操作，只增不减
@@ -28,7 +28,7 @@ class PolicyMaker_Probability(PolicyMaker):
     Remain_UAV_Set = []  # {UAV_INDEX}
 
     # 在重置步(==Step5)重置
-    Remain_Target_Set = []  # {target_pos, target_vel, target_value, target_defence, target_type, T_INDEX, TARGET_INDEX}
+    Remain_Target_Set = []  # {target_pos/xy+lla, target_value, target_defence, target_type, T_INDEX, TARGET_INDEX}
     Current_Target_Index = -1  # {TARGET_INDEX}
     Current_Price_Set = []   # {UAV X STEP}
     Current_Price_Result = []  # {UAV_INDEX,UAV_PRICE}
@@ -115,7 +115,7 @@ class PolicyMaker_Probability(PolicyMaker):
                         seen_target[-1][-4:-1] = [10, 1, 2]
                 # 在seen_target中，真序号是准确的（唯一标识），类型可能有误（相应的价值和防御能力都有误）
 
-        # READ AND WRITE TESTControl.Found_Target_Set
+        # READ AND WRITE PolicyMaker_Probability.Found_Target_Set
         if not PolicyMaker_Probability.Found_Target_Set:
             PolicyMaker_Probability.Found_Target_Set = seen_target
             for i in range(len(seen_target)):
@@ -141,12 +141,12 @@ class PolicyMaker_Probability(PolicyMaker):
                 info.append(self.index)
 
     def searching_is_good_enough(self, step):
-        check1 = ((PolicyMaker_Probability.Found_Target_Set) != [])
+        check1 = (PolicyMaker_Probability.Found_Target_Set != [])
         check2 = (len(PolicyMaker_Probability.Attacked_Target_Index) != len(PolicyMaker_Probability.Found_Target_Set))
 
         # 实际情况
         check3a = 0 if len(PolicyMaker_Probability.Found_Target_Set) == 0 \
-            else (np.sum(PolicyMaker_Probability.Found_Target_Set, axis=0))[4]/len(PolicyMaker_Probability.Remain_UAV_Set)
+            else (np.sum(PolicyMaker_Probability.Found_Target_Set, axis=0))[5]/len(PolicyMaker_Probability.Remain_UAV_Set)
         # 阈值随时间减少
         check3b = 1000/self.env.n*20/(step+1)
         check3 = (check3a > check3b)
@@ -204,7 +204,7 @@ class PolicyMaker_Probability(PolicyMaker):
         e1 = 0.5      # 我方小飞机优势系数
         e2 = 0.5      # 敌方目标战术价值系数  e1 + e2 = 1 (0 <= e1, e2 <= 1)
         pt = 0.8      # 小飞机单发杀伤概率
-        W = PolicyMaker_Probability.Found_Target_Set[PolicyMaker_Probability.Current_Target_Index][4]        # 目标的战术价值
+        W = PolicyMaker_Probability.Found_Target_Set[PolicyMaker_Probability.Current_Target_Index][5]    # 目标的战术价值
         sigma1 = 0.5  # 距离优势系数
         sigma2 = 0.5  # 角度优势系数
         D = 0.6       # 小飞机能够攻击目标的最大距离
@@ -264,7 +264,7 @@ class PolicyMaker_Probability(PolicyMaker):
                         if i not in PolicyMaker_Probability.Attacked_Target_Index:
                             PolicyMaker_Probability.Remain_Target_Set.append(PolicyMaker_Probability.Found_Target_Set[i]+[i])
 
-                    PolicyMaker_Probability.Remain_Target_Set = sorted(PolicyMaker_Probability.Remain_Target_Set, key=lambda x: x[4], reverse=True)
+                    PolicyMaker_Probability.Remain_Target_Set = sorted(PolicyMaker_Probability.Remain_Target_Set, key=lambda x: x[5], reverse=True)
                     # print('Found_Target_Set: ', PolicyMaker_Probability.Found_Target_Set)
                     # print('Remain_Target_Set: ', PolicyMaker_Probability.Remain_Target_Set)
 
@@ -304,11 +304,11 @@ class PolicyMaker_Probability(PolicyMaker):
 
                 # 根据当前目标的类型估计，重新讨论目标的类型（含有随机性），进而确定需要的UAV个数
                 DEMANDED_UAV_NUM = 0
-                if PolicyMaker_Probability.Found_Target_Set[PolicyMaker_Probability.Current_Target_Index][5] == 5:
+                if PolicyMaker_Probability.Found_Target_Set[PolicyMaker_Probability.Current_Target_Index][6] == 5:
                     DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=self.arglist.q1)[0]
-                elif PolicyMaker_Probability.Found_Target_Set[PolicyMaker_Probability.Current_Target_Index][5] == 1:
+                elif PolicyMaker_Probability.Found_Target_Set[PolicyMaker_Probability.Current_Target_Index][6] == 1:
                     DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=self.arglist.q2)[0]
-                elif PolicyMaker_Probability.Found_Target_Set[PolicyMaker_Probability.Current_Target_Index][5] == 2:
+                elif PolicyMaker_Probability.Found_Target_Set[PolicyMaker_Probability.Current_Target_Index][6] == 2:
                     DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=self.arglist.q3)[0]
 
                 if DEMANDED_UAV_NUM > self.swarm_size:
@@ -326,7 +326,7 @@ class PolicyMaker_Probability(PolicyMaker):
                     self.InAttacking = True
                     self.x = PolicyMaker_Probability.Found_Target_Set[PolicyMaker_Probability.Current_Target_Index][0]
                     self.y = PolicyMaker_Probability.Found_Target_Set[PolicyMaker_Probability.Current_Target_Index][1]
-                    self.result = PolicyMaker_Probability.Found_Target_Set[PolicyMaker_Probability.Current_Target_Index][7]
+                    self.result = PolicyMaker_Probability.Found_Target_Set[PolicyMaker_Probability.Current_Target_Index][8]
                     PolicyMaker_Probability.Remain_UAV_Set.remove(self.index)
                 else:
                     pass

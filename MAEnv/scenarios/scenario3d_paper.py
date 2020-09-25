@@ -76,8 +76,8 @@ class Scenario(BaseScenario, ABC):
                 landmark.state.p_pos = np.array(T.target_pos[i])
                 kkk = self.globallocalconverter(ref_lat_deg, ref_lon_deg, landmark.state.p_pos[0],
                                                 landmark.state.p_pos[1], getxy=False)
-                landmark.lat = kkk[0]
-                landmark.lon = kkk[1]
+                landmark.lat = round(kkk[0], 6)
+                landmark.lon = round(kkk[1], 6)
                 landmark.alt = ref_alt_m
             else:
                 landmark.color = T.grid_color
