@@ -5,7 +5,7 @@ import random
 from mpl_toolkits.mplot3d import Axes3D  # req'd for 3d plotting
 from typing import Dict, Union
 import Mini0jsbsim.properties as prp
-from Mini0jsbsim.aircraft import Aircraft, cessna172P
+from Mini0jsbsim.aircraft import Aircraft, Rascal110_JSBSim
 
 
 class Simulation(object):
@@ -20,8 +20,7 @@ class Simulation(object):
 
     def __init__(self,
                  sim_frequency_hz: float = 60.0,
-                 aircraft: Aircraft = cessna172P,
-                 init_conditions: Dict[prp.Property, float] = None,
+                 aircraft: Aircraft = Rascal110_JSBSim,
                  allow_flightgear_output: bool = False):
         """
         Constructor. Creates an instance of JSBSim and sets initial conditions.
