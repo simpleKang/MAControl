@@ -25,11 +25,7 @@ class Scenario(BaseScenario, ABC):
         world.agents = [Simulation() for i in range(num_agents)]
         for i, agent in enumerate(world.agents):
             agent.name = 'agent %d' % i
-            agent.action_callback = [agent.__getitem__(prp.aileron_left),
-                                     agent.__getitem__(prp.aileron_right),
-                                     agent.__getitem__(prp.elevator),
-                                     agent.__getitem__(prp.rudder),
-                                     agent.__getitem__(prp.throttle)]
+            agent.action_callback = True
         # set other entities (on ground)
         num_targets = T.num_targets
         num_grids = 5
