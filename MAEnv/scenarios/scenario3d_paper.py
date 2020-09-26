@@ -60,7 +60,10 @@ class Scenario(BaseScenario, ABC):
         ref_alt_m = 58.809239     # 海拔 (BIT)
 
         for i, agent in enumerate(world.agents):
-            agent.reinitialise()
+            k_init = {prp.initial_latitude_geod_deg: ref_lat_deg,
+                      prp.initial_longitude_geoc_deg: ref_lon_deg + i * 0.001,
+                      prp.initial_altitude_ft: ref_alt_m + 3000}
+            agent.reinitialise(init_conditions=k_init)
             agent.color = T.agent_color
             agent.attacking = False
             agent.attacking_to = -1

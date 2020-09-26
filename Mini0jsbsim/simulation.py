@@ -1,7 +1,6 @@
 import jsbsim
 import os
 import time
-import random
 from mpl_toolkits.mplot3d import Axes3D  # req'd for 3d plotting
 from typing import Dict, Union
 import Mini0jsbsim.properties as prp
@@ -21,6 +20,7 @@ class Simulation(object):
     def __init__(self,
                  sim_frequency_hz: float = 60.0,
                  aircraft: Aircraft = Rascal110_JSBSim,
+                 init_conditions: Dict[prp.Property, float] = None,
                  allow_flightgear_output: bool = False):
         """
         Constructor. Creates an instance of JSBSim and sets initial conditions.
@@ -41,9 +41,7 @@ class Simulation(object):
             self.jsbsim.set_output_directive(flightgear_output_config)
         self.sim_dt = 1.0 / sim_frequency_hz
         self.aircraft = aircraft
-        k_init = {prp.initial_latitude_geod_deg: 39.965376, prp.initial_longitude_geoc_deg: 116.325657,
-                  prp.initial_altitude_ft: 2800 + random.random() * 400}
-        self.initialise(self.sim_dt, self.aircraft.jsbsim_id, k_init)
+        self.initialise(self.sim_dt, self.aircraft.jsbsim_id, init_conditions)
         self.jsbsim.disable_output()
         self.wall_clock_dt = None
 
@@ -161,9 +159,7 @@ class Simulation(object):
 
         :param init_conditions: dict mapping properties to their initial values
         """
-        k_init = {prp.initial_latitude_geod_deg: 39.965376, prp.initial_longitude_geoc_deg: 116.325657,
-                  prp.initial_altitude_ft: 2800 + random.random() * 400}
-        self.set_custom_initial_conditions(init_conditions=k_init)
+        self.set_custom_initial_conditions(init_conditions=init_conditions)
         no_output_reset_mode = 0
         self.jsbsim.reset_to_initial_conditions(no_output_reset_mode)
 
