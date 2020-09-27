@@ -26,6 +26,7 @@ class Scenario(BaseScenario, ABC):
         for i, agent in enumerate(world.agents):
             agent.name = 'agent %d' % i
             agent.action_callback = True
+            agent.size = 0.01  # 10米
         # set other entities (on ground)
         num_targets = T.num_targets
         num_grids = 5
@@ -81,6 +82,7 @@ class Scenario(BaseScenario, ABC):
             else:
                 landmark.color = T.grid_color
                 landmark.state.p_pos = np.array(T.grid_pos[i-len(world.targets)])
+            landmark.shadow = landmark.state.p_pos
 
     def benchmark_data(self, agent, world):
         # returns data for benchmarking purposes
@@ -173,6 +175,8 @@ class Scenario(BaseScenario, ABC):
                      agent.__getitem__(prp.lat_geod_deg), agent.__getitem__(prp.lng_geoc_deg)]
         xy = list(self.globallocalconverter(agent.obs[15], agent.obs[16], 0.0, 0.0, True))[2:]
         agent.obs = agent.obs + xy
+        agent.shadow = xy
+        agent.heading = agent.obs[3] / 180 * math.pi
         # [0] altitude [1] pitch [2] roll [3] heading(yaw)
         # [4] u [5] v [6] w
         # [7] u-aero [8] v-aero [9] w-aero [10] v-north [11] v-east

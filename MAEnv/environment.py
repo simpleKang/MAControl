@@ -253,12 +253,15 @@ class MultiAgentEnv(gym.Env):
                 # import rendering only if we need it (and don't import for headless machines)
                 # from gym.envs.classic_control import rendering
                 from MAEnv import rendering
+                self.viewers[i] = rendering.Viewer(1000, 1000)
 
         # create rendering geometry
         if self.render_geoms is None:
             # import rendering only if we need it (and don't import for headless machines)
             # from gym.envs.classic_control import rendering
             from MAEnv import rendering
+            self.render_geoms = []
+            self.render_geoms_xform = []
             for entity in self.world.entities:
                 if 'grid' in entity.name:
                     preset = [[-2, -2], [-2, 2], [2, 2], [2, -2]]
@@ -279,6 +282,8 @@ class MultiAgentEnv(gym.Env):
             # add geoms to viewer
             for viewer in self.viewers:
                 viewer.geoms = []
+                for geom in self.render_geoms:
+                    viewer.add_geom(geom)
 
         results = []
         for i in range(len(self.viewers)):
@@ -294,9 +299,7 @@ class MultiAgentEnv(gym.Env):
             for e, entity in enumerate(self.world.entities):
                 self.render_geoms_xform[e].set_translation(*entity.shadow)
                 if 'agent' in entity.name:
-                    vx = entity.state.p_vel[0]
-                    vy = entity.state.p_vel[1]
-                    rot = math.atan2(vy, vx) - math.pi/2
+                    rot = entity.heading - math.pi/2
                     self.render_geoms_xform[e].set_rotation(rot)
                 if 'agent' in entity.name and entity.attacking:
                     # self.render_geoms_xform[e].set_scale(3, 3)
