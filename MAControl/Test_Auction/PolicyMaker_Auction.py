@@ -55,6 +55,8 @@ class PolicyMaker_Auction(PolicyMaker):
         self.swarm_size = 0
         self.close_area = []
 
+
+
     def find_mate(self, obs_n, r=0.5):
         selfpos = np.array(obs_n[self.index][2:4])
         close_area = []
@@ -230,6 +232,8 @@ class PolicyMaker_Auction(PolicyMaker):
 
         # 计算成本C
         C = s * T * pt_
+
+
 
         # 最终出价P
         Pr = U - C

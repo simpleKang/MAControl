@@ -257,6 +257,7 @@ class MultiAgentEnv(gym.Env):
                     vy = entity.state.p_vel[1]
                     rot = math.atan2(vy, vx) - math.pi/2
                     self.render_geoms_xform[e].set_rotation(rot)
+                    self.render_geoms[e].set_color(1, 1, 0, 0.8)
                 if 'agent' in entity.name and entity.attacking:
                     # self.render_geoms_xform[e].set_scale(3, 3)
                     self.render_geoms[e].set_color(1, 0, 0, 0.8)

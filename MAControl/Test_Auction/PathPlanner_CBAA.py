@@ -23,10 +23,12 @@ class PathPlanner_Simple(PathPlanner):
 
     def planpath(self, para_list, obs, arrive_flag, step):
         if para_list[0] == 0:
+            self.is_attacking = False
             self.no_operation()
 
         elif para_list[0] == 1:
-            self.add(para_list[1])
+            self.is_attacking = False
+            arrive_flag = True
 
         elif para_list[0] == 2:
             arrive_flag = self.insert(para_list[1])
@@ -42,14 +44,10 @@ class PathPlanner_Simple(PathPlanner):
 
         elif para_list[0] == 10:
             # 攻击状态切换只能进来一次哦～～
-            if self.is_attacking is False:
-                self.attack_replace(para_list[1])
-                self.pointAi = (obs[2], obs[3])
-                self.pointBi = (self.waypoint_list[self.current_wplist][0][0],
-                                self.waypoint_list[self.current_wplist][0][1])
-                self.is_attacking = True
-            else:
-                pass
+            # self.attack_replace(para_list[1])
+            self.pointAi = (obs[2], obs[3])
+            self.pointBi = (para_list[1][0], para_list[1][1])
+            self.is_attacking = True
                 # raise Exception('Target coord is changed again! This should not happen!!!')
 
         else:
@@ -63,7 +61,7 @@ class PathPlanner_Simple(PathPlanner):
             self.is_init = False
 
         # 到达B点后更新A、B点
-        if arrive_flag and self.is_attacking is False and self.waypoint_finished is False:
+        if arrive_flag and self.is_attacking is False and self.waypoint_finished is False and para_list[0] == 0:
             # 当下一个航点不为空且当前B点不为最后一个航点，直接取下一个航点作为B点
             if self.waypoint_list[self.current_wplist][self.pointB_index+1][2] != 0 and self.pointB_index < 255:
                 if self.pointB_index > 0:
@@ -75,6 +73,32 @@ class PathPlanner_Simple(PathPlanner):
                 self.pointBi = (self.waypoint_list[self.current_wplist][self.pointB_index+1][0],
                                 self.waypoint_list[self.current_wplist][self.pointB_index+1][1])
                 self.pointB_index += 1
+            # 当当前列表走完之后重新再走一遍列表
+            elif self.cycle_index < self.total_cycle:
+                for i in range(self.pointB_index + 1):
+                    self.waypoint_list[self.current_wplist][i][2] = 1
+                self.pointAi = (self.waypoint_list[self.current_wplist][self.pointB_index][0],
+                                self.waypoint_list[self.current_wplist][self.pointB_index][1])
+                self.pointBi = (self.waypoint_list[self.current_wplist][0][0],
+                                self.waypoint_list[self.current_wplist][0][1])
+                self.pointB_index = 0
+                self.cycle_index += 1
+            # 当当前列表循环次数达到设定值时，判断航点全部finish
+            else:
+                self.waypoint_finished = True
+
+        elif arrive_flag and self.is_attacking is False and self.waypoint_finished is False and para_list[0] == 1:
+            # 当下一个航点不为空且当前B点不为最后一个航点，直接取下一个航点作为B点
+            if self.waypoint_list[self.current_wplist][self.pointB_index+1][2] != 0 and self.pointB_index < 255:
+                if self.pointB_index > 0:
+                    self.waypoint_list[self.current_wplist][self.pointB_index-1][2] = 4
+                self.waypoint_list[self.current_wplist][self.pointB_index][2] = 2
+                self.waypoint_list[self.current_wplist][self.pointB_index+1][2] = 3
+                self.pointAi = (self.waypoint_list[self.current_wplist][self.pointB_index][0],
+                                self.waypoint_list[self.current_wplist][self.pointB_index][1])
+                self.pointBi = (self.waypoint_list[self.current_wplist][self.pointB_index][0],
+                                self.waypoint_list[self.current_wplist][self.pointB_index][1])
+                #self.pointB_index += 1
             # 当当前列表走完之后重新再走一遍列表
             elif self.cycle_index < self.total_cycle:
                 for i in range(self.pointB_index + 1):
@@ -217,5 +241,5 @@ class PathPlanner_Simple(PathPlanner):
         self.waypoint_list.append([[0 for i in range(3)] for j in range(256)])
         self.current_wplist += 1
         self.waypoint_list[self.current_wplist][0] = [coord[0], coord[1], 1]
-        self.pointB_index = 0
+        # self.pointB_index = 0
 
