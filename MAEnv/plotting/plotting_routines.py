@@ -95,7 +95,7 @@ def plot_Cmd_AngVel_EulerAng(data_fcs, data_vel, data_att, dest_folder=None):
     plt.tight_layout()
 
     # Export
-    if dest_folder != None:
+    if dest_folder is not None:
         plt.savefig(dest_folder + 'plot_Cmd_AngVel_EulerAng.pdf')
 
 
@@ -143,7 +143,7 @@ def plot_Alfa_Beta_V(data_aero, data_vel, dest_folder=None):
     plt.tight_layout()
 
     # Export
-    if dest_folder != None:
+    if dest_folder is not None:
         plt.savefig(dest_folder + 'plot_Alfa_Beta_V.pdf')
 
 
@@ -207,7 +207,7 @@ def plot_PosGeoc(data_pos, data_vel, dest_folder=None):
     plt.tight_layout()
 
     # Export
-    if dest_folder != None:
+    if dest_folder is not None:
         plt.savefig(dest_folder + 'plot_PosGeoc.pdf')
 
 
@@ -291,7 +291,7 @@ def plot_EngineStatus(data_engine, data_vel, dest_folder=None):
     plt.tight_layout()
 
     # Export
-    if dest_folder != None:
+    if dest_folder is not None:
         plt.savefig(dest_folder + 'plot_EngineStatus.pdf')
 
 
@@ -313,7 +313,7 @@ def plot_traj2D_NEA(r_NEA, t_pos, n_arrows, arrow_size, dest_folder=None):
     arrow_size = int
     """
 
-    import plotting_utilities as plut
+    from MAEnv.plotting import plotting_utilities as plut
 
     fig = plt.figure(figsize=(12.3, 10))
 
@@ -357,7 +357,7 @@ def plot_traj2D_NEA(r_NEA, t_pos, n_arrows, arrow_size, dest_folder=None):
     plt.tight_layout()
 
     # Export
-    if dest_folder != None:
+    if dest_folder is not None:
         plt.savefig(dest_folder + 'plot_Traj2D_NEA.pdf')
 
 
@@ -376,8 +376,8 @@ def plot_traj3D_NEA(r_NEA, X_proj='N', Y_proj='E', view=(45, -45), to_scale='XYZ
     mrk_size   = int                  set marker size
     """
 
-    from mpl_toolkits.mplot3d import Axes3D
-    import plotting_utilities as plut
+    # from mpl_toolkits.mplot3d import Axes3D
+    from MAEnv.plotting import plotting_utilities as plut
 
     fig = plt.figure(figsize=(12.3, 10))
     ax = fig.add_subplot(1, 1, 1, projection='3d')
@@ -443,7 +443,7 @@ def plot_traj3D_NEA(r_NEA, X_proj='N', Y_proj='E', view=(45, -45), to_scale='XYZ
     plt.tight_layout()
 
     # Export
-    if dest_folder != None:
+    if dest_folder is not None:
         plt.savefig(dest_folder + 'plot_traj3D_NEA.pdf')
 
 
@@ -504,5 +504,5 @@ def plot_Ground_Effect(data_aer, dest_folder=None):
     plt.tight_layout()
 
     # Export
-    if dest_folder != None:
+    if dest_folder is not None:
         plt.savefig(dest_folder + 'plot_Ground_Effect.pdf')
