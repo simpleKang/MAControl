@@ -1,4 +1,4 @@
-from ACDataOut import ACDataOut
+from MAEnv.plotting.ACDataOut import ACDataOut
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as plttick
@@ -466,7 +466,7 @@ class ACDataPlots(ACDataOut):
 
     def plot_GroundTrack(self, units='m', show_grid=False, n_arrows=10, arrow_size=2, export_pdf=True):
 
-        import plotting_utilities as plut
+        from MAEnv.plotting import plotting_utilities as plut
 
         # Choose units to view data
         if units == 'm':
@@ -527,7 +527,7 @@ class ACDataPlots(ACDataOut):
         """
 
         from mpl_toolkits.mplot3d import Axes3D
-        import plotting_utilities as plut
+        from MAEnv.plotting import plotting_utilities as plut
 
         # Choose units to view data
         if units == 'm':
