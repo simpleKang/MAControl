@@ -51,12 +51,12 @@ def make_env(arglist):
 def get_controller(env, world, arglist):
     ControllerSet = []
 
-    for i in range(arglist.numU):
+    for ii in range(arglist.numU):
         control = []
-        control.append(PM_P.PolicyMaker_Probability("agent_%d" % i, env, world, i, arglist))
-        control.append(PP_S.PathPlanner_Simple("agent_%d" % i, env, world, i, arglist))
-        control.append(MC_L.MotionController_L1_TECS("agent_%d" % i, env, world, i, arglist))
-        control.append(IC_P.InnerController_PID("agent_%d" % i, env, world, i, arglist))
+        control.append(PM_P.PolicyMaker_Probability("agent_%d" % ii, env, world, ii, arglist))
+        control.append(PP_S.PathPlanner_Simple("agent_%d" % ii, env, world, ii, arglist))
+        control.append(MC_L.MotionController_L1_TECS("agent_%d" % ii, env, world, ii, arglist))
+        control.append(IC_P.InnerController_PID("agent_%d" % ii, env, world, ii, arglist))
         control.append([False, False, -1])   # FLAG-SET
         # Arrived # Isattacking # Which-Target(-Under-Attack-)
         ControllerSet.append(control)
@@ -121,7 +121,7 @@ if __name__ == '__main__':
     while episode < arglist.episode_max:
 
         # Create Controller (重置实例变量)
-        Controller = get_controller(env, world, arglist)
+        MainController = get_controller(env, world, arglist)
 
         # Rest Controller (重置类变量)
         PM_P.PolicyMaker_Probability.Found_Target_Set = []
@@ -143,7 +143,7 @@ if __name__ == '__main__':
 
             # get action
             print('>>> step ', step)
-            action_n = update_action(obs_n, WorldTarget, step, Controller)
+            action_n = update_action(obs_n, WorldTarget, step, MainController)
 
             # environment step
             new_obs_n, rew_n, done_n, info_n = env.jstep(action_n)
@@ -153,7 +153,7 @@ if __name__ == '__main__':
             obs_n = new_obs_n
 
             # for displaying
-            augment_view(world, Controller)
+            augment_view(world, MainController)
             # env.render()  # could be commented out
 
             # for recording
