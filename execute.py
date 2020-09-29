@@ -160,16 +160,15 @@ if __name__ == '__main__':
             if step == arglist.step_max:
                 print('>>>>>>>>>>> Episode', episode)
                 pairing = []
-                for i in range(arglist.numU):
+                for i in range(env.n):
                     pairing.append(world.agents[i].attacking_to)
                 print('pairing: ', pairing)
-                # print('reward:', rew_n[0][0])
+                print('reward:', rew_n[0][0])
                 timing = round(time.time() - t_start, 3)
                 t_start = time.time()
                 print('timing: ', timing)
-                time.sleep(1)
-                # if episode == 1:
-                #    logging.info('EPISODE | PAIRING                                             REWARD          TIME')
-                # logging.info([episode]+pairing+[rew_n[0][0]]+[timing])
-                # if episode == arglist.episode_max:
-                #    logging.info('\n')
+                if episode == 1:
+                    logging.info('EPISODE | PAIRING                                               REWARD          TIME')
+                logging.info([episode]+pairing+[rew_n[0][0]]+[timing])
+                if episode == arglist.episode_max:
+                    logging.info('\n')
