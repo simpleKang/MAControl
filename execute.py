@@ -64,24 +64,24 @@ def get_controller(env, world, arglist):
     return ControllerSet
 
 
-def update_action(obs_n, WorldTarget, step, NewController):
+def update_action(obs_n, WorldTarget, step, Controller):
 
     action_n = []
 
     for i in range(arglist.numU):
 
-        list_i = NewController[i][0]. \
+        list_i = Controller[i][0]. \
             make_policy(WorldTarget, obs_n, step)
 
-        NewController[i][4][2] = list_i[1][2]
+        Controller[i][4][2] = list_i[1][2]
 
-        pointAi, pointBi, finishedi, NewController[i][4][1] = NewController[i][1].\
-            planpath(list_i, obs_n[i], NewController[i][4][0], step)
+        pointAi, pointBi, finishedi, Controller[i][4][1] = Controller[i][1].\
+            planpath(list_i, obs_n[i], Controller[i][4][0], step)
 
-        acctEi, acclEi, NewController[i][4][0] = NewController[i][2]. \
+        acctEi, acclEi, Controller[i][4][0] = Controller[i][2]. \
             get_expected_action(obs_n[i], pointAi, pointBi, step, finishedi)
 
-        actioni = NewController[i][3]. \
+        actioni = Controller[i][3]. \
             get_action(obs_n[i], acctEi, acclEi, step, finishedi)
 
         action_n.append(actioni)
@@ -94,11 +94,12 @@ def update_action(obs_n, WorldTarget, step, NewController):
     return action_n
 
 
-def augment_view(env, world, NewController):
-    for i in range(arglist.numU):
-        world.agents[i].attacking_to = NewController[i][4][2]
-        if NewController[i][4][1]:
-            world.agents[i].attacking = True
+def augment_view(wOrld, CONtroller):
+
+    for ii in range(arglist.numU):
+        wOrld.agents[ii].attacking_to = CONtroller[ii][4][2]
+        if CONtroller[ii][4][1]:
+            wOrld.agents[ii].attacking = True
 
 
 if __name__ == '__main__':
@@ -120,7 +121,7 @@ if __name__ == '__main__':
     while episode < arglist.episode_max:
 
         # Create Controller (重置实例变量)
-        NewController = get_controller(env, world, arglist)
+        Controller = get_controller(env, world, arglist)
 
         # Rest Controller (重置类变量)
         PM_P.PolicyMaker_Probability.Found_Target_Set = []
@@ -142,7 +143,7 @@ if __name__ == '__main__':
 
             # get action
             print('>>> step ', step)
-            action_n = update_action(obs_n, WorldTarget, step, NewController)
+            action_n = update_action(obs_n, WorldTarget, step, Controller)
 
             # environment step
             new_obs_n, rew_n, done_n, info_n = env.jstep(action_n)
@@ -152,7 +153,7 @@ if __name__ == '__main__':
             obs_n = new_obs_n
 
             # for displaying
-            augment_view(env, world, NewController)
+            augment_view(world, Controller)
             # env.render()  # could be commented out
 
             # for recording
