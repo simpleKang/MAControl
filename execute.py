@@ -57,6 +57,8 @@ def get_controller(env, world, arglist):
         control.append(PP_S.PathPlanner_Simple("agent_%d" % i, env, world, i, arglist))
         control.append(MC_L.MotionController_L1_TECS("agent_%d" % i, env, world, i, arglist))
         control.append(IC_P.InnerController_PID("agent_%d" % i, env, world, i, arglist))
+        control.append([False, False, -1])   # FLAG-SET
+        # Arrived # Isattacking # Which-Target(-Under-Attack-)
         ControllerSet.append(control)
 
     return ControllerSet
@@ -71,12 +73,12 @@ def update_action(obs_n, WorldTarget, step, NewController):
         list_i = NewController[i][0]. \
             make_policy(WorldTarget, obs_n, step)
 
-        NewController[i][6] = list_i[1][2]
+        NewController[i][4][2] = list_i[1][2]
 
-        pointAi, pointBi, finishedi, NewController[i][5] = NewController[i][1].\
-            planpath(list_i, obs_n[i], NewController[i][4], step)
+        pointAi, pointBi, finishedi, NewController[i][4][1] = NewController[i][1].\
+            planpath(list_i, obs_n[i], NewController[i][4][0], step)
 
-        acctEi, acclEi, NewController[i][4] = NewController[i][2]. \
+        acctEi, acclEi, NewController[i][4][0] = NewController[i][2]. \
             get_expected_action(obs_n[i], pointAi, pointBi, step, finishedi)
 
         actioni = NewController[i][3]. \
@@ -94,8 +96,8 @@ def update_action(obs_n, WorldTarget, step, NewController):
 
 def augment_view(env, world, NewController):
     for i in range(arglist.numU):
-        world.agents[i].attacking_to = NewController[i][6]
-        if NewController[i][5]:
+        world.agents[i].attacking_to = NewController[i][4][2]
+        if NewController[i][4][1]:
             world.agents[i].attacking = True
 
 
