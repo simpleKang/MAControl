@@ -148,7 +148,7 @@ class PolicyMaker_Probability(PolicyMaker):
         check3a = 0 if len(PolicyMaker_Probability.Found_Target_Set) == 0 \
             else (np.sum(PolicyMaker_Probability.Found_Target_Set, axis=0))[5]/len(PolicyMaker_Probability.Remain_UAV_Set)
         # 阈值随时间减少
-        check3b = 1000/self.env.n*20/(step+1)
+        check3b = 1000/self.arglist.numU*20/(step+1)
         check3 = (check3a > check3b)
 
         if check1 and check2 and check3:

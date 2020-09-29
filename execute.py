@@ -51,7 +51,7 @@ def make_env(arglist):
 def get_controller(env, world, arglist):
     ControllerSet = []
 
-    for i in range(env.n):
+    for i in range(arglist.numU):
         control = []
         control.append(PM_P.PolicyMaker_Probability("agent_%d" % i, env, world, i, arglist))
         control.append(PP_S.PathPlanner_Simple("agent_%d" % i, env, world, i, arglist))
@@ -66,7 +66,7 @@ def update_action(obs_n, WorldTarget, step, NewController):
 
     action_n = []
 
-    for i in range(env.n):
+    for i in range(arglist.numU):
 
         list_i = NewController[i][0]. \
             make_policy(WorldTarget, obs_n, step)
@@ -93,7 +93,7 @@ def update_action(obs_n, WorldTarget, step, NewController):
 
 
 def augment_view(env, world, NewController):
-    for i in range(env.n):
+    for i in range(arglist.numU):
         world.agents[i].attacking_to = NewController[i][6]
         if NewController[i][5]:
             world.agents[i].attacking = True
@@ -129,7 +129,7 @@ if __name__ == '__main__':
         PM_P.PolicyMaker_Probability.Current_Target_Index = -1
         PM_P.PolicyMaker_Probability.Current_Price_Set = []
         PM_P.PolicyMaker_Probability.Current_Price_Result = []
-        for i in range(env.n):
+        for i in range(arglist.numU):
             PM_P.PolicyMaker_Probability.Remain_UAV_Set.append(i)
 
         obs_n = env.reset()
@@ -157,7 +157,7 @@ if __name__ == '__main__':
             if step == arglist.step_max:
                 print('>>>>>>>>>>> Episode', episode)
                 pairing = []
-                for i in range(env.n):
+                for i in range(arglist.numU):
                     pairing.append(world.agents[i].attacking_to)
                 print('pairing: ', pairing)
                 # print('reward:', rew_n[0][0])
