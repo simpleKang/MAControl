@@ -16,21 +16,6 @@ class PolicyMaker_Probability(PolicyMaker):
     #                                                                        |
     #                                                                     攻击[阶段]
 
-    # 在搜索目标阶段(<Step0)操作，只增不减
-    Found_Target_Set = []  # {target_pos/xy, target_pos/lla, target_value, target_defence, target_type, T_INDEX}
-
-    # 在重置步(==Step5)操作，只增不减
-    Attacked_Target_Index = []  # {TARGET_INDEX}
-
-    # 在分道步(==Step4)操作，只减不增
-    Remain_UAV_Set = []  # {UAV_INDEX}
-
-    # 在重置步(==Step5)重置
-    Remain_Target_Set = []  # {target_pos/xy+lla, target_value, target_defence, target_type, T_INDEX, TARGET_INDEX}
-    Current_Target_Index = -1  # {TARGET_INDEX}
-    Current_Price_Set = []   # {UAV X STEP}
-    Current_Price_Result = []  # {UAV_INDEX,UAV_PRICE}
-
     def __init__(self, name, env, world, agent_index, arglist):
         super(PolicyMaker_Probability, self).__init__(name, env, world, agent_index, arglist)
         self.opt_index = 0

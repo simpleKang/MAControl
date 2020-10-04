@@ -123,18 +123,6 @@ if __name__ == '__main__':
         # Create Controller (重置实例变量)
         MainController = get_controller(env, world, arglist)
 
-        # Rest Controller (重置类变量)
-        PM_P.PolicyMaker_Probability.Found_Target_Set = []
-        PM_P.PolicyMaker_Probability.Found_Target_Info = []
-        PM_P.PolicyMaker_Probability.Attacked_Target_Index = []
-        PM_P.PolicyMaker_Probability.Remain_UAV_Set = []
-        PM_P.PolicyMaker_Probability.Remain_Target_Set = []
-        PM_P.PolicyMaker_Probability.Current_Target_Index = -1
-        PM_P.PolicyMaker_Probability.Current_Price_Set = []
-        PM_P.PolicyMaker_Probability.Current_Price_Result = []
-        for i in range(arglist.numU):
-            PM_P.PolicyMaker_Probability.Remain_UAV_Set.append(i)
-
         obs_n = env.reset()
         episode += 1
         step = 0
