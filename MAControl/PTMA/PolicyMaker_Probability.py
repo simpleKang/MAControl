@@ -1,7 +1,6 @@
 from MAControl.Base.PolicyMaker import PolicyMaker
 import random
 import numpy as np
-from MAControl.Util.PointInRec import point_in_rec
 from MAControl.Util.Constrain import constrain
 import math
 
@@ -19,7 +18,6 @@ class PolicyMaker_Probability(PolicyMaker):
 
     # 在搜索目标阶段(<Step0)操作，只增不减
     Found_Target_Set = []  # {target_pos/xy, target_pos/lla, target_value, target_defence, target_type, T_INDEX}
-    Found_Target_Info = []  # {TARGET:UAV_INDEX}
 
     # 在重置步(==Step5)操作，只增不减
     Attacked_Target_Index = []  # {TARGET_INDEX}
@@ -118,8 +116,6 @@ class PolicyMaker_Probability(PolicyMaker):
         # READ AND WRITE PolicyMaker_Probability.Found_Target_Set
         if not PolicyMaker_Probability.Found_Target_Set:
             PolicyMaker_Probability.Found_Target_Set = seen_target
-            for i in range(len(seen_target)):
-                PolicyMaker_Probability.Found_Target_Info.append(self.close_area)
         elif seen_target:
             for target1 in seen_target:
                 check = False
@@ -130,15 +126,6 @@ class PolicyMaker_Probability(PolicyMaker):
                     check = check | (deltapos <= ttrange)
                 if not check:
                     PolicyMaker_Probability.Found_Target_Set.append(target1)
-                    PolicyMaker_Probability.Found_Target_Info.append(self.close_area)
-
-        # COMMUNICATE TESTControl.Found_Target_Info
-        for info in PolicyMaker_Probability.Found_Target_Info:
-            check = False
-            for num in self.close_area:
-                check = check | num in info
-            if check and (self.index not in info):
-                info.append(self.index)
 
     def searching_is_good_enough(self, step):
         check1 = (PolicyMaker_Probability.Found_Target_Set != [])
