@@ -1,4 +1,5 @@
 from MAControl.Base.PolicyMaker import PolicyMaker
+from MAControl.Util.viewfield import viewfield
 import random
 import numpy as np
 from MAControl.Util.Constrain import constrain
@@ -39,37 +40,21 @@ class PolicyMaker_Probability(PolicyMaker):
         self.close_area = []
 
     def find_mate(self, obs_n, r=0.5):
-        selfpos = np.array(obs_n[self.index][2:4])
+        selfpos = np.array(obs_n[self.index][0], obs_n[self.index][15], obs_n[self.index][16])  # alt lat lon
         close_area = []
         for i in range(len(obs_n)):
-            posi = obs_n[i][2:4]
-            deltapos = np.sqrt(np.dot(selfpos - posi, selfpos - posi))
-            if deltapos < r:
+            posi = np.array(obs_n[i][0], obs_n[i][15], obs_n[i][16])
+            deltapos = abs(posi - selfpos)
+            delta = np.sqrt(deltapos[0] * deltapos[0] + deltapos[1] * deltapos[1] * 0.4
+                            + deltapos[2] * deltapos[2] * 0.4)
+            if delta < r:
                 close_area.append(i)
         return close_area
 
     def add_new_target(self, obs, WorldTarget, ttrange=0.05):
 
         # COMPUTE selfview
-        selfvel = np.array(obs[0:2])
-        selfpos = np.array(obs[2:4])
-        selfvelunit = selfvel / np.sqrt(np.dot(selfvel, selfvel))
-        selfdir = math.atan2(selfvel[1], selfvel[0])
-        d1 = 0  # 轴向视场距离
-        d2 = 0.2  # 轴向视场宽度
-        d3 = 0.2  # 侧向视场宽度
-        xx1 = -d3/2 * math.cos(selfdir) - d2/2 * math.sin(selfdir) * -1
-        xx2 = -d3/2 * math.cos(selfdir) + d2/2 * math.sin(selfdir) * -1
-        xx3 = d3/2 * math.cos(selfdir) + d2/2 * math.sin(selfdir) * -1
-        xx4 = d3/2 * math.cos(selfdir) - d2/2 * math.sin(selfdir) * -1
-        yy1 = -d3/2 * math.sin(selfdir) - d2/2 * math.cos(selfdir)
-        yy2 = -d3/2 * math.sin(selfdir) + d2/2 * math.cos(selfdir)
-        yy3 = d3/2 * math.sin(selfdir) + d2/2 * math.cos(selfdir)
-        yy4 = d3/2 * math.sin(selfdir) - d2/2 * math.cos(selfdir)
-        selfview1 = selfpos + selfvelunit * (d1+d2/2) + np.array([xx1, yy1])
-        selfview2 = selfpos + selfvelunit * (d1+d2/2) + np.array([xx2, yy2])
-        selfview3 = selfpos + selfvelunit * (d1+d2/2) + np.array([xx3, yy3])
-        selfview4 = selfpos + selfvelunit * (d1+d2/2) + np.array([xx4, yy4])
+        selfproj = viewfield(obs[17], obs[18], obs[0] - 58.809239, obs[1], obs[2], obs[3], 0.05, 0.05)
 
         # GENERATE seen_target
         seen_target = []
