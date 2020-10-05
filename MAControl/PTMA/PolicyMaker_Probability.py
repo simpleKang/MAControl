@@ -98,23 +98,6 @@ class PolicyMaker_Probability(PolicyMaker):
                 if not check:
                     self.seen_targets.append(target1)
 
-    def searching_is_good_enough(self, step):
-        check1 = (PolicyMaker_Probability.Found_Target_Set != [])
-        check2 = (len(PolicyMaker_Probability.Attacked_Target_Index) != len(PolicyMaker_Probability.Found_Target_Set))
-
-        # 实际情况
-        check3a = 0 if len(PolicyMaker_Probability.Found_Target_Set) == 0 \
-            else (np.sum(PolicyMaker_Probability.Found_Target_Set, axis=0))[5]/len(PolicyMaker_Probability.Remain_UAV_Set)
-        # 阈值随时间减少
-        check3b = 1000/self.arglist.numU*20/(step+1)
-        check3 = (check3a > check3b)
-
-        if check1 and check2 and check3:
-            output = True
-        else:
-            output = False
-        return output
-
     def operate_step(self, operate_index, step, waitstep=5):
 
         if operate_index == 0:

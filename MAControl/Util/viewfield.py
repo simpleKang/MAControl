@@ -19,8 +19,8 @@ def viewfield(x, y, h, pitch, roll, heading, wview, hview):
 
     p1 = cross_point(roll, ptch1, head1, x, y, h)
     p2 = cross_point(roll, ptch1, head2, x, y, h)
-    p3 = cross_point(roll, ptch2, head1, x, y, h)
-    p4 = cross_point(roll, ptch2, head2, x, y, h)
+    p3 = cross_point(roll, ptch2, head2, x, y, h)
+    p4 = cross_point(roll, ptch2, head1, x, y, h)
     proj = np.array([p1, p2, p3, p4])
 
     return proj
