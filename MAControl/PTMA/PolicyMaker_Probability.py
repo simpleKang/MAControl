@@ -136,7 +136,7 @@ class PolicyMaker_Probability(PolicyMaker):
             self.Step4 += waitstep
             self.Step5 += waitstep
 
-    def bidding(self, obs):
+    def bidding(self, obs, Tndx):
 
         # Pr = U - C (Pr为最终出价, U为收益, C为成本)
 
@@ -145,7 +145,7 @@ class PolicyMaker_Probability(PolicyMaker):
         e1 = 0.5      # 我方小飞机优势系数
         e2 = 0.5      # 敌方目标战术价值系数  e1 + e2 = 1 (0 <= e1, e2 <= 1)
         pt = 0.8      # 小飞机单发杀伤概率
-        W = PolicyMaker_Probability.Found_Target_Set[PolicyMaker_Probability.Current_Target_Index][5]    # 目标的战术价值
+        W = self.seen_targets[Tndx][5]    # 目标的战术价值
         sigma1 = 0.5  # 距离优势系数
         sigma2 = 0.5  # 角度优势系数
         D = 0.6       # 小飞机能够攻击目标的最大距离
@@ -156,11 +156,11 @@ class PolicyMaker_Probability(PolicyMaker):
         pt_ = 0.6     # 目标的单发杀伤概率
 
         # 计算中间变量
-        dis = math.sqrt((PolicyMaker_Probability.Found_Target_Set[PolicyMaker_Probability.Current_Target_Index][0] - obs[2])**2+
-                        (PolicyMaker_Probability.Found_Target_Set[PolicyMaker_Probability.Current_Target_Index][1] - obs[3])**2)
+        dis = math.sqrt((self.seen_targets[Tndx][0] - obs[2])**2 +
+                        (self.seen_targets[Tndx][1] - obs[3])**2)
         v_unit = np.array([obs[0], obs[1]])/math.sqrt(obs[0]**2+obs[1]**2)
-        t_unit = np.array([PolicyMaker_Probability.Found_Target_Set[PolicyMaker_Probability.Current_Target_Index][0] - obs[2],
-                           PolicyMaker_Probability.Found_Target_Set[PolicyMaker_Probability.Current_Target_Index][1] - obs[3]])/dis
+        t_unit = np.array([self.seen_targets[Tndx][0] - obs[2],
+                           self.seen_targets[Tndx][1] - obs[3]])/dis
         angle = math.acos(constrain(np.dot(v_unit, t_unit), -1, 1))
         Fd = math.exp(1 - dis / D)
         Fq = math.exp(1 - angle/math.pi)
