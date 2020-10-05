@@ -1,4 +1,5 @@
 from MAControl.Base.PolicyMaker import PolicyMaker
+from MAControl.Util.PointInRec import point_in_rec
 from MAControl.Util.viewfield import viewfield
 import random
 import numpy as np
@@ -24,6 +25,8 @@ class PolicyMaker_Probability(PolicyMaker):
         self.y = 0
         self.InAttacking = False
         self.result = -1
+        self.seen_targets = []
+        self.attacked_targets = []
 
         # 以下为一些阶段的初始设定步数
         # >> 未来步数点可修改，从而可以主动停留在某一阶段/步
@@ -54,48 +57,46 @@ class PolicyMaker_Probability(PolicyMaker):
     def add_new_target(self, obs, WorldTarget, ttrange=0.05):
 
         # COMPUTE selfview
-        selfproj = viewfield(obs[17], obs[18], obs[0] - 58.809239, obs[1], obs[2], obs[3], 0.05, 0.05)
+        selfproj = viewfield(obs[17], obs[18], obs[0] - 58.809239, obs[1], obs[2], obs[3], 0.1, 0.1)
 
-        # GENERATE seen_target
-        seen_target = []
+        # GENERATE _seen_targets
+        _seen_targets = []
         for target in WorldTarget:
-            targetpos = np.array(target[0:2])
-            if point_in_rec(selfview1, selfview2, selfview3, selfview4, targetpos):
-                seen_target.append(target)
+            if point_in_rec(selfproj[0], selfproj[1], selfproj[2], selfproj[3], np.array(target[0:2])):
+                _seen_targets.append(target)
                 truetype = target[-2]
                 if truetype == 1:
                     gtype = np.random.choice([1, 2, 3], 1, p=self.arglist.p1)
                     if gtype == 2:
-                        seen_target[-1][-4:-1] = [10, 1, 2]
+                        _seen_targets[-1][-4:-1] = [10, 1, 2]
                     elif gtype == 3:
-                        seen_target[-1][-4:-1] = [5, 2, 3]
+                        _seen_targets[-1][-4:-1] = [5, 2, 3]
                 elif truetype == 2:
                     gtype = np.random.choice([1, 2, 3], 1, p=self.arglist.p2)
                     if gtype == 3:
-                        seen_target[-1][-4:-1] = [5, 2, 3]
+                        _seen_targets[-1][-4:-1] = [5, 2, 3]
                     elif gtype == 1:
-                        seen_target[-1][-4:-1] = [2, 5, 1]
+                        _seen_targets[-1][-4:-1] = [2, 5, 1]
                 elif truetype == 3:
                     gtype = np.random.choice([1, 2, 3], 1, p=self.arglist.p3)
                     if gtype == 1:
-                        seen_target[-1][-4:-1] = [2, 5, 1]
+                        _seen_targets[-1][-4:-1] = [2, 5, 1]
                     elif gtype == 2:
-                        seen_target[-1][-4:-1] = [10, 1, 2]
-                # 在seen_target中，真序号是准确的（唯一标识），类型可能有误（相应的价值和防御能力都有误）
+                        _seen_targets[-1][-4:-1] = [10, 1, 2]
+                # 在 _seen_targets 中，真序号是准确的（唯一标识），类型可能有误（相应的价值和防御能力都有误）
 
-        # READ AND WRITE PolicyMaker_Probability.Found_Target_Set
-        if not PolicyMaker_Probability.Found_Target_Set:
-            PolicyMaker_Probability.Found_Target_Set = seen_target
-        elif seen_target:
-            for target1 in seen_target:
+        # UPDATE self.seen_targets
+        if not self.seen_targets:
+            self.seen_targets = _seen_targets
+        elif _seen_targets:
+            for target1 in _seen_targets:
                 check = False
-                for target2 in PolicyMaker_Probability.Found_Target_Set:
-                    pos1 = np.array(target1[0:2])
-                    pos2 = np.array(target2[0:2])
-                    deltapos = np.sqrt(np.dot(pos1 - pos2, pos1 - pos2))
+                for target2 in self.seen_targets:
+                    target_link = np.array(target1[0:2]) - np.array(target2[0:2])
+                    deltapos = np.sqrt(np.dot(target_link, target_link))
                     check = check | (deltapos <= ttrange)
                 if not check:
-                    PolicyMaker_Probability.Found_Target_Set.append(target1)
+                    self.seen_targets.append(target1)
 
     def searching_is_good_enough(self, step):
         check1 = (PolicyMaker_Probability.Found_Target_Set != [])
