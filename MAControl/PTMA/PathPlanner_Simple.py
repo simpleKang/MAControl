@@ -1,7 +1,5 @@
 from MAControl.Base.PathPlanner import PathPlanner
 import MAControl.Util.CreateWaypoint as CW
-import os
-_path = '/track/' if os.name == 'posix' else '\\track\\'
 
 
 class PathPlanner_EdgeWaypoint(PathPlanner):
@@ -22,7 +20,6 @@ class PathPlanner_EdgeWaypoint(PathPlanner):
         self.waypoint_list.append(CW.creat_veledge_point(world.agents[self.index].state.p_pos,
                                                          world.agents[self.index].state.p_vel,
                                                          world.agents[self.index].state.p_vel, world.edge))
-        # open(os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + _path + 'waypoint_%d.txt' % self.index,'w')
 
     def planpath(self, para_list, obs, arrive_flag, step, obstacles):
 
