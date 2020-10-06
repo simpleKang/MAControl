@@ -141,7 +141,6 @@ class PolicyMaker_Probability(PolicyMaker):
         # Pr = U - C (Pr为最终出价, U为收益, C为成本)
 
         # 收益U的相关参数
-        x = 1         # 表示是否用于打击目标 0 or 1
         e1 = 0.5      # 我方小飞机优势系数
         e2 = 0.5      # 敌方目标战术价值系数  e1 + e2 = 1 (0 <= e1, e2 <= 1)
         pt = 0.8      # 小飞机单发杀伤概率
@@ -156,18 +155,17 @@ class PolicyMaker_Probability(PolicyMaker):
         pt_ = 0.6     # 目标的单发杀伤概率
 
         # 计算中间变量
-        dis = math.sqrt((self.seen_targets[Tndx][0] - obs[2])**2 +
-                        (self.seen_targets[Tndx][1] - obs[3])**2)
-        v_unit = np.array([obs[0], obs[1]])/math.sqrt(obs[0]**2+obs[1]**2)
-        t_unit = np.array([self.seen_targets[Tndx][0] - obs[2],
-                           self.seen_targets[Tndx][1] - obs[3]])/dis
-        angle = math.acos(constrain(np.dot(v_unit, t_unit), -1, 1))
+        delta_lla = np.array(self.seen_targets[Tndx][2:5]) - np.array([obs[16], obs[15], obs[0]])
+        dis = math.sqrt(0.01*delta_lla[0]**2 + 0.01*delta_lla[1]**2 + 0.1*delta_lla[2]**2)
+        v_dir = obs[3]
+        t_dir = math.atan2(delta_lla[1], delta_lla[0])
+        angle = abs(v_dir - t_dir)
         Fd = math.exp(1 - dis / D)
         Fq = math.exp(1 - angle/math.pi)
         P = sigma1 * Fd + sigma2 * Fq
 
         # 计算收益U
-        U = (e1 * P + e2 * W) * (1 - (1 - pt)**x)
+        U = (e1 * P + e2 * W) * pt
 
         # 计算成本C
         C = s * T * pt_
