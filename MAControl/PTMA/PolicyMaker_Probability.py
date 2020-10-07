@@ -188,11 +188,6 @@ class PolicyMaker_Probability(PolicyMaker):
                 self.add_new_target(obs_n[self.index], WorldTarget)
                 self.opt_index = 0
 
-                if self.searching_is_good_enough(step):
-                    self.operate_step(2, step)
-                elif step == (self.Step0 - 1):
-                    self.operate_step(3, step, waitstep=10)
-
             elif step == self.Step0:
                 # print('UAV', self.index, 'resorting')
 
@@ -289,4 +284,4 @@ class PolicyMaker_Probability(PolicyMaker):
             else:
                 raise Exception('Wrong Wrong Wrong')
 
-        return self.opt_index, [self.x, self.y, self.result]
+        return self.opt_index, [self.result, [self.x, self.y]]

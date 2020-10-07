@@ -70,13 +70,12 @@ def update_action(obs_n, WorldTarget, step, Controller):
 
     for i in range(arglist.numU):
 
-        list_i = Controller[i][0]. \
-            make_policy(WorldTarget, obs_n, step)
+        para_list = Controller[i][0].make_policy(WorldTarget, obs_n, step)
 
-        Controller[i][4][2] = list_i[1][2]
+        Controller[i][4][2] = para_list[1][0]
 
         pointAi, pointBi, finishedi, Controller[i][4][1] = Controller[i][1].\
-            planpath(list_i, obs_n[i], Controller[i][4][0], step)
+            planpath(para_list, obs_n[i], Controller[i][4][0], step)
 
         acctEi, acclEi, Controller[i][4][0] = Controller[i][2]. \
             get_expected_action(obs_n[i], pointAi, pointBi, step, finishedi)
