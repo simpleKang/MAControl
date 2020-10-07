@@ -4,7 +4,7 @@ import argparse
 import time
 import MAControl.PTMA.InnerController_PID as IC_P
 import MAControl.PTMA.MotionController_L1_TECS_6DOF as MC_L
-import MAControl.PTMA.PathPlanner_Simple as PP_S
+import MAControl.PTMA.PathPlanner_EdgeWaypoint as PP_S
 import MAControl.PTMA.PolicyMaker_Probability as PM_P
 import logging
 import numpy as np
@@ -54,7 +54,7 @@ def get_controller(env, world, arglist):
     for ii in range(arglist.numU):
         control = []
         control.append(PM_P.PolicyMaker_Probability("agent_%d" % ii, env, world, ii, arglist))
-        control.append(PP_S.PathPlanner_Simple("agent_%d" % ii, env, world, ii, arglist))
+        control.append(PP_S.PathPlanner_EdgeWaypoint("agent_%d" % ii, env, world, ii, arglist))
         control.append(MC_L.MotionController_L1_TECS("agent_%d" % ii, env, world, ii, arglist))
         control.append(IC_P.InnerController_PID("agent_%d" % ii, env, world, ii, arglist))
         control.append([False, False, -1])   # FLAG-SET

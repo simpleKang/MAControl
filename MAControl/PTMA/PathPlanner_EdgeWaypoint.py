@@ -8,7 +8,7 @@ class PathPlanner_EdgeWaypoint(PathPlanner):
         super(PathPlanner_EdgeWaypoint, self).__init__(name, env, world, agent_index, arglist)
         self.pointAi = (0, 0)         # A点坐标，即上一时刻已到达航点坐标
         self.pointBi = (0, 0)         # B点坐标，即此时待飞航点坐标
-        self.edge = world.edge        # 区域边界，为一个象限的边长，即区域总边长为2×edge，单位km
+        self.edge = 2                 # 区域边界，为一个象限的边长，即区域总边长为2×edge，单位km
         self.arrivals_maximum = 1000   # 最多到达多少次边界结束
         self.current_wplist = 0       # 当前航点列表的索引
         self.is_init = True           # 判断是否为初始时刻
