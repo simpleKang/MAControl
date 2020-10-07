@@ -1,15 +1,8 @@
 import random
-import os
 import numpy as np
-import operator
-import MAControl.Util.SignIsSame as sis
-_path_ = '/track/vel.txt' if os.name == 'posix' else '\\track\\vel.txt'
-
-# open(os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + _path_, 'w')
 
 
 def creat_snake_waypoint_list(waypoint_list, N, i, new_list_index, W=0.9, D=0.05, Edge=1):
-
     waypoint_list.append([[0 for j in range(3)] for k in range(256)])
 
     Up = round(W - D * i, 3)
@@ -25,14 +18,14 @@ def creat_snake_waypoint_list(waypoint_list, N, i, new_list_index, W=0.9, D=0.05
 
 def snake_single(Up, Down, Wide1, Wide2, Edge, W, D, i):
     wp_list = []
-    point = [round(-W+i*D, 3), round(-W, 3), 1]
+    point = [round(-W + i * D, 3), round(-W, 3), 1]
     wp_list.append(point)
     while True:
 
         point = [round(point[0], 3), round(Up, 3), 1]
         wp_list.append(point)
 
-        point = [round(point[0]+Wide1, 3), round(Up, 3), 1]
+        point = [round(point[0] + Wide1, 3), round(Up, 3), 1]
         if point[0] > Edge:
             break
         wp_list.append(point)
@@ -40,7 +33,7 @@ def snake_single(Up, Down, Wide1, Wide2, Edge, W, D, i):
         point = [round(point[0], 3), round(Down, 3), 1]
         wp_list.append(point)
 
-        point = [round(point[0]+Wide2, 3), round(Down, 3), 1]
+        point = [round(point[0] + Wide2, 3), round(Down, 3), 1]
         if point[0] > Edge:
             break
         wp_list.append(point)
@@ -49,13 +42,12 @@ def snake_single(Up, Down, Wide1, Wide2, Edge, W, D, i):
 
 
 def create_simple_waypoint_list(waypoint_list, new_list_index, init_point, Edge):
-
     waypoint_list.append([[0 for j in range(3)] for k in range(256)])
     wp_list = []
     point = [init_point[0], init_point[1], 1]
     wp_list.append(point)
     while True:
-        point = [point[0], point[1]+0.2, 1]
+        point = [point[0], point[1] + 0.2, 1]
         if abs(point[1]) > Edge:
             break
         wp_list.append(point)
@@ -64,7 +56,6 @@ def create_simple_waypoint_list(waypoint_list, new_list_index, init_point, Edge)
 
 
 def creat_veledge_point(pos, vel, cur_vel, edge):
-
     waypoint_list = list(pos)
     delta = 0.2
     try:
@@ -73,8 +64,6 @@ def creat_veledge_point(pos, vel, cur_vel, edge):
             vel = cur_vel / np.linalg.norm(cur_vel)
         else:
             vel /= vel_length
-        # with open(os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + _path_, 'a') as f:
-        #     f.write(str(vel[0]) + ' ' + str(vel[1]) + '\n')
     except:
         print(vel)
     while True:
@@ -98,7 +87,6 @@ def creat_veledge_point(pos, vel, cur_vel, edge):
 
 
 def creat_random_edgepoint(pos, Edge):
-
     candidate_edge = []  # 候选边编号
     new_edgepoint = []
 
@@ -117,7 +105,7 @@ def creat_random_edgepoint(pos, Edge):
     # 生成候选边序列，即不包含目前边的边序列
     for i in range(4):
         if i != (current_edge - 1):
-            candidate_edge.append(i+1)
+            candidate_edge.append(i + 1)
 
     # 候选边序列随机选取边编号，为新航点所在边编号;并在该边上随机选取一点
     new_edge = candidate_edge[random.randint(0, 2)]
@@ -137,7 +125,6 @@ def creat_random_edgepoint(pos, Edge):
 
 
 def creat_reflection_edgepoint(current_point, vel, edge):
-
     if edge - abs(current_point[0]) < 0.1:
         new_direction = np.array([-vel[0], vel[1]])
     elif edge - abs(current_point[1]) < 0.1:
@@ -161,7 +148,7 @@ def creat_reflection_edgepoint(current_point, vel, edge):
         waypoint_list[1] += delta * new_direction[1]
 
         if x:
-            if not sis.sign_is_same(current_point[0], waypoint_list[0]) and edge - abs(waypoint_list[0]) < 0.01:
+            if not sign_is_same(current_point[0], waypoint_list[0]) and edge - abs(waypoint_list[0]) < 0.01:
                 waypoint_list = [round(waypoint_list[0], 3), round(waypoint_list[1], 3)]
                 break
             elif edge - abs(waypoint_list[1]) < 0.01:
@@ -169,7 +156,7 @@ def creat_reflection_edgepoint(current_point, vel, edge):
                 break
 
         if y:
-            if not sis.sign_is_same(current_point[1], waypoint_list[1]) and edge - abs(waypoint_list[1]) < 0.01:
+            if not sign_is_same(current_point[1], waypoint_list[1]) and edge - abs(waypoint_list[1]) < 0.01:
                 waypoint_list = [round(waypoint_list[0], 3), round(waypoint_list[1], 3)]
                 break
             elif edge - abs(waypoint_list[0]) < 0.01:
@@ -177,3 +164,19 @@ def creat_reflection_edgepoint(current_point, vel, edge):
                 break
 
     return waypoint_list
+
+
+def sign_is_same(a, b):
+
+    a_is_positive = False
+    b_is_positive = False
+
+    if a > 0:
+        a_is_positive = True
+    if b > 0:
+        b_is_positive = True
+
+    if a_is_positive is b_is_positive:
+        return True
+    else:
+        return False
