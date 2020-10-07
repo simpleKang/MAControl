@@ -1,5 +1,6 @@
 from MAControl.Base.PathPlanner import PathPlanner
 import MAControl.Util.CreateWaypoint as CW
+import random
 
 
 class PathPlanner_EdgeWaypoint(PathPlanner):
@@ -9,31 +10,21 @@ class PathPlanner_EdgeWaypoint(PathPlanner):
         self.pointAi = (0, 0)         # A点坐标，即上一时刻已到达航点坐标
         self.pointBi = (0, 0)         # B点坐标，即此时待飞航点坐标
         self.edge = 2                 # 区域边界，为一个象限的边长，即区域总边长为2×edge，单位km
-        self.arrivals_maximum = 1000   # 最多到达多少次边界结束
-        self.current_wplist = 0       # 当前航点列表的索引
+        self.arrivals_maximum = 1000  # 最多到达多少次边界结束
+        self.current_wplist = 0       # 当前航点列表的索引 [key]
         self.is_init = True           # 判断是否为初始时刻
         self.finished = False         # 是否到达最大循环数
         self.is_attacking = False     # 是否为正在执行
         self.state = 0                # uav状态, 0搜索/1攻击/2攻击完成
         self.attacking_target = None  # 正在攻击的目标编号
-        self.waypoint_list = list()   # 1×2的航点信息，每新增一个航点则增加一个列表，每个列表只存储一个航点
-        self.waypoint_list.append(CW.creat_veledge_point(world.agents[self.index].state.p_pos,
-                                                         world.agents[self.index].state.p_vel,
-                                                         world.agents[self.index].state.p_vel, world.edge))
+        self.waypoint_list = list()   # 1×2的航点信息，每新增一个航点则增加一个列表，每个列表只存储一个航点 [key]
+        self.waypoint_list.append(CW.creat_random_edgepoint([random.random(), random.random()], self.edge))
 
     def planpath(self, para_list, obs, arrive_flag, step):
 
         # 执行决策结果
         if para_list[0] == 0:
             self.no_operation()
-
-        elif para_list[0] == 1:
-            self.new_decision_point(para_list[1], obs[2:4], obs[0:2])
-            self.pointAi = (obs[2], obs[3])
-            self.pointBi = (self.waypoint_list[self.current_wplist][0],
-                            self.waypoint_list[self.current_wplist][1])
-            self.is_attacking = False
-            self.state = 0
 
         elif para_list[0] == 10:
             if not self.is_attacking:
@@ -80,11 +71,6 @@ class PathPlanner_EdgeWaypoint(PathPlanner):
     # 操作数 = 0 不进行任何操作，返回当前航点列表
     def no_operation(self):
         pass
-
-    # 操作数 = 1 根据速度方向进行延长，取与边界交点
-    def new_decision_point(self, v, pos, cur_vel):
-        self.waypoint_list.append(CW.creat_veledge_point(pos, v, cur_vel, self.edge))
-        self.current_wplist += 1
 
     # 操作数 = 10 攻击时刻的特殊操作，生成新的攻击列表，表中只有一行目标坐标
     def attack_replace(self, coord):
