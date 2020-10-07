@@ -15,10 +15,10 @@ class PathPlanner_EdgeWaypoint(PathPlanner):
         self.is_init = True           # 判断是否为初始时刻
         self.finished = False         # 是否到达最大循环数
         self.is_attacking = False     # 是否为正在执行
-        self.state = 0                # uav状态, 0搜索/1攻击/2攻击完成
+        self.state = 0                # uav状态, 0-搜索/1-攻击/2-攻击完成
         self.attacking_target = None  # 正在攻击的目标编号
         self.waypoint_list = list()   # 1×2的航点信息，每新增一个航点则增加一个列表，每个列表只存储一个航点 [key]
-        self.waypoint_list.append(CW.creat_random_edgepoint([random.random(), random.random()], self.edge))
+        self.waypoint_list.append(CW.creat_random_edgepoint([random.random(), random.random()], self.edge))  # [key]
 
     def planpath(self, para_list, obs, arrive_flag, step):
 
@@ -29,7 +29,7 @@ class PathPlanner_EdgeWaypoint(PathPlanner):
         elif para_list[0] == 10:
             if not self.is_attacking:
                 self.attack_replace(para_list[1][1])
-                self.pointAi = (obs[2], obs[3])
+                self.pointAi = (obs[17], obs[18])
                 self.pointBi = (self.waypoint_list[self.current_wplist][0],
                                 self.waypoint_list[self.current_wplist][1])
                 self.is_attacking = True
@@ -41,7 +41,7 @@ class PathPlanner_EdgeWaypoint(PathPlanner):
 
         # 初始时刻输出A、B坐标
         if self.is_init:
-            self.pointAi = (obs[2], obs[3])
+            self.pointAi = (obs[17], obs[18])
             self.pointBi = (self.waypoint_list[self.current_wplist][0],
                             self.waypoint_list[self.current_wplist][1])
             self.is_init = False
@@ -50,7 +50,7 @@ class PathPlanner_EdgeWaypoint(PathPlanner):
 
         # 尚未全局结束且到达预设航点的时候 反射一下
         if arrive_flag and (not self.finished) and (not self.is_attacking):
-            self.get_new_reflection_point(obs[0:2])
+            self.get_new_reflection_point(obs[10:12])
             self.pointAi = (self.waypoint_list[self.current_wplist][0],
                             self.waypoint_list[self.current_wplist][1])
             self.pointBi = (self.waypoint_list[self.current_wplist + 1][0],
