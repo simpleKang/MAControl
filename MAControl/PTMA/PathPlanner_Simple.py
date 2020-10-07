@@ -21,7 +21,7 @@ class PathPlanner_EdgeWaypoint(PathPlanner):
                                                          world.agents[self.index].state.p_vel,
                                                          world.agents[self.index].state.p_vel, world.edge))
 
-    def planpath(self, para_list, obs, arrive_flag, step, obstacles):
+    def planpath(self, para_list, obs, arrive_flag, step):
 
         # 执行决策结果
         if para_list[0] == 0:

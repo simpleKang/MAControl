@@ -3,7 +3,6 @@ from MAControl.Util.PointInRec import point_in_rec
 from MAControl.Util.viewfield import viewfield
 import random
 import numpy as np
-from MAControl.Util.Constrain import constrain
 import math
 
 
