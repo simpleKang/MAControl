@@ -42,10 +42,10 @@ class PolicyMaker_Probability(PolicyMaker):
         self.close_area = []
 
     def find_mate(self, obs_n, r=0.5):
-        selfpos = np.array(obs_n[self.index][0], obs_n[self.index][15], obs_n[self.index][16])  # alt lat lon
+        selfpos = np.array([obs_n[self.index][0], obs_n[self.index][15], obs_n[self.index][16]])  # alt lat lon
         close_area = []
         for i in range(len(obs_n)):
-            posi = np.array(obs_n[i][0], obs_n[i][15], obs_n[i][16])
+            posi = np.array([obs_n[i][0], obs_n[i][15], obs_n[i][16]])
             deltapos = abs(posi - selfpos)
             delta = np.sqrt(deltapos[0] * deltapos[0] + deltapos[1] * deltapos[1] * 0.4
                             + deltapos[2] * deltapos[2] * 0.4)
@@ -289,4 +289,4 @@ class PolicyMaker_Probability(PolicyMaker):
             else:
                 raise Exception('Wrong Wrong Wrong')
 
-        return [self.opt_index, [self.x, self.y, self.result]]
+        return self.opt_index, [self.x, self.y, self.result]

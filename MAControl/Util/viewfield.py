@@ -28,9 +28,9 @@ def viewfield(x, y, h, pitch, roll, heading, wview, hview):
 
 def cross_point(rll, ptch, head, x, y, h):
 
-    vo = np.array(math.sin(head), math.cos(head), 0)
-    rot_rll = np.array([1, 0, 0], [0, math.cos(rll), math.sin(rll)], [0, -math.sin(rll), math.cos(rll)])
-    rot_ptch = np.array([math.cos(ptch), 0, -math.sin(ptch)], [0, 1, 0], [math.sin(ptch), 0, math.cos(ptch)])
+    vo = np.array([math.sin(head), math.cos(head), 0])
+    rot_rll = np.array([[1, 0, 0], [0, math.cos(rll), math.sin(rll)], [0, -math.sin(rll), math.cos(rll)]])
+    rot_ptch = np.array([[math.cos(ptch), 0, -math.sin(ptch)], [0, 1, 0], [math.sin(ptch), 0, math.cos(ptch)]])
     vt = np.matmul(rot_ptch, np.matmul(rot_rll, vo))
 
     #                                 (x,y,h)
