@@ -31,45 +31,39 @@ class MotionController_L1_TECS(MotionController):
         # parameters update
         set_L1 = True
         if set_L1:
-            L1_roll_limit = 0  # radians
-            roll_slew_rate = 0  # .
-            BP_range = 0.1  # (0.1km=100m)
+            param_fw_l1_damping = 0
+            param_fw_l1_period = 0
+            param_fw_r_lim = 0  # radians
+            param_fw_li_r_slew_max = 0  # .
         set_tecs = True
         if set_tecs:
-            speed_weight = 0
-            indicated_airspeed_min = 0
-            indicated_airspeed_max = 0
-            time_const_throt = 0
-            time_const = 0
-            min_sink_rate = 0
-            throttle_damp = 0
-            integrator_gain = 0
-            throttle_slewrate = 0
-            vertical_accel_limit = 0
-            speed_comp_filter_omega = 0
-            roll_throttle_compensation = 0
-            pitch_damping = 0
-            heightrate_p = 0
-            heightrate_ff = 0
-            speedrate_p = 0
-            TAS_setpoint = 0.05  # (km/s)
-            throttle_c = 0  # (%)
-            throttle_setpoint_max = 100  # (%)
-            throttle_setpoint_min = 1  # (%)
-            STE_rate_max = 0.025
-            STE_rate_min = -0.025
-            K_V = 1  # (系数)
-            K_acct = 0.01  # (系数)
-        param_fw_airspd_trim = 30
+            param_fw_t_clmb_max = 0
+            param_fw_t_sink_max = 0
+            param_fw_t_spdweight = 0
+            param_fw_t_thro_const = 0
+            param_fw_t_time_const = 0
+            param_fw_t_sink_min = 0
+            param_fw_t_thr_damp = 0
+            param_fw_t_integ_gain = 0
+            param_fw_thr_slew_max = 0
+            param_fw_t_vert_acc = 0
+            param_fw_t_spd_omega = 0
+            param_fw_t_rll2thr = 0
+            param_fw_t_ptch_damp = 0
+            param_fw_t_hrate_p = 0
+            param_fw_t_hrate_ff = 0
+            param_fw_t_srate_p = 0
+        param_fw_airspd_min = 20
+        param_fw_airspd_max = 40
         param_fw_thr_min = 0.2
         param_fw_thr_cruise = 0.5
         FLT_EPSILON = 0.0001
+        airspeed_demand = 30
 
-        # airspeed + attitude poll
-        airspeed = obs[7:10]
-        roll = obs[2]  # rad
-        pitch = obs[1]  # rad
-        yaw = obs[3]  # deg
+        # target_airspeed ( no countering for pushed more and more away by wind
+        n = math.sqrt(math.cos(obs[2]))
+        adjusted_min_airspeed = constrain(param_fw_airspd_min / n, param_fw_airspd_min, param_fw_airspd_max)
+        target_airspeed = constrain(airspeed_demand, adjusted_min_airspeed, param_fw_airspd_max)
 
         # get waypoint heading distance /lat /lon /alt
         setpoint_prev = pointAi[0:2]
