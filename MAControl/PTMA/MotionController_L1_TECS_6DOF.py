@@ -65,41 +65,25 @@ class MotionController_L1_TECS(MotionController):
         adjusted_min_airspeed = constrain(param_fw_airspd_min / n, param_fw_airspd_min, param_fw_airspd_max)
         target_airspeed = constrain(airspeed_demand, adjusted_min_airspeed, param_fw_airspd_max)
 
-        # get waypoint heading distance /lat /lon /alt
-        setpoint_prev = pointAi[0:2]
-        setpoint_next = pointBi[0:2]
-        setpoint_hold = obs[15:17]
-        setpoint_prev.append(obs[0])
-        setpoint_next.append(obs[0])
-        setpoint_hold.append(obs[0])
-
-        # control position
-        dt = self.world.dt
-        setpoint = True
-        att_sp_fw_control_yaw = False
-        # —— —— —— airspeed valid —— —— —— #
-        air_angle = math.atan2(obs[8], obs[7])
-        ground_angle = math.atan2(obs[5], obs[4])
-        ground_vel = np.sqrt(obs[4]*obs[4]+obs[5]*obs[5])
-        if abs(air_angle - ground_angle) > math.pi / 2 or ground_vel < 3:
-            nav_speed_2d = obs[7:9]
-        else:
-            nav_speed_2d = obs[4:6]
+        # control position ( curr_pos / ground_speed / pos_sp_prev / pos_sp_curr / pos_sp_next (x)
+        nav_speed_2d = ground_speed = obs[10:12]
+        curr_pos = obs[17:19]
+        pos_sp_prev = pointAi
+        pos_sp_curr = pointBi
         throttle_max = 1
-        was_in_air = True
         # —— —— —— autonomous flight —— —— —— #
         hold_alt = obs[0]
         hdg_hold_yaw = obs[3]
         was_circle_mode = False
-        curr_wp = setpoint_hold[0:2]  # unsure
-        prev_wp = setpoint_prev[0:2]
-        next_wp = setpoint_next[0:2]
+        curr_wp = pos_sp_curr
+        prev_wp = pos_sp_prev
         att_sp_roll_reset_integral = False
         att_sp_pitch_reset_integral = False
         att_sp_yaw_reset_integral = False
         mission_airspeed = 30  # pos_sp_curr_cruising_speed
         mission_throttle = 0.7  # pos_sp_curr_cruising_throttle
-        pos_sp_curr_type = 'position'
+        acc_rad = l1_control_switch_distance = 0.5
+        pos_sp_curr_type = 'position'  # ( no position_sp_type to "loiter" yet
         if pos_sp_curr_type == 'idle':
             att_sp_thrust_body_0 = 0
             att_sp_roll_body = 0
