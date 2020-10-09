@@ -77,7 +77,7 @@ def update_action(obs_n, WorldTarget, step, Controller):
         pointAi, pointBi, finishedi, Controller[i][4][3], Controller[i][4][2] = Controller[i][1].\
             planpath(para_list, obs_n[i], Controller[i][4][0], step)
 
-        acctEi, acclEi, Controller[i][4][0] = Controller[i][2]. \
+        pitch_sp, thr_sp, roll_sp, nav_bearing = Controller[i][2]. \
             get_expected_action(obs_n[i], pointAi, pointBi, step, finishedi)
 
         actioni = Controller[i][3]. \

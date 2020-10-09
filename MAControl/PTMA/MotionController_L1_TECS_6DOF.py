@@ -64,7 +64,6 @@ class MotionController_L1_TECS(MotionController):
         mission_throttle = 0.7  # pos_sp_curr_cruising_throttle
         acc_rad = 0.5  # l1_control_switch_distance
         throttle_max = 1
-        FLT_EPSILON = 0.0001
         airspeed_demand = 30
 
         # target_airspeed ( no countering for pushed more and more away by wind
@@ -97,17 +96,9 @@ class MotionController_L1_TECS(MotionController):
             att_sp_yaw_body = self.nav_bearing
             self.tecs_update_pitch_throttle(obs, obs[0], target_airspeed, param_fw_p_lim_min, param_fw_p_lim_max,
                                             param_fw_thr_min, throttle_max, param_fw_thr_cruise)
-        elif pos_sp_curr_type == 'loiter':  # ( not in use yet
-            loiter_radius = 10  # pos_sp_curr
-            loiter_direction = [0, 1]  # pos_sp_curr
-            if abs(loiter_radius) < FLT_EPSILON:
-                loiter_radius = param_nav_loiter_rad = math.pi
-                loiter_direction = 1
-            self.l1_control_navigate_loiter(prev_wp, curr_wp, loiter_radius, loiter_direction, nav_speed_2d)
-            att_sp_roll_body = self.roll_setpoint
-            att_sp_yaw_body = self.nav_bearing
-            alt_sp = pos_sp_curr_alt = 1000
-            self.tecs_update_pitch_throttle(obs, curr_wp[2], param_fw_thr_min, param_fw_thr_cruise)
+        elif pos_sp_curr_type == 'loiter':
+            # ( not in use yet
+            pass
         else:
             pass
         if was_circle_mode and (not self.circle_mode):
@@ -115,6 +106,7 @@ class MotionController_L1_TECS(MotionController):
         # —— —— —— copy thrust output for publication  —— —— —— #
         att_sp_thrust_body_0 = min(self.throttle_setpoint, throttle_max)
         att_sp_pitch_body = self.pitch_setpoint
+        last_manual = False
 
         # FixedwingPositionControl::Run() # Procedure #
         # parameter_update_s pupdate;
@@ -145,7 +137,7 @@ class MotionController_L1_TECS(MotionController):
         # _attitude_sp_pub.publish(_att_sp);
         # status_publish();
 
-        return None
+        return [self.pitch_setpoint, self.throttle_setpoint, self.roll_setpoint, self.nav_bearing]
 
     def l1_control_navigate_waypoints(self, vectorA, vectorB, vectorP, vectorVel):
         L1_ratio = 0.1  # (当v=0.05则L1=0.005km=50m)
@@ -166,7 +158,7 @@ class MotionController_L1_TECS(MotionController):
         L1_distance = L1_ratio * nav_speed
 
         # /* calculate vector from A to B */ #
-        vector_AB = vectorB - vectorA
+        vector_AB = np.array(vectorB) - np.array(vectorA)
         dist_AB = np.sqrt(vector_AB[0]*vector_AB[0] + vector_AB[1]*vector_AB[1])
         dist_AB = max(dist_AB, 0.000000001)
         vector_AB_unit = vector_AB / dist_AB
@@ -373,7 +365,7 @@ class MotionController_L1_TECS(MotionController):
             pitch_setpoint = self.pitch_setpoint - ptchRateIncr
         self.pitch_setpoint = pitch_setpoint
 
-        return [self.pitch_setpoint, throttle_setpoint]
+        return [self.pitch_setpoint, self.throttle_setpoint]
 
     def l1_control_navigate_loiter(self, vectorA, vectorP, loiter_radius, loiter_direction, vectorVel):
         L1_period = 0.5
