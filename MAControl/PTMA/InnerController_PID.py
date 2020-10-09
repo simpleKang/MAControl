@@ -11,7 +11,7 @@ class InnerController_PID(InnerController):
         self.ITerm = 0
         self.last_error = 0
 
-    def get_action(self, obs, Eacct, Eaccl, step, finishedi):
+    def get_action(self, obs, pitch_sp, thr_sp, roll_sp, nav_bearing, step, finishedi):
         # print('inner control')
 
         if finishedi:

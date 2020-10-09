@@ -66,7 +66,7 @@ class PathPlanner_EdgeWaypoint(PathPlanner):
         else:
             pass
 
-        return self.pointAi, self.pointBi, self.finished, self.state, self.attacking_target
+        return self.pointAi, self.pointBi, self.finished, self.state
 
     # 操作数 = 0 不进行任何操作，返回当前航点列表
     def no_operation(self):

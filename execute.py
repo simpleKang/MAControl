@@ -74,21 +74,16 @@ def update_action(obs_n, WorldTarget, step, Controller):
 
         Controller[i][4][2] = para_list[1][0]
 
-        pointAi, pointBi, finishedi, Controller[i][4][3], Controller[i][4][2] = Controller[i][1].\
+        pointAi, pointBi, finishedi, Controller[i][4][3] = Controller[i][1].\
             planpath(para_list, obs_n[i], Controller[i][4][0], step)
 
         pitch_sp, thr_sp, roll_sp, nav_bearing = Controller[i][2]. \
             get_expected_action(obs_n[i], pointAi, pointBi, step, finishedi)
 
         actioni = Controller[i][3]. \
-            get_action(obs_n[i], acctEi, acclEi, step, finishedi)
+            get_action(obs_n[i], pitch_sp, thr_sp, roll_sp, nav_bearing, step, finishedi)
 
         action_n.append(actioni)
-
-    for i in range(arglist.numU):
-
-        action = np.random.random_sample(5) * 2 - 1
-        action_n.append(action)
 
     return action_n
 
