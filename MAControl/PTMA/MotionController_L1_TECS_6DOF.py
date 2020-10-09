@@ -20,10 +20,10 @@ class MotionController_L1_TECS(MotionController):
         self.lateral_acc = 0
 
         # key values
+        self.throttle_setpoint = 0.0
         self.roll_setpoint = 0.0
         self.pitch_setpoint = 0.0
         self.nav_bearing = 0.0
-        self.throttle_setpoint = 0.0
         self.circle_mode = False
         self.vel_last = 0.0
 
@@ -245,7 +245,6 @@ class MotionController_L1_TECS(MotionController):
         TAS_setpoint_adj = TAS_setpoint_last = tas_state = math.sqrt(vel[0]**2 + vel[1]**2 + vel[2]**2)
         throttle_integ_state = 0.0
         pitch_integ_state = 0.0
-        last_throttle_setpoint = thr_cruise
         pitch_setpoint_unc = last_pitch_setpoint = constrain(obs[1], pitch_setpoint_min, pitch_setpoint_max)
         hgt_setpoint_in_prev = hgt_setpoint_prev = hgt_setpoint_adj = hgt_setpoint_adj_prev = obs[0]
         underspeed_detected = False
@@ -314,7 +313,7 @@ class MotionController_L1_TECS(MotionController):
         STE_rate_setpoint = constrain(STE_rate_setpoint, STE_rate_min, STE_rate_max)
         STE_rate_error = 0.2 * (STE_rate_setpoint - SPE_rate - SKE_rate) + 0.8 * STE_rate_error
         if underspeed_detected:
-            throttle_setpoint = 1.0
+            self.throttle_setpoint = 1.0
         else:
             load_factor = 1.0 / constrain(math.cos(obs[2]), 0.1, 1.0) - 1.0
             load_factor_correction = 0.2
@@ -328,22 +327,21 @@ class MotionController_L1_TECS(MotionController):
         throttle_damping_gain = 0.7
         STE_to_throttle = 1.0 / (throttle_time_constant * (STE_rate_max - STE_rate_min))
         throttle_setpoint = (STE_error + STE_rate_error * throttle_damping_gain) * STE_to_throttle + throttle_predicted
-        throttle_setpoint = constrain(throttle_setpoint, throttle_setpoint_min, throttle_setpoint_max)
-        last_throttle_setpoint = throttle_setpoint
+        self.throttle_setpoint = constrain(throttle_setpoint, throttle_setpoint_min, throttle_setpoint_max)
         integrator_gain = 0.2
         if integrator_gain > 0.0:
-            integ_state_max = throttle_setpoint_max - throttle_setpoint + 0.1
-            integ_state_min = throttle_setpoint_min - throttle_setpoint - 0.1
+            integ_state_max = throttle_setpoint_max - self.throttle_setpoint + 0.1
+            integ_state_min = throttle_setpoint_min - self.throttle_setpoint - 0.1
             throttle_integ_state = throttle_integ_state + (STE_error * integrator_gain) * dt * STE_to_throttle
             throttle_integ_state = constrain(throttle_integ_state, integ_state_min, integ_state_max)
         else:
             throttle_integ_state = 0.0
-        throttle_setpoint = throttle_setpoint + throttle_integ_state
-        throttle_setpoint = constrain(throttle_setpoint, throttle_setpoint_min, throttle_setpoint_max)
+        self.throttle_setpoint = self.throttle_setpoint + throttle_integ_state
+        self.throttle_setpoint = constrain(self.throttle_setpoint, throttle_setpoint_min, throttle_setpoint_max)
 
         # 	// Calculate the pitch demand
-        SKE_weighting = 1.0  # 0.0 <= SKE_weighting <= 2.0
-        if underspeed_detected or climbout_mode_active:
+        SKE_weighting = 1.0  # 0.0 <= SKE_weighting <= 2.0 ( pitch speed weight
+        if underspeed_detected:
             SKE_weighting = 2.0
         SPE_weighting = 2.0 - SKE_weighting
         SEB_setpoint = SPE_setpoint * SPE_weighting - SKE_setpoint * SKE_weighting  # specific energy balance demand
@@ -365,17 +363,15 @@ class MotionController_L1_TECS(MotionController):
             pitch_integ_state = 0.0
         pitch_damping_gain = 0.01
         SEB_correction = SEB_error + SEB_rate_error * pitch_damping_gain + SEB_rate_setpoint * pitch_time_constant
-        if climbout_mode_active:
-            SEB_correction += pitch_setpoint_min * climb_angle_to_SEB_rate
         pitch_setpoint_unc = (SEB_correction + pitch_integ_state) / climb_angle_to_SEB_rate
-        self.pitch_setpoint = constrain(pitch_setpoint_unc, pitch_setpoint_min, pitch_setpoint_max)
+        pitch_setpoint = constrain(pitch_setpoint_unc, pitch_setpoint_min, pitch_setpoint_max)
         vert_accel_limit = 0.2
         ptchRateIncr = dt * vert_accel_limit / tas_state
-        if self.pitch_setpoint - last_pitch_setpoint > ptchRateIncr:
-            self.pitch_setpoint = last_pitch_setpoint + ptchRateIncr
-        elif self.pitch_setpoint - last_pitch_setpoint < -1 * ptchRateIncr:
-            self.pitch_setpoint = last_pitch_setpoint - ptchRateIncr
-        last_pitch_setpoint = self.pitch_setpoint
+        if pitch_setpoint - self.pitch_setpoint > ptchRateIncr:
+            pitch_setpoint = self.pitch_setpoint + ptchRateIncr
+        elif pitch_setpoint - self.pitch_setpoint < -1 * ptchRateIncr:
+            pitch_setpoint = self.pitch_setpoint - ptchRateIncr
+        self.pitch_setpoint = pitch_setpoint
 
         return [self.pitch_setpoint, throttle_setpoint]
 
