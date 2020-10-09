@@ -25,6 +25,7 @@ class MotionController_L1_TECS(MotionController):
         self.nav_bearing = 0.0
         self.throttle_setpoint = 0.0
         self.circle_mode = False
+        self.vel_last = 0.0
 
     def get_expected_action(self, obs, pointAi, pointBi, step, finishedi):
 
@@ -57,6 +58,12 @@ class MotionController_L1_TECS(MotionController):
         param_fw_airspd_max = 40
         param_fw_thr_min = 0.2
         param_fw_thr_cruise = 0.5
+        param_fw_p_lim_min = 0.05
+        param_fw_p_lim_max = 0.95
+        mission_airspeed = 30  # pos_sp_curr_cruising_speed
+        mission_throttle = 0.7  # pos_sp_curr_cruising_throttle
+        acc_rad = 0.5  # l1_control_switch_distance
+        throttle_max = 1
         FLT_EPSILON = 0.0001
         airspeed_demand = 30
 
@@ -70,7 +77,6 @@ class MotionController_L1_TECS(MotionController):
         curr_pos = obs[17:19]
         pos_sp_prev = pointAi
         pos_sp_curr = pointBi
-        throttle_max = 1
         # —— —— —— autonomous flight —— —— —— #
         hold_alt = obs[0]
         hdg_hold_yaw = obs[3]
@@ -80,20 +86,18 @@ class MotionController_L1_TECS(MotionController):
         att_sp_roll_reset_integral = False
         att_sp_pitch_reset_integral = False
         att_sp_yaw_reset_integral = False
-        mission_airspeed = 30  # pos_sp_curr_cruising_speed
-        mission_throttle = 0.7  # pos_sp_curr_cruising_throttle
-        acc_rad = l1_control_switch_distance = 0.5
         pos_sp_curr_type = 'position'  # ( no position_sp_type to "loiter" yet
         if pos_sp_curr_type == 'idle':
             att_sp_thrust_body_0 = 0
             att_sp_roll_body = 0
             att_sp_pitch_body = 0
         elif pos_sp_curr_type == 'position':
-            self.l1_control_navigate_waypoints(prev_wp, next_wp, curr_wp, nav_speed_2d)
+            self.l1_control_navigate_waypoints(prev_wp, curr_wp, curr_pos, nav_speed_2d)
             att_sp_roll_body = self.roll_setpoint
             att_sp_yaw_body = self.nav_bearing
-            self.tecs_update_pitch_throttle(obs, curr_wp[2], param_fw_thr_min, param_fw_thr_cruise)
-        elif pos_sp_curr_type == 'loiter':
+            self.tecs_update_pitch_throttle(obs, obs[0], target_airspeed, param_fw_p_lim_min, param_fw_p_lim_max,
+                                            param_fw_thr_min, throttle_max, param_fw_thr_cruise)
+        elif pos_sp_curr_type == 'loiter':  # ( not in use yet
             loiter_radius = 10  # pos_sp_curr
             loiter_direction = [0, 1]  # pos_sp_curr
             if abs(loiter_radius) < FLT_EPSILON:
@@ -221,28 +225,28 @@ class MotionController_L1_TECS(MotionController):
 
         return None
 
-    def tecs_update_pitch_throttle(self, obs, sp_alt, thr_min, thr_cruise):
-        CONSTANTS_ONE_G = 9.81551
+    def tecs_update_pitch_throttle(self, obs, alt_sp, airspeed_sp, pitch_min_rad, pitch_max_rad,
+                                   throttle_min, throttle_max, thr_cruise):
 
+        CONSTANTS_ONE_G = 9.81551
+        max_climb_rate = min_sink_rate = 0.5
+        # // Set class variables from inputs
         dt = self.world.dt
-        throttle_setpoint_max = 0.95
-        throttle_setpoint_min = thr_min
-        pitch_setpoint_max = 0.9
-        pitch_setpoint_min = -0.5
-        max_climb_rate = 0
-        max_sink_rate = 0
-        min_sink_rate = 0
-        climbout_mode_active = False
+        throttle_setpoint_max = throttle_max
+        throttle_setpoint_min = throttle_min
+        pitch_setpoint_max = pitch_max_rad
+        pitch_setpoint_min = pitch_min_rad
+        vel = obs[4:7]
 
         # initialize states
         vert_vel_state = 0.0
         vert_pos_state = obs[0]
         tas_rate_state = 0.0
-        TAS_setpoint_adj = TAS_setpoint_last = tas_state = obs[7:10]
+        TAS_setpoint_adj = TAS_setpoint_last = tas_state = math.sqrt(vel[0]**2 + vel[1]**2 + vel[2]**2)
         throttle_integ_state = 0.0
         pitch_integ_state = 0.0
         last_throttle_setpoint = thr_cruise
-        pitch_setpoint_unc = last_pitch_setpoint = obs[1]
+        pitch_setpoint_unc = last_pitch_setpoint = constrain(obs[1], pitch_setpoint_min, pitch_setpoint_max)
         hgt_setpoint_in_prev = hgt_setpoint_prev = hgt_setpoint_adj = hgt_setpoint_adj_prev = obs[0]
         underspeed_detected = False
         uncommanded_descent_recovery = False
@@ -250,33 +254,31 @@ class MotionController_L1_TECS(MotionController):
         states_initialized = True
 
         # // Update the true airspeed state estimate
-        TAS_setpoint = 0.7
+        TAS_setpoint = airspeed_sp
         TAS_max = 0.9
         TAS_min = 0.2
-        tas_error = 0.1  # 这里要改变一下记录连续变化
+        tas_error = tas_state - self.vel_last
+        self.vel_last = tas_state
         tas_estimate_freq = 0.01
         tas_rate_state_input = tas_error * tas_estimate_freq * tas_estimate_freq
         if tas_state < 3.1:
             tas_rate_state_input = max(tas_rate_state_input, 0.0)
         tas_rate_state = tas_rate_state + tas_rate_state_input * dt
-        speed_derivative = tas_error  # 这个可能有问题
+        speed_derivative = tas_error  # 近似
         tas_state_input = tas_rate_state + speed_derivative + tas_error * tas_estimate_freq * 1.4142
         tas_state = tas_state + tas_state_input * dt
         tas_state = max(tas_state, 3.0)
 
         # 	// Calculate rate limits for specific total energy
         STE_rate_max = max_climb_rate * CONSTANTS_ONE_G
-        STE_rate_min = min_sink_rate * CONSTANTS_ONE_G
+        STE_rate_min = -min_sink_rate * CONSTANTS_ONE_G
 
-        # 	// Detect an underspeed condition
-        if tas_state < TAS_min * 0.9 and self.throttle_setpoint >= throttle_setpoint_max * 0.95:
+        # 	// Detect underspeed condition >>  Detect uncommanded descent caused by unachievable airspeed demand (x)
+        if (tas_state < TAS_min * 0.9 and self.throttle_setpoint >= throttle_setpoint_max * 0.95)\
+                or (vert_pos_state < hgt_setpoint_adj and underspeed_detected):
             underspeed_detected = True
         else:
             underspeed_detected = False
-
-        # 	// Detect an uncommanded descent caused by an unachievable airspeed demand
-        # 	_detect_uncommanded_descent();
-        #   // 似乎是循环进行相关步骤 这里才能有东西可用啊 迷惑 暂时放下
 
         # 	// Calculate the demanded true airspeed
         if underspeed_detected or uncommanded_descent_recovery:
@@ -290,26 +292,7 @@ class MotionController_L1_TECS(MotionController):
         TAS_rate_setpoint = constrain(TAS_rate_setpoint, velRateMin, velRateMax)
 
         # 	// Calculate the demanded height
-        desired = hgt_setpoint = 100.0  # 尚且不清楚这是怎么来的
-        if hgt_setpoint_in_prev < 0.1:
-            hgt_setpoint_in_prev = desired
-        hgt_setpoint = 0.5 * (desired + hgt_setpoint_in_prev)
-        hgt_setpoint_in_prev = hgt_setpoint
-        if (hgt_setpoint - hgt_setpoint_prev) > max_climb_rate * dt:
-            hgt_setpoint = hgt_setpoint_prev + max_climb_rate * dt
-        elif (hgt_setpoint - hgt_setpoint_prev) < max_sink_rate * dt:
-            hgt_setpoint = hgt_setpoint_prev - max_sink_rate * dt
-        hgt_setpoint_prev = hgt_setpoint
-        hgt_setpoint_adj = 0.1 * hgt_setpoint + 0.9 * hgt_setpoint_adj_prev
-        height_error_gain = 0.2
-        height_setpoint_gain_ff = 0.02
-        hgt_rate_setpoint = (hgt_setpoint_adj - obs[0]) * height_error_gain + height_setpoint_gain_ff * \
-                            (hgt_setpoint_adj - hgt_setpoint_adj_prev) / dt
-        hgt_setpoint_adj_prev = hgt_setpoint_adj
-        if hgt_rate_setpoint > max_climb_rate:
-            hgt_rate_setpoint = max_climb_rate
-        elif hgt_rate_setpoint < -1 * max_sink_rate:
-            hgt_rate_setpoint = -1 * max_sink_rate
+        hgt_rate_setpoint = 0.0
 
         # 	// Calculate the specific energy values required by the control loop
         # specific energy demands in units of (m**2/sec**2) #
@@ -352,10 +335,7 @@ class MotionController_L1_TECS(MotionController):
             integ_state_max = throttle_setpoint_max - throttle_setpoint + 0.1
             integ_state_min = throttle_setpoint_min - throttle_setpoint - 0.1
             throttle_integ_state = throttle_integ_state + (STE_error * integrator_gain) * dt * STE_to_throttle
-            if climbout_mode_active:
-                throttle_integ_state = integ_state_max
-            else:
-                throttle_integ_state = constrain(throttle_integ_state, integ_state_min, integ_state_max)
+            throttle_integ_state = constrain(throttle_integ_state, integ_state_min, integ_state_max)
         else:
             throttle_integ_state = 0.0
         throttle_setpoint = throttle_setpoint + throttle_integ_state
