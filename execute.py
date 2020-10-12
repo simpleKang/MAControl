@@ -22,7 +22,7 @@ logging.info('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 def parse_args():
     parser = argparse.ArgumentParser("Control Experiments for Multi-Agent Environments")
     parser.add_argument("--scenario", type=str, default="scenario3d_paper", help="name of the scenario script")
-    parser.add_argument("--step-max", type=int, default=150, help="maximum steps")
+    parser.add_argument("--step-max", type=int, default=8000, help="maximum steps")
     parser.add_argument("--episode-max", type=int, default=4, help="maximum episodes")
     parser.add_argument("--p1", action='append', type=float, dest='p1', default=[], help="P: Line one")
     parser.add_argument("--p2", action='append', type=float, dest='p2', default=[], help="P: Line Two")
@@ -30,7 +30,7 @@ def parse_args():
     parser.add_argument("--q1", action='append', type=float, dest='q1', default=[], help="Q: Line One")
     parser.add_argument("--q2", action='append', type=float, dest='q2', default=[], help="Q: Line Two")
     parser.add_argument("--q3", action='append', type=float, dest='q3', default=[], help="Q: Line Three")
-    parser.add_argument("--numU", type=int, default=2, help="how many UAVs")
+    parser.add_argument("--numU", type=int, default=3, help="how many UAVs")
     parser.add_argument("--typeT", action='append', type=int, dest='typeT', default=[], help="target types")
     return parser.parse_args()
 

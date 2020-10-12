@@ -1,6 +1,7 @@
 from MAControl.Base.PolicyMaker import PolicyMaker
 from MAControl.Util.PointInRec import point_in_rec
 from MAControl.Util.viewfield import viewfield
+from collections import Counter
 import random
 import numpy as np
 import math
@@ -17,6 +18,10 @@ class PolicyMaker_Probability(PolicyMaker):
     #                                                                        |
     #                                                                     攻击[阶段]
 
+    SEEN_TARGETS = []
+    RESULT = []
+    Prices = []
+
     def __init__(self, name, env, world, agent_index, arglist):
         super(PolicyMaker_Probability, self).__init__(name, env, world, agent_index, arglist)
         self.opt_index = 0
@@ -25,7 +30,6 @@ class PolicyMaker_Probability(PolicyMaker):
         self.InAttacking = False
         self.result = -1
         self.seen_targets = []
-        self.attacked_targets = []
 
         # 以下为一些阶段的初始设定步数
         # >> 未来步数点可修改，从而可以主动停留在某一阶段/步
@@ -38,8 +42,10 @@ class PolicyMaker_Probability(PolicyMaker):
         self.Step4 = 521
         self.Step5 = 522
 
-        self.swarm_size = 0
+        self.mission_swarm = 0
         self.close_area = []
+        self.price = 0
+        self.rank = 0
 
     def find_mate(self, obs_n, r=0.5):
         selfpos = np.array([obs_n[self.index][0], obs_n[self.index][15], obs_n[self.index][16]])  # alt lat lon
@@ -189,64 +195,50 @@ class PolicyMaker_Probability(PolicyMaker):
                 self.opt_index = 0
 
             elif step == self.Step0:
-                # print('UAV', self.index, 'resorting')
-
-                if self.index == max(PolicyMaker_Probability.Remain_UAV_Set):
-
-                    for i in range(len(PolicyMaker_Probability.Found_Target_Set)):
-                        if i not in PolicyMaker_Probability.Attacked_Target_Index:
-                            PolicyMaker_Probability.Remain_Target_Set.append(PolicyMaker_Probability.Found_Target_Set[i]+[i])
-
-                    PolicyMaker_Probability.Remain_Target_Set = sorted(PolicyMaker_Probability.Remain_Target_Set, key=lambda x: x[5], reverse=True)
-                    # print('Found_Target_Set: ', PolicyMaker_Probability.Found_Target_Set)
-                    # print('Remain_Target_Set: ', PolicyMaker_Probability.Remain_Target_Set)
+                # print('UAV', self.index, 'resort, then store for communication')
+                self.seen_targets = sorted(self.seen_targets, key=lambda x: x[5], reverse=True)
+                PolicyMaker_Probability.SEEN_TARGETS.append(self.seen_targets)
 
             elif step == self.Step1:
-                # print('UAV', self.index, 'choosing')
+                # print('UAV', self.index, 'communicate locally')
+                HIGHEST_TARGETS = []
+                for i in self.close_area:
+                    HIGHEST_TARGETS.append(PolicyMaker_Probability.SEEN_TARGETS[i][0])
+                HIGHEST_TARGETS = sorted(HIGHEST_TARGETS, key=lambda x: x[5], reverse=True)
+                self.result = HIGHEST_TARGETS[0]
+                PolicyMaker_Probability.RESULT.append(self.result[-1])
 
-                if self.index == max(PolicyMaker_Probability.Remain_UAV_Set):
-                    PolicyMaker_Probability.Current_Target_Index = PolicyMaker_Probability.Remain_Target_Set[0][-1]
-                    # print('Current_Target_Index: ', PolicyMaker_Probability.Current_Target_Index)
-                    PolicyMaker_Probability.Current_Price_Set = [[0 for j in range(len(PolicyMaker_Probability.Remain_UAV_Set))] for k in range(18)]
-
-            elif self.Step2 <= step < self.Step3:
-                # print('UAV', self.index, 'pricing')
-
-                # TODO 是否出价如何判断
-                if random.random() > 0.5:
-                    k = PolicyMaker_Probability.Remain_UAV_Set.index(self.index)
-                    PolicyMaker_Probability.Current_Price_Set[step - self.Step2][k] = self.bidding(obs_n[self.index])
-                    # Current_Price_Set 是根据 Remain_UAV_Set 生成的，从后者选取编号
+            elif step == self.Step2:
+                # print('UAV', self.index, 'choose target, then generate mission-swarm accordingly, then bid price')
+                Counter_k = Counter(PolicyMaker_Probability.RESULT).most_common(1)
+                target_index = Counter_k[0][0]
+                self.mission_swarm = PolicyMaker_Probability.RESULT.index(target_index)
+                if self.index in self.mission_swarm:
+                    self.price = self.bidding(obs_n[self.index], 0)
+                else:
+                    self.price = 0
+                PolicyMaker_Probability.Prices.append(self.price)
 
             elif step == self.Step3:
-                # print('UAV', self.index, 'priced')
-                self.swarm_size = len(PolicyMaker_Probability.Remain_UAV_Set)
-
-                if self.index == max(PolicyMaker_Probability.Remain_UAV_Set):
-
-                    results = sum(np.array(PolicyMaker_Probability.Current_Price_Set))
-                    for k in range(len(PolicyMaker_Probability.Remain_UAV_Set)):
-                        PolicyMaker_Probability.Current_Price_Result.append([PolicyMaker_Probability.Remain_UAV_Set[k], results[k]])
-
-                    PolicyMaker_Probability.Current_Price_Result = \
-                        sorted(PolicyMaker_Probability.Current_Price_Result, key=lambda x: x[1], reverse=True)
-                    # print('Current_Price_Result: ', PolicyMaker_Probability.Current_Price_Result)
+                # print('UAV', self.index, 'sort price, then determine own rank')
+                PolicyMaker_Probability.Prices = sorted(PolicyMaker_Probability.Prices, reverse=True)
+                self.rank = PolicyMaker_Probability.Prices.index(self.price)
 
             elif step == self.Step4:
                 # 下述计算会在各个UAV本地重复进行，确认自己是否具有攻击资格，部分UAV即将进入攻击阶段
 
                 # 根据当前目标的类型估计，重新讨论目标的类型（含有随机性），进而确定需要的UAV个数
                 DEMANDED_UAV_NUM = 0
-                if PolicyMaker_Probability.Found_Target_Set[PolicyMaker_Probability.Current_Target_Index][6] == 5:
+                if self.result[6] == 5:
                     DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=self.arglist.q1)[0]
-                elif PolicyMaker_Probability.Found_Target_Set[PolicyMaker_Probability.Current_Target_Index][6] == 1:
+                elif self.result[6] == 1:
                     DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=self.arglist.q2)[0]
-                elif PolicyMaker_Probability.Found_Target_Set[PolicyMaker_Probability.Current_Target_Index][6] == 2:
+                elif self.result[6] == 2:
                     DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=self.arglist.q3)[0]
 
-                if DEMANDED_UAV_NUM > self.swarm_size:
+                if DEMANDED_UAV_NUM > len(self.mission_swarm):
                     # print('WARNING: HARD TARGET ', PolicyMaker_Probability.Current_Target_Index)
-                    CHOSEN_UAV_NUM = self.swarm_size
+                    CHOSEN_UAV_NUM = len(self.mission_swarm)
                 else:
                     CHOSEN_UAV_NUM = DEMANDED_UAV_NUM
 
