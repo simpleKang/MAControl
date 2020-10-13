@@ -11,7 +11,7 @@ class PathPlanner_Simple(PathPlanner):
         self.pointBi = (0, 0)               # B点坐标
         self.pointB_index = 0               # 当前飞向的B点的索引
         self.cycle_index = 1                # 航点列表循环的次数
-        self.total_cycle = 3                # 列表循环的总次数
+        self.total_cycle = 30                # 列表循环的总次数
         self.current_wplist = -1            # 当前航点列表的索引
         self.path_pace = 50                 # PathPlanner的调用频率
         self.is_init = True                 # 是否为初始时刻
@@ -29,6 +29,7 @@ class PathPlanner_Simple(PathPlanner):
         elif para_list[0] == 1:
             self.is_attacking = False
             arrive_flag = True
+            self.waypoint_finished = False
 
         elif para_list[0] == 2:
             arrive_flag = self.insert(para_list[1])
@@ -114,7 +115,7 @@ class PathPlanner_Simple(PathPlanner):
                 self.waypoint_finished = True
 
         # 在攻击状态下到达航点时认为攻击目标成功，判断航点finish
-        elif arrive_flag and self.is_attacking is True and self.waypoint_finished is False:
+        elif para_list[1][3] == 1 and self.is_attacking is True and self.waypoint_finished is False:
             self.waypoint_finished = True
 
         else:

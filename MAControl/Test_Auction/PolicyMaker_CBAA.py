@@ -141,52 +141,110 @@ class PolicyMaker_Auction(PolicyMaker):
                     self.targetbid[seen_target[i][-1]].append(0)
 
         #与通信范围内友方更新信息
+
+
+        # for tar in range(len(WorldTarget)):
+        #     num_need_tar = []
+        #     friend_index = []
+        #     list1 = []
+        #     list2 = []
+        #     if self.step_now == 400:
+        #         print("gg")
+        #     for friend in range(len(self.close_area)):
+        #         if NewController[self.close_area[friend]][0].targetbid[tar]:
+        #             if NewController[self.close_area[friend]][0].targetbid[tar][0] < 100000000:
+        #                 num_need_tar.append(len(NewController[self.close_area[friend]][0].targetbid[tar]))
+        #                 friend_index.append(self.close_area[friend])
+        #     if not num_need_tar:
+        #         continue
+        #     print(num_need_tar)
+        #     a = max(num_need_tar, key=num_need_tar.count)
+        #     num_need_tar.remove(a)
+        #     if num_need_tar:
+        #         b = max(num_need_tar, key=num_need_tar.count)
+        #         if a != b:
+        #             continue
+        #         with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
+        #             f.write(str(a) + str(b) + '\n')
+        #     for ii in range(a):
+        #         list1.append(0)
+        #     list2.extend(self.targetbid[tar])
+        #     for iii in range(len(friend_index)):
+        #         if not NewController[friend_index[iii]][0].targetbid[tar]:
+        #             continue
+        #         list2.extend(NewController[friend_index[iii]][0].targetbid[tar])
+        #     sorted(set(list2), key=list2.index)
+        #     self.targetbid[tar] = []
+        #     for iiii in range(a):
+        #         if a >8:
+        #             print('gg')
+        #         if iiii < len(list2):
+        #             self.targetbid[tar].append(list2[iiii])
+        #         else:
+        #             self.targetbid[tar].append(0)
+        #     if len(self.targetbid[tar]) > a:
+        #         print("gg")
+
+
+
         for num in range(len(self.close_area)):
             for index_tar in range(len(WorldTarget)):
                 list1 = list()
-                if NewController[self.close_area[num]][0].targetbid[index_tar]:
+                gg = len(NewController[self.close_area[num]][0].targetbid[index_tar])
+                ggg = NewController[self.close_area[num]][0].targetbid[index_tar]
+                if len(NewController[self.close_area[num]][0].targetbid[index_tar]) != 0:
                     if self.targetbid[index_tar]:
-                       if NewController[self.close_area[num]][0].targetbid[index_tar][0] <= self.targetbid[index_tar][0]:
-                            for i in range(len(NewController[self.close_area[num]][0].targetbid[index_tar])):
-                                list1.append(NewController[self.close_area[num]][0].targetbid[index_tar][i])
-                            list1.extend(self.targetbid[index_tar])
-                            list1.remove(NewController[self.close_area[num]][0].targetbid[index_tar][0])
-                            list1.remove(self.targetbid[index_tar][0])
-                            a = len(list1)
-                            while 0 in list1:
-                                list1.remove(0)
-                            b = len(list1)
-                            list1 = sorted(set(list1),key=list1.index)
-                            for iii in range(a-b):
-                                list1.append(0)
-                            list1.sort(reverse=True)
-                            kk = len(NewController[self.close_area[num]][0].targetbid[index_tar]) - 1
-                            self.targetbid[index_tar] = [NewController[self.close_area[num]][0].targetbid[index_tar][0]]
-                            for ii in range(kk):
-                                self.targetbid[index_tar].append(list1[ii])
-                            if not self.self_task[index_tar]:
-                                self.self_task[index_tar].append(0)
-                       else:
-                           for i in range(len(NewController[self.close_area[num]][0].targetbid[index_tar])):
-                               list1.append(NewController[self.close_area[num]][0].targetbid[index_tar][i])
-                           list1.extend(self.targetbid[index_tar])
-                           list1.remove(NewController[self.close_area[num]][0].targetbid[index_tar][0])
-                           list1.remove(self.targetbid[index_tar][0])
-                           list1 = sorted(set(list1), key=list1.index)
-                           a = len(list1)
-                           while 0 in list1:
-                               list1.remove(0)
-                           b = len(list1)
-                           list1 = sorted(set(list1), key=list1.index)
-                           for iii in range(a - b):
-                               list1.append(0)
-                           list1.sort(reverse=True)
-                           kk = len(self.targetbid[index_tar]) - 1
-                           self.targetbid[index_tar] = [self.targetbid[index_tar][0]]
-                           for ii in range(kk):
-                               self.targetbid[index_tar].append(list1[ii])
-                           if not self.self_task[index_tar]:
-                               self.self_task[index_tar].append(0)
+                        if NewController[self.close_area[num]][0].targetbid[index_tar][0]:
+                           if NewController[self.close_area[num]][0].targetbid[index_tar][0] <= self.targetbid[index_tar][0]:
+                                for i in range(len(NewController[self.close_area[num]][0].targetbid[index_tar])):
+                                    list1.append(NewController[self.close_area[num]][0].targetbid[index_tar][i])
+                                list1.extend(self.targetbid[index_tar])
+                                list1.remove(NewController[self.close_area[num]][0].targetbid[index_tar][0])
+                                list1.remove(self.targetbid[index_tar][0])
+                                a = len(list1)
+                                while 0 in list1:
+                                    list1.remove(0)
+                                b = len(list1)
+                                list1 = sorted(set(list1),key=list1.index)
+                                for iii in range(a-b):
+                                    list1.append(0)
+                                list1.sort(reverse=True)
+                                kk = len(NewController[self.close_area[num]][0].targetbid[index_tar]) - 1
+                                k = NewController[self.close_area[num]][0].targetbid[index_tar][0]
+                                self.targetbid[index_tar] = []
+                                self.targetbid[index_tar].append(k)
+                                for ii in range(kk):
+                                    if ii < len(list1):
+                                        self.targetbid[index_tar].append(list1[ii])
+                                    else:
+                                        self.targetbid[index_tar].append(0)
+                                if not self.self_task[index_tar]:
+                                    self.self_task[index_tar].append(0)
+                           else:
+                               for i in range(len(NewController[self.close_area[num]][0].targetbid[index_tar])):
+                                   list1.append(NewController[self.close_area[num]][0].targetbid[index_tar][i])
+                               list1.extend(self.targetbid[index_tar])
+                               list1.remove(NewController[self.close_area[num]][0].targetbid[index_tar][0])
+                               list1.remove(self.targetbid[index_tar][0])
+                               # list1 = sorted(set(list1), key=list1.index)
+                               a = len(list1)
+                               while 0 in list1:
+                                   list1.remove(0)
+                               b = len(list1)
+                               list1 = sorted(set(list1), key=list1.index)
+                               for iii in range(a - b):
+                                   list1.append(0)
+                               list1.sort(reverse=True)
+                               kk = len(self.targetbid[index_tar])-1
+                               kkk = self.targetbid[index_tar][0]
+                               self.targetbid[index_tar] = [kkk]
+                               for ii in range(kk):
+                                   if ii < len(list1):
+                                       self.targetbid[index_tar].append(list1[ii])
+                                   else:
+                                       self.targetbid[index_tar].append(0)
+                               if not self.self_task[index_tar]:
+                                   self.self_task[index_tar].append(0)
                     else:
                         for i in range(len(NewController[self.close_area[num]][0].targetbid[index_tar])):
                             self.targetbid[index_tar].append(NewController[self.close_area[num]][0].targetbid[index_tar][i])
@@ -257,6 +315,7 @@ class PolicyMaker_Auction(PolicyMaker):
         return Pr
 
     def make_policy(self, WorldTarget, obs_n, step, NewController):
+
         if self.over == 0:
 
             dis = np.sqrt((WorldTarget[self.self_task.index(max(self.self_task))][0] - obs_n[self.index][2])**2
@@ -268,8 +327,8 @@ class PolicyMaker_Auction(PolicyMaker):
                 a = self.self_task.index(max(self.self_task))
                 for tar in range(len(WorldTarget)):
                     kkkkk.append([])
-                kkkkk[a].append(1000000)
-                kkkkk[a].append(random.randint(10000, 1000000000))
+                kkkkk[a].append(10000000)
+                kkkkk[a].append(random.randint(100000000, 1000000000000))
                 self.targetbid = kkkkk.copy()
                 self.over = 1
 
@@ -278,7 +337,7 @@ class PolicyMaker_Auction(PolicyMaker):
 
                 if step < self.Step0:
                     # print('UAV', self.index, 'searching')
-                    self.close_area = self.find_mate_communcation(obs_n)
+                    self.close_area = self.find_mate_communcation(obs_n).copy()
                     self.add_new_target(obs_n[self.index], WorldTarget, NewController)
                     self.opt_index = 0
 
@@ -286,13 +345,13 @@ class PolicyMaker_Auction(PolicyMaker):
                 else:
                     if max(self.self_task) == [0]:
                         self.opt_index = 0
-                    self.close_area = self.find_mate_communcation(obs_n)
+                    self.close_area = self.find_mate_communcation(obs_n).copy()
                     self.add_new_target(obs_n[self.index], WorldTarget, NewController)
                     self_bid = self.bidding(obs_n[self.index], WorldTarget)
                     for i in range(len(self_bid)):
                         if self.targetbid[self_bid[i][0]]:
                             kkk = self.targetbid[self_bid[i][0]].copy()
-                            del kkk[0]
+                            kkk.pop(0)
                             if min(kkk) < self_bid[i][1]:
                                 a = self_bid[i]
                                 self.targetbid[self_bid[i][0]][kkk.index(min(kkk))+1] = a[1]
@@ -302,7 +361,12 @@ class PolicyMaker_Auction(PolicyMaker):
                                 self.self_task[self_bid[i][0]][0] = 1
                                 break
                             else:
-                                self.self_task[self_bid[i][0]][0] = 0
+                                # print(self_bid[i][0])
+                                # print(self.self_task)
+                                if self.self_task[self_bid[i][0]]:
+                                    self.self_task[self_bid[i][0]][0] = 0
+                                else:
+                                    self.self_task[self_bid[i][0]].append(0)
                     self.InAttacking = True
                     if max(self.self_task) == [1]:
                         self.x = WorldTarget[self.self_task.index(max(self.self_task))][0]
@@ -316,14 +380,14 @@ class PolicyMaker_Auction(PolicyMaker):
                     if self.opt_index == 10 and max(self.self_task) == [0]:
                         self.opt_index = 1
 
-                    print(self_bid)
+                    # print(self_bid)
                     with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
                         f.write(str(self.step_now) + '\n' + str(self_bid) + '\n')
-                print(self.index)
-                print(self.self_task)
-                print(self.targetbid)
-            with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
-                f.write(str(self.step_now) + '\n' + str(self.index) + '\n' + str(self.self_task) + '\n'
-                        + str(self.targetbid) + '\n')
+                # print(self.index)
+                # print(self.self_task)
+                # print(self.targetbid)
+        with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
+            f.write(str(step) + '\n' + str(self.index) + '\n' + str(self.self_task) + '\n'
+                    + str(self.targetbid) + '\n' + str(self.close_area) + '\n')
 
-        return [self.opt_index, [self.x, self.y, self.result]]
+        return [self.opt_index, [self.x, self.y, self.result, self.mission_success]]
