@@ -2,7 +2,6 @@ from MAControl.Base.PolicyMaker import PolicyMaker
 from MAControl.Util.PointInRec import point_in_rec
 from MAControl.Util.viewfield import viewfield
 from collections import Counter
-import random
 import numpy as np
 import math
 
@@ -38,11 +37,11 @@ class PolicyMaker_Probability(PolicyMaker):
         self.Step0 = 500
         self.Step1 = 501
         self.Step2 = 502
-        self.Step3 = 520
-        self.Step4 = 521
-        self.Step5 = 522
+        self.Step3 = 503
+        self.Step4 = 504
+        self.Step5 = 505
 
-        self.mission_swarm = 0
+        self.mission_swarm = []
         self.close_area = []
         self.price = 0
         self.rank = 0
@@ -52,9 +51,8 @@ class PolicyMaker_Probability(PolicyMaker):
         close_area = []
         for i in range(len(obs_n)):
             posi = np.array([obs_n[i][0], obs_n[i][15], obs_n[i][16]])
-            deltapos = abs(posi - selfpos)
-            delta = np.sqrt(deltapos[0] * deltapos[0] + deltapos[1] * deltapos[1] * 0.4
-                            + deltapos[2] * deltapos[2] * 0.4)
+            Dpos = abs(posi - selfpos)
+            delta = np.sqrt(Dpos[0] * Dpos[0] + Dpos[1] * Dpos[1] * 0.4 + Dpos[2] * Dpos[2] * 0.4)
             if delta < r:
                 close_area.append(i)
         return close_area
@@ -119,18 +117,18 @@ class PolicyMaker_Probability(PolicyMaker):
             self.Step0 = step + 10
             self.Step1 = self.Step0 + 1
             self.Step2 = self.Step0 + 2
-            self.Step3 = self.Step0 + 20
-            self.Step4 = self.Step0 + 21
-            self.Step5 = self.Step0 + 22
+            self.Step3 = self.Step0 + 3
+            self.Step4 = self.Step0 + 4
+            self.Step5 = self.Step0 + 5
 
         if operate_index == 2:
             #  finish searching immediately, start resorting at next step
             self.Step0 = step + 1
             self.Step1 = self.Step0 + 1
             self.Step2 = self.Step0 + 2
-            self.Step3 = self.Step0 + 20
-            self.Step4 = self.Step0 + 21
-            self.Step5 = self.Step0 + 22
+            self.Step3 = self.Step0 + 3
+            self.Step4 = self.Step0 + 4
+            self.Step5 = self.Step0 + 5
 
         if operate_index == 3:
             # wait [waitstep] more steps
@@ -212,7 +210,11 @@ class PolicyMaker_Probability(PolicyMaker):
                 # print('UAV', self.index, 'choose target, then generate mission-swarm accordingly, then bid price')
                 Counter_k = Counter(PolicyMaker_Probability.RESULT).most_common(1)
                 target_index = Counter_k[0][0]
-                self.mission_swarm = PolicyMaker_Probability.RESULT.index(target_index)
+                for i, result in enumerate(PolicyMaker_Probability.RESULT):
+                    if result == target_index:
+                        self.mission_swarm.append(i)
+                    else:
+                        pass
                 if self.index in self.mission_swarm:
                     self.price = self.bidding(obs_n[self.index], 0)
                 else:
@@ -236,23 +238,12 @@ class PolicyMaker_Probability(PolicyMaker):
                 elif self.result[6] == 2:
                     DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=self.arglist.q3)[0]
 
-                if DEMANDED_UAV_NUM > len(self.mission_swarm):
-                    # print('WARNING: HARD TARGET ', PolicyMaker_Probability.Current_Target_Index)
-                    CHOSEN_UAV_NUM = len(self.mission_swarm)
-                else:
-                    CHOSEN_UAV_NUM = DEMANDED_UAV_NUM
-
-                CHOSEN_UAV_SET = []
-                for k in range(CHOSEN_UAV_NUM):
-                    CHOSEN_UAV_SET.append(PolicyMaker_Probability.Current_Price_Result[k][0])
-
-                if self.index in CHOSEN_UAV_SET:
+                if self.rank < DEMANDED_UAV_NUM:
                     # print('UAV', self.index, 'to attack')
+                    self.opt_index = 10
                     self.InAttacking = True
-                    self.x = PolicyMaker_Probability.Found_Target_Set[PolicyMaker_Probability.Current_Target_Index][0]
-                    self.y = PolicyMaker_Probability.Found_Target_Set[PolicyMaker_Probability.Current_Target_Index][1]
-                    self.result = PolicyMaker_Probability.Found_Target_Set[PolicyMaker_Probability.Current_Target_Index][8]
-                    PolicyMaker_Probability.Remain_UAV_Set.remove(self.index)
+                    self.x = self.result[0]
+                    self.y = self.result[1]
                 else:
                     pass
                     # print('UAV', self.index, 'not to attack')
@@ -260,18 +251,9 @@ class PolicyMaker_Probability(PolicyMaker):
             elif step == self.Step5:
                 # print('UAV', self.index, 'recycling')
                 self.operate_step(1, step)
-
-                if len(PolicyMaker_Probability.Remain_Target_Set) == 1:
-                    self.opt_index = 5
-                    self.x = len(PolicyMaker_Probability.Remain_UAV_Set)
-                    self.y = PolicyMaker_Probability.Remain_UAV_Set.index(self.index)
-
-                if self.index == max(PolicyMaker_Probability.Remain_UAV_Set):
-                    PolicyMaker_Probability.Attacked_Target_Index.append(PolicyMaker_Probability.Current_Target_Index)
-                    PolicyMaker_Probability.Remain_Target_Set = []
-                    PolicyMaker_Probability.Current_Target_Index = -1
-                    PolicyMaker_Probability.Current_Price_Set = []
-                    PolicyMaker_Probability.Current_Price_Result = []
+                PolicyMaker_Probability.SEEN_TARGETS = []
+                PolicyMaker_Probability.RESULT = []
+                PolicyMaker_Probability.Prices = []
 
             else:
                 raise Exception('Wrong Wrong Wrong')
