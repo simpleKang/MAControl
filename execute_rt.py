@@ -1,6 +1,6 @@
 import os
 
-os.system("python ./execute.py --numU=2 "
+os.system("python ./execute.py --numU=4 "
           "--p1=0.1  --p1=0.45 --p1=0.45 "
           "--p2=0.45 --p2=0.1  --p2=0.45 "
           "--p3=0.45 --p3=0.45 --p3=0.1 "

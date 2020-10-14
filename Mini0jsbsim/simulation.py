@@ -4,7 +4,7 @@ import time
 from mpl_toolkits.mplot3d import Axes3D  # req'd for 3d plotting
 from typing import Dict, Union
 import Mini0jsbsim.properties as prp
-from Mini0jsbsim.aircraft import Aircraft, cessna172P
+from Mini0jsbsim.aircraft import Aircraft, Rascal110_JSBSim
 
 
 class Simulation(object):
@@ -19,7 +19,7 @@ class Simulation(object):
 
     def __init__(self,
                  sim_frequency_hz: float = 60.0,
-                 aircraft: Aircraft = cessna172P,
+                 aircraft: Aircraft = Rascal110_JSBSim,
                  init_conditions: Dict[prp.Property, float] = None,
                  allow_flightgear_output: bool = False):
         """
@@ -128,11 +128,8 @@ class Simulation(object):
         :param model_name: string, name of aircraft to be loaded
         :param init_conditions: dict mapping properties to their initial values
         """
-        if init_conditions is not None:
-            # if we are specifying conditions, load a minimal file
-            ic_file = 'minimal_ic.xml'
-        else:
-            ic_file = 'basic_ic.xml'
+        # ic_file = 'minimal_ic.xml' if init_conditions is not None else 'basic_ic.xml'
+        ic_file = 'basic_ic.xml'
 
         ic_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ic_file)
         self.jsbsim.load_ic(ic_path, useStoredPath=False)

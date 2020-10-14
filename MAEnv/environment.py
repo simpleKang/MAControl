@@ -1,9 +1,10 @@
 import gym
 from gym import spaces
-from gym.envs.registration import EnvSpec
+# from gym.envs.registration import EnvSpec
 import numpy as np
 from MAEnv.multi_discrete import MultiDiscrete
 import math
+import time
 import Mini0jsbsim.properties as prp
 
 
@@ -18,6 +19,8 @@ class MultiAgentEnv(gym.Env):
                  observation_callback=None, info_callback=None,
                  done_callback=None, shared_viewer=True):
 
+        self.render_geoms_xform = []
+        self.render_geoms = []
         self.world = world
         self.agents = self.world.policy_agents
         # set required vectorized gym env property
@@ -47,7 +50,8 @@ class MultiAgentEnv(gym.Env):
             if self.discrete_action_space:
                 u_action_space = spaces.Discrete(world.dim_p * 2 + 1)
             else:
-                u_action_space = spaces.Box(low=-agent.u_range, high=+agent.u_range, shape=(world.dim_p,), dtype=np.float32)
+                u_action_space = spaces.Box(low=-agent.u_range, high=+agent.u_range, shape=(world.dim_p,),
+                                            dtype=np.float32)
             if agent.movable:
                 total_action_space.append(u_action_space)
             # communication action space
@@ -117,8 +121,7 @@ class MultiAgentEnv(gym.Env):
                             agent.__setitem__(prp.aileron_right, action_n[i][1]),
                             agent.__setitem__(prp.elevator, action_n[i][2]),
                             agent.__setitem__(prp.rudder, action_n[i][3]),
-                            agent.__setitem__(prp.throttle, action_n[i][4]),
-                            agent.__setitem__(prp.gear, action_n[i][5])]
+                            agent.__setitem__(prp.throttle, action_n[i][4])]
 
         # advance world state
         kk = self.jsbsimk()
@@ -134,13 +137,7 @@ class MultiAgentEnv(gym.Env):
         # record observation for each agent
         for agent in self.agents:
             agent.run()
-            obs = [agent.__getitem__(prp.altitude_sl_ft),
-                   agent.__getitem__(prp.pitch_rad), agent.__getitem__(prp.roll_rad), agent.__getitem__(prp.heading_deg),
-                   agent.__getitem__(prp.u_fps), agent.__getitem__(prp.v_fps), agent.__getitem__(prp.w_fps),
-                   agent.__getitem__(prp.u_aero_fps), agent.__getitem__(prp.v_aero_fps), agent.__getitem__(prp.w_aero_fps),
-                   agent.__getitem__(prp.v_north_fps), agent.__getitem__(prp.v_east_fps),
-                   agent.__getitem__(prp.p_radps), agent.__getitem__(prp.q_radps), agent.__getitem__(prp.r_radps),
-                   agent.__getitem__(prp.lat_geod_deg), agent.__getitem__(prp.lng_geoc_deg)]
+            obs = self.observation_callback(agent, self.world)
             obs_n.append(obs)
             reward_n.append(self._get_reward(agent))
             done_n.append(self._get_done(agent))
@@ -186,7 +183,7 @@ class MultiAgentEnv(gym.Env):
         return self.reward_callback(agent, self.world)
 
     # set env action for a particular agent
-    def _set_action(self, action, agent, action_space, time=None):
+    def _set_action(self, action, agent, action_space):
         agent.action.u = np.zeros(self.world.dim_p)
         agent.action.c = np.zeros(self.world.dim_c)
         # process action
@@ -206,10 +203,14 @@ class MultiAgentEnv(gym.Env):
             if self.discrete_action_input:
                 agent.action.u = np.zeros(self.world.dim_p)
                 # process discrete action
-                if action[0] == 1: agent.action.u[0] = -1.0
-                if action[0] == 2: agent.action.u[0] = +1.0
-                if action[0] == 3: agent.action.u[1] = -1.0
-                if action[0] == 4: agent.action.u[1] = +1.0
+                if action[0] == 1:
+                    agent.action.u[0] = -1.0
+                if action[0] == 2:
+                    agent.action.u[0] = +1.0
+                if action[0] == 3:
+                    agent.action.u[1] = -1.0
+                if action[0] == 4:
+                    agent.action.u[1] = +1.0
             else:
                 if self.force_discrete_action:
                     d = np.argmax(action[0])
@@ -250,14 +251,14 @@ class MultiAgentEnv(gym.Env):
             # create viewers (if necessary)
             if self.viewers[i] is None:
                 # import rendering only if we need it (and don't import for headless machines)
-                #from gym.envs.classic_control import rendering
+                # from gym.envs.classic_control import rendering
                 from MAEnv import rendering
                 self.viewers[i] = rendering.Viewer(1000, 1000)
 
         # create rendering geometry
         if self.render_geoms is None:
             # import rendering only if we need it (and don't import for headless machines)
-            #from gym.envs.classic_control import rendering
+            # from gym.envs.classic_control import rendering
             from MAEnv import rendering
             self.render_geoms = []
             self.render_geoms_xform = []
@@ -286,21 +287,19 @@ class MultiAgentEnv(gym.Env):
 
         results = []
         for i in range(len(self.viewers)):
-            from MAEnv import rendering
+            # from MAEnv import rendering
             # update bounds to center around agent
-            cam_range = 2
+            cam_range = 2.5
             if self.shared_viewer:
                 pos = np.zeros(self.world.dim_p)
             else:
-                pos = self.agents[i].state.p_pos
-            self.viewers[i].set_bounds(pos[0]-cam_range, pos[0]+cam_range,pos[1]-cam_range, pos[1]+cam_range)
+                pos = self.agents[i].shadow
+            self.viewers[i].set_bounds(pos[0]-cam_range, pos[0]+cam_range, pos[1]-cam_range, pos[1]+cam_range)
             # update geometry positions
             for e, entity in enumerate(self.world.entities):
-                self.render_geoms_xform[e].set_translation(*entity.state.p_pos)
+                self.render_geoms_xform[e].set_translation(*entity.shadow)
                 if 'agent' in entity.name:
-                    vx = entity.state.p_vel[0]
-                    vy = entity.state.p_vel[1]
-                    rot = math.atan2(vy, vx) - math.pi/2
+                    rot = entity.heading - math.pi/2
                     self.render_geoms_xform[e].set_rotation(rot)
                 if 'agent' in entity.name and entity.attacking:
                     # self.render_geoms_xform[e].set_scale(3, 3)
@@ -311,7 +310,8 @@ class MultiAgentEnv(gym.Env):
         return results
 
     # create receptor field locations in local coordinate frame
-    def _make_receptor_locations(self, agent):
+    @staticmethod
+    def _make_receptor_locations():
         receptor_type = 'polar'
         range_min = 0.05 * 2.0
         range_max = 1.00
@@ -327,7 +327,7 @@ class MultiAgentEnv(gym.Env):
         if receptor_type == 'grid':
             for x in np.linspace(-range_max, +range_max, 5):
                 for y in np.linspace(-range_max, +range_max, 5):
-                    dx.append(np.array([x,y]))
+                    dx.append(np.array([x, y]))
         return dx
 
 
@@ -336,7 +336,7 @@ class MultiAgentEnv(gym.Env):
 class BatchMultiAgentEnv(gym.Env):
     metadata = {
         'runtime.vectorized': True,
-        'render.modes' : ['human', 'rgb_array']
+        'render.modes': ['human', 'rgb_array']
     }
 
     def __init__(self, env_batch):
@@ -354,7 +354,7 @@ class BatchMultiAgentEnv(gym.Env):
     def observation_space(self):
         return self.env_batch[0].observation_space
 
-    def step(self, action_n, time):
+    def step(self, action_n):
         obs_n = []
         reward_n = []
         done_n = []
