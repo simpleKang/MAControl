@@ -20,6 +20,7 @@ class PolicyMaker_Probability(PolicyMaker):
     SEEN_TARGETS = []
     RESULT = []
     Prices = []
+    Occupied_U = []
 
     def __init__(self, name, env, world, agent_index, arglist):
         super(PolicyMaker_Probability, self).__init__(name, env, world, agent_index, arglist)
@@ -195,13 +196,18 @@ class PolicyMaker_Probability(PolicyMaker):
             elif step == self.Step0:
                 print('UAV', self.index, 'resort, then store for communication')
                 self.seen_targets = sorted(self.seen_targets, key=lambda x: x[5], reverse=True)
-                PolicyMaker_Probability.SEEN_TARGETS.append(self.seen_targets)
+                PolicyMaker_Probability.SEEN_TARGETS.append(self.seen_targets)  # All -- Occupied = Active
 
             elif step == self.Step1:
                 print('UAV', self.index, 'communicate locally')
                 HIGHEST_TARGETS = []
+                ACTIVE_U = list(set([i for i in range(self.arglist.numU)]) - set(PolicyMaker_Probability.Occupied_U))
                 for i in self.close_area:
-                    HIGHEST_TARGETS.append(PolicyMaker_Probability.SEEN_TARGETS[i][0])
+                    if i in ACTIVE_U:
+                        ii = ACTIVE_U.index(i)
+                        HIGHEST_TARGETS.append(PolicyMaker_Probability.SEEN_TARGETS[ii][0])
+                    else:
+                        pass
                 HIGHEST_TARGETS = sorted(HIGHEST_TARGETS, key=lambda x: x[5], reverse=True)
                 self.result = HIGHEST_TARGETS[0]
                 PolicyMaker_Probability.RESULT.append(self.result[-1])
@@ -242,6 +248,7 @@ class PolicyMaker_Probability(PolicyMaker):
                     print('UAV', self.index, 'to attack')
                     self.opt_index = 10
                     self.InAttacking = True
+                    PolicyMaker_Probability.Occupied_U.append(self.index)
                     self.x = self.result[0]
                     self.y = self.result[1]
                 else:
