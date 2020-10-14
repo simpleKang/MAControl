@@ -1,6 +1,6 @@
 # MAControl
 
-[9.23] 固化了算法的各种参数 准备进行对照试验
+[2019.09.23] 固化了算法的各种参数 准备进行对照试验
 
 ###### P矩阵
 
@@ -18,7 +18,7 @@
 
     (2,5) (10,1) (5,2)
     
-[10.29]泛化测试
+[2019.10.29] 泛化测试
 
 >> (w,h) = (2,5) (10,1) (5,2)
 
@@ -52,7 +52,7 @@
 
      1     1     3     2     1     3
      
-[10.30]试验设计
+[2019.10.30] 试验设计
 
 >> (w,h) = (2,5) (10,1) (5,2)
 
@@ -66,7 +66,7 @@
 
 >> typeT = 随机生成
 
-[10.31] typeT = 随机生成 算例合集
+[2019.10.31] typeT = 随机生成 算例合集
 
 >> {np.random.choice(3, 10)+1}
 
@@ -74,28 +74,24 @@
     2|   array([1, 1, 2, 2, 2, 3, 1, 1, 1, 3])
     3|   array([2, 2, 3, 3, 2, 2, 2, 1, 2, 2])
     4|   array([1, 1, 1, 3, 2, 3, 1, 2, 1, 3])
+
+[2020.10.14]安装步骤
+
+###### 初始安装
+    pip3 install jsbsim
+
+###### 下载源码并解压
+    https://github.com/JSBSim-Team/jsbsim/releases/tag/Linux
     
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-安装步骤
-1. pip3 install jsbsim
+######  准备编译 jsbsim
+    cd jsbsim  
+    mkdir build 
+    cd build
+    cmake .. 
 
-2.https://github.com/JSBSim-Team/jsbsim/releases/tag/Linux
-    下载源码并解压
-    
-3.跳转到jsbsim源码目录
-cd jsbsim  
-创建build文件夹用于编译jsbsim
+###### 编译 jsbsim
+    make 
 
-mkdir build 
-
-cd build
-
-生成Makefile文件
-
-cmake .. 
-
-编译
-
-make 
-
-4.进入/Miniojsbsim/simulation.py,更改ROOT_DIR为jsbsim解压后的文件夹
+###### 其它
+    更改 /Mini0jsbsim/simulation.py 里的 ROOT_DIR 为 jsbsim 解压后的文件夹
+    将模型 <Rascal110_JSBSim> 拷贝到 /aircraft 文件夹下
