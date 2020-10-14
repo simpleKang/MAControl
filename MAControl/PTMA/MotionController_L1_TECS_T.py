@@ -2,7 +2,8 @@ from MAControl.Base.MotionController import MotionController
 import numpy as np
 import math
 from MAControl.Util.Constrain import constrain
-# Flight Control # Reference #
+
+# >>>>> Flight Control >>>>>> Reference
 # https://github.com/PX4/Firmware/blob/master/src/modules/fw_pos_control_l1/FixedwingPositionControl.cpp #
 # https://github.com/PX4/Firmware/blob/master/src/lib/tecs/TECS.cpp #
 # https://github.com/PX4/Firmware/blob/master/src/lib/l1/ECL_L1_Pos_Controller.cpp #
@@ -12,48 +13,16 @@ class MotionController_L1_TECS(MotionController):
 
     def __init__(self, name, env, world, agent_index, arglist):
         super(MotionController_L1_TECS, self).__init__(name, env, world, agent_index, arglist)
-
-        # extra params
-        self.STE_rate_error = 0
-        self.throttle_integ_s = 0
-        self.tangent_acc = 0
-        self.lateral_acc = 0
-
-        # key values
+        self.circle_mode = False
         self.throttle_setpoint = 0.0
         self.roll_setpoint = 0.0
         self.pitch_setpoint = 0.0
         self.nav_bearing = 0.0
-        self.circle_mode = False
         self.vel_last = 0.0
 
     def get_expected_action(self, obs, pointAi, pointBi, step, finishedi):
 
         # parameters update
-        set_L1 = True
-        if set_L1:
-            param_fw_l1_damping = 0
-            param_fw_l1_period = 0
-            param_fw_r_lim = 0  # radians
-            param_fw_li_r_slew_max = 0  # .
-        set_tecs = True
-        if set_tecs:
-            param_fw_t_clmb_max = 0
-            param_fw_t_sink_max = 0
-            param_fw_t_spdweight = 0
-            param_fw_t_thro_const = 0
-            param_fw_t_time_const = 0
-            param_fw_t_sink_min = 0
-            param_fw_t_thr_damp = 0
-            param_fw_t_integ_gain = 0
-            param_fw_thr_slew_max = 0
-            param_fw_t_vert_acc = 0
-            param_fw_t_spd_omega = 0
-            param_fw_t_rll2thr = 0
-            param_fw_t_ptch_damp = 0
-            param_fw_t_hrate_p = 0
-            param_fw_t_hrate_ff = 0
-            param_fw_t_srate_p = 0
         param_fw_airspd_min = 20
         param_fw_airspd_max = 40
         param_fw_thr_min = 0.2
@@ -106,9 +75,8 @@ class MotionController_L1_TECS(MotionController):
         # —— —— —— copy thrust output for publication  —— —— —— #
         att_sp_thrust_body_0 = min(self.throttle_setpoint, throttle_max)
         att_sp_pitch_body = self.pitch_setpoint
-        last_manual = False
 
-        # FixedwingPositionControl::Run() # Procedure #
+        # >>>>>>> FixedwingPositionControl::Run() # Procedure # ( DO NOT DELETE PLZ )
         # parameter_update_s pupdate;
         # _parameter_update_sub.copy(&pupdate);
         # parameters_update();
@@ -230,7 +198,7 @@ class MotionController_L1_TECS(MotionController):
         pitch_setpoint_min = pitch_min_rad
         vel = obs[4:7]
 
-        # initialize states
+        # // initialize states
         vert_vel_state = 0.0
         vert_pos_state = obs[0]
         tas_rate_state = 0.0
@@ -414,16 +382,13 @@ class MotionController_L1_TECS(MotionController):
            (lateral_accel_sp_center > lateral_accel_sp_circle and loiter_direction < 0.0 and xtrack_err_circle < 0.0):
             lateral_accel = lateral_accel_sp_center
             self.circle_mode = False
-            # /* angle between requested and current velocity vector */ #
-            bearing_error = eta
-            # /* bearing from current position to L1 point */ #
-            nav_bearing = math.atan2(vector_PA_unit[1], vector_PA_unit[0])
+            bearing_error = eta  # angle between requested and current velocity vector
+            nav_bearing = math.atan2(vector_PA_unit[1], vector_PA_unit[0])  # bearing from current position to L1 point
         else:
             lateral_accel = lateral_accel_sp_circle
             self.circle_mode = True
             bearing_error = 0.0
-            # /* bearing from current position to L1 point */ #
-            nav_bearing = math.atan2(vector_PA_unit[1], vector_PA_unit[0])
+            nav_bearing = math.atan2(vector_PA_unit[1], vector_PA_unit[0])  # bearing from current position to L1 point
 
         # update roll setpoint
         roll_new = math.atan(lateral_accel * 1.0 / 9.81551)

@@ -8,14 +8,13 @@ import math
 
 class PolicyMaker_Probability(PolicyMaker):
 
-    #                                       (Step2<=)&(<Step3)
-    # 搜索目标[阶段] | 排序目标[步] | 选择目标[步] | 出价[阶段] | 统计价格[步] | 分道扬镳[步] | 重置[步] >>>> 搜索目标[阶段] ....
-    #  <Step0         ==Step0       ==Step1         ^         ==Step3      ==Step4      ==Step5
-    #                                                                        |
-    #                                                                        |
-    #                                                    InAttacking == True |
-    #                                                                        |
-    #                                                                     攻击[阶段]
+    # 搜索[阶段] | 排序目标[步] | 局部通信[步] | 择标出价[阶段] | 计价自序[步] | 分道扬镳[步] | 重置[步] >>>> 搜索目标[阶段] ...
+    #   <Step0      ==Step0       ==Step1       ==Step2        ==Step3      ==Step4      ==Step5
+    #                                                                            |
+    #                                                                            |
+    #                                                        InAttacking == True |
+    #                                                                            |
+    #                                                                        攻击[阶段]
 
     SEEN_TARGETS = []
     RESULT = []
@@ -30,6 +29,10 @@ class PolicyMaker_Probability(PolicyMaker):
         self.InAttacking = False
         self.result = -1
         self.seen_targets = []
+        self.mission_swarm = []
+        self.close_area = []
+        self.price = 0
+        self.rank = 0
 
         # 以下为一些阶段的初始设定步数
         # >> 未来步数点可修改，从而可以主动停留在某一阶段/步
@@ -42,12 +45,8 @@ class PolicyMaker_Probability(PolicyMaker):
         self.Step4 = 504
         self.Step5 = 505
 
-        self.mission_swarm = []
-        self.close_area = []
-        self.price = 0
-        self.rank = 0
-
     def find_mate(self, obs_n, r=0.5):
+
         selfpos = np.array([obs_n[self.index][0], obs_n[self.index][15], obs_n[self.index][16]])  # alt lat lon
         close_area = []
         for i in range(len(obs_n)):
@@ -233,8 +232,6 @@ class PolicyMaker_Probability(PolicyMaker):
                 self.rank = PolicyMaker_Probability.Prices.index(self.price)
 
             elif step == self.Step4:
-                # 下述计算会在各个UAV本地重复进行，确认自己是否具有攻击资格，部分UAV即将进入攻击阶段
-
                 # 根据当前目标的类型估计，重新讨论目标的类型（含有随机性），进而确定需要的UAV个数
                 DEMANDED_UAV_NUM = 0
                 if self.result[6] == 5:
@@ -243,7 +240,7 @@ class PolicyMaker_Probability(PolicyMaker):
                     DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=self.arglist.q2)[0]
                 elif self.result[6] == 2:
                     DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=self.arglist.q3)[0]
-
+                # 活跃 UAV 本地确认自己是否具有攻击资格，符合条件的 UAV 即将进入攻击阶段
                 if self.rank < DEMANDED_UAV_NUM:
                     print('UAV', self.index, 'to attack')
                     self.opt_index = 10

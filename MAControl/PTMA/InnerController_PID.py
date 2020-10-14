@@ -1,20 +1,16 @@
 from MAControl.Base.InnerController import InnerController
-import numpy as np
 
 
 class InnerController_PID(InnerController):
 
     def __init__(self, name, env, world, agent_index, arglist):
         super(InnerController_PID, self).__init__(name, env, world, agent_index, arglist)
-
-        # extra params
         self.ITerm_pitch = 0
         self.ITerm_roll = 0
         self.Error_pitch = 0
         self.Error_roll = 0
 
     def get_action(self, obs, pitch_sp, thr_sp, roll_sp, nav_bearing, step, finishedi):
-        # print('inner control')
 
         if finishedi:
 

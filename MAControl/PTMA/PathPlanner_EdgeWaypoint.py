@@ -22,10 +22,11 @@ class PathPlanner_EdgeWaypoint(PathPlanner):
 
     def planpath(self, para_list, obs, arrive_flag, step):
 
-        # 执行决策结果
+        # 执行决策结果(index=0)
         if para_list[0] == 0:
             self.no_operation()
 
+        # 执行决策结果(index=10)
         elif para_list[0] == 10:
             if not self.is_attacking:
                 self.attack_replace(para_list[1][1])

@@ -3,11 +3,10 @@
 import argparse
 import time
 import MAControl.PTMA.InnerController_PID as IC_P
-import MAControl.PTMA.MotionController_L1_TECS_6DOF as MC_L
+import MAControl.PTMA.MotionController_L1_TECS_T as MC_L
 import MAControl.PTMA.PathPlanner_EdgeWaypoint as PP_S
 import MAControl.PTMA.PolicyMaker_Probability as PM_P
 import logging
-import numpy as np
 
 # 运行 execute.py 需要补足参数，如 execute_all.py 中所示
 # logging.basicConfig(filename='/home/samantha/gitr/logs/paper/R/result_all.log', level=logging.INFO)
@@ -38,11 +37,9 @@ def parse_args():
 def make_env(arglist):
     from MAEnv.environment import MultiAgentEnv
     import MAEnv.scenarios as scenarios
-
-    # load scenario from script
+    # >>> load scenario from script
     scenario = scenarios.load(arglist.scenario + ".py").Scenario()
-
-    # create world and env
+    # >>> create world and env
     world = scenario.make_js_world(arglist.numU, arglist.typeT)
     env = MultiAgentEnv(world, scenario.reset_world, scenario.reward, scenario.observation)
     return env, world
@@ -89,11 +86,11 @@ def update_action(obs_n, WorldTarget, step, Controller):
 
 
 def augment_view(wOrld, CONtroller):
-
     for ii in range(arglist.numU):
         wOrld.agents[ii].attacking_to = CONtroller[ii][4][2]
         if CONtroller[ii][4][1]:
             wOrld.agents[ii].attacking = True
+    return None
 
 
 if __name__ == '__main__':
@@ -109,6 +106,7 @@ if __name__ == '__main__':
                             landmark.lon, landmark.lat, landmark.alt,
                             landmark.value, landmark.defence, landmark.type, i])
 
+    # START
     episode = 0
     t_start = time.time()
 
@@ -117,6 +115,7 @@ if __name__ == '__main__':
         # Create Controller (重置实例变量)
         MainController = get_controller(env, world, arglist)
 
+        # start
         obs_n = env.reset()
         episode += 1
         step = 0
@@ -129,8 +128,8 @@ if __name__ == '__main__':
 
             # environment step
             new_obs_n, rew_n, done_n, info_n = env.jstep(action_n)
-            print('action_n', action_n)
-            print('obs_n_diff', new_obs_n - obs_n)
+            # print('action_n', action_n)
+            # print('obs_n_diff', new_obs_n - obs_n)
             step += 1
             obs_n = new_obs_n
 
