@@ -74,3 +74,19 @@
     2|   array([1, 1, 2, 2, 2, 3, 1, 1, 1, 3])
     3|   array([2, 2, 3, 3, 2, 2, 2, 1, 2, 2])
     4|   array([1, 1, 1, 3, 2, 3, 1, 2, 1, 3])
+    
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+安装步骤
+1. pip3 install jsbsim
+2.https://github.com/JSBSim-Team/jsbsim/releases/tag/Linux
+    下载源码并解压
+3.# 跳转到jsbsim源码目录
+cd jsbsim  
+# 创建build文件夹用于编译jsbsim
+mkdir build 
+cd build
+# 生成Makefile文件
+cmake .. 
+# 编译
+make 
+4.进入/Miniojsbsim/simulation.py,更改ROOT_DIR为jsbsim解压后的文件夹
