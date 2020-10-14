@@ -20,6 +20,7 @@ class PolicyMaker_Probability(PolicyMaker):
     RESULT = []
     Prices = []
     Occupied_U = []
+    Attacked_T = []
 
     def __init__(self, name, env, world, agent_index, arglist):
         super(PolicyMaker_Probability, self).__init__(name, env, world, agent_index, arglist)
@@ -195,6 +196,9 @@ class PolicyMaker_Probability(PolicyMaker):
             elif step == self.Step0:
                 print('UAV', self.index, 'resort, then store for communication')
                 self.seen_targets = sorted(self.seen_targets, key=lambda x: x[5], reverse=True)
+                for i, target in enumerate(self.seen_targets):
+                    if target[-1] in PolicyMaker_Probability.Attacked_T:
+                        self.seen_targets.remove(target)  # 搜索到全部目标 but 只将尚未打击的目标作为待作用对象
                 PolicyMaker_Probability.SEEN_TARGETS.append(self.seen_targets)  # All -- Occupied = Active
 
             elif step == self.Step1:
@@ -242,10 +246,11 @@ class PolicyMaker_Probability(PolicyMaker):
                     DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=self.arglist.q3)[0]
                 # 活跃 UAV 本地确认自己是否具有攻击资格，符合条件的 UAV 即将进入攻击阶段
                 if self.rank < DEMANDED_UAV_NUM:
-                    print('UAV', self.index, 'to attack')
+                    print('UAV', self.index, 'to attack', 'target', self.result[-1])
                     self.opt_index = 10
                     self.InAttacking = True
                     PolicyMaker_Probability.Occupied_U.append(self.index)
+                    PolicyMaker_Probability.Attacked_T.append(self.result[-1])
                     self.x = self.result[0]
                     self.y = self.result[1]
                 else:

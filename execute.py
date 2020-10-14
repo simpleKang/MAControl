@@ -115,6 +115,13 @@ if __name__ == '__main__':
         # Create Controller (重置实例变量)
         MainController = get_controller(env, world, arglist)
 
+        # Rest Controller (重置类变量)
+        PM_P.PolicyMaker_Probability.SEEN_TARGETS = []
+        PM_P.PolicyMaker_Probability.RESULT = []
+        PM_P.PolicyMaker_Probability.Prices = []
+        PM_P.PolicyMaker_Probability.Occupied_U = []
+        PM_P.PolicyMaker_Probability.Attacked_T = []
+
         # start
         obs_n = env.reset()
         episode += 1
