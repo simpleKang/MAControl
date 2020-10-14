@@ -1,5 +1,4 @@
 from MAControl.Base.PolicyMaker import PolicyMaker
-import random
 import numpy as np
 from MAControl.Util.PointInRec import point_in_rec
 from MAControl.Util.Constrain import constrain
@@ -18,23 +17,6 @@ class PolicyMaker_Auction(PolicyMaker):
     #                                                    InAttacking == True |
     #                                                                        |
     #                                                                     攻击[阶段]
-
-    # 在搜索目标阶段(<Step0)操作，只增不减
-    Found_Target_Set = []  # {target_pos, target_vel, target_value, target_defence, target_type, T_INDEX}
-    Found_Target_Info = []  # {TARGET:UAV_INDEX}
-
-    # 在重置步(==Step5)操作，只增不减
-    Attacked_Target_Index = []  # {TARGET_INDEX}
-
-    # 在分道步(==Step4)操作，只减不增
-    Remain_UAV_Set = []  # {UAV_INDEX}
-
-    # 在重置步(==Step5)重置
-    Remain_Target_Set = []  # {target_pos, target_vel, target_value, target_defence, target_type, T_INDEX, TARGET_INDEX}
-    Current_Target_Index = -1  # {TARGET_INDEX}
-    Current_Price_Set = []   # {UAV X STEP}
-    Current_Price_Result = []  # {UAV_INDEX,UAV_PRICE}
-
 
     def __init__(self, name, env, world, agent_index, arglist):
         super(PolicyMaker_Auction, self).__init__(name, env, world, agent_index, arglist)
@@ -62,15 +44,10 @@ class PolicyMaker_Auction(PolicyMaker):
         self.mission_success = 0
         self.over = 0
 
-        self.self_task = []
-        for tar in range(len(world.targets)):
-            self.self_task.append([])
+        self.self_task = [[] for t in range(len(world.targets))]
+        self.targetbid = [[] for t in range(len(world.targets))]
 
-        self.targetbid = []
-        for tar in range(len(world.targets)):
-            self.targetbid.append([])
-
-    def find_mate_communcation(self, obs_n, r=0.5):
+    def find_mate_communication(self, obs_n, r=0.5):
         selfpos = np.array(obs_n[self.index][2:4])
         close_area = []
         for i in range(len(obs_n)):
@@ -79,7 +56,6 @@ class PolicyMaker_Auction(PolicyMaker):
             if deltapos < r:
                 close_area.append(i)
         return close_area
-
 
     def add_new_target(self, obs, WorldTarget, NewController, ttrange=0.05):
 
@@ -131,61 +107,13 @@ class PolicyMaker_Auction(PolicyMaker):
                         seen_target[-1][-4:-1] = [10, 1, 2]
                 # 在seen_target中，真序号是准确的（唯一标识），类型可能有误（相应的价值和防御能力都有误）
 
-
-        #更新自身任务矩阵
+        # 更新自身任务矩阵
         for i in range(len(seen_target)):
             if not self.self_task[seen_target[i][-1]]:
                 self.self_task[seen_target[i][-1]].append(0)
                 self.targetbid[seen_target[i][-1]].append(self.step_now)
                 for num_number in range(int(seen_target[i][-3])):
                     self.targetbid[seen_target[i][-1]].append(0)
-
-        #与通信范围内友方更新信息
-
-
-        # for tar in range(len(WorldTarget)):
-        #     num_need_tar = []
-        #     friend_index = []
-        #     list1 = []
-        #     list2 = []
-        #     if self.step_now == 400:
-        #         print("gg")
-        #     for friend in range(len(self.close_area)):
-        #         if NewController[self.close_area[friend]][0].targetbid[tar]:
-        #             if NewController[self.close_area[friend]][0].targetbid[tar][0] < 100000000:
-        #                 num_need_tar.append(len(NewController[self.close_area[friend]][0].targetbid[tar]))
-        #                 friend_index.append(self.close_area[friend])
-        #     if not num_need_tar:
-        #         continue
-        #     print(num_need_tar)
-        #     a = max(num_need_tar, key=num_need_tar.count)
-        #     num_need_tar.remove(a)
-        #     if num_need_tar:
-        #         b = max(num_need_tar, key=num_need_tar.count)
-        #         if a != b:
-        #             continue
-        #         with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
-        #             f.write(str(a) + str(b) + '\n')
-        #     for ii in range(a):
-        #         list1.append(0)
-        #     list2.extend(self.targetbid[tar])
-        #     for iii in range(len(friend_index)):
-        #         if not NewController[friend_index[iii]][0].targetbid[tar]:
-        #             continue
-        #         list2.extend(NewController[friend_index[iii]][0].targetbid[tar])
-        #     sorted(set(list2), key=list2.index)
-        #     self.targetbid[tar] = []
-        #     for iiii in range(a):
-        #         if a >8:
-        #             print('gg')
-        #         if iiii < len(list2):
-        #             self.targetbid[tar].append(list2[iiii])
-        #         else:
-        #             self.targetbid[tar].append(0)
-        #     if len(self.targetbid[tar]) > a:
-        #         print("gg")
-
-
 
         for num in range(len(self.close_area)):
             for index_tar in range(len(WorldTarget)):
@@ -205,7 +133,7 @@ class PolicyMaker_Auction(PolicyMaker):
                                 while 0 in list1:
                                     list1.remove(0)
                                 b = len(list1)
-                                list1 = sorted(set(list1),key=list1.index)
+                                list1 = sorted(set(list1), key=list1.index)
                                 for iii in range(a-b):
                                     list1.append(0)
                                 list1.sort(reverse=True)
@@ -337,7 +265,7 @@ class PolicyMaker_Auction(PolicyMaker):
 
                 if step < self.Step0:
                     # print('UAV', self.index, 'searching')
-                    self.close_area = self.find_mate_communcation(obs_n).copy()
+                    self.close_area = self.find_mate_communication(obs_n).copy()
                     self.add_new_target(obs_n[self.index], WorldTarget, NewController)
                     self.opt_index = 0
 
@@ -345,7 +273,7 @@ class PolicyMaker_Auction(PolicyMaker):
                 else:
                     if max(self.self_task) == [0]:
                         self.opt_index = 0
-                    self.close_area = self.find_mate_communcation(obs_n).copy()
+                    self.close_area = self.find_mate_communication(obs_n).copy()
                     self.add_new_target(obs_n[self.index], WorldTarget, NewController)
                     self_bid = self.bidding(obs_n[self.index], WorldTarget)
                     for i in range(len(self_bid)):
