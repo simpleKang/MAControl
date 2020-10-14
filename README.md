@@ -78,15 +78,24 @@
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 安装步骤
 1. pip3 install jsbsim
+
 2.https://github.com/JSBSim-Team/jsbsim/releases/tag/Linux
     下载源码并解压
-3.# 跳转到jsbsim源码目录
+    
+3.跳转到jsbsim源码目录
 cd jsbsim  
-# 创建build文件夹用于编译jsbsim
+创建build文件夹用于编译jsbsim
+
 mkdir build 
+
 cd build
-# 生成Makefile文件
+
+生成Makefile文件
+
 cmake .. 
-# 编译
+
+编译
+
 make 
+
 4.进入/Miniojsbsim/simulation.py,更改ROOT_DIR为jsbsim解压后的文件夹
