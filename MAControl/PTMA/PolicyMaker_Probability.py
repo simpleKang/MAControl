@@ -182,23 +182,23 @@ class PolicyMaker_Probability(PolicyMaker):
 
         if self.InAttacking:
             self.opt_index = 10
-            # print('UAV', self.index, 'ATTACKING ATTACKING')
+            print('UAV', self.index, 'ATTACKING ATTACKING')
 
         else:
 
             if step < self.Step0:
-                # print('UAV', self.index, 'searching')
+                print('UAV', self.index, 'searching')
                 self.close_area = self.find_mate(obs_n)
                 self.add_new_target(obs_n[self.index], WorldTarget)
                 self.opt_index = 0
 
             elif step == self.Step0:
-                # print('UAV', self.index, 'resort, then store for communication')
+                print('UAV', self.index, 'resort, then store for communication')
                 self.seen_targets = sorted(self.seen_targets, key=lambda x: x[5], reverse=True)
                 PolicyMaker_Probability.SEEN_TARGETS.append(self.seen_targets)
 
             elif step == self.Step1:
-                # print('UAV', self.index, 'communicate locally')
+                print('UAV', self.index, 'communicate locally')
                 HIGHEST_TARGETS = []
                 for i in self.close_area:
                     HIGHEST_TARGETS.append(PolicyMaker_Probability.SEEN_TARGETS[i][0])
@@ -207,7 +207,7 @@ class PolicyMaker_Probability(PolicyMaker):
                 PolicyMaker_Probability.RESULT.append(self.result[-1])
 
             elif step == self.Step2:
-                # print('UAV', self.index, 'choose target, then generate mission-swarm accordingly, then bid price')
+                print('UAV', self.index, 'choose target, then generate mission-swarm accordingly, then bid price')
                 Counter_k = Counter(PolicyMaker_Probability.RESULT).most_common(1)
                 target_index = Counter_k[0][0]
                 for i, result in enumerate(PolicyMaker_Probability.RESULT):
@@ -222,7 +222,7 @@ class PolicyMaker_Probability(PolicyMaker):
                 PolicyMaker_Probability.Prices.append(self.price)
 
             elif step == self.Step3:
-                # print('UAV', self.index, 'sort price, then determine own rank')
+                print('UAV', self.index, 'sort price, then determine own rank')
                 PolicyMaker_Probability.Prices = sorted(PolicyMaker_Probability.Prices, reverse=True)
                 self.rank = PolicyMaker_Probability.Prices.index(self.price)
 
@@ -239,17 +239,17 @@ class PolicyMaker_Probability(PolicyMaker):
                     DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=self.arglist.q3)[0]
 
                 if self.rank < DEMANDED_UAV_NUM:
-                    # print('UAV', self.index, 'to attack')
+                    print('UAV', self.index, 'to attack')
                     self.opt_index = 10
                     self.InAttacking = True
                     self.x = self.result[0]
                     self.y = self.result[1]
                 else:
                     pass
-                    # print('UAV', self.index, 'not to attack')
+                    print('UAV', self.index, 'not to attack')
 
             elif step == self.Step5:
-                # print('UAV', self.index, 'recycling')
+                print('UAV', self.index, 'recycling')
                 self.operate_step(1, step)
                 PolicyMaker_Probability.SEEN_TARGETS = []
                 PolicyMaker_Probability.RESULT = []
