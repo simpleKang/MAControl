@@ -7,7 +7,6 @@ import MAControl.PTMA.MotionController_L1_TECS_T as MC_L
 import MAControl.PTMA.PathPlanner_EdgeWaypoint as PP_S
 import MAControl.PTMA.PolicyMaker_Probability as PM_P
 import matplotlib.pyplot as plt
-import numpy as np
 import math
 import logging
 
@@ -129,14 +128,24 @@ if __name__ == '__main__':
         obs_n = env.reset()
         episode += 1
         step = 0
-        ax = []  # 定义一个 x 轴的空列表用来接收动态的数据
-        ay = []  # 定义一个 y 轴的空列表用来接收动态的数据
-        az = []  # 定义一个 z 轴的空列表用来接收动态的数据
+        # pos #
+        lon = [[] for i in range(arglist.numU)]
+        lat = [[] for i in range(arglist.numU)]
+        alt = [[] for i in range(arglist.numU)]
+        # command #
+        ele = [[] for i in range(arglist.numU)]
+        ail_r = [[] for i in range(arglist.numU)]
+        thr = [[] for i in range(arglist.numU)]
+        # state #
+        pitch = [[] for i in range(arglist.numU)]
+        roll = [[] for i in range(arglist.numU)]
+        vel = [[] for i in range(arglist.numU)]
+        # plot #
         fig = plt.figure()
         ax1 = fig.add_subplot(221, projection='3d')
-        ax2 = fig.add_subplot(222, projection='3d')
-        ax3 = fig.add_subplot(223, projection='3d')
-        ax4 = fig.add_subplot(224, projection='3d')
+        ax2 = fig.add_subplot(222)
+        ax3 = fig.add_subplot(223)
+        ax4 = fig.add_subplot(224)
         plt.ion()
 
         while step <= arglist.step_max:
@@ -156,24 +165,22 @@ if __name__ == '__main__':
             augment_view(world, MainController)
             # env.render()  # could be commented out
 
-            # real-time plotting (matplotlib) of in/out data of CONTROLLERS
-            # purpose: visualized DEBUG
-            ax.append(math.sin(step*0.1))    # 添加 sin(step*0.1) 到 x 轴的数据中
-            ay.append(math.cos(step*0.1))    # 添加 cos(step*0.1) 到 y 轴的数据中
-            az.append(step)                  # 添加 (step)        到 z 轴的数据中
-            [x, t] = np.meshgrid(np.array(range(25)) / 24.0, np.arange(0, 40+step, 1) / 50 * 17 * np.pi - 2 * np.pi)
-            p = (np.pi / 2) * np.exp(-t / (8 * np.pi))
-            u = 1 - (1 - np.mod(3.6 * t, 2 * np.pi) / np.pi) ** 4 / 2
-            y = 2 * (x ** 2 - x) ** 2 * np.sin(p)
-            r = u * (x * np.sin(p) + y * np.cos(p))
-            surf = ax1.plot_surface(r * np.cos(t), r * np.sin(t), u * (x * np.cos(p) - y * np.sin(p)), rstride=1,
-                                    cstride=1, linewidth=0, antialiased=True)
-            surf2 = ax2.plot_surface(r * np.cos(t), r * np.sin(t), u * (x * np.cos(p) - y * np.sin(p)), rstride=1,
-                                     cstride=1, linewidth=0, antialiased=True)
-            surf3 = ax3.plot_surface(r * np.cos(t), r * np.sin(t), u * (x * np.cos(p) - y * np.sin(p)), rstride=1,
-                                     cstride=1, linewidth=0, antialiased=True)
-            surf4 = ax4.plot_surface(r * np.cos(t), r * np.sin(t), u * (x * np.cos(p) - y * np.sin(p)), rstride=1,
-                                     cstride=1, linewidth=0, antialiased=True)
+            # IN/OUT DATA OF CONTROLLERS
+            for i in range(arglist.numU):
+                lon[i].append(obs_n[i][16])
+                lat[i].append(obs_n[i][15])
+                alt[i].append(obs_n[i][0])
+                ele[i].append(action_n[i][2])
+                ail_r[i].append(action_n[i][1])
+                thr[i].append(action_n[i][4])
+                pitch[i].append(obs_n[i][1])
+                roll[i].append(obs_n[i][2])
+                vel[i].append(math.sqrt(obs_n[i][4]**2+obs_n[i][5]**2+obs_n[i][6]**2))
+            # Real-time plotting (matplotlib) for visualized DEBUG
+            ax1.plot3D(lon[0], lat[0], alt[0])
+            ax2.plot(ail_r[0], roll[0])
+            ax3.plot(ele[0], pitch[0])
+            ax4.plot(thr[0], vel[0])
             plt.show()
             plt.pause(0.1)  # 暂停一秒
 
