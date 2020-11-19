@@ -23,17 +23,17 @@ class MotionController_L1_TECS(MotionController):
     def get_expected_action(self, obs, pointAi, pointBi, step, finishedi):
 
         # parameters update
-        param_fw_airspd_min = 20
-        param_fw_airspd_max = 40
+        param_fw_airspd_min = 400  # fps
+        param_fw_airspd_max = 600  # fps
+        airspeed_demand = 300  # fps
         param_fw_thr_min = 0.2
         param_fw_thr_cruise = 0.5
-        param_fw_p_lim_min = 0.05
-        param_fw_p_lim_max = 0.95
-        mission_airspeed = 30  # pos_sp_curr_cruising_speed
+        throttle_max = 1.0
+        param_fw_p_lim_min = 0.15
+        param_fw_p_lim_max = 0.75
+        mission_airspeed = 300  # pos_sp_curr_cruising_speed (fps)
         mission_throttle = 0.7  # pos_sp_curr_cruising_throttle
         acc_rad = 0.5  # l1_control_switch_distance
-        throttle_max = 1
-        airspeed_demand = 30
 
         # target_airspeed ( no countering for pushed more and more away by wind
         n = math.sqrt(math.cos(obs[2]))
@@ -331,6 +331,8 @@ class MotionController_L1_TECS(MotionController):
             pitch_setpoint = self.pitch_setpoint + ptchRateIncr
         elif pitch_setpoint - self.pitch_setpoint < -1 * ptchRateIncr:
             pitch_setpoint = self.pitch_setpoint - ptchRateIncr
+        else:
+            pass
         self.pitch_setpoint = pitch_setpoint
 
         return [self.pitch_setpoint, self.throttle_setpoint]

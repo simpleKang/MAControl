@@ -207,7 +207,7 @@ if __name__ == '__main__':
                 ax4.plot(sstep, thr[i], color='#BDB'+str(i)+'6B')
                 ax4.plot(sstep, vel[i], color='#8B0'+str(i)+'8B')
             plt.show()
-            plt.pause(0.1)  # 暂停一秒
+            plt.pause(0.0001)  # 暂停一瞬
 
             # for recording
             if step == arglist.step_max:
