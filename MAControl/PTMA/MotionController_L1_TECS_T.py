@@ -20,7 +20,6 @@ class MotionController_L1_TECS(MotionController):
         self.nav_bearing = 0.0
 
         self.vel_last = 328.0
-        self.STE_rate_error_last = 0.0
         self.throttle_integ_state_last = 0.0
         self.pitch_integ_state_last = 0.0
 
@@ -193,7 +192,7 @@ class MotionController_L1_TECS(MotionController):
                                    throttle_min, throttle_max, thr_cruise):
 
         CONSTANTS_ONE_G = 9.81551 / 0.3048   # （fps/s^2)
-        max_climb_rate = min_sink_rate = 0.5
+        max_climb_rate = min_sink_rate = 20  # (fps)
         # // Set class variables from inputs
         dt = self.world.dt
         throttle_setpoint_max = throttle_max
@@ -217,7 +216,7 @@ class MotionController_L1_TECS(MotionController):
         TAS_min = 200
         tas_error = tas_state - self.vel_last
         self.vel_last = tas_state
-        speed_derivative = tas_error  # 近似
+        speed_derivative = tas_error  # (approximate)
         tas_state = max(tas_state, 3.0)
 
         # 	// Calculate rate limits for specific total energy
@@ -237,9 +236,8 @@ class MotionController_L1_TECS(MotionController):
         TAS_setpoint = constrain(TAS_setpoint, TAS_min, TAS_max)
         velRateMax = 0.5 * STE_rate_max / tas_state
         velRateMin = 0.5 * STE_rate_min / tas_state
-        TAS_setpoint_adj = constrain(TAS_setpoint, TAS_min, TAS_max)
         speed_error_gain = 0.1
-        TAS_rate_setpoint = (TAS_setpoint_adj - tas_state) * speed_error_gain
+        TAS_rate_setpoint = (TAS_setpoint - tas_state) * speed_error_gain
         TAS_rate_setpoint = constrain(TAS_rate_setpoint, velRateMin, velRateMax)
 
         # 	// Calculate the demanded height
@@ -248,7 +246,7 @@ class MotionController_L1_TECS(MotionController):
         # 	// Calculate the specific energy values required by the control loop
         # specific energy demands in units of (m**2/sec**2) #
         SPE_setpoint = hgt_setpoint_adj * CONSTANTS_ONE_G  # potential #
-        SKE_setpoint = 0.5 * TAS_setpoint_adj * TAS_setpoint_adj  # kinetic #
+        SKE_setpoint = 0.5 * TAS_setpoint * TAS_setpoint  # kinetic #
         # specific energy rate demands in units of (m**2/sec**3) #
         SPE_rate_setpoint = hgt_rate_setpoint * CONSTANTS_ONE_G
         SKE_rate_setpoint = tas_state * TAS_rate_setpoint
@@ -263,8 +261,7 @@ class MotionController_L1_TECS(MotionController):
         STE_error = SPE_setpoint - SPE_estimate + SKE_setpoint - SKE_estimate
         STE_rate_setpoint = SPE_rate_setpoint + SKE_rate_setpoint
         STE_rate_setpoint = constrain(STE_rate_setpoint, STE_rate_min, STE_rate_max)
-        STE_rate_error = 0.2 * (STE_rate_setpoint - SPE_rate - SKE_rate) + 0.8 * self.STE_rate_error_last
-        self.STE_rate_error_last = STE_error
+        STE_rate_error = 0.01 * (STE_rate_setpoint - SPE_rate - SKE_rate)
         if underspeed_detected:
             self.throttle_setpoint = 1.0
         else:
@@ -276,8 +273,8 @@ class MotionController_L1_TECS(MotionController):
             throttle_predicted = thr_cruise + STE_rate_setpoint / STE_rate_max * (throttle_setpoint_max - thr_cruise)
         else:  # throttle is between cruise and minimum
             throttle_predicted = thr_cruise + STE_rate_setpoint / STE_rate_min * (throttle_setpoint_min - thr_cruise)
-        throttle_time_constant = 0.01
-        throttle_damping_gain = 0.7
+        throttle_time_constant = 8
+        throttle_damping_gain = 0.01
         STE_to_throttle = 1.0 / (throttle_time_constant * (STE_rate_max - STE_rate_min))
         throttle_setpoint = (STE_error + STE_rate_error * throttle_damping_gain) * STE_to_throttle + throttle_predicted
         self.throttle_setpoint = constrain(throttle_setpoint, throttle_setpoint_min, throttle_setpoint_max)
