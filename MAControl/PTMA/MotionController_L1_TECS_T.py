@@ -19,7 +19,7 @@ class MotionController_L1_TECS(MotionController):
         self.pitch_setpoint = 0.0
         self.nav_bearing = 0.0
 
-        self.vel_last = 0.0
+        self.vel_last = 328.0
         self.tas_rate_state_last = 0.0
         self.STE_rate_error_last = 0.0
         self.throttle_integ_state_last = 0.0
@@ -28,9 +28,9 @@ class MotionController_L1_TECS(MotionController):
     def get_expected_action(self, obs, pointAi, pointBi, step, finishedi):
 
         # parameters update
-        param_fw_airspd_min = 400  # fps
-        param_fw_airspd_max = 600  # fps
-        airspeed_demand = 300  # fps
+        param_fw_airspd_min = 200  # fps
+        param_fw_airspd_max = 400  # fps
+        airspeed_demand = 320  # fps
         param_fw_thr_min = 0.2
         param_fw_thr_cruise = 0.5
         throttle_max = 1.0
@@ -215,8 +215,8 @@ class MotionController_L1_TECS(MotionController):
 
         # // Update the true airspeed state estimate
         TAS_setpoint = airspeed_sp
-        TAS_max = 600
-        TAS_min = 400
+        TAS_max = 400
+        TAS_min = 200
         tas_error = tas_state - self.vel_last
         self.vel_last = tas_state
         tas_estimate_freq = 0.01
@@ -333,6 +333,7 @@ class MotionController_L1_TECS(MotionController):
         vert_accel_limit = 0.2
         ptchRateIncr = dt * vert_accel_limit / tas_state
         if pitch_setpoint - self.pitch_setpoint > ptchRateIncr:
+            print('s1', 'new-old-limit', pitch_setpoint, self.pitch_setpoint, ptchRateIncr)
             pitch_setpoint = self.pitch_setpoint + ptchRateIncr
         elif pitch_setpoint - self.pitch_setpoint < -1 * ptchRateIncr:
             pitch_setpoint = self.pitch_setpoint - ptchRateIncr
