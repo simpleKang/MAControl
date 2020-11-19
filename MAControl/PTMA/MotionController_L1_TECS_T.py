@@ -59,7 +59,6 @@ class MotionController_L1_TECS(MotionController):
         att_sp_yaw_reset_integral = False
         pos_sp_curr_type = 'position'  # ( no position_sp_type to "loiter" yet
         if pos_sp_curr_type == 'idle':
-            att_sp_thrust_body_0 = 0
             att_sp_roll_body = 0
             att_sp_pitch_body = 0
         elif pos_sp_curr_type == 'position':
@@ -76,7 +75,6 @@ class MotionController_L1_TECS(MotionController):
         if was_circle_mode and (not self.circle_mode):
             att_sp_roll_reset_integral = True
         # —— —— —— copy thrust output for publication  —— —— —— #
-        att_sp_thrust_body_0 = min(self.throttle_setpoint, throttle_max)
         att_sp_pitch_body = self.pitch_setpoint
 
         # >>>>>>> FixedwingPositionControl::Run() # Procedure # ( DO NOT DELETE PLZ )
@@ -277,28 +275,27 @@ class MotionController_L1_TECS(MotionController):
         throttle_damping_gain = 0.01
         STE_to_throttle = 1.0 / (throttle_time_constant * (STE_rate_max - STE_rate_min))
         throttle_setpoint = (STE_error + STE_rate_error * throttle_damping_gain) * STE_to_throttle + throttle_predicted
-        self.throttle_setpoint = constrain(throttle_setpoint, throttle_setpoint_min, throttle_setpoint_max)
+        throttle_setpoint = constrain(throttle_setpoint, throttle_setpoint_min, throttle_setpoint_max)
         integrator_gain = 0.2
         if integrator_gain > 0.0:
-            integ_state_max = throttle_setpoint_max - self.throttle_setpoint + 0.1
-            integ_state_min = throttle_setpoint_min - self.throttle_setpoint - 0.1
+            integ_state_max = throttle_setpoint_max - throttle_setpoint + 0.1
+            integ_state_min = throttle_setpoint_min - throttle_setpoint - 0.1
             throttle_integ_state = self.throttle_integ_state_last + (STE_error * integrator_gain) * dt * STE_to_throttle
             throttle_integ_state = constrain(throttle_integ_state, integ_state_min, integ_state_max)
         else:
             throttle_integ_state = 0.0
         self.throttle_integ_state_last = throttle_integ_state
-        self.throttle_setpoint = self.throttle_setpoint + throttle_integ_state
-        self.throttle_setpoint = constrain(self.throttle_setpoint, throttle_setpoint_min, throttle_setpoint_max)
+        throttle_setpoint = throttle_setpoint + throttle_integ_state
+        self.throttle_setpoint = constrain(throttle_setpoint, throttle_setpoint_min, throttle_setpoint_max)
 
         # 	// Calculate the pitch demand
-        SKE_weighting = 1.0  # 0.0 <= SKE_weighting <= 2.0 ( pitch speed weight
+        SKE_weighting = 1.5  # 0.0 <= SKE_weighting <= 2.0 ( pitch speed weight
         if underspeed_detected:
             SKE_weighting = 2.0
         SPE_weighting = 2.0 - SKE_weighting
         SEB_setpoint = SPE_setpoint * SPE_weighting - SKE_setpoint * SKE_weighting  # specific energy balance demand
         SEB_rate_setpoint = SPE_rate_setpoint * SPE_weighting - SKE_rate_setpoint * SKE_weighting
         SEB_error = SEB_setpoint - (SPE_estimate * SPE_weighting - SKE_estimate * SKE_weighting)
-        SEB_rate_error = SEB_rate_setpoint - (SPE_rate * SPE_weighting - SKE_rate * SKE_weighting)
         pitch_time_constant = 0.2
         climb_angle_to_SEB_rate = tas_state * pitch_time_constant * CONSTANTS_ONE_G
         if integrator_gain > 0.0:
@@ -314,7 +311,7 @@ class MotionController_L1_TECS(MotionController):
             pitch_integ_state = 0.0
         self.pitch_integ_state_last = pitch_integ_state
         pitch_damping_gain = 0.01
-        SEB_correction = SEB_error + SEB_rate_error * pitch_damping_gain + SEB_rate_setpoint * pitch_time_constant
+        SEB_correction = SEB_error + SEB_rate_setpoint * pitch_time_constant
         pitch_setpoint_unc = (SEB_correction + pitch_integ_state) / climb_angle_to_SEB_rate
         pitch_setpoint = constrain(pitch_setpoint_unc, pitch_setpoint_min, pitch_setpoint_max)
         vert_accel_limit = 0.2
