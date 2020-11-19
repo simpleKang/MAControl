@@ -18,7 +18,12 @@ class MotionController_L1_TECS(MotionController):
         self.roll_setpoint = 0.0
         self.pitch_setpoint = 0.0
         self.nav_bearing = 0.0
+
         self.vel_last = 0.0
+        self.tas_rate_state_last = 0.0
+        self.STE_rate_error_last = 0.0
+        self.throttle_integ_state_last = 0.0
+        self.pitch_integ_state_last = 0.0
 
     def get_expected_action(self, obs, pointAi, pointBi, step, finishedi):
 
@@ -199,30 +204,27 @@ class MotionController_L1_TECS(MotionController):
         vel = obs[4:7]
 
         # // initialize states
-        vert_vel_state = 0.0
+        vert_vel_state = obs[6]*(-1)
         vert_pos_state = obs[0]
-        tas_rate_state = 0.0
         TAS_setpoint_adj = TAS_setpoint_last = tas_state = math.sqrt(vel[0]**2 + vel[1]**2 + vel[2]**2)
-        throttle_integ_state = 0.0
-        pitch_integ_state = 0.0
         pitch_setpoint_unc = last_pitch_setpoint = constrain(obs[1], pitch_setpoint_min, pitch_setpoint_max)
         hgt_setpoint_in_prev = hgt_setpoint_prev = hgt_setpoint_adj = hgt_setpoint_adj_prev = obs[0]
         underspeed_detected = False
         uncommanded_descent_recovery = False
-        STE_rate_error = 0.0
         states_initialized = True
 
         # // Update the true airspeed state estimate
         TAS_setpoint = airspeed_sp
-        TAS_max = 0.9
-        TAS_min = 0.2
+        TAS_max = 600
+        TAS_min = 400
         tas_error = tas_state - self.vel_last
         self.vel_last = tas_state
         tas_estimate_freq = 0.01
         tas_rate_state_input = tas_error * tas_estimate_freq * tas_estimate_freq
         if tas_state < 3.1:
             tas_rate_state_input = max(tas_rate_state_input, 0.0)
-        tas_rate_state = tas_rate_state + tas_rate_state_input * dt
+        tas_rate_state = self.tas_rate_state_last + tas_rate_state_input * dt
+        self.tas_rate_state_last = tas_rate_state
         speed_derivative = tas_error  # 近似
         tas_state_input = tas_rate_state + speed_derivative + tas_error * tas_estimate_freq * 1.4142
         tas_state = tas_state + tas_state_input * dt
@@ -271,7 +273,8 @@ class MotionController_L1_TECS(MotionController):
         STE_error = SPE_setpoint - SPE_estimate + SKE_setpoint - SKE_estimate
         STE_rate_setpoint = SPE_rate_setpoint + SKE_rate_setpoint
         STE_rate_setpoint = constrain(STE_rate_setpoint, STE_rate_min, STE_rate_max)
-        STE_rate_error = 0.2 * (STE_rate_setpoint - SPE_rate - SKE_rate) + 0.8 * STE_rate_error
+        STE_rate_error = 0.2 * (STE_rate_setpoint - SPE_rate - SKE_rate) + 0.8 * self.STE_rate_error_last
+        self.STE_rate_error_last = STE_error
         if underspeed_detected:
             self.throttle_setpoint = 1.0
         else:
@@ -292,10 +295,11 @@ class MotionController_L1_TECS(MotionController):
         if integrator_gain > 0.0:
             integ_state_max = throttle_setpoint_max - self.throttle_setpoint + 0.1
             integ_state_min = throttle_setpoint_min - self.throttle_setpoint - 0.1
-            throttle_integ_state = throttle_integ_state + (STE_error * integrator_gain) * dt * STE_to_throttle
+            throttle_integ_state = self.throttle_integ_state_last + (STE_error * integrator_gain) * dt * STE_to_throttle
             throttle_integ_state = constrain(throttle_integ_state, integ_state_min, integ_state_max)
         else:
             throttle_integ_state = 0.0
+        self.throttle_integ_state_last = throttle_integ_state
         self.throttle_setpoint = self.throttle_setpoint + throttle_integ_state
         self.throttle_setpoint = constrain(self.throttle_setpoint, throttle_setpoint_min, throttle_setpoint_max)
 
@@ -318,9 +322,10 @@ class MotionController_L1_TECS(MotionController):
             elif pitch_setpoint_unc < pitch_setpoint_min:
                 edge = (pitch_setpoint_min - pitch_setpoint_unc) * climb_angle_to_SEB_rate / pitch_time_constant
                 pitch_integ_input = max(pitch_integ_input, max(edge, 0.0))
-            pitch_integ_state = pitch_integ_state + pitch_integ_input * dt
+            pitch_integ_state = self.pitch_integ_state_last + pitch_integ_input * dt
         else:
             pitch_integ_state = 0.0
+        self.pitch_integ_state_last = pitch_integ_state
         pitch_damping_gain = 0.01
         SEB_correction = SEB_error + SEB_rate_error * pitch_damping_gain + SEB_rate_setpoint * pitch_time_constant
         pitch_setpoint_unc = (SEB_correction + pitch_integ_state) / climb_angle_to_SEB_rate
