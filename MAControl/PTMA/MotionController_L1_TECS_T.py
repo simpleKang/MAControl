@@ -20,7 +20,6 @@ class MotionController_L1_TECS(MotionController):
         self.nav_bearing = 0.0
 
         self.vel_last = 328.0
-        self.tas_rate_state_last = 0.0
         self.STE_rate_error_last = 0.0
         self.throttle_integ_state_last = 0.0
         self.pitch_integ_state_last = 0.0
@@ -193,7 +192,7 @@ class MotionController_L1_TECS(MotionController):
     def tecs_update_pitch_throttle(self, obs, alt_sp, airspeed_sp, pitch_min_rad, pitch_max_rad,
                                    throttle_min, throttle_max, thr_cruise):
 
-        CONSTANTS_ONE_G = 9.81551
+        CONSTANTS_ONE_G = 9.81551 / 0.3048   # （fps/s^2)
         max_climb_rate = min_sink_rate = 0.5
         # // Set class variables from inputs
         dt = self.world.dt
@@ -206,12 +205,11 @@ class MotionController_L1_TECS(MotionController):
         # // initialize states
         vert_vel_state = obs[6]*(-1)
         vert_pos_state = obs[0]
-        TAS_setpoint_adj = TAS_setpoint_last = tas_state = math.sqrt(vel[0]**2 + vel[1]**2 + vel[2]**2)
-        pitch_setpoint_unc = last_pitch_setpoint = constrain(obs[1], pitch_setpoint_min, pitch_setpoint_max)
-        hgt_setpoint_in_prev = hgt_setpoint_prev = hgt_setpoint_adj = hgt_setpoint_adj_prev = obs[0]
+        tas_state = math.sqrt(vel[0]**2 + vel[1]**2 + vel[2]**2)
+        pitch_setpoint_unc = constrain(obs[1], pitch_setpoint_min, pitch_setpoint_max)
+        hgt_setpoint_adj = obs[0]
         underspeed_detected = False
         uncommanded_descent_recovery = False
-        states_initialized = True
 
         # // Update the true airspeed state estimate
         TAS_setpoint = airspeed_sp
@@ -219,15 +217,7 @@ class MotionController_L1_TECS(MotionController):
         TAS_min = 200
         tas_error = tas_state - self.vel_last
         self.vel_last = tas_state
-        tas_estimate_freq = 0.01
-        tas_rate_state_input = tas_error * tas_estimate_freq * tas_estimate_freq
-        if tas_state < 3.1:
-            tas_rate_state_input = max(tas_rate_state_input, 0.0)
-        tas_rate_state = self.tas_rate_state_last + tas_rate_state_input * dt
-        self.tas_rate_state_last = tas_rate_state
         speed_derivative = tas_error  # 近似
-        tas_state_input = tas_rate_state + speed_derivative + tas_error * tas_estimate_freq * 1.4142
-        tas_state = tas_state + tas_state_input * dt
         tas_state = max(tas_state, 3.0)
 
         # 	// Calculate rate limits for specific total energy

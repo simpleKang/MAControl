@@ -4,7 +4,7 @@
 #  MAE - Entity   (x,y)=(0,0) 对应 (lat,lon) = (39.965376,116.325657)
 #                 (z) === 0   对应 (alt) = 58.809239
 #  lon/deg, lat/deg, alt/m, x/km, y/km, z/km
-
+# conversion >>> 1 fps = 0.3048 m/s
 
 from abc import ABC
 import numpy as np
