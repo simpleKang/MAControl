@@ -139,7 +139,7 @@ if __name__ == '__main__':
         sstep = []
         # plot #
         fig = plt.figure()
-        ax1 = fig.add_subplot(311, projection='3d')
+        ax1 = fig.add_subplot(311)
         ax2 = fig.add_subplot(312)
         ax3 = fig.add_subplot(313)
         plt.ion()
@@ -172,7 +172,7 @@ if __name__ == '__main__':
                 vel[i].append(math.sqrt(obs_n[i][4]**2+obs_n[i][5]**2+obs_n[i][6]**2))
             # Real-time plotting (matplotlib) for visualized DEBUG
             for i in range(arglist.numU):
-                ax1.plot3D(lon[i], lat[i], alt[i], color='c')
+                ax1.plot(sstep, alt[i], color='c')
                 ax2.plot(sstep, roll[i], color='r')
                 ax2.plot(sstep, pitch[i], color='b')
                 ax3.plot(sstep, vel[i], color='y')

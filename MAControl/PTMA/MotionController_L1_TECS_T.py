@@ -26,15 +26,14 @@ class MotionController_L1_TECS(MotionController):
     def get_expected_action(self, obs, pointAi, pointBi, step, finishedi):
 
         # parameters update
-        param_fw_airspd_min = 200  # fps
-        param_fw_airspd_max = 400  # fps
-        airspeed_demand = 320  # fps
+        param_fw_airspd_min = 100  # fps
+        param_fw_airspd_max = 300  # fps
+        airspeed_demand = 200  # fps
         param_fw_thr_min = 0.2
         param_fw_thr_cruise = 0.5
         throttle_max = 1.0
         param_fw_p_lim_min = -0.99
         param_fw_p_lim_max = 0.99
-        mission_airspeed = 300  # pos_sp_curr_cruising_speed (fps)
         mission_throttle = 0.7  # pos_sp_curr_cruising_throttle
         acc_rad = 0.5  # l1_control_switch_distance
 
