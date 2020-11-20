@@ -108,7 +108,7 @@ class MotionController_L1_TECS(MotionController):
         return [self.pitch_setpoint, self.throttle_setpoint, self.roll_setpoint, self.nav_bearing]
 
     def l1_control_navigate_waypoints(self, vectorA, vectorB, vectorP, vectorVel):
-        L1_ratio = 0.1  # (当v=0.05则L1=0.005km=50m)
+        L1_ratio = 0.001
 
         # /* this follows the logic presented in [1] */ #
         eta = 0.0
@@ -180,7 +180,7 @@ class MotionController_L1_TECS(MotionController):
         bearing_error = eta
 
         # update roll setpoint
-        roll_new = math.atan(lateral_accel * 1.0 / 9.81551)
+        roll_new = math.atan(lateral_accel * 1.0 / 9.81551 * 0.3048)
         self.roll_setpoint = roll_new
 
         return None
@@ -382,7 +382,7 @@ class MotionController_L1_TECS(MotionController):
             nav_bearing = math.atan2(vector_PA_unit[1], vector_PA_unit[0])  # bearing from current position to L1 point
 
         # update roll setpoint
-        roll_new = math.atan(lateral_accel * 1.0 / 9.81551)
+        roll_new = math.atan(lateral_accel * 1.0 / 9.81551 * 0.3048)
         self.roll_setpoint = roll_new
 
         return None
