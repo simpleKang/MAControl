@@ -132,10 +132,6 @@ if __name__ == '__main__':
         lon = [[] for i in range(arglist.numU)]
         lat = [[] for i in range(arglist.numU)]
         alt = [[] for i in range(arglist.numU)]
-        # command #
-        ele = [[] for i in range(arglist.numU)]
-        ail_r = [[] for i in range(arglist.numU)]
-        thr = [[] for i in range(arglist.numU)]
         # state #
         pitch = [[] for i in range(arglist.numU)]
         roll = [[] for i in range(arglist.numU)]
@@ -143,10 +139,9 @@ if __name__ == '__main__':
         sstep = []
         # plot #
         fig = plt.figure()
-        ax1 = fig.add_subplot(221, projection='3d')
-        ax2 = fig.add_subplot(222)
-        ax3 = fig.add_subplot(223)
-        ax4 = fig.add_subplot(224)
+        ax1 = fig.add_subplot(311, projection='3d')
+        ax2 = fig.add_subplot(312)
+        ax3 = fig.add_subplot(313)
         plt.ion()
 
         while step <= arglist.step_max:
@@ -164,7 +159,7 @@ if __name__ == '__main__':
 
             # for displaying
             augment_view(world, MainController)
-            # env.render()  # could be commented out
+            env.render()  # could be commented out
 
             # IN/OUT DATA OF CONTROLLERS
             sstep.append(step)
@@ -172,21 +167,15 @@ if __name__ == '__main__':
                 lon[i].append(obs_n[i][16])
                 lat[i].append(obs_n[i][15])
                 alt[i].append(obs_n[i][0])
-                ele[i].append(action_n[i][2])
-                ail_r[i].append(action_n[i][1])
-                thr[i].append(action_n[i][4])
                 pitch[i].append(obs_n[i][1])
                 roll[i].append(obs_n[i][2])
                 vel[i].append(math.sqrt(obs_n[i][4]**2+obs_n[i][5]**2+obs_n[i][6]**2))
             # Real-time plotting (matplotlib) for visualized DEBUG
             for i in range(arglist.numU):
-                ax1.plot3D(lon[i], lat[i], alt[i], color='#000'+str(i)+'8B')
-                ax2.plot(sstep, ail_r[i], color='#008'+str(i)+'8B')
-                ax2.plot(sstep, roll[i], color='#B88'+str(i)+'0B')
-                ax3.plot(sstep, ele[i], color='#A9A'+str(i)+'A9')
-                ax3.plot(sstep, pitch[i], color='#006'+str(i)+'00')
-                ax4.plot(sstep, thr[i], color='#BDB'+str(i)+'6B')
-                ax4.plot(sstep, vel[i], color='#8B0'+str(i)+'8B')
+                ax1.plot3D(lon[i], lat[i], alt[i], color='c')
+                ax2.plot(sstep, roll[i], color='r')
+                ax2.plot(sstep, pitch[i], color='b')
+                ax3.plot(sstep, vel[i], color='y')
             plt.show()
             plt.pause(0.0001)  # 暂停一瞬
 

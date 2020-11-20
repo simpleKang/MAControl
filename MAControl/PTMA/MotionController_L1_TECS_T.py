@@ -32,7 +32,7 @@ class MotionController_L1_TECS(MotionController):
         param_fw_thr_min = 0.2
         param_fw_thr_cruise = 0.5
         throttle_max = 1.0
-        param_fw_p_lim_min = 0.00
+        param_fw_p_lim_min = -0.99
         param_fw_p_lim_max = 0.99
         mission_airspeed = 300  # pos_sp_curr_cruising_speed (fps)
         mission_throttle = 0.7  # pos_sp_curr_cruising_throttle
@@ -318,7 +318,6 @@ class MotionController_L1_TECS(MotionController):
         vert_accel_limit = 0.2
         ptchRateIncr = dt * vert_accel_limit / tas_state
         if pitch_setpoint - self.pitch_setpoint > ptchRateIncr:
-            print('s1', 'new-old-limit', pitch_setpoint, self.pitch_setpoint, ptchRateIncr)
             pitch_setpoint = self.pitch_setpoint + ptchRateIncr
         elif pitch_setpoint - self.pitch_setpoint < -1 * ptchRateIncr:
             pitch_setpoint = self.pitch_setpoint - ptchRateIncr
