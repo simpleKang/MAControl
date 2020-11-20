@@ -166,25 +166,6 @@ if __name__ == '__main__':
             augment_view(world, MainController)
             # env.render()  # could be commented out
 
-            # color
-            # 'darkblue': '#00008B'
-            # 'darkcyan': '#008B8B'
-            # 'darkgoldenrod': '#B8860B'
-            # 'darkgray': '#A9A9A9'
-            # 'darkgreen': '#006400'
-            # 'darkkhaki': '#BDB76B'
-            # 'darkmagenta': '#8B008B'
-            # 'darkolivegreen': '#556B2F'
-            # 'darkorange': '#FF8C00'
-            # 'darkorchid': '#9932CC'
-            # 'darkred': '#8B0000'
-            # 'darksalmon': '#E9967A'
-            # 'darkseagreen': '#8FBC8F'
-            # 'darkslateblue': '#483D8B'
-            # 'darkslategray': '#2F4F4F'
-            # 'darkturquoise': '#00CED1'
-            # 'darkviolet': '#9400D3'
-
             # IN/OUT DATA OF CONTROLLERS
             sstep.append(step)
             for i in range(arglist.numU):
