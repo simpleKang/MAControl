@@ -19,8 +19,8 @@ class InnerController_PID(InnerController):
         else:
 
             delta_time = self.world.dt
-            P_value = 0.8
-            I_value = 0.08
+            P_value = 0.4
+            I_value = 0.0
             D_value = 0.0
             ITerm_window = 1
 

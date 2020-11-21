@@ -76,6 +76,8 @@ def update_action(obs_n, WorldTarget, step, Controller):
         pointAi, pointBi, finishedi, Controller[i][4][3] = Controller[i][1].\
             planpath(para_list, obs_n[i], Controller[i][4][0], step)
 
+        print('i-A-B', i, pointAi, pointBi)
+
         pitch_sp, thr_sp, roll_sp, nav_bearing = Controller[i][2]. \
             get_expected_action(obs_n[i], pointAi, pointBi, step, finishedi)
 
@@ -185,7 +187,7 @@ if __name__ == '__main__':
                 ax2.plot(sstep, pitch[i], color='b')
                 ax3.plot(sstep, vel[i], color='y')
                 ax4.plot(sstep, ele[i], color='k')
-                ax4.plot(sstep, ail_r[i], color='m')
+                ax4.plot(sstep, ail_r[i])
                 ax4.plot(sstep, thr[i], color='g')
             plt.show()
             plt.pause(0.0001)  # 暂停一瞬

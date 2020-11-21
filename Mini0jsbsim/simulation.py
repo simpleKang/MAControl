@@ -18,7 +18,7 @@ class Simulation(object):
     FULL = 'full'
 
     def __init__(self,
-                 sim_frequency_hz: float = 60.0,
+                 sim_frequency_hz: float = 100.0,
                  aircraft: Aircraft = Rascal110_JSBSim,
                  init_conditions: Dict[prp.Property, float] = None,
                  allow_flightgear_output: bool = False):
