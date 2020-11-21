@@ -132,6 +132,10 @@ if __name__ == '__main__':
         lon = [[] for i in range(arglist.numU)]
         lat = [[] for i in range(arglist.numU)]
         alt = [[] for i in range(arglist.numU)]
+        # command #
+        ele = [[] for i in range(arglist.numU)]
+        ail_r = [[] for i in range(arglist.numU)]
+        rud = [[] for i in range(arglist.numU)]
         # state #
         pitch = [[] for i in range(arglist.numU)]
         roll = [[] for i in range(arglist.numU)]
@@ -139,9 +143,10 @@ if __name__ == '__main__':
         sstep = []
         # plot #
         fig = plt.figure()
-        ax1 = fig.add_subplot(311)
-        ax2 = fig.add_subplot(312)
-        ax3 = fig.add_subplot(313)
+        ax1 = fig.add_subplot(221)
+        ax2 = fig.add_subplot(222)
+        ax3 = fig.add_subplot(223)
+        ax4 = fig.add_subplot(224)
         plt.ion()
 
         while step <= arglist.step_max:
@@ -167,6 +172,9 @@ if __name__ == '__main__':
                 lon[i].append(obs_n[i][16])
                 lat[i].append(obs_n[i][15])
                 alt[i].append(obs_n[i][0])
+                ele[i].append(action_n[i][2])
+                ail_r[i].append(action_n[i][1])
+                rud[i].append(action_n[i][3])
                 pitch[i].append(obs_n[i][1])
                 roll[i].append(obs_n[i][2])
                 vel[i].append(math.sqrt(obs_n[i][4]**2+obs_n[i][5]**2+obs_n[i][6]**2))
@@ -176,6 +184,9 @@ if __name__ == '__main__':
                 ax2.plot(sstep, roll[i], color='r')
                 ax2.plot(sstep, pitch[i], color='b')
                 ax3.plot(sstep, vel[i], color='y')
+                ax4.plot(sstep, ele[i], color='k')
+                ax4.plot(sstep, ail_r[i], color='m')
+                ax4.plot(sstep, rud[i], color='g')
             plt.show()
             plt.pause(0.0001)  # 暂停一瞬
 
