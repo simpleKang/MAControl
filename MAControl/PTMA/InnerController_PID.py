@@ -53,7 +53,7 @@ class InnerController_PID(InnerController):
             pitch_action = P_value * PTerm_pitch + I_value * self.ITerm_pitch + D_value * DTerm_pitch
             roll_action = P_value * PTerm_roll + I_value * self.ITerm_roll + D_value * DTerm_roll
 
-            action = [-roll_action, roll_action, pitch_action, 0, 0]
+            action = [-roll_action, roll_action, pitch_action, 0, thr_sp]
 
         return action
 

@@ -109,6 +109,7 @@ class MotionController_L1_TECS(MotionController):
 
     def l1_control_navigate_waypoints(self, vectorA, vectorB, vectorP, vectorVel):
         L1_ratio = 0.001
+        K_L1 = 0.01
 
         # /* this follows the logic presented in [1] */ #
         eta = 0.0
@@ -175,7 +176,7 @@ class MotionController_L1_TECS(MotionController):
             # bearing from current position to L1 point
 
         eta = constrain(eta, -1*math.pi/2, math.pi/2)
-        lateral_accel = nav_speed * nav_speed / L1_distance * math.sin(eta)
+        lateral_accel = K_L1 * nav_speed * nav_speed / L1_distance * math.sin(eta)
         self.circle_mode = False
         bearing_error = eta
 
