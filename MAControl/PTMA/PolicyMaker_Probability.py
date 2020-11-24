@@ -207,28 +207,28 @@ class PolicyMaker_Probability(PolicyMaker):
                 ACTIVE_U = list(set([i for i in range(self.arglist.numU)]) - set(PolicyMaker_Probability.Occupied_U))
                 for i in self.close_area:
                     if i in ACTIVE_U:
-                        ii = ACTIVE_U.index(i)
+                        ii = ACTIVE_U.index(i)  # close_area 与 ACTIVE_U 的交集，其元素在全体个体中的编号 只拿它们所见最优目标
                         HIGHEST_TARGETS.append(PolicyMaker_Probability.SEEN_TARGETS[ii][0])
                     else:
                         pass
                 HIGHEST_TARGETS = sorted(HIGHEST_TARGETS, key=lambda x: x[5], reverse=True)
-                self.result = HIGHEST_TARGETS[0]
-                PolicyMaker_Probability.RESULT.append(self.result[-1])
+                self.result = HIGHEST_TARGETS[0]   # 各agent自己的result 即使是孤岛 最起码有自己的观测
+                PolicyMaker_Probability.RESULT.append(self.result[-1])  # 这里记录的是预选择目标的真编号，最后求得分会用到
 
             elif step == self.Step2:
                 print('UAV', self.index, 'choose target, then generate mission-swarm accordingly, then bid price')
                 Counter_k = Counter(PolicyMaker_Probability.RESULT).most_common(1)
-                target_index = Counter_k[0][0]
+                target_index = Counter_k[0][0]   # Counter_k[0][1] 则是最常见目标出现的个数
                 for i, result in enumerate(PolicyMaker_Probability.RESULT):
                     if result == target_index:
-                        self.mission_swarm.append(i)
+                        self.mission_swarm.append(i)   # 这是产生 mission_swarm 的其中一种方式 偏向诱导良好结果 可随机指定
                     else:
                         pass
-                if self.index in self.mission_swarm:
+                if self.index in self.mission_swarm:   # 只在看上同一个体的 ms 里进行决策 也是一种变相的[非全联]
                     self.price = self.bidding(obs_n[self.index], 0)
                 else:
                     self.price = 0
-                PolicyMaker_Probability.Prices.append(self.price)
+                PolicyMaker_Probability.Prices.append(self.price)  # Prices 虽然瞬传 但只在 mission_swarm 内 约束可加给 ms
 
             elif step == self.Step3:
                 print('UAV', self.index, 'sort price, then determine own rank')
