@@ -4,7 +4,7 @@ import argparse
 import time
 import MAControl.Test_Auction.InnerController_PID as IC_P
 import MAControl.Test_Auction.MotionController_L1_TECS as MC_L
-import MAControl.Test_Auction.PathPlanner_Simple as PP_S
+import MAControl.Test_Auction.PathPlanner_CBAA as PP_S
 import MAControl.Test_Auction.PolicyMaker_Probability as PM_A
 import logging
 import os
@@ -173,7 +173,7 @@ if __name__ == '__main__':
 
             # for displaying
             augment_view(env, world, NewController)
-            #env.render()  # could be commented out
+            env.render()  # could be commented out
 
             # for recording
             if step == arglist.step_max:

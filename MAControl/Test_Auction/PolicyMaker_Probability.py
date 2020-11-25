@@ -231,8 +231,11 @@ class PolicyMaker_Probability(PolicyMaker):
                     else:
                         pass
                 HIGHEST_TARGETS = sorted(HIGHEST_TARGETS, key=lambda x: x[4], reverse=True)
-                self.result = HIGHEST_TARGETS[0]
-                PolicyMaker_Probability.RESULT.append(self.result[-1])
+                if HIGHEST_TARGETS:
+                    self.result = HIGHEST_TARGETS[0]
+                    PolicyMaker_Probability.RESULT.append(self.result[-1])
+                else:
+                    PolicyMaker_Probability.RESULT.append([])
 
             elif step == self.Step2:
                 print('UAV', self.index, 'choose target, then generate mission-swarm accordingly, then bid price')

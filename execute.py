@@ -24,24 +24,24 @@ def parse_args():
     parser.add_argument("--scenario", type=str, default="scenario_paper", help="name of the scenario script")
     parser.add_argument("--step-max", type=int, default=5000, help="maximum steps")
     parser.add_argument("--episode-max", type=int, default=100, help="maximum episodes")
-    parser.add_argument("--p1", action='append', type=float, dest='p1', default=[], help="P: Line one")
-    parser.add_argument("--p2", action='append', type=float, dest='p2', default=[], help="P: Line Two")
-    parser.add_argument("--p3", action='append', type=float, dest='p3', default=[], help="P: Line Three")
-    parser.add_argument("--q1", action='append', type=float, dest='q1', default=[], help="Q: Line One")
-    parser.add_argument("--q2", action='append', type=float, dest='q2', default=[], help="Q: Line Two")
-    parser.add_argument("--q3", action='append', type=float, dest='q3', default=[], help="Q: Line Three")
-    parser.add_argument("--numU", type=int, default=30, help="how many UAVs")
-    parser.add_argument("--typeT", action='append', type=int, dest='typeT', default=[], help="target types")
-    #测试用
-    # parser.add_argument("--p1", action='append', type=float, dest='p1', default=[0.1, 0.45, 0.45], help="P: Line one")
-    # parser.add_argument("--p2", action='append', type=float, dest='p2', default=[0.45, 0.1, 0.45], help="P: Line Two")
-    # parser.add_argument("--p3", action='append', type=float, dest='p3', default=[0.45, 0.45, 0.1], help="P: Line Three")
-    # parser.add_argument("--q1", action='append', type=float, dest='q1', default=[1, 0, 0], help="Q: Line One")
-    # parser.add_argument("--q2", action='append', type=float, dest='q2', default=[0, 1, 0], help="Q: Line Two")
-    # parser.add_argument("--q3", action='append', type=float, dest='q3', default=[0, 0, 1], help="Q: Line Three")
+    # parser.add_argument("--p1", action='append', type=float, dest='p1', default=[], help="P: Line one")
+    # parser.add_argument("--p2", action='append', type=float, dest='p2', default=[], help="P: Line Two")
+    # parser.add_argument("--p3", action='append', type=float, dest='p3', default=[], help="P: Line Three")
+    # parser.add_argument("--q1", action='append', type=float, dest='q1', default=[], help="Q: Line One")
+    # parser.add_argument("--q2", action='append', type=float, dest='q2', default=[], help="Q: Line Two")
+    # parser.add_argument("--q3", action='append', type=float, dest='q3', default=[], help="Q: Line Three")
     # parser.add_argument("--numU", type=int, default=30, help="how many UAVs")
-    # parser.add_argument("--typeT", action='append', type=int, dest='typeT', default=[2, 2, 3, 3, 2, 2, 2, 1, 2, 2],
-    #                     help="target types")
+    # parser.add_argument("--typeT", action='append', type=int, dest='typeT', default=[], help="target types")
+    # #测试用
+    parser.add_argument("--p1", action='append', type=float, dest='p1', default=[0.1, 0.45, 0.45], help="P: Line one")
+    parser.add_argument("--p2", action='append', type=float, dest='p2', default=[0.45, 0.1, 0.45], help="P: Line Two")
+    parser.add_argument("--p3", action='append', type=float, dest='p3', default=[0.45, 0.45, 0.1], help="P: Line Three")
+    parser.add_argument("--q1", action='append', type=float, dest='q1', default=[1, 0, 0], help="Q: Line One")
+    parser.add_argument("--q2", action='append', type=float, dest='q2', default=[0, 1, 0], help="Q: Line Two")
+    parser.add_argument("--q3", action='append', type=float, dest='q3', default=[0, 0, 1], help="Q: Line Three")
+    parser.add_argument("--numU", type=int, default=30, help="how many UAVs")
+    parser.add_argument("--typeT", action='append', type=int, dest='typeT', default=[2, 2, 3, 3, 2, 2, 2, 1, 2, 2],
+                        help="target types")
 
     return parser.parse_args()
 
@@ -173,7 +173,7 @@ if __name__ == '__main__':
 
             # for displaying
             augment_view(env, world, NewController)
-            #env.render()  # could be commented out
+            env.render()  # could be commented out
 
             # for recording
             if step == arglist.step_max:
