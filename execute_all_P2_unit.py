@@ -4,7 +4,7 @@ import os
 
 # numU= 10 # p=0.2 # q=1 #
 
-os.system("python ./execute.py --numU=10 "
+os.system("python ./execute_Probability.py --numU=10 "
           "--p1=0.2 --p1=0.4 --p1=0.4 "
           "--p2=0.4 --p2=0.2 --p2=0.4 "
           "--p3=0.4 --p3=0.4 --p3=0.2 "
@@ -13,7 +13,7 @@ os.system("python ./execute.py --numU=10 "
           "--q3=0.0 --q3=0.0 --q3=1.0 "
           "--typeT=1 --typeT=3 --typeT=1 --typeT=1 --typeT=3 --typeT=2 --typeT=1 --typeT=2 --typeT=2 --typeT=1 ")
 
-os.system("python ./execute.py --numU=10 "
+os.system("python ./execute_Probability.py --numU=10 "
           "--p1=0.2 --p1=0.4 --p1=0.4 "
           "--p2=0.4 --p2=0.2 --p2=0.4 "
           "--p3=0.4 --p3=0.4 --p3=0.2 "
@@ -22,7 +22,7 @@ os.system("python ./execute.py --numU=10 "
           "--q3=0.0 --q3=0.0 --q3=1.0 "
           "--typeT=1 --typeT=1 --typeT=2 --typeT=2 --typeT=2 --typeT=3 --typeT=1 --typeT=1 --typeT=1 --typeT=3 ")
 
-os.system("python ./execute.py --numU=10 "
+os.system("python ./execute_Probability.py --numU=10 "
           "--p1=0.2 --p1=0.4 --p1=0.4 "
           "--p2=0.4 --p2=0.2 --p2=0.4 "
           "--p3=0.4 --p3=0.4 --p3=0.2 "
@@ -31,7 +31,7 @@ os.system("python ./execute.py --numU=10 "
           "--q3=0.0 --q3=0.0 --q3=1.0 "
           "--typeT=2 --typeT=2 --typeT=3 --typeT=3 --typeT=2 --typeT=2 --typeT=2 --typeT=1 --typeT=2 --typeT=2 ")
 
-os.system("python ./execute.py --numU=10 "
+os.system("python ./execute_Probability.py --numU=10 "
           "--p1=0.2 --p1=0.4 --p1=0.4 "
           "--p2=0.4 --p2=0.2 --p2=0.4 "
           "--p3=0.4 --p3=0.4 --p3=0.2 "
@@ -42,7 +42,7 @@ os.system("python ./execute.py --numU=10 "
 
 # numU= 15 # p=0.2 # q=1 #
 
-os.system("python ./execute.py --numU=15 "
+os.system("python ./execute_Probability.py --numU=15 "
           "--p1=0.2 --p1=0.4 --p1=0.4 "
           "--p2=0.4 --p2=0.2 --p2=0.4 "
           "--p3=0.4 --p3=0.4 --p3=0.2 "
@@ -51,7 +51,7 @@ os.system("python ./execute.py --numU=15 "
           "--q3=0.0 --q3=0.0 --q3=1.0 "
           "--typeT=1 --typeT=3 --typeT=1 --typeT=1 --typeT=3 --typeT=2 --typeT=1 --typeT=2 --typeT=2 --typeT=1 ")
 
-os.system("python ./execute.py --numU=15 "
+os.system("python ./execute_Probability.py --numU=15 "
           "--p1=0.2 --p1=0.4 --p1=0.4 "
           "--p2=0.4 --p2=0.2 --p2=0.4 "
           "--p3=0.4 --p3=0.4 --p3=0.2 "
@@ -60,7 +60,7 @@ os.system("python ./execute.py --numU=15 "
           "--q3=0.0 --q3=0.0 --q3=1.0 "
           "--typeT=1 --typeT=1 --typeT=2 --typeT=2 --typeT=2 --typeT=3 --typeT=1 --typeT=1 --typeT=1 --typeT=3 ")
 
-os.system("python ./execute.py --numU=15 "
+os.system("python ./execute_Probability.py --numU=15 "
           "--p1=0.2 --p1=0.4 --p1=0.4 "
           "--p2=0.4 --p2=0.2 --p2=0.4 "
           "--p3=0.4 --p3=0.4 --p3=0.2 "
@@ -69,7 +69,7 @@ os.system("python ./execute.py --numU=15 "
           "--q3=0.0 --q3=0.0 --q3=1.0 "
           "--typeT=2 --typeT=2 --typeT=3 --typeT=3 --typeT=2 --typeT=2 --typeT=2 --typeT=1 --typeT=2 --typeT=2 ")
 
-os.system("python ./execute.py --numU=15 "
+os.system("python ./execute_Probability.py --numU=15 "
           "--p1=0.2 --p1=0.4 --p1=0.4 "
           "--p2=0.4 --p2=0.2 --p2=0.4 "
           "--p3=0.4 --p3=0.4 --p3=0.2 "
@@ -80,7 +80,7 @@ os.system("python ./execute.py --numU=15 "
 
 # numU= 20 # p=0.2 # q=1 #
 
-os.system("python ./execute.py --numU=20 "
+os.system("python ./execute_Probability.py --numU=20 "
           "--p1=0.2 --p1=0.4 --p1=0.4 "
           "--p2=0.4 --p2=0.2 --p2=0.4 "
           "--p3=0.4 --p3=0.4 --p3=0.2 "
@@ -89,7 +89,7 @@ os.system("python ./execute.py --numU=20 "
           "--q3=0.0 --q3=0.0 --q3=1.0 "
           "--typeT=1 --typeT=3 --typeT=1 --typeT=1 --typeT=3 --typeT=2 --typeT=1 --typeT=2 --typeT=2 --typeT=1 ")
 
-os.system("python ./execute.py --numU=20 "
+os.system("python ./execute_Probability.py --numU=20 "
           "--p1=0.2 --p1=0.4 --p1=0.4 "
           "--p2=0.4 --p2=0.2 --p2=0.4 "
           "--p3=0.4 --p3=0.4 --p3=0.2 "
@@ -98,7 +98,7 @@ os.system("python ./execute.py --numU=20 "
           "--q3=0.0 --q3=0.0 --q3=1.0 "
           "--typeT=1 --typeT=1 --typeT=2 --typeT=2 --typeT=2 --typeT=3 --typeT=1 --typeT=1 --typeT=1 --typeT=3 ")
 
-os.system("python ./execute.py --numU=20 "
+os.system("python ./execute_Probability.py --numU=20 "
           "--p1=0.2 --p1=0.4 --p1=0.4 "
           "--p2=0.4 --p2=0.2 --p2=0.4 "
           "--p3=0.4 --p3=0.4 --p3=0.2 "
@@ -107,7 +107,7 @@ os.system("python ./execute.py --numU=20 "
           "--q3=0.0 --q3=0.0 --q3=1.0 "
           "--typeT=2 --typeT=2 --typeT=3 --typeT=3 --typeT=2 --typeT=2 --typeT=2 --typeT=1 --typeT=2 --typeT=2 ")
 
-os.system("python ./execute.py --numU=20 "
+os.system("python ./execute_Probability.py --numU=20 "
           "--p1=0.2 --p1=0.4 --p1=0.4 "
           "--p2=0.4 --p2=0.2 --p2=0.4 "
           "--p3=0.4 --p3=0.4 --p3=0.2 "
@@ -118,7 +118,7 @@ os.system("python ./execute.py --numU=20 "
 
 # numU= 25 # p=0.2 # q=1 #
 
-os.system("python ./execute.py --numU=25 "
+os.system("python ./execute_Probability.py --numU=25 "
           "--p1=0.2 --p1=0.4 --p1=0.4 "
           "--p2=0.4 --p2=0.2 --p2=0.4 "
           "--p3=0.4 --p3=0.4 --p3=0.2 "
@@ -127,7 +127,7 @@ os.system("python ./execute.py --numU=25 "
           "--q3=0.0 --q3=0.0 --q3=1.0 "
           "--typeT=1 --typeT=3 --typeT=1 --typeT=1 --typeT=3 --typeT=2 --typeT=1 --typeT=2 --typeT=2 --typeT=1 ")
 
-os.system("python ./execute.py --numU=25 "
+os.system("python ./execute_Probability.py --numU=25 "
           "--p1=0.2 --p1=0.4 --p1=0.4 "
           "--p2=0.4 --p2=0.2 --p2=0.4 "
           "--p3=0.4 --p3=0.4 --p3=0.2 "
@@ -136,7 +136,7 @@ os.system("python ./execute.py --numU=25 "
           "--q3=0.0 --q3=0.0 --q3=1.0 "
           "--typeT=1 --typeT=1 --typeT=2 --typeT=2 --typeT=2 --typeT=3 --typeT=1 --typeT=1 --typeT=1 --typeT=3 ")
 
-os.system("python ./execute.py --numU=25 "
+os.system("python ./execute_Probability.py --numU=25 "
           "--p1=0.2 --p1=0.4 --p1=0.4 "
           "--p2=0.4 --p2=0.2 --p2=0.4 "
           "--p3=0.4 --p3=0.4 --p3=0.2 "
@@ -145,7 +145,7 @@ os.system("python ./execute.py --numU=25 "
           "--q3=0.0 --q3=0.0 --q3=1.0 "
           "--typeT=2 --typeT=2 --typeT=3 --typeT=3 --typeT=2 --typeT=2 --typeT=2 --typeT=1 --typeT=2 --typeT=2 ")
 
-os.system("python ./execute.py --numU=25 "
+os.system("python ./execute_Probability.py --numU=25 "
           "--p1=0.2 --p1=0.4 --p1=0.4 "
           "--p2=0.4 --p2=0.2 --p2=0.4 "
           "--p3=0.4 --p3=0.4 --p3=0.2 "
@@ -156,7 +156,7 @@ os.system("python ./execute.py --numU=25 "
 
 # numU= 30 # p=0.2 # q=1 #
 
-os.system("python ./execute.py --numU=30 "
+os.system("python ./execute_Probability.py --numU=30 "
           "--p1=0.2 --p1=0.4 --p1=0.4 "
           "--p2=0.4 --p2=0.2 --p2=0.4 "
           "--p3=0.4 --p3=0.4 --p3=0.2 "
@@ -165,7 +165,7 @@ os.system("python ./execute.py --numU=30 "
           "--q3=0.0 --q3=0.0 --q3=1.0 "
           "--typeT=1 --typeT=3 --typeT=1 --typeT=1 --typeT=3 --typeT=2 --typeT=1 --typeT=2 --typeT=2 --typeT=1 ")
 
-os.system("python ./execute.py --numU=30 "
+os.system("python ./execute_Probability.py --numU=30 "
           "--p1=0.2 --p1=0.4 --p1=0.4 "
           "--p2=0.4 --p2=0.2 --p2=0.4 "
           "--p3=0.4 --p3=0.4 --p3=0.2 "
@@ -174,7 +174,7 @@ os.system("python ./execute.py --numU=30 "
           "--q3=0.0 --q3=0.0 --q3=1.0 "
           "--typeT=1 --typeT=1 --typeT=2 --typeT=2 --typeT=2 --typeT=3 --typeT=1 --typeT=1 --typeT=1 --typeT=3 ")
 
-os.system("python ./execute.py --numU=30 "
+os.system("python ./execute_Probability.py --numU=30 "
           "--p1=0.2 --p1=0.4 --p1=0.4 "
           "--p2=0.4 --p2=0.2 --p2=0.4 "
           "--p3=0.4 --p3=0.4 --p3=0.2 "
@@ -183,7 +183,7 @@ os.system("python ./execute.py --numU=30 "
           "--q3=0.0 --q3=0.0 --q3=1.0 "
           "--typeT=2 --typeT=2 --typeT=3 --typeT=3 --typeT=2 --typeT=2 --typeT=2 --typeT=1 --typeT=2 --typeT=2 ")
 
-os.system("python ./execute.py --numU=30 "
+os.system("python ./execute_Probability.py --numU=30 "
           "--p1=0.2 --p1=0.4 --p1=0.4 "
           "--p2=0.4 --p2=0.2 --p2=0.4 "
           "--p3=0.4 --p3=0.4 --p3=0.2 "
@@ -194,7 +194,7 @@ os.system("python ./execute.py --numU=30 "
 
 # numU= 35 # p=0.2 # q=1 #
 
-os.system("python ./execute.py --numU=35 "
+os.system("python ./execute_Probability.py --numU=35 "
           "--p1=0.2 --p1=0.4 --p1=0.4 "
           "--p2=0.4 --p2=0.2 --p2=0.4 "
           "--p3=0.4 --p3=0.4 --p3=0.2 "
@@ -203,7 +203,7 @@ os.system("python ./execute.py --numU=35 "
           "--q3=0.0 --q3=0.0 --q3=1.0 "
           "--typeT=1 --typeT=3 --typeT=1 --typeT=1 --typeT=3 --typeT=2 --typeT=1 --typeT=2 --typeT=2 --typeT=1 ")
 
-os.system("python ./execute.py --numU=35 "
+os.system("python ./execute_Probability.py --numU=35 "
           "--p1=0.2 --p1=0.4 --p1=0.4 "
           "--p2=0.4 --p2=0.2 --p2=0.4 "
           "--p3=0.4 --p3=0.4 --p3=0.2 "
@@ -212,7 +212,7 @@ os.system("python ./execute.py --numU=35 "
           "--q3=0.0 --q3=0.0 --q3=1.0 "
           "--typeT=1 --typeT=1 --typeT=2 --typeT=2 --typeT=2 --typeT=3 --typeT=1 --typeT=1 --typeT=1 --typeT=3 ")
 
-os.system("python ./execute.py --numU=35 "
+os.system("python ./execute_Probability.py --numU=35 "
           "--p1=0.2 --p1=0.4 --p1=0.4 "
           "--p2=0.4 --p2=0.2 --p2=0.4 "
           "--p3=0.4 --p3=0.4 --p3=0.2 "
@@ -221,7 +221,7 @@ os.system("python ./execute.py --numU=35 "
           "--q3=0.0 --q3=0.0 --q3=1.0 "
           "--typeT=2 --typeT=2 --typeT=3 --typeT=3 --typeT=2 --typeT=2 --typeT=2 --typeT=1 --typeT=2 --typeT=2 ")
 
-os.system("python ./execute.py --numU=35 "
+os.system("python ./execute_Probability.py --numU=35 "
           "--p1=0.2 --p1=0.4 --p1=0.4 "
           "--p2=0.4 --p2=0.2 --p2=0.4 "
           "--p3=0.4 --p3=0.4 --p3=0.2 "
@@ -232,7 +232,7 @@ os.system("python ./execute.py --numU=35 "
 
 # numU= 40 # p=0.2 # q=1 #
 
-os.system("python ./execute.py --numU=40 "
+os.system("python ./execute_Probability.py --numU=40 "
           "--p1=0.2 --p1=0.4 --p1=0.4 "
           "--p2=0.4 --p2=0.2 --p2=0.4 "
           "--p3=0.4 --p3=0.4 --p3=0.2 "
@@ -241,7 +241,7 @@ os.system("python ./execute.py --numU=40 "
           "--q3=0.0 --q3=0.0 --q3=1.0 "
           "--typeT=1 --typeT=3 --typeT=1 --typeT=1 --typeT=3 --typeT=2 --typeT=1 --typeT=2 --typeT=2 --typeT=1 ")
 
-os.system("python ./execute.py --numU=40 "
+os.system("python ./execute_Probability.py --numU=40 "
           "--p1=0.2 --p1=0.4 --p1=0.4 "
           "--p2=0.4 --p2=0.2 --p2=0.4 "
           "--p3=0.4 --p3=0.4 --p3=0.2 "
@@ -250,7 +250,7 @@ os.system("python ./execute.py --numU=40 "
           "--q3=0.0 --q3=0.0 --q3=1.0 "
           "--typeT=1 --typeT=1 --typeT=2 --typeT=2 --typeT=2 --typeT=3 --typeT=1 --typeT=1 --typeT=1 --typeT=3 ")
 
-os.system("python ./execute.py --numU=40 "
+os.system("python ./execute_Probability.py --numU=40 "
           "--p1=0.2 --p1=0.4 --p1=0.4 "
           "--p2=0.4 --p2=0.2 --p2=0.4 "
           "--p3=0.4 --p3=0.4 --p3=0.2 "
@@ -259,7 +259,7 @@ os.system("python ./execute.py --numU=40 "
           "--q3=0.0 --q3=0.0 --q3=1.0 "
           "--typeT=2 --typeT=2 --typeT=3 --typeT=3 --typeT=2 --typeT=2 --typeT=2 --typeT=1 --typeT=2 --typeT=2 ")
 
-os.system("python ./execute.py --numU=40 "
+os.system("python ./execute_Probability.py --numU=40 "
           "--p1=0.2 --p1=0.4 --p1=0.4 "
           "--p2=0.4 --p2=0.2 --p2=0.4 "
           "--p3=0.4 --p3=0.4 --p3=0.2 "
@@ -270,7 +270,7 @@ os.system("python ./execute.py --numU=40 "
 
 # numU= 45 # p=0.2 # q=1 #
 
-os.system("python ./execute.py --numU=45 "
+os.system("python ./execute_Probability.py --numU=45 "
           "--p1=0.2 --p1=0.4 --p1=0.4 "
           "--p2=0.4 --p2=0.2 --p2=0.4 "
           "--p3=0.4 --p3=0.4 --p3=0.2 "
@@ -279,7 +279,7 @@ os.system("python ./execute.py --numU=45 "
           "--q3=0.0 --q3=0.0 --q3=1.0 "
           "--typeT=1 --typeT=3 --typeT=1 --typeT=1 --typeT=3 --typeT=2 --typeT=1 --typeT=2 --typeT=2 --typeT=1 ")
 
-os.system("python ./execute.py --numU=45 "
+os.system("python ./execute_Probability.py --numU=45 "
           "--p1=0.2 --p1=0.4 --p1=0.4 "
           "--p2=0.4 --p2=0.2 --p2=0.4 "
           "--p3=0.4 --p3=0.4 --p3=0.2 "
@@ -288,7 +288,7 @@ os.system("python ./execute.py --numU=45 "
           "--q3=0.0 --q3=0.0 --q3=1.0 "
           "--typeT=1 --typeT=1 --typeT=2 --typeT=2 --typeT=2 --typeT=3 --typeT=1 --typeT=1 --typeT=1 --typeT=3 ")
 
-os.system("python ./execute.py --numU=45 "
+os.system("python ./execute_Probability.py --numU=45 "
           "--p1=0.2 --p1=0.4 --p1=0.4 "
           "--p2=0.4 --p2=0.2 --p2=0.4 "
           "--p3=0.4 --p3=0.4 --p3=0.2 "
@@ -297,7 +297,7 @@ os.system("python ./execute.py --numU=45 "
           "--q3=0.0 --q3=0.0 --q3=1.0 "
           "--typeT=2 --typeT=2 --typeT=3 --typeT=3 --typeT=2 --typeT=2 --typeT=2 --typeT=1 --typeT=2 --typeT=2 ")
 
-os.system("python ./execute.py --numU=45 "
+os.system("python ./execute_Probability.py --numU=45 "
           "--p1=0.2 --p1=0.4 --p1=0.4 "
           "--p2=0.4 --p2=0.2 --p2=0.4 "
           "--p3=0.4 --p3=0.4 --p3=0.2 "
