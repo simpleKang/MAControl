@@ -34,6 +34,7 @@ class PolicyMaker_Probability(PolicyMaker):
         self.close_area = []
         self.price = 0
         self.rank = 0
+        self.mission_success = 0
 
         # 以下为一些阶段的初始设定步数
         # >> 未来步数点可修改，从而可以主动停留在某一阶段/步
@@ -271,6 +272,8 @@ class PolicyMaker_Probability(PolicyMaker):
                     PolicyMaker_Probability.Attacked_T.append(self.result[-1])
                     self.x = self.result[0]
                     self.y = self.result[1]
+
+                    self.mission_success = 1
                 else:
                     pass
                     print('UAV', self.index, 'not to attack')
@@ -284,5 +287,8 @@ class PolicyMaker_Probability(PolicyMaker):
 
             else:
                 raise Exception('Wrong Wrong Wrong')
-
-        return self.opt_index, [self.result, [self.x, self.y]]
+        # self.result指目标的整条属性
+        if self.result == -1:
+            return self.opt_index, [self.x, self.y, self.result, self.mission_success]
+        else:
+            return self.opt_index, [self.x, self.y, self.result[-1], self.mission_success]

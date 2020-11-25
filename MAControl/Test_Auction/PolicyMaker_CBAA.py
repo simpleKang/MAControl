@@ -358,5 +358,6 @@ class PolicyMaker_Auction(PolicyMaker):
         with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
             f.write(str(step) + '\n' + str(self.index) + '\n' + str(self.self_task) + '\n'
                     + str(self.targetbid) + '\n' + str(self.close_area) + '\n')
-
+        # self.result 指目标的编号
+        # self.mission_success 指uav是否已经打到了目标上
         return [self.opt_index, [self.x, self.y, self.result, self.mission_success]]
