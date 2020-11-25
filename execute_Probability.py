@@ -89,15 +89,13 @@ def update_action(env, world, obs_n, step, NewController):
         list_i = NewController[i][0]. \
             make_policy(WorldTarget, obs_n, step)
 
-        NewController[i][6] = list_i[1][1]
+        NewController[i][6] = list_i[1][2]
 
         pointAi, pointBi, finishedi, NewController[i][5] = NewController[i][1].\
             planpath(list_i, obs_n[i], NewController[i][4], step)
 
         acctEi, acclEi, NewController[i][4] = NewController[i][2]. \
             get_expected_action(obs_n[i], pointAi, pointBi, step, finishedi)
-
-
 
         actioni = NewController[i][3]. \
             get_action(obs_n[i], acctEi, acclEi, step, finishedi)
@@ -136,16 +134,12 @@ if __name__ == '__main__':
         NewController = get_controller(env, world, arglist)
 
         # Rest Controller (重置类变量)
-        PM_A.PolicyMaker_Probability.Found_Target_Set = []
-        PM_A.PolicyMaker_Probability.Found_Target_Info = []
-        PM_A.PolicyMaker_Probability.Attacked_Target_Index = []
-        PM_A.PolicyMaker_Probability.Remain_UAV_Set = []
-        PM_A.PolicyMaker_Probability.Remain_Target_Set = []
-        PM_A.PolicyMaker_Probability.Current_Target_Index = -1
-        PM_A.PolicyMaker_Probability.Current_Price_Set = []
-        PM_A.PolicyMaker_Probability.Current_Price_Result = []
-        for i in range(env.n):
-            PM_A.PolicyMaker_Probability.Remain_UAV_Set.append(i)
+        PM_A.PolicyMaker_Probability.SEEN_TARGETS = []
+        PM_A.PolicyMaker_Probability.KNOWN_TARGETS = []
+        PM_A.PolicyMaker_Probability.RESULT = []
+        PM_A.PolicyMaker_Probability.Prices = []
+        PM_A.PolicyMaker_Probability.Occupied_U = []
+        PM_A.PolicyMaker_Probability.Attacked_T = []
 
         obs_n = env.reset()
         episode += 1

@@ -250,7 +250,9 @@ class PolicyMaker_Probability(PolicyMaker):
             elif step == self.Step2:
                 print('UAV', self.index, 'bid price(s) for all seen + communicated targets')
                 PolicyMaker_Probability.Prices.append([[] for i in range(len(WorldTarget))])
-                for target in PolicyMaker_Probability.KNOWN_TARGETS[self.index]:
+                ACTIVE_U = list(set([i for i in range(self.arglist.numU)]) - set(PolicyMaker_Probability.Occupied_U))
+                si = ACTIVE_U.index(self.index)
+                for target in PolicyMaker_Probability.KNOWN_TARGETS[si]:
                     bid = self.bidding(obs_n[self.index], target)
                     PolicyMaker_Probability.Prices[-1][target[-1]] = bid
                 # Prices 最终是 len_ACTIVE_U * len_target
@@ -261,15 +263,19 @@ class PolicyMaker_Probability(PolicyMaker):
                 ACTIVE_U = list(set([i for i in range(self.arglist.numU)]) - set(PolicyMaker_Probability.Occupied_U))
                 si = ACTIVE_U.index(self.index)
                 ti = PolicyMaker_Probability.RESULT[si]
-                for i in self.close_area:
-                    if i in ACTIVE_U:
-                        ii = ACTIVE_U.index(i)  # close_area 与 ACTIVE_U 的交集，其元素在 ACTIVE_U 中的编号
-                        N_Prices.append(PolicyMaker_Probability.Prices[ii][ti])
-                    else:
-                        pass
-                N_Prices = sorted(N_Prices, reverse=True)
-                self_price = PolicyMaker_Probability.Prices[si][ti]
-                self.rank = N_Prices.index(self_price)
+                if not ti == []:
+                    for i in self.close_area:
+                        if i in ACTIVE_U:
+                            ii = ACTIVE_U.index(i)  # close_area 与 ACTIVE_U 的交集，其元素在 ACTIVE_U 中的编号
+                            N_Prices.append(PolicyMaker_Probability.Prices[ii][ti])
+                        else:
+                            pass
+                    NN_Prices = [item for item in N_Prices if item != []]  # 相互能通信到的个体未必看见了同一个目标
+                    NN_Prices = sorted(NN_Prices, reverse=True)  # 上述代码去除了所有 [] 只留下 float
+                    self_price = PolicyMaker_Probability.Prices[si][ti]
+                    self.rank = NN_Prices.index(self_price)
+                else:
+                    self.rank = 'NA'
 
             elif step == self.Step4:
                 # 根据当前目标的类型估计，重新讨论目标的类型（含有随机性），进而确定需要的UAV个数
@@ -281,19 +287,23 @@ class PolicyMaker_Probability(PolicyMaker):
                 elif self.result[6] == 2:
                     DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=self.arglist.q3)[0]
                 # 活跃 UAV 本地确认自己是否具有攻击资格，符合条件的 UAV 即将进入攻击阶段
-                if self.rank < DEMANDED_UAV_NUM:
-                    print('UAV', self.index, 'to attack', 'target', self.result[-1])
-                    self.opt_index = 10
-                    self.InAttacking = True
-                    PolicyMaker_Probability.Occupied_U.append(self.index)
-                    if np.random.random() > 0.5:
-                        PolicyMaker_Probability.Attacked_T.append(self.result[-1])
-                    self.x = self.result[0]
-                    self.y = self.result[1]
-                    self.mission_success = 1
-                else:
+                if self.rank == 'NA':
                     pass
                     print('UAV', self.index, 'not to attack')
+                else:
+                    if self.rank < DEMANDED_UAV_NUM:
+                        print('UAV', self.index, 'to attack', 'target', self.result[-1])
+                        self.opt_index = 10
+                        self.InAttacking = True
+                        PolicyMaker_Probability.Occupied_U.append(self.index)
+                        if np.random.random() > 0.5:
+                            PolicyMaker_Probability.Attacked_T.append(self.result[-1])
+                        self.x = self.result[0]
+                        self.y = self.result[1]
+                        self.mission_success = 1
+                    else:
+                        pass
+                        print('UAV', self.index, 'not to attack')
 
             elif step == self.Step5:
                 print('UAV', self.index, 'recycling')
