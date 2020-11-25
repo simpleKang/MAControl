@@ -176,8 +176,8 @@ class PolicyMaker_Probability(PolicyMaker):
         pt_ = 0.6     # 目标的单发杀伤概率
 
         # 计算中间变量
-        delta_lla = np.array(self.seen_targets[Tndx][2:4]) - np.array([obs[2:4]])
-        dis = math.sqrt(0.01*delta_lla[0]**2 + 0.01*delta_lla[1]**2 + 0.1*delta_lla[2]**2)
+        delta_lla = np.array(self.seen_targets[Tndx][2:4]) - np.array(obs[2:4])
+        dis = math.sqrt(0.01*delta_lla[0]**2 + 0.01*delta_lla[1]**2)
         v_dir = obs[3]
         t_dir = math.atan2(delta_lla[1], delta_lla[0])
         angle = abs(v_dir - t_dir)

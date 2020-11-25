@@ -11,5 +11,5 @@ class PolicyMaker(ABC):
         self.arglist = arglist
 
     @abstractmethod
-    def make_policy(self, WorldTarget, obs_n, step, NewController):
+    def make_policy(self, WorldTarget, obs_n, step):
         raise NotImplementedError

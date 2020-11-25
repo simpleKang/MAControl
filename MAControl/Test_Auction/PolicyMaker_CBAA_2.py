@@ -1,3 +1,6 @@
+
+#在cbaa_1的基础上采用了高斯分布求目标的价值
+
 from MAControl.Base.PolicyMaker import PolicyMaker
 import numpy as np
 from MAControl.Util.PointInRec import point_in_rec
@@ -99,23 +102,31 @@ class PolicyMaker_Auction(PolicyMaker):
                 seen_target.append(target)
                 truetype = target[-2]
                 if truetype == 1:
-                    gtype = np.random.choice([1, 2, 3], 1, p=self.arglist.p1)
-                    if gtype == 2:
-                        seen_target[-1][-4:-1] = [10, 1, 2]
-                    elif gtype == 3:
-                        seen_target[-1][-4:-1] = [5, 2, 3]
+                    self.random_value = numpy.random.normal(loc=self.arglist.p1[0], scale=self.proportion * self.arglist.p1[0])
+                    if self.arglist.p1[0]*(1 - self.proportion) < self.random_value < self.arglist.p1[0]*(self.proportion + 1):
+                        seen_target[-1][-4:-1] = [2, 5, 1]
+                        if random.random() < 0.5:
+                            seen_target[-1][-4:-1] = [10, 1, 2]
+                        else:
+                            seen_target[-1][-4:-1] = [5, 2, 3]
                 elif truetype == 2:
-                    gtype = np.random.choice([1, 2, 3], 1, p=self.arglist.p2)
-                    if gtype == 3:
-                        seen_target[-1][-4:-1] = [5, 2, 3]
-                    elif gtype == 1:
-                        seen_target[-1][-4:-1] = [2, 5, 1]
-                elif truetype == 3:
-                    gtype = np.random.choice([1, 2, 3], 1, p=self.arglist.p3)
-                    if gtype == 1:
-                        seen_target[-1][-4:-1] = [2, 5, 1]
-                    elif gtype == 2:
+                    self.random_value = numpy.random.normal(loc=self.arglist.p2[1], scale=self.proportion * self.arglist.p2[1])
+                    if self.arglist.p2[1] * (1 - self.proportion) < self.random_value < self.arglist.p2[1] * (
+                            self.proportion + 1):
                         seen_target[-1][-4:-1] = [10, 1, 2]
+                        if random.random() < 0.5:
+                            seen_target[-1][-4:-1] = [2, 5, 1]
+                        else:
+                            seen_target[-1][-4:-1] = [5, 2, 3]
+                elif truetype == 3:
+                    self.random_value = numpy.random.normal(loc=self.arglist.p3[2], scale=self.proportion * self.arglist.p3[2])
+                    if self.arglist.p3[2] * (1 - self.proportion) < self.random_value < self.arglist.p3[2] * \
+                       (self.proportion + 1):
+                        seen_target[-1][-4:-1] = [5, 2, 3]
+                        if random.random() < 0.5:
+                            seen_target[-1][-4:-1] = [10, 1, 2]
+                        else:
+                            seen_target[-1][-4:-1] = [2, 5, 1]
 
 
                             # seen_target = []
@@ -150,7 +161,7 @@ class PolicyMaker_Auction(PolicyMaker):
                 self.self_task[seen_target[i][-1]].append(0)
                 self.targetbid[seen_target[i][-1]].append(self.step_now)
                 for num_number in range(int(seen_target[i][-3])):
-                    self.targetbid[seen_target[i][-1]].append(0)
+                    self.targetbid[seen_target[i][-1]].append([0,0,0])
 
         for num in range(len(self.close_area)):
             for index_tar in range(len(WorldTarget)):
@@ -168,47 +179,88 @@ class PolicyMaker_Auction(PolicyMaker):
                                 list1.remove(NewController[self.close_area[num]][0].targetbid[index_tar][0])
                                 list1.remove(self.targetbid[index_tar][0])
                                 a = len(list1)
-                                while 0 in list1:
-                                    list1.remove(0)
+                                while [0, 0,0] in list1:
+                                    list1.remove([0, 0,0])
                                 b = len(list1)
-                                list1 = sorted(set(list1), key=list1.index)
+                                list2 = []
+                                for unit_list1 in list1:
+                                    if unit_list1 not in list2:
+                                        list2.append(unit_list1)
+                                list3 = []
+                                for unit_list2 in list2:
+                                    if not list3:
+                                        list3.append(unit_list2)
+                                    else:
+                                        key = 0
+                                        for index_1 in range(len(list3)):
+                                            if unit_list2[0] == list3[index_1][0]:
+                                                key = 1
+                                        if key == 0:
+                                            list3.append(unit_list2)
+                                        for index in range(len(list3)):
+                                            if unit_list2[0] == list3[index][0] and unit_list2[2]>list3[index][2]:
+                                                list3.remove(list3[index])
+                                                list3.append(unit_list2)
+                                # list1 = sorted(set(list1), key=list1.index)
                                 for iii in range(a-b):
-                                  list1.append(0)
-                                list1.sort(reverse=True)
+                                  list3.append([0, 0,0])
+                                list3.sort(reverse=True)
                                 kk = len(NewController[self.close_area[num]][0].targetbid[index_tar]) - 1
                                 k = NewController[self.close_area[num]][0].targetbid[index_tar][0]
                                 self.targetbid[index_tar] = []
                                 self.targetbid[index_tar].append(k)
                                 for ii in range(kk):
-                                    if ii < len(list1):
-                                        self.targetbid[index_tar].append(list1[ii])
+                                    if ii < len(list3):
+                                        self.targetbid[index_tar].append(list3[ii])
                                     else:
-                                        self.targetbid[index_tar].append(0)
+                                        self.targetbid[index_tar].append([0,0,0])
                                 if not self.self_task[index_tar]:
                                     self.self_task[index_tar].append(0)
+                                # with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
+                                #     f.write(str('>>>>>>>>>>>>>>>>>>>>>') + '\n'+str(list1) + '\n'+str(list2) + '\n'+str(list3) + '\n'+
+                                #             str('>>>>>>>>>>>>>>>>>>>>>') + '\n')
                            else:
                                for i in range(len(NewController[self.close_area[num]][0].targetbid[index_tar])):
                                    list1.append(NewController[self.close_area[num]][0].targetbid[index_tar][i])
                                list1.extend(self.targetbid[index_tar])
                                list1.remove(NewController[self.close_area[num]][0].targetbid[index_tar][0])
                                list1.remove(self.targetbid[index_tar][0])
+                               list2 = []
+                               for unit_list1 in list1:
+                                   if unit_list1 not in list2:
+                                       list2.append(unit_list1)
                                # list1 = sorted(set(list1), key=list1.index)
-                               a = len(list1)
-                               while 0 in list1:
-                                   list1.remove(0)
-                               b = len(list1)
-                               list1 = sorted(set(list1), key=list1.index)
+                               a = len(list2)
+                               while [0,0,0] in list2:
+                                   list2.remove([0,0,0])
+                               b = len(list2)
+                               #list1 = sorted(set(list1), key=list1.index)
+                               list3 = []
+                               for unit_list2 in list2:
+                                   if not list3:
+                                       list3.append(unit_list2)
+                                   else:
+                                       key = 0
+                                       for index_1 in range(len(list3)):
+                                           if unit_list2[0] == list3[index_1][0]:
+                                               key = 1
+                                       if key == 0:
+                                           list3.append(unit_list2)
+                                       for index in range(len(list3)):
+                                           if unit_list2[0] == list3[index][0] and unit_list2[2] > list3[index][2]:
+                                               list3.remove(list3[index])
+                                               list3.append(unit_list2)
                                for iii in range(a - b):
-                                   list1.append(0)
-                               list1.sort(reverse=True)
+                                   list3.append([0,0,0])
+                               list3.sort(reverse=True)
                                kk = len(self.targetbid[index_tar])-1
                                kkk = self.targetbid[index_tar][0]
                                self.targetbid[index_tar] = [kkk]
                                for ii in range(kk):
-                                   if ii < len(list1):
-                                       self.targetbid[index_tar].append(list1[ii])
+                                   if ii < len(list3):
+                                       self.targetbid[index_tar].append(list3[ii])
                                    else:
-                                       self.targetbid[index_tar].append(0)
+                                       self.targetbid[index_tar].append([0,0,0])
                                if not self.self_task[index_tar]:
                                    self.self_task[index_tar].append(0)
                     else:
@@ -216,6 +268,35 @@ class PolicyMaker_Auction(PolicyMaker):
                             self.targetbid[index_tar].append(NewController[self.close_area[num]][0].targetbid[index_tar][i])
                         if not self.self_task[index_tar]:
                             self.self_task[index_tar].append(0)
+
+        #将targetbid中的所有相同编号的变成一个
+        list5 = []
+        for i in range(len(self.targetbid)):
+            for j in range(len(self.targetbid[i])):
+                u = str([self.targetbid[i][j], i, j])
+                u = u.replace('[', '')
+                u = u.replace(']', '')
+                a = list(eval(u))
+                list5.append(a)
+        list4 = []
+        if self.step_now == 500:
+            print("gg")
+        for unit_list3 in list5:
+            if not list4:
+                list4.append(unit_list3)
+            for ii in range(len(list4)):
+                if unit_list3[0] == list4[ii][0] and unit_list3[0] != 0 and unit_list3[1] != list4[ii][1]:
+                    if unit_list3[-3] < list4[ii][-3]:
+                        aa = unit_list3[-2]
+                        self.targetbid[aa].remove(unit_list3[0:-2])
+                        self.targetbid[aa].append([0, 0, 0])
+                    elif unit_list3[-3] > list4[ii][-3]:
+                         aa = list4[ii][-2]
+                         self.targetbid[aa].remove(list4[0:-2])
+                         self.targetbid[aa].append([0, 0, 0])
+
+
+
 
 
     def bidding(self, obs, WorldTarget):
@@ -229,10 +310,26 @@ class PolicyMaker_Auction(PolicyMaker):
         pt = 0.8      # 小飞机单发杀伤概率
 
         #已发现目标的战术价值
+        # W = []
+        # for num in range(len(self.self_task)):
+        #     if self.self_task[num]:
+        #         W.append(WorldTarget[num][-4])
+        #     else:
+        #         W.append(0)
+
+        # 已发现目标的战术价值并使用了高斯分布求均值
+        # mu 为p(真实） sigma为self.proportion * mu
+        # 其中，选到真实w的范围为1sigma
         W = []
         for num in range(len(self.self_task)):
+            w_each = []
             if self.self_task[num]:
-                W.append(WorldTarget[num][-4])
+                weight_true = WorldTarget[num][-4]
+                for i in range(len(WorldTarget)):
+                    if WorldTarget[i][-4] != weight_true and WorldTarget[i][-4] not in w_each:
+                        w_each.append(WorldTarget[i][-4])
+                weight = weight_true*0.6526 + sum(w_each)*(1-0.6526)/len(w_each)
+                W.append(weight)
             else:
                 W.append(0)
 
@@ -257,7 +354,7 @@ class PolicyMaker_Auction(PolicyMaker):
                 angle = math.acos(constrain(np.dot(v_unit, t_unit), -1, 1))
                 Fd = math.exp(1 - dis / D)
                 Fq = math.exp(1 - angle/math.pi)
-                P_one = (sigma1 * Fd + sigma2 * Fq)*(self.step_now - 500)**1.01
+                P_one = (sigma1 * Fd + sigma2 * Fq)
                 P.append(P_one)
             else:
                 P.append(0)
@@ -280,6 +377,7 @@ class PolicyMaker_Auction(PolicyMaker):
 
         return Pr
 
+
     def make_policy(self, WorldTarget, obs_n, step, NewController):
 
         print(WorldTarget)
@@ -295,7 +393,7 @@ class PolicyMaker_Auction(PolicyMaker):
                 for tar in range(len(WorldTarget)):
                     kkkkk.append([])
                 kkkkk[a].append(10000000)
-                kkkkk[a].append(random.randint(100000000, 1000000000000))
+                kkkkk[a].append([self.index, random.randint(100000000, 1000000000000), 1000000])
                 self.targetbid = kkkkk.copy()
                 self.over = 1
 
@@ -318,17 +416,51 @@ class PolicyMaker_Auction(PolicyMaker):
                     print(WorldTarget)
                     self_bid = self.bidding(obs_n[self.index], WorldTarget)
                     for i in range(len(self_bid)):
+                        # 比较self出价与竞标价格
                         if self.targetbid[self_bid[i][0]]:
                             kkk = self.targetbid[self_bid[i][0]].copy()
-                            kkk.pop(0)
-                            if min(kkk) < self_bid[i][1]:
+                            kkk_mirror = []
+                            for index_mirror in range(len(kkk)):
+                                kkk_mirror.append(kkk[index_mirror])
+                            for index_t in range(len(kkk_mirror)-1):
+                                if kkk_mirror[index_t+1][1] == 0:
+                                    kkk.remove(kkk_mirror[index_t+1])
+                            kkk.remove(self.targetbid[self_bid[i][0]][0])
+
+                            #查看self.targetbid中的index_tar是否已经有self.index
+                            signal = 666
+                            for index_kkk in range(len(kkk)):
+                                if kkk[index_kkk][0] == self.index:
+                                    signal = index_kkk
+
+                            if not kkk and self_bid[i][1]>0:
                                 a = self_bid[i]
-                                self.targetbid[self_bid[i][0]][kkk.index(min(kkk))+1] = a[1]
+                                self.targetbid[self_bid[i][0]][1] = [self.index, a[1], self.step_now]
                                 for j in range(len(self.self_task)):
                                     if self.self_task[j]:
                                         self.self_task[j][0] = 0
                                 self.self_task[self_bid[i][0]][0] = 1
                                 break
+
+                            elif kkk[kkk.index(min(kkk, key=lambda kkk: kkk[1]))][1] < self_bid[i][1] and signal == 666:
+                                a = self_bid[i]
+                                self.targetbid[self_bid[i][0]][kkk.index(min(kkk))+1] = [self.index, a[1], self.step_now]
+                                for j in range(len(self.self_task)):
+                                    if self.self_task[j]:
+                                        self.self_task[j][0] = 0
+                                self.self_task[self_bid[i][0]][0] = 1
+                                break
+                            elif signal != 666:
+                                a = self_bid[i]
+                                self.targetbid[self_bid[i][0]][signal+1] = [self.index, a[1], self.step_now]
+                                for j in range(len(self.self_task)):
+                                    if self.self_task[j]:
+                                        self.self_task[j][0] = 0
+                                self.self_task[self_bid[i][0]][0] = 1
+                                with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
+                                    f.write(str(self_bid[i][0]) + str('更新区域') +str(signal+1) + '\n')
+                                break
+
                             else:
                                 # print(self_bid[i][0])
                                 # print(self.self_task)

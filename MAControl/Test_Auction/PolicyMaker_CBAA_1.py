@@ -1,3 +1,6 @@
+
+# 在cbaa的基础上，优化了共识过程中的通信
+
 from MAControl.Base.PolicyMaker import PolicyMaker
 import numpy as np
 from MAControl.Util.PointInRec import point_in_rec
@@ -88,42 +91,29 @@ class PolicyMaker_Auction(PolicyMaker):
 
         # GENERATE seen_target
         seen_target = []
-        print(WorldTarget)
-        print('7')
-        print('7')
         for target in WorldTarget:
-            print(WorldTarget)
-            print('0')
             targetpos = np.array(target[0:2])
             if point_in_rec(selfview1, selfview2, selfview3, selfview4, targetpos):
                 seen_target.append(target)
                 truetype = target[-2]
                 if truetype == 1:
-                    self.random_value = numpy.random.normal(loc=self.arglist.p1[0], scale=self.proportion * self.arglist.p1[0])
-                    if self.arglist.p1[0]*(1 - self.proportion) < self.random_value < self.arglist.p1[0]*(self.proportion + 1):
-                        seen_target[-1][-4:-1] = [2, 5, 1]
-                        if random.random() < 0.5:
-                            seen_target[-1][-4:-1] = [10, 1, 2]
-                        else:
-                            seen_target[-1][-4:-1] = [5, 2, 3]
-                elif truetype == 2:
-                    self.random_value = numpy.random.normal(loc=self.arglist.p2[1], scale=self.proportion * self.arglist.p2[1])
-                    if self.arglist.p2[1] * (1 - self.proportion) < self.random_value < self.arglist.p2[1] * (
-                            self.proportion + 1):
+                    gtype = np.random.choice([1, 2, 3], 1, p=self.arglist.p1)
+                    if gtype == 2:
                         seen_target[-1][-4:-1] = [10, 1, 2]
-                        if random.random() < 0.5:
-                            seen_target[-1][-4:-1] = [2, 5, 1]
-                        else:
-                            seen_target[-1][-4:-1] = [5, 2, 3]
-                elif truetype == 3:
-                    self.random_value = numpy.random.normal(loc=self.arglist.p3[2], scale=self.proportion * self.arglist.p3[2])
-                    if self.arglist.p3[2] * (1 - self.proportion) < self.random_value < self.arglist.p3[2] * \
-                       (self.proportion + 1):
+                    elif gtype == 3:
                         seen_target[-1][-4:-1] = [5, 2, 3]
-                        if random.random() < 0.5:
-                            seen_target[-1][-4:-1] = [10, 1, 2]
-                        else:
-                            seen_target[-1][-4:-1] = [2, 5, 1]
+                elif truetype == 2:
+                    gtype = np.random.choice([1, 2, 3], 1, p=self.arglist.p2)
+                    if gtype == 3:
+                        seen_target[-1][-4:-1] = [5, 2, 3]
+                    elif gtype == 1:
+                        seen_target[-1][-4:-1] = [2, 5, 1]
+                elif truetype == 3:
+                    gtype = np.random.choice([1, 2, 3], 1, p=self.arglist.p3)
+                    if gtype == 1:
+                        seen_target[-1][-4:-1] = [2, 5, 1]
+                    elif gtype == 2:
+                        seen_target[-1][-4:-1] = [10, 1, 2]
 
 
                             # seen_target = []
@@ -267,6 +257,9 @@ class PolicyMaker_Auction(PolicyMaker):
                             self.self_task[index_tar].append(0)
 
         #将targetbid中的所有相同编号的变成一个
+        with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
+            f.write('>>>>>>>>>>>>>>>>>>' + '\n' +
+                    str(self.targetbid) + '\n')
         list5 = []
         for i in range(len(self.targetbid)):
             for j in range(len(self.targetbid[i])):
@@ -279,18 +272,46 @@ class PolicyMaker_Auction(PolicyMaker):
         if self.step_now == 500:
             print("gg")
         for unit_list3 in list5:
+            signal = 0
             if not list4:
                 list4.append(unit_list3)
-            for ii in range(len(list4)):
-                if unit_list3[0] == list4[ii][0] and unit_list3[0] != 0 and unit_list3[1] != list4[ii][1]:
-                    if unit_list3[-3] < list4[ii][-3]:
-                        aa = unit_list3[-2]
-                        self.targetbid[aa].remove(unit_list3[0:-2])
+            for index2 in list4:
+                if unit_list3[0] == index2[0] and unit_list3[2] != index2[2] and len(index2) == 5:
+
+                    if unit_list3[2]>index2[2]:
+                        aa = index2[-2]
+                        self.targetbid[aa].remove(index2[0:3])
                         self.targetbid[aa].append([0, 0, 0])
-                    elif unit_list3[-3] > list4[ii][-3]:
-                         aa = list4[ii][-2]
-                         self.targetbid[aa].remove(list4[0:-2])
-                         self.targetbid[aa].append([0, 0, 0])
+                        signal = 1
+                    else:
+                        aa = unit_list3[-2]
+                        self.targetbid[aa].remove(unit_list3[0:3])
+                        self.targetbid[aa].append([0, 0, 0])
+                        signal =2
+                    break
+            list4.append(unit_list3)
+            if signal == 1:
+                list4.remove(index2)
+            if signal == 2:
+                list4.remove(unit_list3)
+
+
+
+
+            # for ii in range(len(list4)):
+            #     if unit_list3[0] == list4[ii][0] and unit_list3[0] != 0 and unit_list3[1] != list4[ii][1]:
+            #         if unit_list3[-3] < list4[ii][-3]:
+            #             aa = unit_list3[-2]
+            #             self.targetbid[aa].remove(unit_list3[0:-2])
+            #             self.targetbid[aa].append([0, 0, 0])
+            #         elif unit_list3[-3] > list4[ii][-3]:
+            #              aa = list4[ii][-2]
+            #              self.targetbid[aa].remove(list4[0:-2])
+            #              self.targetbid[aa].append([0, 0, 0])
+        with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
+            f.write('>>>>>>>>>>>>>>>>>>' + '\n' +
+                    str(self.targetbid) + '\n' + str(list5) + '\n' + str(list4) + '\n')
+
 
 
 
@@ -307,9 +328,19 @@ class PolicyMaker_Auction(PolicyMaker):
         pt = 0.8      # 小飞机单发杀伤概率
 
         #已发现目标的战术价值
+        # W = []
+        # for num in range(len(self.self_task)):
+        #     if self.self_task[num]:
+        #         W.append(WorldTarget[num][-4])
+        #     else:
+        #         W.append(0)
+
+        # 已发现目标的战术价值并使用了高斯分布求均值
+        # mu 为p(真实） sigma为self.proportion * mu
         W = []
         for num in range(len(self.self_task)):
             if self.self_task[num]:
+
                 W.append(WorldTarget[num][-4])
             else:
                 W.append(0)
@@ -358,9 +389,9 @@ class PolicyMaker_Auction(PolicyMaker):
 
         return Pr
 
+
     def make_policy(self, WorldTarget, obs_n, step, NewController):
 
-        print(WorldTarget)
         if self.over == 0:
 
             dis = np.sqrt((WorldTarget[self.self_task.index(max(self.self_task))][0] - obs_n[self.index][2])**2
@@ -388,12 +419,10 @@ class PolicyMaker_Auction(PolicyMaker):
 
                 #elif ((step % 2) == 0 and self.mission_success == 0) or ((step % 2) == 1 and max(self.self_task) == [0] and self.mission_success == 0):
                 else:
-                    print(WorldTarget)
                     if max(self.self_task) == [0]:
                         self.opt_index = 0
                     self.close_area = self.find_mate_communication(obs_n).copy()
                     self.add_new_target(obs_n[self.index], WorldTarget, NewController)
-                    print(WorldTarget)
                     self_bid = self.bidding(obs_n[self.index], WorldTarget)
                     for i in range(len(self_bid)):
                         # 比较self出价与竞标价格
