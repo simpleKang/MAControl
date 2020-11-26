@@ -2,6 +2,44 @@ import os
 
 # 利用 np.random.choice(3, 10)+1 生成算例
 
+# numU= 30 # p=0.1 # q=1 #
+
+os.system("python ./execute_Probability.py --numU=30 "
+          "--p1=0.1  --p1=0.45 --p1=0.45 "
+          "--p2=0.45 --p2=0.1  --p2=0.45 "
+          "--p3=0.45 --p3=0.45 --p3=0.1 "
+          "--q1=0.0560 --q1=0.0125 --q1=0.9315 "
+          "--q2=0.3192 --q2=0.1795 --q2=0.5013 "
+          "--q3=0.0749 --q3=0.8885 --q3=0.0366 "
+          "--typeT=1 --typeT=3 --typeT=1 --typeT=1 --typeT=3 --typeT=2 --typeT=1 --typeT=2 --typeT=2 --typeT=1 ")
+
+os.system("python ./execute_Probability.py --numU=30 "
+          "--p1=0.1  --p1=0.45 --p1=0.45 "
+          "--p2=0.45 --p2=0.1  --p2=0.45 "
+          "--p3=0.45 --p3=0.45 --p3=0.1 "
+          "--q1=0.0560 --q1=0.0125 --q1=0.9315 "
+          "--q2=0.3192 --q2=0.1795 --q2=0.5013 "
+          "--q3=0.0749 --q3=0.8885 --q3=0.0366 "
+          "--typeT=1 --typeT=1 --typeT=2 --typeT=2 --typeT=2 --typeT=3 --typeT=1 --typeT=1 --typeT=1 --typeT=3 ")
+
+os.system("python ./execute_Probability.py --numU=30 "
+          "--p1=0.1  --p1=0.45 --p1=0.45 "
+          "--p2=0.45 --p2=0.1  --p2=0.45 "
+          "--p3=0.45 --p3=0.45 --p3=0.1 "
+          "--q1=0.0560 --q1=0.0125 --q1=0.9315 "
+          "--q2=0.3192 --q2=0.1795 --q2=0.5013 "
+          "--q3=0.0749 --q3=0.8885 --q3=0.0366 "
+          "--typeT=2 --typeT=2 --typeT=3 --typeT=3 --typeT=2 --typeT=2 --typeT=2 --typeT=1 --typeT=2 --typeT=2 ")
+
+os.system("python ./execute_Probability.py --numU=30 "
+          "--p1=0.1  --p1=0.45 --p1=0.45 "
+          "--p2=0.45 --p2=0.1  --p2=0.45 "
+          "--p3=0.45 --p3=0.45 --p3=0.1 "
+          "--q1=0.0560 --q1=0.0125 --q1=0.9315 "
+          "--q2=0.3192 --q2=0.1795 --q2=0.5013 "
+          "--q3=0.0749 --q3=0.8885 --q3=0.0366 "
+          "--typeT=1 --typeT=1 --typeT=1 --typeT=3 --typeT=2 --typeT=3 --typeT=1 --typeT=2 --typeT=1 --typeT=3 ")
+
 # numU= 10 # p=0.1 # q=1 #
 
 os.system("python ./execute_Probability.py --numU=10 "
@@ -152,44 +190,6 @@ os.system("python ./execute_Probability.py --numU=25 "
           "--q1=0.2319 --q1=0.4706 --q1=0.2975 "
           "--q2=0.1841 --q2=0.0014 --q2=0.8145 "
           "--q3=0.0364 --q3=0.7697 --q3=0.1939 "
-          "--typeT=1 --typeT=1 --typeT=1 --typeT=3 --typeT=2 --typeT=3 --typeT=1 --typeT=2 --typeT=1 --typeT=3 ")
-
-# numU= 30 # p=0.1 # q=1 #
-
-os.system("python ./execute_Probability.py --numU=30 "
-          "--p1=0.1  --p1=0.45 --p1=0.45 "
-          "--p2=0.45 --p2=0.1  --p2=0.45 "
-          "--p3=0.45 --p3=0.45 --p3=0.1 "
-          "--q1=0.0560 --q1=0.0125 --q1=0.9315 "
-          "--q2=0.3192 --q2=0.1795 --q2=0.5013 "
-          "--q3=0.0749 --q3=0.8885 --q3=0.0366 "
-          "--typeT=1 --typeT=3 --typeT=1 --typeT=1 --typeT=3 --typeT=2 --typeT=1 --typeT=2 --typeT=2 --typeT=1 ")
-
-os.system("python ./execute_Probability.py --numU=30 "
-          "--p1=0.1  --p1=0.45 --p1=0.45 "
-          "--p2=0.45 --p2=0.1  --p2=0.45 "
-          "--p3=0.45 --p3=0.45 --p3=0.1 "
-          "--q1=0.0560 --q1=0.0125 --q1=0.9315 "
-          "--q2=0.3192 --q2=0.1795 --q2=0.5013 "
-          "--q3=0.0749 --q3=0.8885 --q3=0.0366 "
-          "--typeT=1 --typeT=1 --typeT=2 --typeT=2 --typeT=2 --typeT=3 --typeT=1 --typeT=1 --typeT=1 --typeT=3 ")
-
-os.system("python ./execute_Probability.py --numU=30 "
-          "--p1=0.1  --p1=0.45 --p1=0.45 "
-          "--p2=0.45 --p2=0.1  --p2=0.45 "
-          "--p3=0.45 --p3=0.45 --p3=0.1 "
-          "--q1=0.0560 --q1=0.0125 --q1=0.9315 "
-          "--q2=0.3192 --q2=0.1795 --q2=0.5013 "
-          "--q3=0.0749 --q3=0.8885 --q3=0.0366 "
-          "--typeT=2 --typeT=2 --typeT=3 --typeT=3 --typeT=2 --typeT=2 --typeT=2 --typeT=1 --typeT=2 --typeT=2 ")
-
-os.system("python ./execute_Probability.py --numU=30 "
-          "--p1=0.1  --p1=0.45 --p1=0.45 "
-          "--p2=0.45 --p2=0.1  --p2=0.45 "
-          "--p3=0.45 --p3=0.45 --p3=0.1 "
-          "--q1=0.0560 --q1=0.0125 --q1=0.9315 "
-          "--q2=0.3192 --q2=0.1795 --q2=0.5013 "
-          "--q3=0.0749 --q3=0.8885 --q3=0.0366 "
           "--typeT=1 --typeT=1 --typeT=1 --typeT=3 --typeT=2 --typeT=3 --typeT=1 --typeT=2 --typeT=1 --typeT=3 ")
 
 # numU= 35 # p=0.1 # q=1 #
