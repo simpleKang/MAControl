@@ -170,6 +170,7 @@ class PolicyMaker_Auction(PolicyMaker):
                                 while [0, 0,0] in list1:
                                     list1.remove([0, 0,0])
                                 b = len(list1)
+                                list1.sort(reverse = True, key=lambda x:x[1])
                                 list2 = []
                                 for unit_list1 in list1:
                                     if unit_list1 not in list2:
@@ -192,7 +193,7 @@ class PolicyMaker_Auction(PolicyMaker):
                                 # list1 = sorted(set(list1), key=list1.index)
                                 for iii in range(a-b):
                                   list3.append([0, 0, 0])
-                                list3.sort(reverse=True)
+                                list3.sort(reverse=True, key=lambda x:x[1])
                                 kk = len(NewController[self.close_area[num]][0].targetbid[index_tar]) - 1
                                 k = NewController[self.close_area[num]][0].targetbid[index_tar][0]
                                 self.targetbid[index_tar] = []
@@ -204,9 +205,12 @@ class PolicyMaker_Auction(PolicyMaker):
                                         self.targetbid[index_tar].append([0,0,0])
                                 if not self.self_task[index_tar]:
                                     self.self_task[index_tar].append(0)
-                                with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
-                                    f.write(str(index_tar)+str('list3>>>>>>>>>>>>>>>>>>>>>') + '\n'+str(list3) + '\n'+
-                                            str('>>>>>>>>>>>>>>>>>>>>>') + '\n')
+                                # with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
+                                #     f.write(str(index_tar)+str('list3>>>>>>>>>>>>>>>>>>>>>') + '\n'+str(list3) + '\n'+
+                                #             str('list2>>>>>>>>>>>>>>>>>>>>>') +str(list2) + '\n'+
+                                #             str('list1>>>>>>>>>>>>>>>>>>>>>') + str(list1) + '\n' +
+                                #             str('other>>>>>>>>>>>>>>>>>>>>>') + str(NewController[self.close_area[num]][0].targetbid[index_tar]) + '\n' +
+                                #             str(self.close_area[num]) + 'targetbid>>>>>>>>>>>>>>>>>>>>>' + str(self.targetbid) + '\n')
                            else:
                                for i in range(len(NewController[self.close_area[num]][0].targetbid[index_tar])):
                                    list1.append(NewController[self.close_area[num]][0].targetbid[index_tar][i])
@@ -258,9 +262,9 @@ class PolicyMaker_Auction(PolicyMaker):
                             self.self_task[index_tar].append(0)
 
         #将targetbid中的所有相同编号的变成一个
-        with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
-            f.write('>>>>>>>>>>>>>>>>>>' + '\n' +
-                    str(self.targetbid) + '\n')
+        # with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
+        #     f.write('>>>>>>>>>>>>>>>>>>' + '\n' +
+        #             str(self.targetbid) + '\n')
         list5 = []
         for i in range(len(self.targetbid)):
             for j in range(len(self.targetbid[i])):
@@ -309,9 +313,9 @@ class PolicyMaker_Auction(PolicyMaker):
             #              aa = list4[ii][-2]
             #              self.targetbid[aa].remove(list4[0:-2])
             #              self.targetbid[aa].append([0, 0, 0])
-        with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
-            f.write('>>>>>>>>>>>>>>>>>>' + '\n' +
-                    str(self.targetbid) + '\n' + str(list5) + '\n' + str(list4) + '\n')
+        # with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
+        #     f.write('>>>>>>>>>>>>>>>>>>' + '\n' +
+        #             str(self.targetbid) + '\n' + str(list5) + '\n' + str(list4) + '\n')
 
 
 
@@ -459,29 +463,37 @@ class PolicyMaker_Auction(PolicyMaker):
                                         self.self_task[j][0] = 0
                                 self.self_task[self.self_bid[i][0]][0] = 1
                                 break
-
-                            elif kkk[kkk.index(min(kkk, key=lambda kkk: kkk[1]))][1] < self.self_bid[i][1] and signal == 666:
-                                a = self.self_bid[i]
-                                self.targetbid[self.self_bid[i][0]][kkk.index(min(kkk))+1] = [self.index, a[1], self.step_now]
-                                for j in range(len(self.self_task)):
-                                    if self.self_task[j]:
-                                        self.self_task[j][0] = 0
-                                self.self_task[self.self_bid[i][0]][0] = 1
-                                break
-                            elif signal != 666:
-                                a = self.self_bid[i]
-                                self.targetbid[self.self_bid[i][0]][signal+1] = [self.index, a[1], self.step_now]
-                                for j in range(len(self.self_task)):
-                                    if self.self_task[j]:
-                                        self.self_task[j][0] = 0
-                                self.self_task[self.self_bid[i][0]][0] = 1
-                                with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
-                                    f.write(str(self.self_bid[i][0]) + str('更新区域') +str(signal+1) + '\n')
-                                break
+                            elif kkk:
+                                if kkk[kkk.index(min(kkk, key=lambda kkk: kkk[1]))][1] < self.self_bid[i][1] and signal == 666:
+                                    with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
+                                        f.write(str(min(kkk, key=lambda kkk: kkk[1])) + str('------') +str(self.self_bid[i][1]) + '\n')
+                                    a = self.self_bid[i]
+                                    self.targetbid[self.self_bid[i][0]][kkk.index(min(kkk, key=lambda kkk: kkk[1])) + 1] = [self.index, a[1],
+                                                                                                    self.step_now]
+                                    for j in range(len(self.self_task)):
+                                        if self.self_task[j]:
+                                            self.self_task[j][0] = 0
+                                    self.self_task[self.self_bid[i][0]][0] = 1
+                                    break
+                                elif signal != 666:
+                                    a = self.self_bid[i]
+                                    self.targetbid[self.self_bid[i][0]][signal+1] = [self.index, a[1], self.step_now]
+                                    for j in range(len(self.self_task)):
+                                        if self.self_task[j]:
+                                            self.self_task[j][0] = 0
+                                    self.self_task[self.self_bid[i][0]][0] = 1
+                                    with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
+                                        f.write(str(self.self_bid[i][0]) + str('更新区域') +str(signal+1) + '\n')
+                                    break
+                                else:
+                                    if self.self_task[self.self_bid[i][0]]:
+                                        if step > 600:
+                                            print('666')
+                                        self.self_task[self.self_bid[i][0]][0] = 0
+                                    else:
+                                        self.self_task[self.self_bid[i][0]].append(0)
 
                             else:
-                                # print(self_bid[i][0])
-                                # print(self.self_task)
                                 if self.self_task[self.self_bid[i][0]]:
                                     self.self_task[self.self_bid[i][0]][0] = 0
                                 else:
@@ -500,13 +512,13 @@ class PolicyMaker_Auction(PolicyMaker):
                         self.opt_index = 1
 
                     # print(self_bid)
-                    with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
-                        f.write(str(self.step_now) + '\n' + str(self.self_bid) + '\n')
-                # print(self.index)
-                # print(self.self_task)
-                # print(self.targetbid)
-        with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
-            f.write(str(step) + '\n' + str(self.index) + '\n' + str(self.self_task) + '\n'
-                    + str(self.targetbid) + '\n' + str(self.close_area) + '\n')
+        #             with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
+        #                 f.write(str(self.step_now) + '\n' + str(self.self_bid) + '\n')
+        #         # print(self.index)
+        #         # print(self.self_task)
+        #         # print(self.targetbid)
+        # with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
+        #     f.write(str(step) + '\n' + str(self.index) + '\n' + str(self.self_task) + '\n'
+        #             + str(self.targetbid) + '\n' + str(self.close_area) + '\n')
 
         return [self.opt_index, [self.x, self.y, self.result, self.mission_success]]
