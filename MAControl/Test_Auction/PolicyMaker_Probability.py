@@ -5,14 +5,14 @@ import math
 
 
 class PolicyMaker_Probability(PolicyMaker):
-
+    #                                (Step2<=) & (<Step3)
     #  搜索[阶段] | 开始[步] | 局部通信[步] | 出价[步] | 计价自序[步] | 分道扬镳[步] | 重置[步] >>>> 搜索[阶段] ...
-    #    <Step0    ==Step0    ==Step1       ==Step2    ==Step3      ==Step4      ==Step5
-    #                                                                  |
-    #                                                                  |
-    #                                              InAttacking == True |
-    #                                                                  |
-    #                                                             攻击[阶段]
+    #    <Step0    ==Step0    ==Step1         ^        ==Step3      ==Step4      ==Step5
+    #                                                                   |
+    #                                                                   |
+    #                                               InAttacking == True |
+    #                                                                   |
+    #                                                               攻击[阶段]
 
     SEEN_TARGETS = []
     KNOWN_TARGETS = []
@@ -40,9 +40,9 @@ class PolicyMaker_Probability(PolicyMaker):
         self.Step0 = 500
         self.Step1 = 501
         self.Step2 = 502
-        self.Step3 = 503
-        self.Step4 = 504
-        self.Step5 = 505
+        self.Step3 = 518
+        self.Step4 = 519
+        self.Step5 = 520
 
     def find_mate(self, obs_n, r=0.5):
         selfpos = np.array(obs_n[self.index][2:4])
@@ -133,18 +133,18 @@ class PolicyMaker_Probability(PolicyMaker):
             self.Step0 = step + 10
             self.Step1 = self.Step0 + 1
             self.Step2 = self.Step0 + 2
-            self.Step3 = self.Step0 + 3
-            self.Step4 = self.Step0 + 4
-            self.Step5 = self.Step0 + 5
+            self.Step3 = self.Step0 + 18
+            self.Step4 = self.Step0 + 19
+            self.Step5 = self.Step0 + 20
 
         if operate_index == 2:
             #  finish searching immediately, start resorting at next step
             self.Step0 = step + 1
             self.Step1 = self.Step0 + 1
             self.Step2 = self.Step0 + 2
-            self.Step3 = self.Step0 + 3
-            self.Step4 = self.Step0 + 4
-            self.Step5 = self.Step0 + 5
+            self.Step3 = self.Step0 + 18
+            self.Step4 = self.Step0 + 19
+            self.Step5 = self.Step0 + 20
 
         if operate_index == 3:
             # wait [waitstep] more steps
@@ -247,7 +247,7 @@ class PolicyMaker_Probability(PolicyMaker):
                 else:
                     PolicyMaker_Probability.RESULT.append([])
 
-            elif step == self.Step2:
+            elif self.Step2 <= step < self.Step3:
                 print('UAV', self.index, 'bid price(s) for all seen + communicated targets')
                 PolicyMaker_Probability.Prices.append([[] for i in range(len(WorldTarget))])
                 ACTIVE_U = list(set([i for i in range(self.arglist.numU)]) - set(PolicyMaker_Probability.Occupied_U))
