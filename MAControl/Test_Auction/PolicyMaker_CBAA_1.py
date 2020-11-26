@@ -55,6 +55,7 @@ class PolicyMaker_Auction(PolicyMaker):
 
         self.self_task = [[] for t in range(len(world.targets))]
         self.targetbid = [[] for t in range(len(world.targets))]
+        self.self_bid = []
 
     def find_mate_communication(self, obs_n, r=0.5):
         selfpos = np.array(obs_n[self.index][2:4])
@@ -190,7 +191,7 @@ class PolicyMaker_Auction(PolicyMaker):
                                                 list3.append(unit_list2)
                                 # list1 = sorted(set(list1), key=list1.index)
                                 for iii in range(a-b):
-                                  list3.append([0, 0,0])
+                                  list3.append([0, 0, 0])
                                 list3.sort(reverse=True)
                                 kk = len(NewController[self.close_area[num]][0].targetbid[index_tar]) - 1
                                 k = NewController[self.close_area[num]][0].targetbid[index_tar][0]
@@ -203,9 +204,9 @@ class PolicyMaker_Auction(PolicyMaker):
                                         self.targetbid[index_tar].append([0,0,0])
                                 if not self.self_task[index_tar]:
                                     self.self_task[index_tar].append(0)
-                                # with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
-                                #     f.write(str('>>>>>>>>>>>>>>>>>>>>>') + '\n'+str(list1) + '\n'+str(list2) + '\n'+str(list3) + '\n'+
-                                #             str('>>>>>>>>>>>>>>>>>>>>>') + '\n')
+                                with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
+                                    f.write(str(index_tar)+str('list3>>>>>>>>>>>>>>>>>>>>>') + '\n'+str(list3) + '\n'+
+                                            str('>>>>>>>>>>>>>>>>>>>>>') + '\n')
                            else:
                                for i in range(len(NewController[self.close_area[num]][0].targetbid[index_tar])):
                                    list1.append(NewController[self.close_area[num]][0].targetbid[index_tar][i])
@@ -276,7 +277,7 @@ class PolicyMaker_Auction(PolicyMaker):
             if not list4:
                 list4.append(unit_list3)
             for index2 in list4:
-                if unit_list3[0] == index2[0] and unit_list3[2] != index2[2] and len(index2) == 5:
+                if unit_list3[0] == index2[0] and unit_list3[2] != index2[2] and len(index2) == 5 and len(unit_list3) == 5:
 
                     if unit_list3[2]>index2[2]:
                         aa = index2[-2]
@@ -396,6 +397,7 @@ class PolicyMaker_Auction(PolicyMaker):
 
             dis = np.sqrt((WorldTarget[self.self_task.index(max(self.self_task))][0] - obs_n[self.index][2])**2
                           + (WorldTarget[self.self_task.index(max(self.self_task))][1] - obs_n[self.index][3])**2)
+
             if dis <= 0.1 and max(self.self_task) == [1]:
                 self.mission_success = 1
             if self.mission_success and self.opt_index == 10:
@@ -418,65 +420,72 @@ class PolicyMaker_Auction(PolicyMaker):
                     self.opt_index = 0
 
                 #elif ((step % 2) == 0 and self.mission_success == 0) or ((step % 2) == 1 and max(self.self_task) == [0] and self.mission_success == 0):
+                elif step % 10 == 0:
+                    if max(self.self_task) == [0]:
+                        self.opt_index = 0
+
+                    self.self_bid = self.bidding(obs_n[self.index], WorldTarget)
                 else:
                     if max(self.self_task) == [0]:
                         self.opt_index = 0
                     self.close_area = self.find_mate_communication(obs_n).copy()
                     self.add_new_target(obs_n[self.index], WorldTarget, NewController)
-                    self_bid = self.bidding(obs_n[self.index], WorldTarget)
-                    for i in range(len(self_bid)):
+                    with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
+                        f.write(str(self.targetbid) + '\n')
+                    for i in range(len(self.self_bid)):
                         # 比较self出价与竞标价格
-                        if self.targetbid[self_bid[i][0]]:
-                            kkk = self.targetbid[self_bid[i][0]].copy()
+                        if self.targetbid[self.self_bid[i][0]]:
+                            kkk = self.targetbid[self.self_bid[i][0]].copy()
                             kkk_mirror = []
                             for index_mirror in range(len(kkk)):
                                 kkk_mirror.append(kkk[index_mirror])
                             for index_t in range(len(kkk_mirror)-1):
                                 if kkk_mirror[index_t+1][1] == 0:
                                     kkk.remove(kkk_mirror[index_t+1])
-                            kkk.remove(self.targetbid[self_bid[i][0]][0])
+                            kkk.remove(self.targetbid[self.self_bid[i][0]][0])
 
                             #查看self.targetbid中的index_tar是否已经有self.index
                             signal = 666
+                            # 本个体是否已经在targetbid中，若不在，则signal=666
                             for index_kkk in range(len(kkk)):
                                 if kkk[index_kkk][0] == self.index:
                                     signal = index_kkk
 
-                            if not kkk and self_bid[i][1]>0:
-                                a = self_bid[i]
-                                self.targetbid[self_bid[i][0]][1] = [self.index, a[1], self.step_now]
+                            if not kkk and self.self_bid[i][1]>0:
+                                a = self.self_bid[i]
+                                self.targetbid[self.self_bid[i][0]][1] = [self.index, a[1], self.step_now]
                                 for j in range(len(self.self_task)):
                                     if self.self_task[j]:
                                         self.self_task[j][0] = 0
-                                self.self_task[self_bid[i][0]][0] = 1
+                                self.self_task[self.self_bid[i][0]][0] = 1
                                 break
 
-                            elif kkk[kkk.index(min(kkk, key=lambda kkk: kkk[1]))][1] < self_bid[i][1] and signal == 666:
-                                a = self_bid[i]
-                                self.targetbid[self_bid[i][0]][kkk.index(min(kkk))+1] = [self.index, a[1], self.step_now]
+                            elif kkk[kkk.index(min(kkk, key=lambda kkk: kkk[1]))][1] < self.self_bid[i][1] and signal == 666:
+                                a = self.self_bid[i]
+                                self.targetbid[self.self_bid[i][0]][kkk.index(min(kkk))+1] = [self.index, a[1], self.step_now]
                                 for j in range(len(self.self_task)):
                                     if self.self_task[j]:
                                         self.self_task[j][0] = 0
-                                self.self_task[self_bid[i][0]][0] = 1
+                                self.self_task[self.self_bid[i][0]][0] = 1
                                 break
                             elif signal != 666:
-                                a = self_bid[i]
-                                self.targetbid[self_bid[i][0]][signal+1] = [self.index, a[1], self.step_now]
+                                a = self.self_bid[i]
+                                self.targetbid[self.self_bid[i][0]][signal+1] = [self.index, a[1], self.step_now]
                                 for j in range(len(self.self_task)):
                                     if self.self_task[j]:
                                         self.self_task[j][0] = 0
-                                self.self_task[self_bid[i][0]][0] = 1
+                                self.self_task[self.self_bid[i][0]][0] = 1
                                 with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
-                                    f.write(str(self_bid[i][0]) + str('更新区域') +str(signal+1) + '\n')
+                                    f.write(str(self.self_bid[i][0]) + str('更新区域') +str(signal+1) + '\n')
                                 break
 
                             else:
                                 # print(self_bid[i][0])
                                 # print(self.self_task)
-                                if self.self_task[self_bid[i][0]]:
-                                    self.self_task[self_bid[i][0]][0] = 0
+                                if self.self_task[self.self_bid[i][0]]:
+                                    self.self_task[self.self_bid[i][0]][0] = 0
                                 else:
-                                    self.self_task[self_bid[i][0]].append(0)
+                                    self.self_task[self.self_bid[i][0]].append(0)
                     self.InAttacking = True
                     if max(self.self_task) == [1]:
                         self.x = WorldTarget[self.self_task.index(max(self.self_task))][0]
@@ -492,7 +501,7 @@ class PolicyMaker_Auction(PolicyMaker):
 
                     # print(self_bid)
                     with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
-                        f.write(str(self.step_now) + '\n' + str(self_bid) + '\n')
+                        f.write(str(self.step_now) + '\n' + str(self.self_bid) + '\n')
                 # print(self.index)
                 # print(self.self_task)
                 # print(self.targetbid)
