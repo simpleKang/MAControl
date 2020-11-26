@@ -22,8 +22,8 @@ logging.info('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 def parse_args():
     parser = argparse.ArgumentParser("Control Experiments for Multi-Agent Environments")
     parser.add_argument("--scenario", type=str, default="scenario_paper", help="name of the scenario script")
-    parser.add_argument("--step-max", type=int, default=5000, help="maximum steps")
-    parser.add_argument("--episode-max", type=int, default=100, help="maximum episodes")
+    parser.add_argument("--step-max", type=int, default=3000, help="maximum steps")
+    parser.add_argument("--episode-max", type=int, default=50, help="maximum episodes")
     # parser.add_argument("--p1", action='append', type=float, dest='p1', default=[], help="P: Line one")
     # parser.add_argument("--p2", action='append', type=float, dest='p2', default=[], help="P: Line Two")
     # parser.add_argument("--p3", action='append', type=float, dest='p3', default=[], help="P: Line Three")
