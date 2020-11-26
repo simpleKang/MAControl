@@ -222,6 +222,7 @@ class PolicyMaker_Probability(PolicyMaker):
                 known_targets = []
                 target_indexes = []
                 ACTIVE_U = list(set([i for i in range(self.arglist.numU)]) - set(PolicyMaker_Probability.Occupied_U))
+                self.close_area = self.find_mate(obs_n)
                 for i in self.close_area:
                     if i in ACTIVE_U:
                         ii = ACTIVE_U.index(i)  # close_area 与 ACTIVE_U 的交集，其元素在 ACTIVE_U 中的编号
@@ -254,7 +255,11 @@ class PolicyMaker_Probability(PolicyMaker):
                 si = ACTIVE_U.index(self.index)
                 for target in PolicyMaker_Probability.KNOWN_TARGETS[si]:
                     bid = self.bidding(obs_n[self.index], target)
-                    PolicyMaker_Probability.Prices[-1][target[-1]] = bid
+                    old_bid = PolicyMaker_Probability.Prices[-1][target[-1]]
+                    if old_bid:
+                        PolicyMaker_Probability.Prices[-1][target[-1]] = 0.5*old_bid + 0.5*bid
+                    else:
+                        PolicyMaker_Probability.Prices[-1][target[-1]] = bid
                 # Prices 最终是 len_ACTIVE_U * len_target
 
             elif step == self.Step3:
@@ -263,6 +268,7 @@ class PolicyMaker_Probability(PolicyMaker):
                 ACTIVE_U = list(set([i for i in range(self.arglist.numU)]) - set(PolicyMaker_Probability.Occupied_U))
                 si = ACTIVE_U.index(self.index)
                 ti = PolicyMaker_Probability.RESULT[si]
+                self.close_area = self.find_mate(obs_n)
                 if not ti == []:
                     for i in self.close_area:
                         if i in ACTIVE_U:
