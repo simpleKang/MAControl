@@ -97,13 +97,13 @@ class Scenario(BaseScenario):
         res2 = []
         res3 = []
         for t in range(len(world.targets)):
-            res2.append(res.count(t))  # 长度为TARGET数量，每个元素是分配给这个目标的UAV个数
-            res3.append(world.targets[t].defence)  # 长度为TARGET数量，每个元素是这个目标需要的UAV个数
-        res4 = list(np.array(res2)-np.array(res3))  # 长度为TARGET数量，每个元素是上述两项差值
+            res2.append(res.count(t))  # 长度为TARGET数量，每个元素是分配给这个目标的UAV个数 (L)
+            res3.append(world.targets[t].defence)  # 长度为TARGET数量，每个元素是这个目标需要的UAV个数 (d)
+        res4 = list(np.array(res2)-np.array(res3))  # 长度为TARGET数量，每个元素是(L-d)
         res5 = []   # 长度为TARGET数量，每个元素是根据差值计算出的奖励值
         for r in res4:
             if r >= 0:
-                res5.append(1/(0.2*r+1))
+                res5.append(1/(r+1))
             else:
                 res5.append(0)
         return res5
