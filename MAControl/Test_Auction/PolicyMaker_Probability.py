@@ -286,11 +286,11 @@ class PolicyMaker_Probability(PolicyMaker):
             elif step == self.Step4:
                 # 根据当前目标的类型估计，重新讨论目标的类型（含有随机性），进而确定需要的UAV个数
                 DEMANDED_UAV_NUM = 0
-                if self.result[6] == 5:
+                if self.result[5] == 5:
                     DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=self.arglist.q1)[0]
-                elif self.result[6] == 1:
+                elif self.result[5] == 1:
                     DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=self.arglist.q2)[0]
-                elif self.result[6] == 2:
+                elif self.result[5] == 2:
                     DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=self.arglist.q3)[0]
                 # 活跃 UAV 本地确认自己是否具有攻击资格，符合条件的 UAV 即将进入攻击阶段
                 if self.rank == 'NA':
