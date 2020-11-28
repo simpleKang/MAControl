@@ -199,18 +199,18 @@ class PolicyMaker_Probability(PolicyMaker):
 
         if self.InAttacking:
             self.opt_index = 10
-            print('UAV', self.index, 'ATTACKING ATTACKING')
+            # print('UAV', self.index, 'ATTACKING ATTACKING')
 
         else:
 
             if step < self.Step0:
-                print('UAV', self.index, 'searching')
+                # print('UAV', self.index, 'searching')
                 self.close_area = self.find_mate(obs_n)
                 self.add_new_target(obs_n[self.index], WorldTarget)
                 self.opt_index = 0
 
             elif step == self.Step0:
-                print('UAV', self.index, 'resort, then store for communication')
+                # print('UAV', self.index, 'resort, then store for communication')
                 self.seen_targets = sorted(self.seen_targets, key=lambda x: x[4], reverse=True)
                 for i, target in enumerate(self.seen_targets):
                     if target[-1] in PolicyMaker_Probability.Attacked_T:
@@ -218,7 +218,7 @@ class PolicyMaker_Probability(PolicyMaker):
                 PolicyMaker_Probability.SEEN_TARGETS.append(self.seen_targets)  # All -- Occupied = Active
 
             elif step == self.Step1:
-                print('UAV', self.index, 'communicate locally, extend target knowledge')
+                # print('UAV', self.index, 'communicate locally, extend target knowledge')
                 known_targets = []
                 target_indexes = []
                 ACTIVE_U = list(set([i for i in range(self.arglist.numU)]) - set(PolicyMaker_Probability.Occupied_U))
@@ -237,7 +237,7 @@ class PolicyMaker_Probability(PolicyMaker):
                             pass
                     else:
                         pass
-                print('targets', known_targets, target_indexes)
+                # print('targets', known_targets, target_indexes)
                 known_targets = sorted(known_targets, key=lambda x: x[4], reverse=True)
                 PolicyMaker_Probability.KNOWN_TARGETS.append(known_targets)
                 # 这里是个体所知的目标们 是出价的依据
@@ -249,7 +249,7 @@ class PolicyMaker_Probability(PolicyMaker):
                     PolicyMaker_Probability.RESULT.append([])
 
             elif self.Step2 <= step < self.Step3:
-                print('UAV', self.index, 'bid price(s) for all seen + communicated targets')
+                # print('UAV', self.index, 'bid price(s) for all seen + communicated targets')
                 PolicyMaker_Probability.Prices.append([[] for i in range(len(WorldTarget))])
                 ACTIVE_U = list(set([i for i in range(self.arglist.numU)]) - set(PolicyMaker_Probability.Occupied_U))
                 si = ACTIVE_U.index(self.index)
@@ -263,7 +263,7 @@ class PolicyMaker_Probability(PolicyMaker):
                 # Prices 最终是 len_ACTIVE_U * len_target
 
             elif step == self.Step3:
-                print('UAV', self.index, 'extract bids, sort and determine own rank')
+                # print('UAV', self.index, 'extract bids, sort and determine own rank')
                 N_Prices = []
                 ACTIVE_U = list(set([i for i in range(self.arglist.numU)]) - set(PolicyMaker_Probability.Occupied_U))
                 si = ACTIVE_U.index(self.index)
@@ -302,7 +302,7 @@ class PolicyMaker_Probability(PolicyMaker):
                         self.opt_index = 10
                         self.InAttacking = True
                         PolicyMaker_Probability.Occupied_U.append(self.index)
-                        if np.random.random() > 0.5:
+                        if np.random.random() < 0.9:
                             PolicyMaker_Probability.Attacked_T.append(self.result[-1])
                         self.x = self.result[0]
                         self.y = self.result[1]
@@ -312,7 +312,7 @@ class PolicyMaker_Probability(PolicyMaker):
                         print('UAV', self.index, 'not to attack')
 
             elif step == self.Step5:
-                print('UAV', self.index, 'recycling')
+                # print('UAV', self.index, 'recycling')
                 self.operate_step(1, step)
                 PolicyMaker_Probability.SEEN_TARGETS = []
                 PolicyMaker_Probability.KNOWN_TARGETS = []
