@@ -279,14 +279,17 @@ class PolicyMaker_Probability(PolicyMaker):
                     NN_Prices = [item for item in N_Prices if item != []]  # 相互能通信到的个体未必看见了同一个目标
                     NN_Prices = sorted(NN_Prices, reverse=True)  # 上述代码去除了所有 [] 只留下 float
                     self_price = PolicyMaker_Probability.Prices[si][ti]
-                    self.rank = NN_Prices.index(self_price)
+                    if self_price:
+                        self.rank = NN_Prices.index(self_price)
+                    else:
+                        self.rank = 'NA'
                 else:
                     self.rank = 'NA'
 
             elif step == self.Step4:
                 # 根据当前目标的类型估计，重新讨论目标的类型（含有随机性），进而确定需要的UAV个数
                 DEMANDED_UAV_NUM = 0
-                if not self.result:
+                if self.result == -1:
                     DEMANDED_UAV_NUM = 0
                 else:
                     if self.result[5] == 5:
