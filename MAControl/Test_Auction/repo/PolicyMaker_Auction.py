@@ -283,7 +283,6 @@ class PolicyMaker_Auction(PolicyMaker):
             elif self.Step2 <= step < self.Step3:
                 # print('UAV', self.index, 'pricing')
 
-                # TODO 是否出价如何判断
                 if random.random() > 0.5:
                     k = PolicyMaker_Auction.Remain_UAV_Set.index(self.index)
                     PolicyMaker_Auction.Current_Price_Set[step - self.Step2][k] = self.bidding(obs_n[self.index])

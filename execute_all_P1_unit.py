@@ -2,6 +2,44 @@ import os
 
 # 利用 np.random.choice(3, 10)+1 生成算例
 
+# numU= 30 # p=0.1 # q=1 #
+
+os.system("python ./execute_Probability.py --numU=30 "
+          "--p1=0.1  --p1=0.45 --p1=0.45 "
+          "--p2=0.45 --p2=0.1  --p2=0.45 "
+          "--p3=0.45 --p3=0.45 --p3=0.1 "
+          "--q1=1.0 --q1=0.0 --q1=0.0 "
+          "--q2=0.0 --q2=1.0 --q2=0.0 "
+          "--q3=0.0 --q3=0.0 --q3=1.0 "
+          "--typeT=1 --typeT=3 --typeT=1 --typeT=1 --typeT=3 --typeT=2 --typeT=1 --typeT=2 --typeT=2 --typeT=1 ")
+
+os.system("python ./execute_Probability.py --numU=30 "
+          "--p1=0.1  --p1=0.45 --p1=0.45 "
+          "--p2=0.45 --p2=0.1  --p2=0.45 "
+          "--p3=0.45 --p3=0.45 --p3=0.1 "
+          "--q1=1.0 --q1=0.0 --q1=0.0 "
+          "--q2=0.0 --q2=1.0 --q2=0.0 "
+          "--q3=0.0 --q3=0.0 --q3=1.0 "
+          "--typeT=1 --typeT=1 --typeT=2 --typeT=2 --typeT=2 --typeT=3 --typeT=1 --typeT=1 --typeT=1 --typeT=3 ")
+
+os.system("python ./execute_Probability.py --numU=30 "
+          "--p1=0.1  --p1=0.45 --p1=0.45 "
+          "--p2=0.45 --p2=0.1  --p2=0.45 "
+          "--p3=0.45 --p3=0.45 --p3=0.1 "
+          "--q1=1.0 --q1=0.0 --q1=0.0 "
+          "--q2=0.0 --q2=1.0 --q2=0.0 "
+          "--q3=0.0 --q3=0.0 --q3=1.0 "
+          "--typeT=2 --typeT=2 --typeT=3 --typeT=3 --typeT=2 --typeT=2 --typeT=2 --typeT=1 --typeT=2 --typeT=2 ")
+
+os.system("python ./execute_Probability.py --numU=30 "
+          "--p1=0.1  --p1=0.45 --p1=0.45 "
+          "--p2=0.45 --p2=0.1  --p2=0.45 "
+          "--p3=0.45 --p3=0.45 --p3=0.1 "
+          "--q1=1.0 --q1=0.0 --q1=0.0 "
+          "--q2=0.0 --q2=1.0 --q2=0.0 "
+          "--q3=0.0 --q3=0.0 --q3=1.0 "
+          "--typeT=1 --typeT=1 --typeT=1 --typeT=3 --typeT=2 --typeT=3 --typeT=1 --typeT=2 --typeT=1 --typeT=3 ")
+
 # numU= 10 # p=0.1 # q=1 #
 
 os.system("python ./execute_Probability.py --numU=10 "
@@ -146,44 +184,6 @@ os.system("python ./execute_Probability.py --numU=25 "
           "--typeT=2 --typeT=2 --typeT=3 --typeT=3 --typeT=2 --typeT=2 --typeT=2 --typeT=1 --typeT=2 --typeT=2 ")
 
 os.system("python ./execute_Probability.py --numU=25 "
-          "--p1=0.1  --p1=0.45 --p1=0.45 "
-          "--p2=0.45 --p2=0.1  --p2=0.45 "
-          "--p3=0.45 --p3=0.45 --p3=0.1 "
-          "--q1=1.0 --q1=0.0 --q1=0.0 "
-          "--q2=0.0 --q2=1.0 --q2=0.0 "
-          "--q3=0.0 --q3=0.0 --q3=1.0 "
-          "--typeT=1 --typeT=1 --typeT=1 --typeT=3 --typeT=2 --typeT=3 --typeT=1 --typeT=2 --typeT=1 --typeT=3 ")
-
-# numU= 30 # p=0.1 # q=1 #
-
-os.system("python ./execute_Probability.py --numU=30 "
-          "--p1=0.1  --p1=0.45 --p1=0.45 "
-          "--p2=0.45 --p2=0.1  --p2=0.45 "
-          "--p3=0.45 --p3=0.45 --p3=0.1 "
-          "--q1=1.0 --q1=0.0 --q1=0.0 "
-          "--q2=0.0 --q2=1.0 --q2=0.0 "
-          "--q3=0.0 --q3=0.0 --q3=1.0 "
-          "--typeT=1 --typeT=3 --typeT=1 --typeT=1 --typeT=3 --typeT=2 --typeT=1 --typeT=2 --typeT=2 --typeT=1 ")
-
-os.system("python ./execute_Probability.py --numU=30 "
-          "--p1=0.1  --p1=0.45 --p1=0.45 "
-          "--p2=0.45 --p2=0.1  --p2=0.45 "
-          "--p3=0.45 --p3=0.45 --p3=0.1 "
-          "--q1=1.0 --q1=0.0 --q1=0.0 "
-          "--q2=0.0 --q2=1.0 --q2=0.0 "
-          "--q3=0.0 --q3=0.0 --q3=1.0 "
-          "--typeT=1 --typeT=1 --typeT=2 --typeT=2 --typeT=2 --typeT=3 --typeT=1 --typeT=1 --typeT=1 --typeT=3 ")
-
-os.system("python ./execute_Probability.py --numU=30 "
-          "--p1=0.1  --p1=0.45 --p1=0.45 "
-          "--p2=0.45 --p2=0.1  --p2=0.45 "
-          "--p3=0.45 --p3=0.45 --p3=0.1 "
-          "--q1=1.0 --q1=0.0 --q1=0.0 "
-          "--q2=0.0 --q2=1.0 --q2=0.0 "
-          "--q3=0.0 --q3=0.0 --q3=1.0 "
-          "--typeT=2 --typeT=2 --typeT=3 --typeT=3 --typeT=2 --typeT=2 --typeT=2 --typeT=1 --typeT=2 --typeT=2 ")
-
-os.system("python ./execute_Probability.py --numU=30 "
           "--p1=0.1  --p1=0.45 --p1=0.45 "
           "--p2=0.45 --p2=0.1  --p2=0.45 "
           "--p3=0.45 --p3=0.45 --p3=0.1 "
