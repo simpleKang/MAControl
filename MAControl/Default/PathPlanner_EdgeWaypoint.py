@@ -21,7 +21,7 @@ class PathPlanner_EdgeWaypoint(PathPlanner):
                                                          world.agents[self.index].state.p_vel, world.edge))
         open(os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + _path + 'waypoint_%d.txt' % self.index, 'w')
 
-    def planpath(self, para_list, obs, arrive_flag, step, obstacles):
+    def planpath(self, para_list, obs, arrive_flag, step):
 
         # 执行决策结果
         if para_list[0] == 0:

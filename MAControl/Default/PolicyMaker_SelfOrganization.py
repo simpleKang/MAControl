@@ -98,7 +98,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         else:
             pass
 
-    def make_policy(self, obstacles, obs_n, step):
+    def make_policy(self, obs_n, step):
 
         _opt_index = 0
 
