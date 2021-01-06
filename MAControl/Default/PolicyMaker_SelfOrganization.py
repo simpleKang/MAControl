@@ -124,94 +124,98 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
     def rule1(self, obs):
         R1_list = list()
         for uav in self.seen_uavs:
-            uav_vel = uav[1:]
-            R1_list.append(uav_vel)
+            R1_list.append(uav[1])
         if R1_list:
-            R1 = sum(np.array(R1_list)) / len(R1_list)
+            R1_k = sum(np.array(R1_list)) / len(R1_list)
+            self_speed = np.linalg.norm(obs[self.index][0:2])
+            R1 = [self_speed*math.cos(R1_k), self_speed*math.sin(R1_k)]
         else:
             R1 = [0, 0]
         return R1
 
-    # >>>> Target Orbit
+    # >>>> Cohesion
     def rule2(self, obs):
         R2_list = list()
-        self_vel = obs[self.index][0:2]
-        vel_bearing = math.atan2(self_vel[1], self_vel[0])
-        for tar in self.seen_targets:
-            bearing = tar[0]
-            d1_vec = bearing + math.pi/2
-            d2_vec = bearing - math.pi/2
-            if abs(d1_vec-vel_bearing) <= abs(d1_vec-vel_bearing):
-                R2_list.append(d1_vec)
-            else:
-                R2_list.append(d2_vec)
+        for uav in self.seen_uavs:
+            R2_list.append(uav[0])
         if R2_list:
-            R2_ = sum(np.array(R2_list)) / len(R2_list)
-            R2 = [math.cos(R2_), math.sin(R2_)]
+            R2_k = sum(np.array(R2_list)) / len(R2_list)
+            self_speed = np.linalg.norm(obs[self.index][0:2])
+            R2 = [self_speed*math.cos(R2_k), self_speed*math.sin(R2_k)]
         else:
             R2 = [0, 0]
         return R2
 
-    # >>>> Cohesion
+    # >>>> Separation
     def rule3(self, obs):
         R3_list = list()
         for uav in self.seen_uavs:
-            bearing = uav[0]
-            R3_list.append(bearing)
+            R3_list.append(uav[0])
         if R3_list:
-            R3_ = sum(np.array(R3_list)) / len(R3_list)
-            R3 = [math.cos(R3_), math.sin(R3_)]
+            R3_k = sum(np.array(R3_list)) / len(R3_list)
+            self_speed = np.linalg.norm(obs[self.index][0:2])
+            R3 = [self_speed*math.cos(R3_k+math.pi), math.sin(R3_k+math.pi)]
         else:
             R3 = [0, 0]
         return R3
 
-    # >>>> Separation
+    # >>>> Random
     def rule4(self, obs):
-        R4_list = list()
-        for uav in self.seen_uavs:
-            bearing = uav[0]
-            R4_list.append(bearing)
-        if R4_list:
-            R4_ = sum(np.array(R4_list)) / len(R4_list)
-            R4 = [-1*math.cos(R4_), -1*math.sin(R4_)]
-        else:
-            R4 = [0, 0]
+        R4_k = -1 * math.pi + np.random.randn() * 2 * math.pi
+        self_speed = np.linalg.norm(obs[self.index][0:2])
+        R4 = [self_speed * math.cos(R4_k), math.sin(R4_k)]
         return R4
 
-    # >>>> Take turns when losing sight of target
+    # >>>> One Target Attraction
     def rule5(self, obs):
-        # if (not self.seen_targets) and self.target_sense:
-        self_vel = obs[self.index][0:2]
-        vel_bearing = math.atan2(self_vel[1], self_vel[0])
-        new_dir = vel_bearing - math.pi/2
-        R5 = [np.linalg.norm(self_vel)*math.cos(new_dir), np.linalg.norm(self_vel)*math.sin(new_dir)]
-        # else:
+        R5_list = list()
+        for tar in self.seen_targets:
+            R5_list.append(tar[0])
+        if R5_list:
+            R5_list_abs = np.array([abs(item) for item in R5_list])
+            R5_k = R5_list[R5_list_abs.argmin()]
+            self_speed = np.linalg.norm(obs[self.index][0:2])
+            R5 = [self_speed*math.cos(R5_k), math.sin(R5_k)]
+        else:
+            R5 = [0, 0]
         return R5
 
-    # >>>> Flat Target Repulsion
+    # >>>> One Target Repulsion
     def rule6(self, obs):
         R6_list = list()
         for tar in self.seen_targets:
-            bearing = tar[0]
-            # if tar[3] <= len(self.seen_uavs):
-            R6_list.append(bearing)
+            R6_list.append(tar[0])
         if R6_list:
-            R6_ = sum(np.array(R6_list)) / len(R6_list)
-            R6 = [-1*math.cos(R6_), -1*math.sin(R6_)]
+            R6_list_abs = np.array([abs(item) for item in R6_list])
+            R6_k = R6_list[R6_list_abs.argmin()]
+            self_speed = np.linalg.norm(obs[self.index][0:2])
+            R6 = [self_speed*math.cos(R6_k+math.pi), math.sin(R6_k+math.pi)]
         else:
             R6 = [0, 0]
         return R6
 
-    # >>>> Flat Attraction
+    # >>>> Multi Target Attraction
+    def rule7(self, obs):
+        R7_list = list()
+        for tar in self.seen_targets:
+            R7_list.append(tar[0])
+        if R7_list:
+            R7_k = sum(np.array(R7_list)) / len(R7_list)
+            self_speed = np.linalg.norm(obs[self.index][0:2])
+            R7 = [self_speed*math.cos(R7_k), math.sin(R7_k)]
+        else:
+            R7 = [0, 0]
+        return R7
+
+    # >>>> Multi Target Repulsion
     def rule8(self, obs):
         R8_list = list()
         for tar in self.seen_targets:
-            bearing = tar[0]
-            # if tar[3] > len(self.seen_uavs):
-            R8_list.append(bearing)
+            R8_list.append(tar[0])
         if R8_list:
-            R8_ = sum(np.array(R8_list)) / len(R8_list)
-            R8 = [math.cos(R8_), math.sin(R8_)]
+            R8_k = sum(np.array(R8_list)) / len(R8_list)
+            self_speed = np.linalg.norm(obs[self.index][0:2])
+            R8 = [self_speed*math.cos(R8_k+math.pi), math.sin(R8_k+math.pi)]
         else:
             R8 = [0, 0]
         return R8
