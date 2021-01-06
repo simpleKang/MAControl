@@ -2,6 +2,7 @@ import numpy as np
 import os
 import MAControl.Util.OnlineCoverRate as CR
 import MAEnv.scenarios.TargetProfile as T
+_path = '/cover_rate_Folder/' if os.name == 'posix' else '\\cover_rate_Folder\\'
 
 
 def calculate_coverage(num, step, loop=0):
@@ -9,8 +10,8 @@ def calculate_coverage(num, step, loop=0):
     curdir = os.path.dirname(__file__)
     pardir = os.path.dirname(os.path.dirname(curdir))
 
-    txt_name = '/cover_rate-%s-%s-%s.txt' % (str(num), str(step), str(loop))
-    open(pardir + '/cover_rate_Folder' + txt_name, 'w')
+    txt_name = 'cover_rate-%s-%s-%s.txt' % (str(num), str(step), str(loop))
+    open(pardir + _path + txt_name, 'w')
 
     cell = 200                     # 区域划分精度
     track = list()
@@ -64,7 +65,7 @@ def calculate_coverage(num, step, loop=0):
         print('>>> Round', loop, 'Total ', np.size(track[-1], 0), ' >>> step ', l)
 
         cover_rate, overlap_rate = CR.cal_cover_rate(area)
-        with open(pardir + '/cover_rate_Folder' + txt_name, 'a') as c:
+        with open(pardir + _path + txt_name, 'a') as c:
             c.write(str(l) + ' ' + str(cover_rate) + ' ' + str(overlap_rate) + '\n')
 
     # np.savetxt(pardir + '/cover_rate_Folder' + '/area.text', area, fmt='%d')

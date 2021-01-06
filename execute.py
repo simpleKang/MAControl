@@ -10,7 +10,7 @@ import MAControl.Default.InnerController_PID as IC_P
 import MAControl.Default.MotionController_L1_TECS as MC_L
 import MAControl.Default.PathPlanner_EdgeWaypoint as PP_G
 import MAControl.Default.PolicyMaker_SelfOrganization as PM_S
-_path = '/track/' if os.name == 'posix' else 'E:\\S-Projects\\Git-r\\MAControl\\track\\'
+_path = '/track/' if os.name == 'posix' else '\\track\\'
 
 
 def parse_args():
@@ -18,7 +18,7 @@ def parse_args():
     parser = argparse.ArgumentParser("Control Experiments for Multi-Agent Environments")
 
     # Environment
-    parser.add_argument("--scenario", type=str, default="scenario_vision", help="name of the scenario script")
+    parser.add_argument("--scenario", type=str, default="scenario_entropy", help="name of the scenario script")
     parser.add_argument("--uav-num", type=int, default=40, help="number of uav")
     parser.add_argument("--step-max", type=int, default=8000, help="number of maximum steps")
     parser.add_argument("--repeat-num", type=int, default=1, help="number of repeat runs")
