@@ -9,13 +9,18 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
     def __init__(self, name, env, world, agent_index, arglist):
         super(PolicyMaker_SelfOrganization, self).__init__(name, env, world, agent_index, arglist)
         self.UD = [0, 0]                      # 存储决策(rule->BA)得出的速度期望
+
+        self.uav_num = arglist.uav_num        # 小瓜子数量
         self.seen_uavs = list()               # 个体视野中uav
         self.seen_targets = list()            # 个体视野中target
-        self.pheromone = -1                   # uav 会将它更新为非负数. # 一直是 -1 表示自己是个target.
-        self.uav_num = arglist.uav_num        # 小瓜子数量
-        self.decision_frequency = 50
-        self.rule_act = 0                     # 记录选中的行为原型序号 0-默认 1-主回转 2-主排斥 3-主吸引
-        self.target_sense = 0                 # 0 是默认状况 # 被吸引过就会变成1 # 被排斥过就会变回0 # 其它时候保持记忆
+
+        self.pheromone = -1                   # (?)
+        self.density = -1                     # 观测密度
+        self.cluster = -1                     # 目标密度
+        self.sense = 0                        # 记忆
+
+        self.decision_frequency = 50          # 决策频率
+        self.rule_act = 0                     # (?)
 
     def get_objects_in_sight(self, obs):
 
@@ -49,12 +54,13 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self.seen_uavs = _seen_uavs
         self.seen_targets = _seen_targets
         self.density = len(_seen_uavs)
+        self.cluster = len(_seen_targets)
 
     def rule_summation(self, archetype, obs_n):
 
         W = archetype[4:]
         W.append(2)
-        W.append(0.5)
+        W.append(2)
 
         UR = list()
         UR.append(np.array(self.rule1(obs_n)))
@@ -66,7 +72,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         UR.append(np.array([0, 0]))
         UR.append(np.array(self.rule8(obs_n)))
         UR.append(np.array(self.rule9(obs_n)))
-        UR.append(np.array(self.rule10(obs_n)))
+        UR.append(np.array([0, 0]))
 
         URLength = [np.linalg.norm(UR[i]) for i in range(10)]
         threshold = sum(URLength) * 0.01
@@ -81,14 +87,6 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
 
         self.UD = UD
 
-    def update_sense(self):
-        if self.rule_act == 3:
-            self.target_sense = 1
-        elif self.rule_act == 2:
-            self.target_sense = 0
-        else:
-            pass
-
     def make_policy(self, obs_n, step):
 
         _opt_index = 0
@@ -99,18 +97,15 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             elif (step % self.decision_frequency == 1) and (step > self.decision_frequency):
                 pheromone = self.pheromone
                 density = self.density
-                neednum = sum([self.seen_targets[i][3] for i in range(len(self.seen_targets))])
-                sense = self.target_sense
+                cluster = self.cluster
+                sense = self.sense
 
                 BEHAVIOR = [0, 0]
                 for k, ba_k in enumerate(BA.SYS):
-                    BA_k = pheromone * ba_k[0] + density * ba_k[1] + neednum * ba_k[2] + sense * ba_k[3]
+                    BA_k = pheromone * ba_k[0] + density * ba_k[1] + cluster * ba_k[2] + sense * ba_k[3]
                     BEHAVIOR = [BA_k, k] if BEHAVIOR[0] < BA_k else BEHAVIOR
                 self.rule_summation(BA.SYS[BEHAVIOR[1]], obs_n)
                 self.rule_act = BEHAVIOR[1]
-                self.update_sense()
-
-                # self.rule_summation(behavior, obs_n)
 
                 _opt_index = 1
             else:
@@ -237,30 +232,3 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         else:
             R9 = [0, 0]
         return R9
-    def rule10(self, obs):
-        R10_list = list()
-        signal = 0
-        angle_self_v = math.atan2(obs[self.index][1], obs[self.index][0])
-        for uav in self.seen_uavs:
-            angle_u_v = math.atan2(uav[2], uav[1])
-            if abs(angle_self_v - angle_u_v) <= math.pi/2:
-                signal = 1
-                bearing = uav[0]
-                R10_list.append(bearing)
-            else:
-                signal = 0
-                break
-
-        if R10_list and signal == 1:
-            R10_ = sum(np.array(R10_list)) / len(R10_list)
-            angle_v = math.atan2(obs[self.index][1], obs[self.index][0])
-            angle = angle_v - R10_
-            if angle > 0 and angle <= math.pi/4:
-                R10 = [-obs[self.index][1], obs[self.index][0]]
-            elif angle <= 0 and angle >= -math.pi/4:
-                R10 = [obs[self.index][1], -obs[self.index][0]]
-            else:
-                R10 = [0, 0]
-        else:
-            R10 = [0, 0]
-        return R10
