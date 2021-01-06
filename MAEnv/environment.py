@@ -4,7 +4,7 @@ from gym.envs.registration import EnvSpec
 import numpy as np
 from MAEnv.multi_discrete import MultiDiscrete
 import math
-
+np.warnings.filterwarnings('ignore', category=np.VisibleDeprecationWarning)
 
 # environment for all agents in the multiagent world
 # currently code assumes that no agents will be created/destroyed at runtime!
