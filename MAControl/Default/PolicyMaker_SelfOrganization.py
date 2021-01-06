@@ -27,15 +27,16 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
 
         # 从环境里拿到的 observation 是 [bearing + index] 的形式
         # bearing 是真正的观测所得，而距离是未知的
-        # index 作为接口来读取 agent 性质(target?UAV?)及其它认为可观测的量(vel)
+        # index 作为接口来读取 agent 性质(target?UAV?)及其它认为可观测的量(heading)
 
         for i in range(num):
             bearing = obs[self.index][6+i*2]
             index = int(obs[self.index][7+i*2])
             if index < self.uav_num:
-                _seen_uavs.append([bearing, obs[index][0], obs[index][1]])
+                _seen_uavs.append([bearing, math.atan2(obs[index][1], obs[index][0])])
             else:
-                _seen_targets.append([bearing, obs[index][0], obs[index][1], self.world.agents[index].H])
+                _seen_targets.append([bearing, math.atan2(obs[index][1], obs[index][0]),
+                                      self.world.agents[index].alive])
 
         if self.index < self.uav_num:
             if _seen_targets.__len__() != 0:
@@ -47,17 +48,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
 
         self.seen_uavs = _seen_uavs
         self.seen_targets = _seen_targets
-
-    def get_UAV_density(self, obs):
-
-        # item = list()
-        # for uav in self.seen_uavs:
-        #    item.append(1/uav[0])  # further bearing -> lesser density
-        # _density = sum(item)
-
-        _density = len(self.seen_uavs)
-
-        return _density
+        self.density = len(_seen_uavs)
 
     def rule_summation(self, archetype, obs_n):
 
@@ -107,7 +98,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
                 self.get_objects_in_sight(obs_n)
             elif (step % self.decision_frequency == 1) and (step > self.decision_frequency):
                 pheromone = self.pheromone
-                density = self.get_UAV_density(obs_n)
+                density = self.density
                 neednum = sum([self.seen_targets[i][3] for i in range(len(self.seen_targets))])
                 sense = self.target_sense
 
