@@ -124,7 +124,7 @@ if __name__ == '__main__':
     # Create Controller
     Controllers = get_controller(env, world, arglist)
 
-    for num in range(arglist.repeat_num):
+    for r_num in range(arglist.repeat_num):
 
         with open(os.path.dirname(__file__) + _path + 'para.txt', 'w') as f:
             f.write(str(arglist.uav_num) + ' ' + str(arglist.step_max))
@@ -145,7 +145,6 @@ if __name__ == '__main__':
             new_obs_n, rew_n, done_n, info_n = env.step(action_n)
 
             obs_n = new_obs_n
-            # print(obs_n[0].__len__(), obs_n[1].__len__(), obs_n[2].__len__())
 
             # 保存每个小瓜子每个step的状态信息
             for k in range(arglist.uav_num):
@@ -156,11 +155,11 @@ if __name__ == '__main__':
             # 画图展示
             augment_view(world, Controllers[0])
             env.render()
-            print('>>> Num', num, '>>>> step', step)
+            print('>>> Run', r_num, '>>>> step', step)
             time.sleep(0.001)
 
         time.sleep(1)
-        OCR.calculate_coverage(arglist.uav_num, arglist.step_max, num)
+        OCR.calculate_coverage(arglist.uav_num, arglist.step_max, r_num)
         end = time.time()
         interval = round((end - start), 2)
         print('Time Interval ', interval)
