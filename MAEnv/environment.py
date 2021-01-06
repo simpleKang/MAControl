@@ -220,6 +220,7 @@ class MultiAgentEnv(gym.Env):
             self.render_geoms = []
             self.render_geoms_xform = []
             for entity in self.world.entities:
+                # shape
                 if 'grid' in entity.name:
                     preset = [[-2, -2], [-2, 2], [2, 2], [2, -2]]
                     geom = rendering.make_polygon(list(np.array(preset) * entity.size))
@@ -230,8 +231,11 @@ class MultiAgentEnv(gym.Env):
                 else:
                     geom = rendering.make_house(entity.size)
                 xform = rendering.Transform()
+                # color
                 if 'uav' in entity.name:
                     geom.set_color(*entity.color, alpha=0.8)
+                elif 'target' in entity.name:
+                    geom.set_color(*entity.color, alpha=0.3 + entity.alive*0.5)
                 elif 'square' in entity.name:
                     geom.set_color(*entity.color, alpha=0.3)
                 else:

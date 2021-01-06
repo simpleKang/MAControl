@@ -1,6 +1,7 @@
 # 环境长度 1 = 实际长度 1000 米 = 1 千米
 # 初步应用了 entity = agent + landmark 和 agent = uav + target 的区分，删去了许多参数，仍需进一步修改
 # （landmark = grid + obstacle + ...  , target = fixed_target + movable_target)
+from abc import ABC
 
 import numpy as np
 import random
@@ -10,7 +11,7 @@ from MAEnv.scenario import BaseScenario
 import MAEnv.scenarios.TargetProfile as T
 
 
-class Scenario(BaseScenario):
+class Scenario(BaseScenario, ABC):
     def make_World(self, _uav_num):
         world = World()
         # set any world properties first
@@ -46,6 +47,7 @@ class Scenario(BaseScenario):
             target.H = T.target_H[i]
             target.Dam = T.target_Dam[i]
             target.w = T.target_w[i]
+            target.alive = T.target_init[i]
 
         # agents summary
         world.agents = world.U_agents + world.T_agents
