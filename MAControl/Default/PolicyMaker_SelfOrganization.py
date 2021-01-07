@@ -11,6 +11,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self.UD = [0, 0]                      # 存储决策(rule->BA)得出的速度期望
 
         self.uav_num = arglist.uav_num        # 小瓜子数量
+        self.t_num = self.world.t_num         # 小花生数量
         self.seen_uavs = list()               # 个体视野中uav
         self.seen_targets = list()            # 个体视野中target
 
@@ -59,8 +60,6 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
     def rule_summation(self, archetype, obs_n):
 
         W = archetype[4:]
-        W.append(2)
-        W.append(2)
 
         UR = list()
         UR.append(np.array(self.rule1(obs_n)))
@@ -69,10 +68,10 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         UR.append(np.array(self.rule4(obs_n)))
         UR.append(np.array(self.rule5(obs_n)))
         UR.append(np.array(self.rule6(obs_n)))
-        UR.append(np.array([0, 0]))
+        UR.append(np.array(self.rule7(obs_n)))
         UR.append(np.array(self.rule8(obs_n)))
         UR.append(np.array(self.rule9(obs_n)))
-        UR.append(np.array([0, 0]))
+        UR.append(np.array(self.rule10(obs_n)))
 
         URLength = [np.linalg.norm(UR[i]) for i in range(10)]
         threshold = sum(URLength) * 0.01
@@ -159,11 +158,19 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             R3 = [0, 0]
         return R3
 
-    # >>>> Random
+    # >>>> Mixed Evasion
     def rule4(self, obs):
-        R4_k = -1 * math.pi + np.random.randn() * 2 * math.pi
-        self_speed = np.linalg.norm(obs[self.index][0:2])
-        R4 = [self_speed * math.cos(R4_k), math.sin(R4_k)]
+        R4_list = list()
+        for uav in self.seen_uavs:
+            R4_list.append([math.cos(uav[0]) * math.cos(math.pi+uav[1]-uav[0]),
+                            math.sin(uav[0]) * math.cos(math.pi+uav[1]-uav[0])])
+        if R4_list:
+            R4_k = sum(np.array(R4_list))
+            R4_kk = math.atan2(R4_k[1], R4_k[0])
+            self_speed = np.linalg.norm(obs[self.index][0:2])
+            R4 = [self_speed*math.cos(R4_kk), math.sin(R4_kk)]
+        else:
+            R4 = [0, 0]
         return R4
 
     # >>>> One Target Attraction
@@ -220,19 +227,18 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             R8 = [0, 0]
         return R8
 
-    # >>>> Evasion
+    # >>>> Random
     def rule9(self, obs):
-        R9_list = list()
-        for uav in self.seen_uavs:
-            bearing = uav[0]
-            uav_vel = uav[1:]
-            dot = np.dot([-1*math.cos(bearing), -1*math.sin(bearing)], uav_vel)
-            if dot >= 0.0001:
-                R9_list.append([-1*dot*math.cos(bearing), -1*dot*math.sin(bearing)])
-            else:
-                pass
-        if R9_list:
-            R9 = sum(np.array(R9_list)) / len(R9_list)
-        else:
-            R9 = [0, 0]
+        R9_k = -1 * math.pi + np.random.randn() * 2 * math.pi
+        self_speed = np.linalg.norm(obs[self.index][0:2])
+        R9 = [self_speed * math.cos(R9_k), math.sin(R9_k)]
         return R9
+
+    # >>>> Balance
+    def rule10(self, obs):
+        if len(self.seen_targets) * self.uav_num > len(self.seen_uavs) * self.t_num:
+            print('t', self.t_num)
+            R10 = self.rule2(obs)
+        else:
+            R10 = self.rule7(obs)
+        return R10

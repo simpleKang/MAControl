@@ -21,6 +21,7 @@ class Scenario(BaseScenario, ABC):
         # set nums
         num_uav = _uav_num
         num_targets = T.num_targets
+        world.t_num = T.num_targets
         num_grids = T.num_grids
         num_square = T.num_square
 
