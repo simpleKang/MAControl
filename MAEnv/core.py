@@ -51,7 +51,7 @@ class Entity(object):
         # color
         self.color = None
         # max speed and accel
-        self.max_speed = None
+        self.max_speed = 10000.0
         self.accel = None
         # state
         self.state = EntityState()
@@ -174,11 +174,11 @@ class World(object):
                 if f_a is not None:
                     if p_force[a] is None:
                         p_force[a] = 0.0
-                    p_force[a] = f_a + p_force[a] 
+                    p_force[a] = f_a + p_force[a]
                 if f_b is not None:
                     if p_force[b] is None:
                         p_force[b] = 0.0
-                    p_force[b] = f_b + p_force[b]        
+                    p_force[b] = f_b + p_force[b]
         return p_force
 
     # integrate physical state
@@ -205,7 +205,7 @@ class World(object):
             agent.state.c = np.zeros(self.dim_c)
         else:
             noise = np.random.randn(*agent.action.c.shape) * agent.c_noise if agent.c_noise else 0.0
-            agent.state.c = agent.action.c + noise      
+            agent.state.c = agent.action.c + noise
 
     # get collision forces for any contact between two entities
     def get_collision_force(self, entity_a, entity_b):

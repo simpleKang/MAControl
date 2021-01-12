@@ -85,13 +85,13 @@ class Scenario(BaseScenario, ABC):
                 # agent.state.p_vel = np.array([0.01, 0.00])  # 10 米/秒
                 agent.state.p_pos = np.random.uniform(-T.edge, T.edge, world.dim_p)
                 agent.state.p_vel = np.random.uniform(-T.edge, T.edge, world.dim_p)
-                agent.state.p_acc = np.array([0, 0])
+                agent.state.p_acc = np.array([0.0, 0.0])
                 agent.color = T.UAV_color
                 uav_count += 1
             else:
                 agent.state.p_pos = np.array(T.target_pos[i-uav_count])
                 agent.state.p_vel = np.array([0.01, 0.00])  # 10 米/秒
-                agent.state.p_acc = np.array([0, 0])
+                agent.state.p_acc = np.array([0.0, 0.0])
                 if agent.movable:
                     agent.color = T.movable_target_color
                 else:
