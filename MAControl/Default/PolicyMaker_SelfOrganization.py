@@ -44,18 +44,12 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
                 _seen_targets.append([bearing, math.atan2(obs[index][1], obs[index][0]),
                                       self.world.agents[index].alive])
 
-        if self.index < self.uav_num:
-            if _seen_targets.__len__() != 0:
-                self.pheromone = 1
-            else:
-                self.pheromone = 0
-        else:
-            pass
-
         self.seen_uavs = _seen_uavs
         self.seen_targets = _seen_targets
         self.density = len(_seen_uavs)
         self.cluster = len(_seen_targets)
+        self.pheromone = self.pheromone + 1 if self.seen_uavs else self.pheromone
+        self.sense = self.sense + 1 if self.seen_targets else self.sense
 
     def rule_summation(self, archetype, obs_n):
 
@@ -94,14 +88,14 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             if step % self.decision_frequency == self.decision_frequency-1:
                 self.get_objects_in_sight(obs_n)
             elif (step % self.decision_frequency == 1) and (step > self.decision_frequency):
-                pheromone = self.pheromone
                 density = self.density
                 cluster = self.cluster
+                pheromone = self.pheromone
                 sense = self.sense
 
                 BEHAVIOR = [0, 0]
                 for k, ba_k in enumerate(BA.SYS):
-                    BA_k = pheromone * ba_k[0] + density * ba_k[1] + cluster * ba_k[2] + sense * ba_k[3]
+                    BA_k = density * ba_k[0] + cluster * ba_k[1] + pheromone * ba_k[2] + sense * ba_k[3]
                     BEHAVIOR = [BA_k, k] if BEHAVIOR[0] < BA_k else BEHAVIOR
                 self.rule_summation(BA.SYS[BEHAVIOR[1]], obs_n)
                 self.rule_act = BEHAVIOR[1]
@@ -237,7 +231,6 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
     # >>>> Balance
     def rule10(self, obs):
         if len(self.seen_targets) * self.uav_num > len(self.seen_uavs) * self.t_num:
-            print('t', self.t_num)
             R10 = self.rule2(obs)
         else:
             R10 = self.rule7(obs)

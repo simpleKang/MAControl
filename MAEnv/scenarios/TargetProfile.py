@@ -7,7 +7,7 @@ UAV_Dam = 10
 UAV_w = 1000
 
 # target parameters
-num_targets = 10
+num_targets = 4
 target_size = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
 target_pos = [[-0.2,    0],
               [-0.8,  1.5],
@@ -22,9 +22,9 @@ target_pos = [[-0.2,    0],
 target_movable = [False, False, False, False, False, False, False, False, False, False]
 movable_target_color = np.array([0, 0.8, 0])
 fixed_target_color = np.array([0.4, 0.5, 0.2])
-target_H = [3, 3, 3, 3, 3, 8, 8, 8, 8, 8]
-target_Dam = [1, 2, 1, 0, 5, 1, 2, 1, 0, 1]
-target_w = [2, 2, 5, 2, 3, 2, 2, 5, 2, 3]
+target_H = [3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
+target_Dam = [3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
+target_w = [3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
 target_init = [0, 1, 0, 1, 0, 1, 0, 1, 0, 1]
 
 # edge of the battle field (a kind of non-obstacle)
