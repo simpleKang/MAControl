@@ -18,17 +18,7 @@ import MAControl.Util.SignIsSame as sis
 # plt.show()
 
 
-uav_pos = np.array([1, 1])
-tar_pos = np.array([1, 2])
-
-uav_vel = np.array([0.01, 0.02])
-tar_vel = np.array([0.03, 0.05])
-
-dist = np.linalg.norm(tar_pos - uav_pos)
-
-a = 0.1
-
-print(uav_pos/(2*a))
+print(math.atan(-1))
 
 
 

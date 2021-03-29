@@ -73,8 +73,8 @@ def creat_veledge_point(pos, vel, cur_vel, edge):
             vel = cur_vel / np.linalg.norm(cur_vel)
         else:
             vel /= vel_length
-        with open(os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + _path_, 'a') as f:
-            f.write(str(vel[0]) + ' ' + str(vel[1]) + '\n')
+        # with open(os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + _path_, 'a') as f:
+        #     f.write(str(vel[0]) + ' ' + str(vel[1]) + '\n')
     except:
         print(vel)
     while True:

@@ -3,6 +3,7 @@
 import argparse
 import time
 import os
+import numpy as np
 import MAEnv.scenarios.TargetProfile as T
 import MAControl.Util.OfflineCoverRate as OCR
 
@@ -10,8 +11,8 @@ import MAControl.Default.InnerController_PID as IC_P
 import MAControl.Default.MotionController_L1_TECS as MC_L
 import MAControl.Default.PathPlanner_EdgeWaypoint as PP_G
 import MAControl.Default.PolicyMaker_SelfOrganization as PM_S
-_path = '/track/' if os.name == 'posix' else 'E:\\S-Projects\\Git-r\\MAControl\\track\\'
-
+# _path = '/track/' if os.name == 'posix' else 'E:\\S-Projects\\Git-r\\MAControl\\track\\'
+_path = '/case/case1_6/'
 
 def parse_args():
 
@@ -19,7 +20,7 @@ def parse_args():
 
     # Environment
     parser.add_argument("--scenario", type=str, default="scenario6_AFIT", help="name of the scenario script")
-    parser.add_argument("--uav-num", type=int, default=10, help="number of uav")
+    parser.add_argument("--uav-num", type=int, default=1000, help="number of uav")
     parser.add_argument("--step-max", type=int, default=8000, help="number of maximum steps")
     parser.add_argument("--repeat-num", type=int, default=1, help="number of repeat runs")
 
@@ -91,16 +92,18 @@ def action(obs_n, step, ControllerSet, obstacles):
             make_policy(obstacles, obs_n, step)
 
         pointAi, pointBi, finishedi = ControllerSet[i][1].\
-            planpath(list_i, obs_n[i], ControllerSet[i][4], step, obstacles)
+            planpath(list_i, obs_n[i], ControllerSet[i][4], step)
 
         acctEi, acclEi, ControllerSet[i][4] = ControllerSet[i][2]. \
             get_expected_action(obs_n[i], pointAi, pointBi, step, finishedi)
 
         actioni = ControllerSet[i][3]. \
             get_action(obs_n[i], acctEi, acclEi, step, finishedi)
-
+        # length=np.sqrt(np.square(pointBi[0]-pointAi[0]) + np.square(pointBi[1]-pointAi[1]))
+        # actioni=[0,(pointBi[0]-pointAi[0])/length*0.016,0,(pointBi[1]-pointAi[1])/length*0.016,0]
         action_n.append(actioni)
-
+        # with open(os.path.dirname(__file__) + _path + 'action_%d.txt'%i, 'a') as f:
+        #     f.write(str(action_n)+'\n')
     return action_n
 
 

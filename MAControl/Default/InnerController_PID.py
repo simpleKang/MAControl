@@ -25,7 +25,7 @@ class InnerController_PID(InnerController):
 
             delta_time = self.world.dt
             P_value = 0.8
-            I_value = 0.08
+            I_value = 0.3
             D_value = 0.0
             Iterm_window = 1
 

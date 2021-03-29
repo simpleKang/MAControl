@@ -18,7 +18,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         PolicyMaker_SelfOrganization.pheromonal.append(-1)     # agent 会将它更新为非负数. # 一直是 -1 表示自己是个target.
         self.known_uavs = list()              # 视野+通信到的uav
         self.known_targets = list()           # 视野+通信到的target
-        self.communication_range = 1
+        self.communication_range = 0.1
         self.uav_sensor_range = 0.3
         self.target_sensor_range = 0.8
         self.uav_engagement_range = 0.5
@@ -29,6 +29,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self.size = 0.03
         self.uav_num = arglist.uav_num        # 小瓜子数量
         self.decision_frequency = 50
+        self.net_uavs = list()#用于计算网络鲁棒性
 
     def get_limited_vision(self, obs):  # 速度正常观测 # 位置未知>>>仅知方位
         limited_obs = list()
@@ -49,12 +50,12 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         selfpos = np.array(obs[self.index][2:4])
         selfvelunit = selfvel / np.sqrt(np.dot(selfvel, selfvel))
         selfdir = math.atan2(selfvel[1], selfvel[0])
-        # d1 = 0.1  # 轴向视场距离
-        # d2 = 0.2  # 轴向视场宽度
-        # d3 = 0.2  # 侧向视场宽度
-        d1 = self.uav_sensor_range*(-1)
-        d2 = self.uav_sensor_range*2
-        d3 = self.uav_sensor_range*2
+        d1 = 0  # 轴向视场距离
+        d2 = 0.2  # 轴向视场宽度
+        d3 = 0.2  # 侧向视场宽度
+        # d1 = self.uav_sensor_range*(-1)
+        # d2 = self.uav_sensor_range*2
+        # d3 = self.uav_sensor_range*2
         xx1 = -d3 / 2 * math.cos(selfdir) - d2 / 2 * math.sin(selfdir) * -1
         xx2 = -d3 / 2 * math.cos(selfdir) + d2 / 2 * math.sin(selfdir) * -1
         xx3 = d3 / 2 * math.cos(selfdir) + d2 / 2 * math.sin(selfdir) * -1
@@ -95,7 +96,6 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
 
     def find_communication_mates(self, obs):
         _COMMates = list()
-
         self_pos = np.array(obs[self.index][2:4])
         for i in range(self.uav_num):
             uav_pos = np.array(obs[i][2:4])
@@ -155,8 +155,8 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
     def rule_summation(self, ba_index, obs_n, obstacles):
 
         W = BA.BA[ba_index][2:]
-        W.append(2)
-        W.append(2)
+        W.append(0)
+        W.append(0)
 
         UR = list()
         UR.append(np.array(self.rule1(obs_n)))
@@ -173,7 +173,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         URLength = [np.linalg.norm(UR[i]) for i in range(10)]
         threshold = sum(URLength) * 0.01
 
-        UD = np.array([0, 0])
+        UD = obs_n[self.index][0:2]
 
         for i in range(10):
             if URLength[i] > threshold:
@@ -203,7 +203,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
                     BA_k = pheromonal * ba_k[0] + density * ba_k[1]
                     BEHAVIOR = [BA_k, k] if BEHAVIOR[0] < BA_k else BEHAVIOR
                 self.rule_summation(BEHAVIOR[1], obs_n, obstacles)
-                _opt_index = 1
+                _opt_index = 0
 
                 # self.UD = self.rule9(obs_n)
 
@@ -417,50 +417,50 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
 
     # @XJ >>>> Obstacle Avoidance
     def rule10(self, obs, obstacles):
-
-        dUO = list()
-        R10part2 = list()
-        self_pos = np.array(obs[self.index][2:4])
-        for item in obstacles:
-            distance = np.linalg.norm(np.array(item[0:2])-self_pos)
-            d = self.uav_sensor_range + item[2] - distance
-            d = d if d > 0.000001 else 0.000001
-            dUO.append(d)
-            if (distance - item[2]) < self.uav_sensor_range/2:
-                R10part2.append(np.array(item[0:2])-self_pos)
-                R10part2[-1] = R10part2[-1] / distance * (distance - item[2])
-                R10part2[-1] = R10part2[-1] * dUO[-1] / self.uav_sensor_range * (-1)
-            else:
-                R10part2.append([0, 0])
-        sumdUO = sum(dUO)
-
-        R10f = list()
-        R10part1 = list()
-        self_vel = np.array(obs[self.index][0:2])
-        for k, item in enumerate(obstacles):
-            vector1 = np.array(item[0:2])-self_pos
-            cos1 = np.dot(vector1, self_vel)/np.linalg.norm(vector1)/np.linalg.norm(self_vel)
-            if cos1 > 0:
-                vector2 = np.array([vector1[1], -1*vector1[0]])
-                vector3 = np.array([-1*vector1[1], vector1[0]])
-                cos2 = np.dot(vector2, self_vel)/np.linalg.norm(vector2)/np.linalg.norm(self_vel)
-                cos3 = np.dot(vector3, self_vel)/np.linalg.norm(vector3)/np.linalg.norm(self_vel)
-                if cos2 > cos3:
-                    R10part1.append(vector2 * math.acos(cos1) * 2 / math.pi / np.linalg.norm(vector2))
-                else:
-                    R10part1.append(vector3 * math.acos(cos1) * 2 / math.pi / np.linalg.norm(vector3))
-            else:
-                R10part1.append([0, 0])
-            if np.linalg.norm(vector1) < self.uav_sensor_range:
-                r10f = (np.array(R10part1[k]) + 0.1 * np.array(R10part2[k])) * dUO[k]
-            else:
-                r10f = np.array([0, 0])
-            R10f.append(r10f)
-        sumR10f = sum(R10f)
-
-        R10 = sumR10f / sumdUO
-        if np.linalg.norm(R10) == 0:
-            R10 = self_vel
-
-        # R10 = obs[self.index][0:2]
+        #
+        # dUO = list()
+        # R10part2 = list()
+        # self_pos = np.array(obs[self.index][2:4])
+        # for item in obstacles:
+        #     distance = np.linalg.norm(np.array(item[0:2])-self_pos)
+        #     d = self.uav_sensor_range + item[2] - distance
+        #     d = d if d > 0.000001 else 0.000001
+        #     dUO.append(d)
+        #     if (distance - item[2]) < self.uav_sensor_range/2:
+        #         R10part2.append(np.array(item[0:2])-self_pos)
+        #         R10part2[-1] = R10part2[-1] / distance * (distance - item[2])
+        #         R10part2[-1] = R10part2[-1] * dUO[-1] / self.uav_sensor_range * (-1)
+        #     else:
+        #         R10part2.append([0, 0])
+        # sumdUO = sum(dUO)
+        #
+        # R10f = list()
+        # R10part1 = list()
+        # self_vel = np.array(obs[self.index][0:2])
+        # for k, item in enumerate(obstacles):
+        #     vector1 = np.array(item[0:2])-self_pos
+        #     cos1 = np.dot(vector1, self_vel)/np.linalg.norm(vector1)/np.linalg.norm(self_vel)
+        #     if cos1 > 0:
+        #         vector2 = np.array([vector1[1], -1*vector1[0]])
+        #         vector3 = np.array([-1*vector1[1], vector1[0]])
+        #         cos2 = np.dot(vector2, self_vel)/np.linalg.norm(vector2)/np.linalg.norm(self_vel)
+        #         cos3 = np.dot(vector3, self_vel)/np.linalg.norm(vector3)/np.linalg.norm(self_vel)
+        #         if cos2 > cos3:
+        #             R10part1.append(vector2 * math.acos(cos1) * 2 / math.pi / np.linalg.norm(vector2))
+        #         else:
+        #             R10part1.append(vector3 * math.acos(cos1) * 2 / math.pi / np.linalg.norm(vector3))
+        #     else:
+        #         R10part1.append([0, 0])
+        #     if np.linalg.norm(vector1) < self.uav_sensor_range:
+        #         r10f = (np.array(R10part1[k]) + 0.1 * np.array(R10part2[k])) * dUO[k]
+        #     else:
+        #         r10f = np.array([0, 0])
+        #     R10f.append(r10f)
+        # sumR10f = sum(R10f)
+        #
+        # R10 = sumR10f / sumdUO
+        # if np.linalg.norm(R10) == 0:
+        #     R10 = self_vel
+        #
+        R10 = obs[self.index][0:2]
         return R10

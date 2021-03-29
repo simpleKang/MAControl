@@ -76,14 +76,55 @@ class Scenario(BaseScenario):
         uav_count = 0
         for i, agent in enumerate(world.agents):
             if agent.UAV:
-                agent.state.p_pos = np.random.uniform(-1.6, -1.9, world.dim_p)
-                # agent.state.p_pos = np.array([-0.5+i*0.5, 0])
-                # agent.state.p_pos = np.array([-0.5, -0.5])
-                agent.state.p_vel = np.random.uniform(-0.05, 0.05, world.dim_p)  # 50 米/秒
-                # agent.state.p_vel = np.array([0.01, 0.01])
-                agent.state.p_acc = np.array([0, 0])
+                # case1
+                agent.state.p_pos = np.random.uniform(-1, 1, world.dim_p)
+                agent.state.p_vel = np.random.uniform(-0.05, 0.05, world.dim_p)
+                agent.state.p_acc = np.array([0.0, 0.0])
                 agent.color = T.UAV_color
                 uav_count += 1
+
+                # # case2
+                # agent.state.p_pos = np.array([0.0, 0.0])
+                # agent.state.p_vel = np.random.uniform(-0.05, 0.05, world.dim_p)
+                # agent.state.p_acc = np.array([0.0, 0.0])
+                # agent.color = T.UAV_color
+                # uav_count += 1
+
+                # case3
+                # agent.state.p_pos = np.array([-2.0+4/100*i, -2.0])
+                # agent.state.p_vel = np.array([0.0, 0.0001])
+                # agent.state.p_acc = np.array([0.0, 0.0])
+                # agent.color = T.UAV_color
+                # uav_count += 1
+
+                # case4
+                # if i <= 24:
+                #     # agent.state.p_pos = np.random.uniform(-2, -1.9, world.dim_p)
+                #     # agent.state.p_pos = np.array([-2, -1.9+uav_count*0.2]).astype(np.float)
+                #     agent.state.p_pos = np.array([-1+i*2/25, -2])
+                #     # agent.state.p_vel = np.random.uniform(-0.05, 0.05, world.dim_p)  # 50 米/秒
+                #     agent.state.p_vel = np.array([0.0, 0.1])
+                #     agent.state.p_acc = np.array([0, 0])
+                #     agent.color = T.UAV_color
+                #     uav_count += 1
+                # elif i <= 49:
+                #     agent.state.p_pos = np.array([-1+(i-24)*2/25, 2])
+                #     agent.state.p_vel = np.array([0.0, -0.1])
+                #     agent.state.p_acc = np.array([0, 0])
+                #     agent.color = T.UAV_color
+                #     uav_count += 1
+                # elif i <= 74:
+                #     agent.state.p_pos = np.array([-2, -1+(i-49)*2/25])
+                #     agent.state.p_vel = np.array([0.1, 0.0])
+                #     agent.state.p_acc = np.array([0, 0])
+                #     agent.color = T.UAV_color
+                #     uav_count += 1
+                # elif i <= 99:
+                #     agent.state.p_pos = np.array([2, -1+(i-74)*2/25])
+                #     agent.state.p_vel = np.array([-0.1, 0.0])
+                #     agent.state.p_acc = np.array([0, 0])
+                #     agent.color = T.UAV_color
+                #     uav_count += 1
             else:
                 agent.state.p_pos = np.array(T.target_pos[i-uav_count])
                 agent.state.p_vel = np.random.uniform(-0.02, 0.02, world.dim_p)  # 20 米/秒

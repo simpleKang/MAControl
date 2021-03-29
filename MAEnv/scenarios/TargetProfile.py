@@ -9,14 +9,14 @@ UAV_w = 1000
 # target parameters
 num_targets = 0
 target_size = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
-target_pos = [[0,   0],
-              [1,  -1.5],
-              [1,  -1.5],
-              [-1,    0.4],
-              [-1.4,  1.6],
-              [-0.4,    1],
-              [-0.6, -0.2],
-              [-1.2, -0.8],
+target_pos = [[0,    1.5],
+              [1.5,  0],
+              [1.5,  1.5],
+              [1.0,   0.4],
+              [0.8,   1.4],
+              [1,    1],
+              [0.6, 0.2],
+              [1.2, 1.8],
               [1.6,  -0.6],
               [0.6,  -1.2]]
 target_movable = [False, False, False, False, False, False, False, False, False, False]
@@ -41,7 +41,7 @@ grid_obstacle = False
 # 环境里不存在自然斥力，必须由 agent 做出避障决策才会有避开障碍的效果
 
 # square (a kind of obstacle)
-num_square = 5
+num_square = 0
 square_size = 0.05
 square_pos = [[0., 0.],
               [1., 1.],
