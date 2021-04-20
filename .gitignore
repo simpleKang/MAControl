@@ -1,4 +1,10 @@
-/.idea/
 */__pycache__
+/.idea/
+
 /track/
+/Mini0jsbsim/
 /cover_rate_Folder/
+/case/
+
+/MAControl/PTMA/
+/MAControl/Test_Auction/
