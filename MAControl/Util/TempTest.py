@@ -18,6 +18,13 @@ import MAControl.Util.SignIsSame as sis
 # # plt.xlim(0, 4000)
 # plt.show()
 
+# write-o
+curdir_ = os.path.dirname(__file__)
+pardir_ = os.path.dirname(os.path.dirname(curdir_))
+para = np.loadtxt(pardir_ + '/track/para.txt')
+print('curdir_', curdir_)
+print('pardir_', pardir_)
+print('para', para)
 
 # uav_pos = np.array([1, 1])
 # tar_pos = np.array([1, 2])

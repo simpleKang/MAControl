@@ -1,11 +1,16 @@
 import numpy as np
+import math
 import MAControl.Util.get_random_state as rs
+
+# blind angle
+blind_angle = [math.pi/3, math.pi/3*2, math.pi, math.pi/3*4]
 
 # UAV
 UAV_color = np.array([0.47, 0.79, 0.79])
 UAV_H = 100
 UAV_Dam = 1
 UAV_w = 1000
+UAV_size = 1
 
 # target parameters
 num_targets = 1

@@ -1,6 +1,7 @@
 # 环境长度 1 = 实际长度 1000 米 = 1 千米
 # 初步应用了 entity = agent + landmark 和 agent = uav + target 的区分，删去了许多参数，仍需进一步修改
-# （landmark = grid + obstacle + ...  , target = fixed_target + movable_target)
+# (landmark = grid + obstacle + ...  , target = fixed_target + movable_target)
+# 用来算的大小 vs 拿来看的大小 # 这个关系要理顺 视觉效果应该ok
 
 import numpy as np
 import os
@@ -21,13 +22,13 @@ class Scenario(BaseScenario):
         num_uav = _uav_num
         num_targets = T.num_targets
         num_grids = T.num_grids
-        num_square = T.num_square
+        num_square = T.num_square  # zero for now
 
         # add agents (uavs)
         world.U_agents = [Agent() for i in range(num_uav)]
         for i, uav in enumerate(world.U_agents):
             uav.name = 'uav %d' % i
-            uav.size = 0.01  # 10米
+            uav.state.size = T.UAV_size * 0.01  # 10米
             uav.movable = True
             uav.UAV = True
             uav.H = T.UAV_H
@@ -39,7 +40,7 @@ class Scenario(BaseScenario):
         world.T_agents = [Agent() for i in range(num_targets)]
         for i, target in enumerate(world.T_agents):
             target.name = 'target %d' % i
-            target.size = T.target_size[i] * 0.01
+            target.state.size = T.target_size[i] * 0.01
             if not T.target_movable[i]:
                 target.movable = False
             target.Target = True
@@ -54,7 +55,7 @@ class Scenario(BaseScenario):
         world.grids = [Landmark() for i in range(num_grids)]
         for i, grid in enumerate(world.grids):
             grid.name = 'grid %d' % i
-            grid.size = T.grid_size
+            grid.state.size = T.grid_size
             grid.Landmark = True
             grid.obstacle = False
 
@@ -62,17 +63,18 @@ class Scenario(BaseScenario):
         world.squares = [Landmark() for i in range(num_square)]
         for i, square in enumerate(world.squares):
             square.name = 'square %d' % i
-            square.size = T.square_size
+            square.state.size = T.square_size
             square.Landmark = True
             square.obstacle = True
 
         # landmarks summary
         world.landmarks = world.grids + world.squares
 
-        curdir_ = os.path.dirname(__file__)
-        pardir_ = os.path.dirname(os.path.dirname(curdir_))
-        para = np.loadtxt(pardir_ + '/track/para.txt')
-        self.collect = int(para[2])
+        # write-o
+        curdir_ = os.path.dirname(__file__)  # current directory
+        pardir_ = os.path.dirname(os.path.dirname(curdir_))  # parent parent directory
+        para = np.loadtxt(pardir_ + '/track/para.txt')  # currently [10,3000]
+        # self.collect = int(para[2])  # so ... wtf?
 
         # make initial conditions
         self.reset_world(world)
@@ -124,33 +126,53 @@ class Scenario(BaseScenario):
         rew = agent.color[0] + world.edge
         return rew
 
-    def limited_view(self, agent, world):
-
-        # 视场参数
-        sensor_range1 = 0.0  # km
-        sensor_range2 = 0.5  # km
-        sensor_angle = 120 / 2 / 180 * math.pi  # 半个视场角
-
+    def retina(self, agent, world):
         # 描述自己
         selfpos = agent.state.p_pos
         selfvel = agent.state.p_vel
-        selfdir = math.atan2(selfvel[1], selfvel[0])
+        self_ornt = math.atan2(selfvel[1], selfvel[0])  # orientation = ORNT
 
-        # 使用极坐标描述其它个体
-        bearings = []
+        # 视场参数
+        gamma = T.blind_angle[0]  # 整个盲区角
+        G1 = math.fmod(self_ornt + math.pi - gamma/2, math.pi)  # so that -math.pi <= G1 <= math.pi
+        G2 = math.fmod(G1 + gamma, math.pi)
+
+        # 根据个体的方位 + 距离 + 大小 得到个体的投影角(1,2) + 距离
+        # ## # entity size, bearing, distance -> entity projected-angles, distance
+        retina = []  # each item = 3-tuple element
         for i, other in enumerate(world.agents):
             if other is not agent:
                 relative_pos = other.state.p_pos - selfpos
                 relative_dis = np.linalg.norm(relative_pos)
                 relative_bearing = math.atan2(relative_pos[1], relative_pos[0])
-                if sensor_range1 <= relative_dis <= sensor_range2 and abs(relative_bearing - selfdir) <= sensor_angle:
-                    bearings.append(relative_bearing)
-                    bearings.append(i)
+                half_ang = math.atan2(other.state.size/2, relative_dis)
+                r1 = math.fmod(relative_bearing - half_ang, math.pi)
+                r2 = math.fmod(relative_bearing + half_ang, math.pi)
+                r3 = relative_dis
+                # ## # ↓↓ credit: KSB ↓↓ # ## #
+                if abs(math.fmod(r1-G1, math.pi)) + abs(math.fmod(r1-G2, math.pi)) != gamma \
+                        and abs(math.fmod(r2-G1, math.pi)) + abs(math.fmod(r2-G2, math.pi)) != gamma:
+                    retina.append([r1, r2, r3])
+                elif abs(math.fmod(r1-G1, math.pi)) + abs(math.fmod(r1-G2, math.pi)) == gamma \
+                        and abs(math.fmod(r2-G1, math.pi)) + abs(math.fmod(r2-G2, math.pi)) == gamma:
+                    retina.append('none')
+                elif abs(math.fmod(r1-G1, math.pi)) + abs(math.fmod(r1-G2, math.pi)) == gamma:
+                    retina.append([G2, r2, r3])
                 else:
-                    pass
-            else:
-                pass
-        return bearings
+                    retina.append([r1, G1, r3])
+
+        # output
+        return retina
+
+    def neighbouring_view(self, agent, world):
+
+        neighborhood = []
+        return neighborhood
+
+    def projected_view(self, agent, world):
+
+        projection = []
+        return projection
 
     def observation(self, agent, world):
         a1 = agent.state.p_acc[0]
@@ -160,7 +182,6 @@ class Scenario(BaseScenario):
         vel_right_unit = np.array([agent.state.p_vel[1], -1 * agent.state.p_vel[0]]) / vel_size
         a_front = np.dot([a1, 0], vel_front_unit) + np.dot([0, a2], vel_front_unit)
         a_right = np.dot([a1, 0], vel_right_unit) + np.dot([0, a2], vel_right_unit)
-        bearings = self.limited_view(agent, world)
-        # temp = np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + [[a_front]] + [[a_right]] + [bearings])
-        # print(temp)
-        return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + [[a_front]] + [[a_right]] + [bearings])
+        n_view = self.neighbouring_view(agent, world)
+        p_view = self.projected_view(agent, world)
+        return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + [[a_front]] + [[a_right]] + [n_view]+[p_view])
