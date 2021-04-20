@@ -2,6 +2,7 @@
 # 初步应用了 entity = agent + landmark 和 agent = uav + target 的区分，删去了许多参数，仍需进一步修改
 # (landmark = grid + obstacle + ...  , target = fixed_target + movable_target)
 # 用来算的大小 vs 拿来看的大小 # 这个关系要理顺 视觉效果应该ok
+# Require >=8 entities in the scenario for the codes to properly work -?
 
 import numpy as np
 import os
@@ -155,7 +156,7 @@ class Scenario(BaseScenario):
                     retina.append([r1, r2, r3])
                 elif abs(math.fmod(r1-G1, math.pi)) + abs(math.fmod(r1-G2, math.pi)) == gamma \
                         and abs(math.fmod(r2-G1, math.pi)) + abs(math.fmod(r2-G2, math.pi)) == gamma:
-                    retina.append('none')
+                    retina.append([G1, G2, float('inf')])
                 elif abs(math.fmod(r1-G1, math.pi)) + abs(math.fmod(r1-G2, math.pi)) == gamma:
                     retina.append([G2, r2, r3])
                 else:
@@ -165,6 +166,8 @@ class Scenario(BaseScenario):
         return retina
 
     def neighbouring_view(self, agent, world):
+        _retina = self.retina(agent, world)
+        _distance = [item[2] for item in _retina]
 
         neighborhood = []
         return neighborhood
