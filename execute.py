@@ -44,7 +44,7 @@ import MAControl.Default.InnerController_PID as IC_P
 import MAControl.Default.MotionController_L1_TECS as MC_L
 import MAControl.Default.PathPlanner_EdgeWaypoint as PP_G
 import MAControl.Default.PolicyMaker_SOcomm as PM_C
-import MAControl.Default.PolicyMaker_SOvision as PM_V
+import MAControl.Default.PolicyMaker_SOvisionOP as PM_V
 
 _path = '/track/' if os.name == 'posix' else 'E:\\S-Projects\\Git-r\\MAControl\\track\\'
 

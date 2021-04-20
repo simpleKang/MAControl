@@ -2,7 +2,7 @@ from MAControl.Base.PolicyMaker import PolicyMaker
 import numpy as np
 import math
 
-.gitignore
+
 class PolicyMaker_SelfOrganization(PolicyMaker):
 
     uav_in_sight = list()
