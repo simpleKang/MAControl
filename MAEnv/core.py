@@ -11,6 +11,8 @@ class EntityState(object):
         self.p_vel = None
         # physical acceleration
         self.p_acc = None
+        # physical size
+        self.size = 0.050
 
 
 # state of agents (including communication and internal/mental state)
@@ -40,8 +42,6 @@ class Entity(object):
     def __init__(self):
         # name 
         self.name = ''
-        # properties:
-        self.size = 0.050
         # entity can move / be pushed
         self.movable = False
         # entity collides with others
