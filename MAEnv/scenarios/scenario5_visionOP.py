@@ -218,9 +218,40 @@ class Scenario(BaseScenario):
         rank = self.retina(agent, world)[3]
         width = (2*math.pi-gamma)/num
 
-        projection = [[] for i in range(num)]
+        projection = [0 for i in range(num)]
 
-        projection = []
+        for i in range(num):
+            s1 = math.fmod(G2 + i*width, math.pi)
+            s2 = math.fmod(G2 + (i+1)*width, math.pi)
+            SS = por.open(s1, s2) if s1 < s2 else por.open(s1, math.pi) | por.open(-math.pi, s2)
+            A1 = A2 = por.empty()
+            a1 = a2 = 0
+            # ## # from closer to further, terminate when a1 > 0.5 width or a2 > 0.5 width
+            for k in rank:
+                if a1/width <= 0.5 and a2/width <= 0.5:
+                    item = retina[k]
+                    ptem = por.open(item[0], item[1]) if item[0] < item[1] else \
+                        por.open(item[0], math.pi) | por.open(-math.pi, item[1])
+                    if (ptem & SS).empty:
+                        pass
+                    else:
+                        new = (A1 | A2 | (ptem & SS)).difference(A1 | A2)
+                        # add to A1 (or A2) then compute a1 (or a2) depending on what kind of entity you are
+                        if 'uav' in world.agents[k].name:
+                            A1 = A1 | new
+                            L = len(A1)
+                            a1_list = [A1[m].upper-A1[m].lower for m in range(L)]
+                            a1 = sum(a1_list)
+                        else:
+                            A2 = A2 | new
+                            L = len(A2)
+                            a2_list = [A2[m].upper - A2[m].lower for m in range(L)]
+                            a2 = sum(a2_list)
+                elif a1/width > 0.5:
+                    projection[i] = 1
+                else:
+                    projection[i] = 2
+
         return projection
 
     def observation(self, agent, world):

@@ -17,7 +17,7 @@ UAV_size = 1
 # target parameters
 num_targets = 1
 target_size = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
-target_pos = [[0,    0],
+target_pos = [[0,       0],
               [-0.8,  1.5],
               [1.0,  -1.2],
               [1.0,   0.4],
