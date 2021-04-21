@@ -165,17 +165,18 @@ class Scenario(BaseScenario):
                     retina.append([r1, G1, r3])
 
         # output
-        return retina
+        distance = [item[2] for item in retina]
+        rank = [index for index, value in sorted(list(enumerate(distance)), key=lambda x: x[1])]
+        return [retina, gamma, G2, rank]
 
     def neighbouring_view(self, agent, world):
-        _retina = self.retina(agent, world)
-        _distance = [item[2] for item in _retina]
-        _rank = [index for index, value in sorted(list(enumerate(_distance)), key=lambda x: x[1])]
+        _retina = self.retina(agent, world)[0]
+        _rank = self.retina(agent, world)[3]
 
         neighborhood = []
         cover = por.empty()
 
-        for i in range(len(_distance)):
+        for i in range(len(_rank)):
             print(i, cover, neighborhood)
             if len(neighborhood) < 7:
                 # ## # get the ptem. note that [-pi] = [pi] so split there if needed
@@ -210,6 +211,14 @@ class Scenario(BaseScenario):
         return neighborhood
 
     def projected_view(self, agent, world):
+        num = T.num_section[0]
+        retina = self.retina(agent, world)[0]
+        gamma = self.retina(agent, world)[1]
+        G2 = self.retina(agent, world)[2]
+        rank = self.retina(agent, world)[3]
+        width = (2*math.pi-gamma)/num
+
+        projection = [[] for i in range(num)]
 
         projection = []
         return projection
