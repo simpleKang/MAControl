@@ -3,8 +3,10 @@
 # (landmark = grid + obstacle + ...  , target = fixed_target + movable_target)
 # 用来算的大小 vs 拿来看的大小 # 这个关系要理顺 视觉效果应该ok
 # Require >=8 entities in the scenario for the codes to properly work -?
+# Entites could NOT occupy the same space physically -?
 
 import numpy as np
+import portion as por
 import os
 import math
 from MAEnv.core import World, Agent, Landmark
@@ -168,8 +170,43 @@ class Scenario(BaseScenario):
     def neighbouring_view(self, agent, world):
         _retina = self.retina(agent, world)
         _distance = [item[2] for item in _retina]
+        _rank = [index for index, value in sorted(list(enumerate(_distance)), key=lambda x: x[1])]
 
         neighborhood = []
+        cover = por.empty()
+
+        for i in range(len(_distance)):
+            print(i, cover, neighborhood)
+            if len(neighborhood) < 7:
+                # ## # get the ptem. note that [-pi] = [pi] so split there if needed
+                index = _rank[i]
+                item = _retina[index]
+                if item[0] < item[1]:
+                    ptem = por.closed(item[0], item[1])
+                else:
+                    ptem = por.closed(item[0], math.pi) | por.closed(-math.pi, item[1])
+                # ## # if approved for inclusion
+                if not (cover | ptem).difference(cover).empty:
+                    neighborhood.append(item)
+                    cover = cover | ptem
+                    if 'uav' in world.agents[index].name:
+                        othervel = world.agents[index].state.p_vel
+                        other_ornt = math.atan2(othervel[1], othervel[0])  # orientation = ORNT
+                        neighborhood[-1].append(1)
+                        neighborhood[-1].append(other_ornt)
+                    else:
+                        neighborhood[-1].append(2)
+                        neighborhood.append(float('nan'))
+                # ## # if not
+                else:
+                    pass
+                # ## # end
+            else:
+                pass
+
+        bb = 7 - len(neighborhood)
+        for i in range(bb):
+            neighborhood.append([float('nan'), float('nan'), float('nan'), float('nan'), float('nan')])
         return neighborhood
 
     def projected_view(self, agent, world):
