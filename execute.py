@@ -1,52 +1,36 @@
 # coding=utf-8
 
-#
-#                       _oo0oo_
-#                      o8888888o
-#                      88" . "88
-#                      (| -_- |)
-#                      0\  =  /0
-#                    ___/`---'\___
-#                  .' \\|     |// '.
-#                 / \\|||  :  |||// \
-#                / _||||| -:- |||||- \
-#               |   | \\\  -  /// |   |
-#               | \_|  ''\---/''  |_/ |
-#               \  .-\__  '-'  ___/-. /
-#             ___'. .'  /--.--\  `. .'___
-#          ."" '<  `.___\_<|>_/___.' >' "".
-#         | | :  `- \`.;`\ _ /`;.`/ - ` : | |
-#         \  \ `_.   \_ __\ /__ _/   .-` /  /
-#     =====`-.____`.___ \_____/___.-`___.-'=====
-#                       `=---='
-#
-#     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#
-#               佛祖保佑         永无BUG
-#
+#         .--,       .--,
+#        ( (  \.---./  ) )
+#         '.__/o   o\__.'
+#            {=  ^  =}
+#             >  -  <
+#            /       \
+#           //       \\
+#          //|   .   |\\
+#          "'\       /'"_.-~^`'-.
+#             \  _  /--'         `
+#           ___)( )(___
+#          (((__) (__)))    长烟一空，皓月千里，浮光跃金，_ _ _ _ ，渔歌互答，_ _ _ _ ！
 
 import argparse
 import time
 import os
 import numpy as np
 import GeneticAlgorithm.genetic_algorithm as ga
-from GeneticAlgorithm.BehaviorArchetypes import behavior
+# from GeneticAlgorithm.BehaviorArchetypes import behavior
 from GeneticAlgorithm.BehaviorArchetypes_vision import behavior_v
 
 import MAEnv.scenarios.TargetProfile as T
 import MAControl.Util.get_random_state as rs
-import MAControl.Util.OfflineCoverRate as OCR
-import MAControl.Util.CalCoverage as cc
-import MAControl.Util.coverrate_by_image as calculate
-import MAControl.Util.coverrate_vision as cv
 
 import MAControl.Default.InnerController_PID as IC_P
 import MAControl.Default.MotionController_L1_TECS as MC_L
 import MAControl.Default.PathPlanner_EdgeWaypoint as PP_G
-import MAControl.Default.PolicyMaker_SOcomm as PM_C
+# import MAControl.Default.PolicyMaker_SOcomm as PM_C
 import MAControl.Default.PolicyMaker_SOvisionOP as PM_V
 
-_path = '/track/' if os.name == 'posix' else 'E:\\S-Projects\\Git-r\\MAControl\\track\\'
+path = '/track/' if os.name == 'posix' else '\\track\\'
 
 
 def parse_args():
@@ -63,18 +47,18 @@ def parse_args():
     parser.add_argument("--preserved-population", type=float, default=0.5, help="percentage of population selected")
     parser.add_argument("--generation-num", type=int, default=20, help="number of generation")
     parser.add_argument("--max-behavior-archetypes", type=int, default=1, help="number of behavior archetypes")
-    parser.add_argument("--collect-num", type=int, default=7, help="number of fitness score collection")
+    parser.add_argument("--collect-num", type=int, default=7, help="number of fitness score collection")  # per genratn?
 
     # Core parameters
     parser.add_argument("--crossover-rate", type=float, default=0.1, help="crossover rate")
     parser.add_argument("--mutation-rate", type=float, default=0.9, help="mutation rate")
-    parser.add_argument("--mutation-neighborhood", type=float, default=0.05, help="mutation neighborhood")
+    parser.add_argument("--mutation-neighborhood", type=float, default=0.05, help="mutation neighborhood")  # ?
 
     # Evolve or Test
     parser.add_argument("--evolve", action="store_false", default=True)
     parser.add_argument("--test", action="store_true", default=False)
     parser.add_argument("--restore", action="store_true", default=False)
-    parser.add_argument("--repeat-num", type=int, default=1, help="number of repeat runs")
+    parser.add_argument("--repeat-num", type=int, default=1, help="number of repeat runs")  # ?
 
     return parser.parse_args()
 
@@ -96,7 +80,7 @@ def make_env(arglist):
         if landmark.obstacle:
             obstacle_info_.append([landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.size, k])
 
-    with open(os.path.dirname(__file__) + _path + 'para.txt', 'w') as f:
+    with open(os.path.dirname(__file__) + path + 'para.txt', 'w') as f:
         f.write(str(arglist.uav_num) + ' ' + str(arglist.step_max))
 
     return env_, world_, obstacle_info_
@@ -178,7 +162,7 @@ def augment_view(arglist, world, Controller, obs, step):
     #             world.agents[i].movable = False
     #             world.agents[i].H = 0
     #             world.agents[Controller[i][6]].H -= T.UAV_Dam
-    #             with open(os.path.dirname(__file__) + _path + 'target_attacking.txt', 'a') as f:
+    #             with open(os.path.dirname(__file__) + path + 'target_attacking.txt', 'a') as f:
     #                 f.write(str(step) + ' ' + str(Controller[i][6]) + ' ' + str(world.agents[Controller[i][6]].H) + '\n')
     #         else:
     #             raise Exception('Unexpected uac state!')
@@ -197,7 +181,7 @@ def augment_view(arglist, world, Controller, obs, step):
             #             world.agents[i].movable = False
             #             world.agents[i].H = 0
             #             world.agents[arglist.uav_num+tar].H -= T.UAV_Dam
-            #             with open(os.path.dirname(__file__) + _path + 'target_attacking.txt', 'a') as f:
+            #             with open(os.path.dirname(__file__) + path + 'target_attacking.txt', 'a') as f:
             #                 f.write(str(step) + ' ' + str(arglist.uav_num+tar) + ' ' +
             #                         str(world.agents[arglist.uav_num+tar].H) + '\n')
 
@@ -220,7 +204,7 @@ def get_score(arglist, gen, ind, num):
     # _score = cc.calculate_coverage(arglist.uav_num, arglist.step_max, num)
 
     # WZQ 最小化攻击时间间隔作为评分
-    # target = np.loadtxt(os.path.dirname(__file__) + _path + 'target_attacking.txt')
+    # target = np.loadtxt(os.path.dirname(__file__) + path + 'target_attacking.txt')
     # if target.size > 3:
     #     x, y = target.shape
     #     if target[x-1][y-1] == 0:
@@ -269,7 +253,7 @@ def get_score(arglist, gen, ind, num):
 
 def run_simulation(arglist, behavior_archetypes, gen, ind, num):
 
-    with open(os.path.dirname(__file__) + _path + 'para.txt', 'w') as f:
+    with open(os.path.dirname(__file__) + path + 'para.txt', 'w') as f:
         f.write(str(arglist.uav_num) + ' ' + str(arglist.step_max) + ' ' + str(num))
 
     # Create environment
@@ -278,11 +262,11 @@ def run_simulation(arglist, behavior_archetypes, gen, ind, num):
     # Create Controller
     Controllers = get_controller(env, world, arglist)
 
-    open(os.path.dirname(__file__) + _path + 'target_attacking.txt', 'w')
+    open(os.path.dirname(__file__) + path + 'target_attacking.txt', 'w')
 
     # 为每个小瓜子创建状态文件
     for k in range(arglist.uav_num):
-        open(os.path.dirname(__file__) + _path + 'uav_%d_track.txt' % k, 'w')
+        open(os.path.dirname(__file__) + path + 'uav_%d_track.txt' % k, 'w')
 
     obs_n = env.reset()
 
@@ -299,7 +283,7 @@ def run_simulation(arglist, behavior_archetypes, gen, ind, num):
 
         # 保存每个小瓜子每个step的状态信息
         for k in range(arglist.uav_num):
-            with open(os.path.dirname(__file__) + _path + 'uav_%d_track.txt' % k, 'a') as f:
+            with open(os.path.dirname(__file__) + path + 'uav_%d_track.txt' % k, 'a') as f:
                 f.write(str(obs_n[k][0]) + ' ' + str(obs_n[k][1]) + ' ' +
                         str(obs_n[k][2]) + ' ' + str(obs_n[k][3]) + '\n')
 

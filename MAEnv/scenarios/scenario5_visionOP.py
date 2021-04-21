@@ -1,6 +1,6 @@
 # 环境长度 1 = 实际长度 1000 米 = 1 千米
 # 初步应用了 entity = agent + landmark 和 agent = uav + target 的区分，删去了许多参数，仍需进一步修改
-# (landmark = grid + obstacle + ...  , target = fixed_target + movable_target)
+# (landmark = grid + square + ...  , target = fixed_target + movable_target)
 # 用来算的大小 vs 拿来看的大小 # 这个关系要理顺 视觉效果应该ok
 # Require >=8 entities in the scenario for the codes to properly work -?
 # Entites could NOT occupy the same space physically -?
