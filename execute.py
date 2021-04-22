@@ -102,7 +102,6 @@ def get_controller(env, world, arglist):
         control.append(False)  # Arriveflag
         control.append(0)      # Isattacking
         control.append(None)   # AttackingTarget
-        control.append(None)   # Current Behavior
 
         uavController.append(control)
 
@@ -118,7 +117,6 @@ def get_controller(env, world, arglist):
         control.append(False)  # Arriveflag
         control.append(0)      # Isattacking(为了和小瓜子保持维度一致，没有实际意义)
         control.append(None)   # AttackingTarget(为了和小瓜子保持维度一致，没有实际意义)
-        control.append(None)   # Current Behavior(为了和小瓜子保持维度一致，没有实际意义)
 
         targetController.append(control)
 
@@ -133,7 +131,7 @@ def action(world, obs_n, step, ControllerSet, obstacles, behavior_archetypes):
     # 小瓜子或小花生的运动
     for i in range(ControllerSet.__len__()):  # 提取ControllerSet的长度
 
-        list_i, ControllerSet[i][7] = ControllerSet[i][0].\
+        list_i = ControllerSet[i][0].\
             make_policy(world, obstacles, obs_n, behavior_archetypes, step)
 
         pointAi, pointBi, finishedi, ControllerSet[i][5], ControllerSet[i][6] = ControllerSet[i][1].\
@@ -152,38 +150,9 @@ def action(world, obs_n, step, ControllerSet, obstacles, behavior_archetypes):
 
 def augment_view(arglist, world, Controller, obs, step):
 
-    # for i in range(arglist.uav_num):
-    #     if world.agents[i].movable:
-    #         if Controller[i][5] == 0:
-    #             world.agents[i].attacking = False
-    #         elif Controller[i][5] == 1:
-    #             world.agents[i].attacking = True
-    #         elif Controller[i][5] == 2:
-    #             world.agents[i].movable = False
-    #             world.agents[i].H = 0
-    #             world.agents[Controller[i][6]].H -= T.UAV_Dam
-    #             with open(os.path.dirname(__file__) + path + 'target_attacking.txt', 'a') as f:
-    #                 f.write(str(step) + ' ' + str(Controller[i][6]) + ' ' + str(world.agents[Controller[i][6]].H) + '\n')
-    #         else:
-    #             raise Exception('Unexpected uac state!')
-    #     else:
-    #         pass
-
     for i in range(arglist.uav_num):
         if world.agents[i].movable:
             uav_pos = obs[i][2:4]
-            world.agents[i].behavior = Controller[i][7]
-            # for tar in range(T.num_targets):
-            #     tar_pos = np.array(T.target_pos[tar])
-            #     if world.agents[arglist.uav_num+tar].H > 0:
-            #         mis_dis = np.linalg.norm(uav_pos - tar_pos)
-            #         if mis_dis < 0.05:
-            #             world.agents[i].movable = False
-            #             world.agents[i].H = 0
-            #             world.agents[arglist.uav_num+tar].H -= T.UAV_Dam
-            #             with open(os.path.dirname(__file__) + path + 'target_attacking.txt', 'a') as f:
-            #                 f.write(str(step) + ' ' + str(arglist.uav_num+tar) + ' ' +
-            #                         str(world.agents[arglist.uav_num+tar].H) + '\n')
 
 
 def get_score(arglist, gen, ind, num):

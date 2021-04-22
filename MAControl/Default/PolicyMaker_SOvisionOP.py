@@ -19,7 +19,6 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self.rule_act = 0                     # 记录选中的行为原型序号 0-默认 1-主回转 2-主排斥 3-主吸引
         self.target_sense = 0
         self.sense_count = -1
-        self.current_behavior = None
         PolicyMaker_SelfOrganization.uav_in_sight.append([])
         PolicyMaker_SelfOrganization.target_in_sight.append([])
 
@@ -139,8 +138,6 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
                 else:
                     PolicyMaker_SelfOrganization.target_in_sight[self.index].append(0)
 
-                self.current_behavior = BEHAVIOR[2]
-
                 _opt_index = 1
 
             else:
@@ -150,7 +147,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             pass
 
         opt = [_opt_index, self.UD]
-        return opt, self.current_behavior
+        return opt
 
     # 每个 rule 是一个单独的函数 利于融合代码
     # 输出为二维速度 输入可以修改
