@@ -5,64 +5,85 @@ import math
 
 class PolicyMaker_SelfOrganization(PolicyMaker):
 
-    uav_in_sight = list()
-    target_in_sight = list()
-
     def __init__(self, name, env, world, agent_index, arglist):
         super(PolicyMaker_SelfOrganization, self).__init__(name, env, world, agent_index, arglist)
-        self.UD = [0, 0]                      # 存储决策(rule->BA)得出的速度期望
-        self.seen_uavs = list()               # 个体视野中uav
-        self.seen_targets = list()            # 个体视野中target
-        self.pheromone = -1                   # uav 会将它更新为非负数. # 一直是 -1 表示自己是个target.
+        self.UD = [0, 0]                      # 存储决策出的速度期望
+        self.n_view_a = []                    # 个体视野中 neighborhood (mate)
+        self.n_view_t = []                    # 个体视野中 neighborhood (target)
+        self.p_view = []                      # 个体视野中 projection
+        self.perception_quan = []             # （量化）perception
+        self.perception_dir = []              # （指向性）perception
         self.uav_num = arglist.uav_num        # 小瓜子数量
-        self.decision_frequency = 50
-        self.rule_act = 0                     # 记录选中的行为原型序号 0-默认 1-主回转 2-主排斥 3-主吸引
-        self.target_sense = 0
-        self.sense_count = -1
-        PolicyMaker_SelfOrganization.uav_in_sight.append([])
-        PolicyMaker_SelfOrganization.target_in_sight.append([])
+        self.decision_frequency = 50          # 小瓜子决策周期
 
-    def get_objects_in_sight(self, obs):
+    def raw_input_extraction(self, obs):
 
-        _seen_uavs = list()
-        _seen_targets = list()
+        ob = obs[self.index]
 
-        length = obs[self.index].__len__()
-        num = int((length-6)/2)
+        n_view = ob[6:41]
+        p_view = ob[41:]
 
-        # 从环境里拿到的 observation 是 [bearing + index] 的形式
-        # bearing 是真正的观测所得，而距离是未知的
-        # index 作为接口来读取 agent 性质(target?UAV?)及其它认为可观测的量(vel)
-
-        for i in range(num):
-            bearing = obs[self.index][6+i*2]
-            index = int(obs[self.index][7+i*2])
-            if index < self.uav_num:
-                _seen_uavs.append([bearing, obs[index][0], obs[index][1]])
+        n_view_a = []
+        n_view_t = []
+        n_view_list = [n_view[5*i:(5*i+5)] for i in range(7)]
+        for i in range(7):
+            if float('inf') in n_view_list[i]:
+                pass
+            elif math.isnan(n_view_list[i][0]):
+                pass
+            elif n_view_list[i][3] == 1:
+                n_view_a.append(n_view_list[i][0:5])
             else:
-                _seen_targets.append([bearing, obs[index][0], obs[index][1], self.world.agents[index].H])
+                n_view_t.append(n_view_list[i][0:4])
 
-        if self.index < self.uav_num:
-            if _seen_targets.__len__() != 0:
-                self.pheromone = 1
-            else:
-                self.pheromone = 0
-        else:
-            pass
+        self.p_view = p_view
+        self.n_view_a = n_view_a
+        self.n_view_t = n_view_t
 
-        self.seen_uavs = _seen_uavs
-        self.seen_targets = _seen_targets
+        # 从环境里拿到的 每个 n_view 的倒数第二位表明了性质 mate / target
+        # 从环境里拿到的 每个 p_view 都只表现区域的主要性质
 
-    def get_UAV_density(self, obs):
+    def perception(self, obs):
 
-        # item = list()
-        # for uav in self.seen_uavs:
-        #    item.append(1/uav[0])  # further bearing -> lesser density
-        # _density = sum(item)
+        p_view = self.p_view
+        n_view_a = self.n_view_a
+        n_view_t = self.n_view_t
 
-        _density = len(self.seen_uavs)
+        # Neighbouring Mean Distance
+        p1_a_list = [n_view_a[2] for i in range(len(n_view_a))]
+        p1_t_list = [n_view_t[2] for i in range(len(n_view_t))]
+        p1 = (sum(p1_a_list) + sum(p1_t_list)) / (len(n_view_a) + len(n_view_t))
 
-        return _density
+        # Neighbouring Agent Ratio
+        p2 = len(n_view_a) / (len(n_view_a) + len(n_view_t))
+
+        # Projected Agent Ratio
+        p3 = p_view.count(1) / len(p_view)
+
+        # Projected Target Ratio
+        p4 = p_view.count(2) / 2 / len(p_view)
+
+        # Neighbouring Agent Orientation
+        p5_list = [n_view_a[4] for i in range(len(n_view_a))]
+        p5 = sum(p5_list) / len(n_view_a)
+
+        # Neighbouring Agent Bearing
+        p6_list = [n_view_a[0] + n_view_a[1] for i in range(len(n_view_a))]
+        p6 = math.fmod(sum(p6_list) / 2 / len(n_view_a), math.pi)
+
+        # Neighbouring Target Bearing
+        p7_list = [n_view_t[0] + n_view_t[1] for i in range(len(n_view_t))]
+        p7 = math.fmod(sum(p7_list) / 2 / len(n_view_t), math.pi)
+
+        # Projected Agent Bearing
+        p8 = []
+
+        # Projected Target Bearing
+        p9 = []
+
+        self.perception_quan = [p1, p2, p3, p4]
+        self.perception_dir = [p5, p6, p7, p8, p9]
+        # ↑↑↑ represented with inertial angle, not unit vector
 
     def rule_summation(self, archetype, obs_n):
 
