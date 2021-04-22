@@ -99,9 +99,7 @@ def get_controller(env, world, arglist):
         control.append(PP_G.PathPlanner_EdgeWaypoint("uav_%d" % i, env, world, i, arglist))
         control.append(MC_L.MotionController_L1_TECS("uav_%d" % i, env, world, i, arglist))
         control.append(IC_P.InnerController_PID("uav_%d" % i, env, world, i, arglist))
-        control.append(False)  # Arriveflag
-        control.append(0)      # Isattacking
-        control.append(None)   # AttackingTarget
+        control.append(False)  # Arrive-flag
 
         uavController.append(control)
 
@@ -114,9 +112,7 @@ def get_controller(env, world, arglist):
         control.append(PP_G.PathPlanner_EdgeWaypoint("target_%d" % i, env, world, i+arglist.uav_num, arglist))
         control.append(MC_L.MotionController_L1_TECS("target_%d" % i, env, world, i+arglist.uav_num, arglist))
         control.append(IC_P.InnerController_PID("target_%d" % i, env, world, i+arglist.uav_num, arglist))
-        control.append(False)  # Arriveflag
-        control.append(0)      # Isattacking(为了和小瓜子保持维度一致，没有实际意义)
-        control.append(None)   # AttackingTarget(为了和小瓜子保持维度一致，没有实际意义)
+        control.append(False)  # Arrive-flag
 
         targetController.append(control)
 
@@ -134,7 +130,7 @@ def action(world, obs_n, step, ControllerSet, obstacles, behavior_archetypes):
         list_i = ControllerSet[i][0].\
             make_policy(world, obstacles, obs_n, behavior_archetypes, step)
 
-        pointAi, pointBi, finishedi, ControllerSet[i][5], ControllerSet[i][6] = ControllerSet[i][1].\
+        pointAi, pointBi, finishedi = ControllerSet[i][1].\
             planpath(list_i, obs_n[i], ControllerSet[i][4], step, obstacles)
 
         acctEi, acclEi, ControllerSet[i][4] = ControllerSet[i][2]. \
