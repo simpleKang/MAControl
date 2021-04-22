@@ -17,7 +17,7 @@ import argparse
 import time
 import os
 import numpy as np
-import GeneticAlgorithm.genetic_algorithm as ga
+import GeneticAlgorithm.genetic_algorithm_duo as ga_duo
 # from GeneticAlgorithm.BehaviorArchetypes import behavior
 from GeneticAlgorithm.BehaviorArchetypes_vision import behavior_v
 
@@ -145,10 +145,8 @@ def action(world, obs_n, step, ControllerSet, obstacles, behavior_archetypes):
 
 
 def augment_view(arglist, world, Controller, obs, step):
-
     for i in range(arglist.uav_num):
-        if world.agents[i].movable:
-            uav_pos = obs[i][2:4]
+        pass
 
 
 def get_score(arglist, gen, ind, num):
@@ -272,7 +270,7 @@ if __name__ == '__main__':
     T.init_state = r_state
 
     if arglist.evolve:
-        ga = ga.GA(arglist)
+        ga = ga_duo.GA(arglist)
 
         for gen in range(arglist.generation_num + 1):
             for ind, individual in enumerate(ga.population):
