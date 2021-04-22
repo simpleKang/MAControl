@@ -40,14 +40,14 @@ def parse_args():
     # Environment
     parser.add_argument("--scenario", type=str, default="scenario7_vision", help="name of the scenario script")
     parser.add_argument("--uav-num", type=int, default=10, help="number of uav")
-    parser.add_argument("--step-max", type=int, default=3000, help="number of maximum steps")
+    parser.add_argument("--step-max", type=int, default=100, help="number of maximum steps")
 
     # GA
-    parser.add_argument("--pop-size", type=int, default=20, help="size of population")
+    parser.add_argument("--pop-size", type=int, default=5, help="size of population")
     parser.add_argument("--preserved-population", type=float, default=0.5, help="percentage of population selected")
-    parser.add_argument("--generation-num", type=int, default=20, help="number of generation")
+    parser.add_argument("--generation-num", type=int, default=4, help="number of generation")
     parser.add_argument("--max-behavior-archetypes", type=int, default=1, help="number of behavior archetypes")
-    parser.add_argument("--collect-num", type=int, default=7, help="number of fitness score collection")  # per genratn?
+    parser.add_argument("--collect-num", type=int, default=3, help="number of fitness score collection")  # per genratn?
 
     # Core parameters
     parser.add_argument("--crossover-rate", type=float, default=0.1, help="crossover rate")
@@ -254,7 +254,7 @@ def run_simulation(arglist, behavior_archetypes, gen, ind, num):
 
         # 画图展示
         augment_view(arglist, world, Controllers[0], obs_n, step)
-        env.render()
+        # env.render()
         time.sleep(0.001)
 
     time.sleep(0.1)

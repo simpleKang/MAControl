@@ -3,6 +3,7 @@ import random
 import os
 
 pardir = os.path.dirname(os.path.dirname(__file__))
+path = '/GeneticAlgorithm/model/' if os.name == 'posix' else '\\GeneticAlgorithm\\model\\'
 
 
 class GA(object):
@@ -183,8 +184,8 @@ class GA(object):
             score_sum.append(individual_score)
         score_sum = sorted(score_sum, key=lambda x: x[1], reverse=True)
 
-        open(os.path.dirname(__file__) + '/weight_model_gen_%d.txt' % gen, 'w')
-        with open(os.path.dirname(__file__) + '/weight_model_gen_%d.txt' % gen, 'a') as f:
+        open(pardir + path + '/weight_model_gen_%d.txt' % gen, 'w')
+        with open(pardir + path + '/weight_model_gen_%d.txt' % gen, 'a') as f:
             for i in range(self.pop_size):
                 rank = score_sum[i][0]
                 f.write('Average Score: ' + str(round(score_sum[i][1]/self.collect_num, 5)) + '\n')
@@ -199,7 +200,7 @@ class GA(object):
     # 载入模型
     def load_model(self):
 
-        model = np.loadtxt(pardir + '/GeneticAlgorithm/model/model.txt')
+        model = np.loadtxt(pardir + path + 'model.txt')
 
         self.population = list()
         x, y = model.shape
@@ -216,8 +217,8 @@ class GA(object):
     # 存储模型(方便载入)
     def save_model(self, gen):
 
-        open(pardir + '/GeneticAlgorithm/model/model_%d.txt' % gen, 'w')
-        with open(pardir + '/GeneticAlgorithm/model/model_%d.txt' % gen, 'a') as f:
+        open(pardir + path + 'model_%d.txt' % gen, 'w')
+        with open(pardir + path + 'model_%d.txt' % gen, 'a') as f:
             for ind in self.population:
                 for arch in ind:
                     for wei in arch:
