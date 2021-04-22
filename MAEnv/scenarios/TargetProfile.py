@@ -37,7 +37,7 @@ target_w = [2, 2, 5, 2, 3, 2, 2, 5, 2, 3]
 # edge of the battle field (a kind of non-obstacle)
 edge = 1.5
 num_grids = 5
-grid_size = 0.005
+grid_size = 0.5
 grid_pos = [[0, 0], [edge, edge], [-edge, edge], [-edge, -edge], [edge, -edge]]
 grid_color = np.array([0.25, 0.25, 0.25])
 grid_obstacle = False
@@ -50,7 +50,7 @@ grid_obstacle = False
 
 # square (a kind of obstacle)
 num_square = 0
-square_size = 0.05
+square_size = 5
 square_pos = [[0., 0.],
               [1., 1.],
               [1., -1.],

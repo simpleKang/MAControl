@@ -1,9 +1,9 @@
 # 环境长度 1 = 实际长度 1000 米 = 1 千米
 # 初步应用了 entity = agent + landmark 和 agent = uav + target 的区分，删去了许多参数，仍需进一步修改
 # (landmark = grid + square + ...  , target = fixed_target + movable_target)
-# 用来算的大小 vs 拿来看的大小 # 这个关系要理顺 视觉效果应该ok
-# Require >=8 entities in the scenario for the codes to properly work -?
 # Entites could NOT occupy the same space physically -?
+# rendered object is not contained in r=1 circle (a.k.a. is now scaled) so "block from sight" not quite straight forward
+# —— but entites too small would be quite hard to see —— so how to balance these two needs -?
 
 import numpy as np
 import portion as por
@@ -58,7 +58,7 @@ class Scenario(BaseScenario):
         world.grids = [Landmark() for i in range(num_grids)]
         for i, grid in enumerate(world.grids):
             grid.name = 'grid %d' % i
-            grid.state.size = T.grid_size
+            grid.state.size = T.grid_size*0.01
             grid.Landmark = True
             grid.obstacle = False
 
@@ -66,7 +66,7 @@ class Scenario(BaseScenario):
         world.squares = [Landmark() for i in range(num_square)]
         for i, square in enumerate(world.squares):
             square.name = 'square %d' % i
-            square.state.size = T.square_size
+            square.state.size = T.square_size*0.01
             square.Landmark = True
             square.obstacle = True
 
@@ -177,7 +177,6 @@ class Scenario(BaseScenario):
         cover = por.empty()
 
         for i in range(len(_rank)):
-            print(i, cover, neighborhood)
             if len(neighborhood) < 7:
                 # ## # get the ptem. note that [-pi] = [pi] so split there if needed
                 index = _rank[i]
@@ -262,6 +261,10 @@ class Scenario(BaseScenario):
         vel_right_unit = np.array([agent.state.p_vel[1], -1 * agent.state.p_vel[0]]) / vel_size
         a_front = np.dot([a1, 0], vel_front_unit) + np.dot([0, a2], vel_front_unit)
         a_right = np.dot([a1, 0], vel_right_unit) + np.dot([0, a2], vel_right_unit)
-        n_view = self.neighbouring_view(agent, world)
+        n_view = list(np.concatenate(self.neighbouring_view(agent, world)))
+        # ↑↑↑ concatenate this 2-dimension array into 1-dimension array —— for observation concatenating ↓↓↓
         p_view = self.projected_view(agent, world)
-        return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + [[a_front]] + [[a_right]] + [n_view]+[p_view])
+        # print(agent.state.p_vel, agent.state.p_pos, [a_front], [a_right], n_view, p_view)
+        return np.concatenate([agent.state.p_vel] + [agent.state.p_pos]
+                              + [[a_front]] + [[a_right]]
+                              + [n_view] + [p_view])
