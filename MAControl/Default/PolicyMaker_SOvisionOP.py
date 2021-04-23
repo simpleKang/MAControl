@@ -10,7 +10,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self.UD = [0, 0]                      # 存储决策出的速度期望
         self.n_view_a = []                    # 个体视野中 neighborhood (mate)
         self.n_view_t = []                    # 个体视野中 neighborhood (target)
-        self.p_view = []                      # 个体视野中 projection
+        self.p_views = []                     # 个体视野中 projection + gamma
         self.perception_quan = []             # （量化）perception
         self.perception_dir = []              # （指向性）perception
         self.uav_num = arglist.uav_num        # 小瓜子数量
@@ -21,7 +21,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         ob = obs[self.index]
 
         n_view = ob[6:41]
-        p_view = ob[41:]
+        p_views = ob[41:]
 
         n_view_a = []
         n_view_t = []
@@ -36,7 +36,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
             else:
                 n_view_t.append(n_view_list[i][0:4])
 
-        self.p_view = p_view
+        self.p_views = p_views
         self.n_view_a = n_view_a
         self.n_view_t = n_view_t
 
@@ -45,7 +45,8 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
 
     def perception(self, obs):
 
-        p_view = self.p_view
+        p_view = self.p_views[0:-1]
+        gamma = self.p_views[-1]
         n_view_a = self.n_view_a
         n_view_t = self.n_view_t
 
@@ -75,11 +76,22 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         p7_list = [n_view_t[0] + n_view_t[1] for i in range(len(n_view_t))]
         p7 = math.fmod(sum(p7_list) / 2 / len(n_view_t), math.pi)
 
+        self_ornt = math.atan2(obs[self.index][1], obs[self.index][0])
+        G2 = self_ornt + math.pi + gamma/2
+        width = (2 * math.pi - gamma) / len(p_view)
         # Projected Agent Bearing
-        p8 = []
+        p8_list = []
+        for i in range(len(p_view)):
+            if p_view[i] == 1:
+                p8_list.append(G2 + (i+0.5) * width)
+        p8 = sum(p8_list)/len(p8_list)
 
         # Projected Target Bearing
-        p9 = []
+        p9_list = []
+        for i in range(len(p_view)):
+            if p_view[i] == 2:
+                p9_list.append(G2 + (i+0.5) * width)
+        p9 = sum(p9_list)/len(p9_list)
 
         self.perception_quan = [p1, p2, p3, p4]
         self.perception_dir = [p5, p6, p7, p8, p9]

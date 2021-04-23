@@ -251,6 +251,7 @@ class Scenario(BaseScenario):
                 else:
                     projection[i] = 2
 
+        projection.append(gamma)
         return projection
 
     def observation(self, agent, world):
