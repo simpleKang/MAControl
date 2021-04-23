@@ -53,12 +53,18 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         n_view_t = self.n_view_t
 
         # Neighbouring Mean Distance
-        p1_a_list = [n_view_a[2] for i in range(len(n_view_a))]
-        p1_t_list = [n_view_t[2] for i in range(len(n_view_t))]
-        p1 = (sum(p1_a_list) + sum(p1_t_list)) / (len(n_view_a) + len(n_view_t))
+        p1_a_list = [n_view_a[i][2] for i in range(len(n_view_a))]
+        p1_t_list = [n_view_t[i][2] for i in range(len(n_view_t))]
+        if p1_a_list or p1_t_list:
+            p1 = (sum(p1_a_list) + sum(p1_t_list)) / (len(n_view_a) + len(n_view_t))
+        else:
+            p1 = 0
 
         # Neighbouring Agent Ratio
-        p2 = len(n_view_a) / (len(n_view_a) + len(n_view_t))
+        if p1:
+            p2 = len(n_view_a) / (len(n_view_a) + len(n_view_t))
+        else:
+            p2 = 0
 
         # Projected Agent Ratio
         p3 = list(p_view).count(1) / len(p_view)
@@ -67,7 +73,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         p4 = list(p_view).count(2) / 2 / len(p_view)
 
         # Neighbouring Agent Orientation
-        p5_list = [n_view_a[4] for i in range(len(n_view_a))]
+        p5_list = [n_view_a[i][4] for i in range(len(n_view_a))]
         if p5_list:
             p5 = sum(p5_list) / len(n_view_a)
         else:
