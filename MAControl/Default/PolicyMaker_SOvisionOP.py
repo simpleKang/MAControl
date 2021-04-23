@@ -2,7 +2,6 @@ from MAControl.Base.PolicyMaker import PolicyMaker
 import numpy as np
 import random
 import math
-# zero issue -?
 
 
 class PolicyMaker_SelfOrganization(PolicyMaker):
@@ -46,6 +45,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         # 从环境里拿到的 每个 p_view 都只表现区域的主要性质
 
     def perception(self, obs):
+        self_ornt = math.atan2(obs[self.index][1], obs[self.index][0])
 
         p_view = self.p_views[0:-1]
         gamma = self.p_views[-1]
@@ -61,24 +61,32 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         p2 = len(n_view_a) / (len(n_view_a) + len(n_view_t))
 
         # Projected Agent Ratio
-        p3 = p_view.count(1) / len(p_view)
+        p3 = list(p_view).count(1) / len(p_view)
 
         # Projected Target Ratio
-        p4 = p_view.count(2) / 2 / len(p_view)
+        p4 = list(p_view).count(2) / 2 / len(p_view)
 
         # Neighbouring Agent Orientation
         p5_list = [n_view_a[4] for i in range(len(n_view_a))]
-        p5 = sum(p5_list) / len(n_view_a)
+        if p5_list:
+            p5 = sum(p5_list) / len(n_view_a)
+        else:
+            p5 = self_ornt
 
         # Neighbouring Agent Bearing
-        p6_list = [n_view_a[0] + n_view_a[1] for i in range(len(n_view_a))]
-        p6 = math.fmod(sum(p6_list) / 2 / len(n_view_a), math.pi)
+        p6_list = [n_view_a[i][0] + n_view_a[i][1] for i in range(len(n_view_a))]
+        if p6_list:
+            p6 = math.fmod(sum(p6_list) / 2 / len(n_view_a), math.pi)
+        else:
+            p6 = self_ornt
 
         # Neighbouring Target Bearing
-        p7_list = [n_view_t[0] + n_view_t[1] for i in range(len(n_view_t))]
-        p7 = math.fmod(sum(p7_list) / 2 / len(n_view_t), math.pi)
+        p7_list = [n_view_t[i][0] + n_view_t[i][1] for i in range(len(n_view_t))]
+        if p7_list:
+            p7 = math.fmod(sum(p7_list) / 2 / len(n_view_t), math.pi)
+        else:
+            p7 = self_ornt
 
-        self_ornt = math.atan2(obs[self.index][1], obs[self.index][0])
         G2 = self_ornt + math.pi + gamma/2
         width = (2 * math.pi - gamma) / len(p_view)
         # Projected Agent Bearing
@@ -86,14 +94,20 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         for i in range(len(p_view)):
             if p_view[i] == 1:
                 p8_list.append(G2 + (i+0.5) * width)
-        p8 = sum(p8_list)/len(p8_list)
+        if p8_list:
+            p8 = sum(p8_list)/len(p8_list)
+        else:
+            p8 = self_ornt
 
         # Projected Target Bearing
         p9_list = []
         for i in range(len(p_view)):
             if p_view[i] == 2:
                 p9_list.append(G2 + (i+0.5) * width)
-        p9 = sum(p9_list)/len(p9_list)
+        if p9_list:
+            p9 = sum(p9_list)/len(p9_list)
+        else:
+            p9 = self_ornt
 
         self.perception_quan = [p1, p2, p3, p4]
         self.perception_dir = [p5, p6, p7, p8, p9]
