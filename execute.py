@@ -95,7 +95,7 @@ def get_controller(env, world, arglist):
     for i in range(arglist.uav_num):
         control = list()
 
-        control.append(PM_V.PolicyMaker_SelfOrganization("uav_%d" % i, env, world, i, arglist))
+        control.append(PM_V.PolicyMaker_SO("uav_%d" % i, env, world, i, arglist))
         control.append(PP_G.PathPlanner_EdgeWaypoint("uav_%d" % i, env, world, i, arglist))
         control.append(MC_L.MotionController_L1_TECS("uav_%d" % i, env, world, i, arglist))
         control.append(IC_P.InnerController_PID("uav_%d" % i, env, world, i, arglist))
@@ -108,7 +108,7 @@ def get_controller(env, world, arglist):
         control = list()
 
         # i 是作为target的编号 # i+arglist.uav_num 是作为agent的编号
-        control.append(PM_V.PolicyMaker_SelfOrganization("target_%d" % i, env, world, i+arglist.uav_num, arglist))
+        control.append(PM_V.PolicyMaker_SO("target_%d" % i, env, world, i+arglist.uav_num, arglist))
         control.append(PP_G.PathPlanner_EdgeWaypoint("target_%d" % i, env, world, i+arglist.uav_num, arglist))
         control.append(MC_L.MotionController_L1_TECS("target_%d" % i, env, world, i+arglist.uav_num, arglist))
         control.append(IC_P.InnerController_PID("target_%d" % i, env, world, i+arglist.uav_num, arglist))
@@ -178,11 +178,11 @@ def get_score(arglist, gen, ind, num):
     #     _score = -arglist.step_max
 
     # WZQ 计算目标处于UAV感知范围内的时间
-    # _score = round(sum(PM_S.PolicyMaker_SelfOrganization.target_in_sight) / arglist.uav_num, 2)
-    # PM_S.PolicyMaker_SelfOrganization.target_in_sight.clear()
+    # _score = round(sum(PM_S.PolicyMaker_SO.target_in_sight) / arglist.uav_num, 2)
+    # PM_S.PolicyMaker_SO.target_in_sight.clear()
 
     # WZQ 有限数量目标吸引，多于排斥
-    # target_seen_step = np.array(PM_S.PolicyMaker_SelfOrganization.target_in_sight[:arglist.uav_num])
+    # target_seen_step = np.array(PM_S.PolicyMaker_SO.target_in_sight[:arglist.uav_num])
     # step_sum = np.sum(target_seen_step, axis=0)
     # reward = 0
     # punish = 0
@@ -192,10 +192,10 @@ def get_score(arglist, gen, ind, num):
     #         if step_sum[i] > T.target_H[0]:
     #             punish += 1
     # _score = reward - punish
-    # PM_S.PolicyMaker_SelfOrganization.target_in_sight.clear()
+    # PM_S.PolicyMaker_SO.target_in_sight.clear()
 
     # WZQ 目标吸引加权得分，排斥扣分
-    # target_seen_step = np.array(PM_V.PolicyMaker_SelfOrganization.target_in_sight[:arglist.uav_num])
+    # target_seen_step = np.array(PM_V.PolicyMaker_SO.target_in_sight[:arglist.uav_num])
     # step_sum = np.sum(target_seen_step, axis=0)
     # _score = 0
     # for i in range(step_sum.size):
@@ -203,13 +203,13 @@ def get_score(arglist, gen, ind, num):
     #         _score += 1 - 0.3*(T.target_H[0] - step_sum[i])
     #     elif step_sum[i] > T.target_H[0]:
     #         _score -= 1
-    # PM_V.PolicyMaker_SelfOrganization.target_in_sight.clear()
+    # PM_V.PolicyMaker_SO.target_in_sight.clear()
 
     # WZQ 视觉列队飞行
-    # uav_seen_step = np.array(PM_V.PolicyMaker_SelfOrganization.uav_in_sight[:arglist.uav_num])
+    # uav_seen_step = np.array(PM_V.PolicyMaker_SO.uav_in_sight[:arglist.uav_num])
     # step_sum = np.sum(uav_seen_step, axis=0)
     # _score = sum(step_sum)
-    # PM_V.PolicyMaker_SelfOrganization.uav_in_sight.clear()
+    # PM_V.PolicyMaker_SO.uav_in_sight.clear()
 
     return _score
 

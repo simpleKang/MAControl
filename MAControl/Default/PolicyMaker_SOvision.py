@@ -3,13 +3,13 @@ import numpy as np
 import math
 
 
-class PolicyMaker_SelfOrganization(PolicyMaker):
+class PolicyMaker_SO(PolicyMaker):
 
     uav_in_sight = list()
     target_in_sight = list()
 
     def __init__(self, name, env, world, agent_index, arglist):
-        super(PolicyMaker_SelfOrganization, self).__init__(name, env, world, agent_index, arglist)
+        super(PolicyMaker_SO, self).__init__(name, env, world, agent_index, arglist)
         self.UD = [0, 0]                      # 存储决策(rule->BA)得出的速度期望
         self.seen_uavs = list()               # 个体视野中uav
         self.seen_targets = list()            # 个体视野中target
@@ -20,8 +20,8 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         self.target_sense = 0
         self.sense_count = -1
         self.current_behavior = None
-        PolicyMaker_SelfOrganization.uav_in_sight.append([])
-        PolicyMaker_SelfOrganization.target_in_sight.append([])
+        PolicyMaker_SO.uav_in_sight.append([])
+        PolicyMaker_SO.target_in_sight.append([])
 
     def get_objects_in_sight(self, obs):
 
@@ -135,9 +135,9 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
                 # else:
                 #     PolicyMaker_SelfOrganization.uav_in_sight[self.index].append(0)
                 if self.seen_targets:
-                    PolicyMaker_SelfOrganization.target_in_sight[self.index].append(1)
+                    PolicyMaker_SO.target_in_sight[self.index].append(1)
                 else:
-                    PolicyMaker_SelfOrganization.target_in_sight[self.index].append(0)
+                    PolicyMaker_SO.target_in_sight[self.index].append(0)
 
                 self.current_behavior = BEHAVIOR[2]
 

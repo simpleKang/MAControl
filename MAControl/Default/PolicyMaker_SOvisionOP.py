@@ -4,10 +4,10 @@ import random
 import math
 
 
-class PolicyMaker_SelfOrganization(PolicyMaker):
+class PolicyMaker_SO(PolicyMaker):
 
     def __init__(self, name, env, world, agent_index, arglist):
-        super(PolicyMaker_SelfOrganization, self).__init__(name, env, world, agent_index, arglist)
+        super(PolicyMaker_SO, self).__init__(name, env, world, agent_index, arglist)
         self.UD = [0, 0]                      # 存储决策出的速度期望
         self.n_view_a = []                    # 个体视野中 neighborhood (mate)
         self.n_view_t = []                    # 个体视野中 neighborhood (target)
