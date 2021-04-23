@@ -39,7 +39,7 @@ def parse_args():
 
     # Environment
     parser.add_argument("--scenario", type=str, default="scenario5_visionOP", help="name of the scenario script")
-    parser.add_argument("--uav-num", type=int, default=20, help="number of uav")
+    parser.add_argument("--uav-num", type=int, default=7, help="number of uav")
     parser.add_argument("--step-max", type=int, default=100, help="number of maximum steps")
 
     # GA

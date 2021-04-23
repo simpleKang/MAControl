@@ -125,13 +125,13 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         p_dir = self.perception_dir
 
         UR = list()
-        UR.append(np.array(math.cos(p_dir[0]), math.sin(p_dir[0])))  # rule 1
-        UR.append(np.array(math.cos(p_dir[1]), math.sin(p_dir[1])))  # rule 2
-        UR.append(np.array(math.cos(p_dir[2]), math.sin(p_dir[2])))  # rule 3
-        UR.append(np.array(math.cos(p_dir[3]), math.sin(p_dir[3])))  # rule 4
-        UR.append(np.array(math.cos(p_dir[4]), math.sin(p_dir[4])))  # rule 5
+        UR.append(np.array([math.cos(p_dir[0]), math.sin(p_dir[0])]))  # rule 1
+        UR.append(np.array([math.cos(p_dir[1]), math.sin(p_dir[1])]))  # rule 2
+        UR.append(np.array([math.cos(p_dir[2]), math.sin(p_dir[2])]))  # rule 3
+        UR.append(np.array([math.cos(p_dir[3]), math.sin(p_dir[3])]))  # rule 4
+        UR.append(np.array([math.cos(p_dir[4]), math.sin(p_dir[4])]))  # rule 5
         rand = -math.pi + 2*math.pi*random.random()
-        UR.append(np.array(math.cos(rand), math.sin(rand)))          # rule 6
+        UR.append(np.array([math.cos(rand), math.sin(rand)]))          # rule 6
 
         UD = np.array([0, 0])
         for i in range(len(UR)):
