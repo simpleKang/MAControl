@@ -1,4 +1,5 @@
 import numpy as np
+import math
 import random
 import os
 
@@ -68,7 +69,7 @@ class GA(object):
         self.binary_population.clear()
 
         score_sum = list()
-        score_sum_individual = np.sum(self.score, axis=1)
+        score_sum_individual = np.sum(self.score, axis=1)  # sum over collect_num
 
         for i in range(self.pop_size):
             individual_score = [i, score_sum_individual[i]]
@@ -79,43 +80,34 @@ class GA(object):
         for i in range(self.preserved_num):
             self.new_population.append(self.population[score_sum[i][0]])
 
-    # 交叉操作,交叉操作完成后，使得新种群数量与原种群保持一致
+    # 交叉操作,交叉操作完成后
     def crossover(self):
 
-        if len(self.binary_population) < self.pop_size:
-            child = list()
-            for i in range(0, (self.pop_size - self.preserved_num)):
+        child = list()
+        cross_num = math.ceil(self.pop_size * self.cr2)
+        cross_bit = math.ceil((self.ba_c + self.ba_w) * self.max_archetypes * self.cr1)
 
-                parent = random.sample(range(0, len(self.binary_population)), 2)
+        for i in range(cross_num):
+            parent = random.sample(range(0, len(self.binary_population)), 2)
+            parent0 = self.binary_population[parent[0]]
+            parent1 = self.binary_population[parent[1]]
 
-                # 行为原型交叉
-                r1 = random.sample(range(0, (self.max_archetypes*self.ba_c)), 2)
-                parent1_part1 = self.binary_population[parent[0]][0:(self.bit*self.max_archetypes*self.ba_c)]
-                parent2_part1 = self.binary_population[parent[1]][0:(self.bit*self.max_archetypes*self.ba_c)]
-                child1_part1 = parent2_part1[0:min(r1) * self.bit] + parent1_part1[min(r1) * self.bit:max(r1) * self.bit]\
-                               + parent2_part1[max(r1) * self.bit:]
-                child2_part1 = parent1_part1[0:min(r1) * self.bit] + parent2_part1[min(r1) * self.bit:max(r1) * self.bit]\
-                               + parent1_part1[max(r1) * self.bit:]
+            points = random.sample(range(0, (self.max_archetypes * (self.ba_c + self.ba_w))), cross_bit)
+            points.sort()
 
-                # 行为矩阵交叉
-                r2 = random.sample(range(0, (self.max_archetypes*(self.ba_w+self.ba_r))), 2)
-                parent1_part2 = self.binary_population[parent[0]][(self.bit*self.max_archetypes*self.ba_c):]
-                parent2_part2 = self.binary_population[parent[1]][(self.bit*self.max_archetypes*self.ba_c):]
-                child1_part2 = parent2_part2[0:min(r2) * self.bit] + parent1_part2[min(r2) * self.bit:max(r2) * self.bit]\
-                               + parent2_part2[max(r2) * self.bit:]
-                child2_part2 = parent1_part2[0:min(r2) * self.bit] + parent2_part2[min(r2) * self.bit:max(r2) * self.bit]\
-                               + parent1_part2[max(r2) * self.bit:]
-
-                child1 = child1_part1 + child1_part2
-                child2 = child2_part1 + child2_part2
-
-                if random.random() < self.crossover_rate:
-                    child.append(child1)
+            for ii in range(len(points)):
+                k = points[ii]
+                if ii == 0:
+                    child.append(parent0[0:k*self.bit])
+                elif ii == len(points):
+                    child.append(parent0[k*self.bit:points[ii+1]*self.bit])
                 else:
-                    child.append(child2)
-            self.binary_population += child
+                    child.append(parent0[k*self.bit:-1])
+                child.append(parent1[k*self.bit:(k+1)*self.bit])
 
-    # 变异操作,不改变种群数量
+        self.binary_population += child
+
+    # 变异操作
     def mutate(self):
 
         # 采用随机位变异
