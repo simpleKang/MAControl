@@ -11,28 +11,29 @@ class GA(object):
 
         self.pop_size = arglist.pop_size
         self.generation_num = arglist.generation_num
-        self.preserved_num = round(arglist.preserved_population*self.pop_size)
+        self.preserved_num = arglist.pop_size
         self.collect_num = arglist.collect_num
         self.max_archetypes = arglist.max_behavior_archetypes
-        self.crossover_rate = arglist.crossover_rate
-        self.mutation_rate = arglist.mutation_rate
-        self.mutation_neighborhood = arglist.mutation_neighborhood
+        self.cr1 = arglist.crossover_rate_inner
+        self.cr2 = arglist.crossover_rate_outer
+        self.mr1 = arglist.mutation_rate_inner
+        self.mr2 = arglist.mutaiton_rate_outer
+        self.mutation_neighborhood = arglist.mutation_neighborhood  # ?
         self.bit = 5
 
-        self.ba_c = 2
-        self.ba_w = 9
-        self.ba_r = 3
+        self.ba_c = 4
+        self.ba_w = 5
 
         if arglist.restore:
             self.load_model()
             print('Loading existing model.')
         else:
-            # 初始化随机种群
+            # 随机初始化种群
             self.population = [[] for i in range(self.pop_size)]
             for individual in self.population:
-                for ba_arch in range(self.max_archetypes):
+                for arch in range(self.max_archetypes):
                     individual.append([])
-                    for weight in range(self.ba_c+self.ba_w+self.ba_r):
+                    for weight in range(self.ba_c+self.ba_w):
                         individual[-1].append(np.random.random())
 
         self.score = np.zeros((self.pop_size, self.collect_num))

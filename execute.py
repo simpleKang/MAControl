@@ -44,7 +44,6 @@ def parse_args():
 
     # GA
     parser.add_argument("--pop-size", type=int, default=5, help="size of population")
-    parser.add_argument("--preserved-population", type=float, default=0.5, help="percentage of population selected")
     parser.add_argument("--generation-num", type=int, default=4, help="number of generation")
     parser.add_argument("--max-behavior-archetypes", type=int, default=1, help="number of behavior archetypes")
     parser.add_argument("--collect-num", type=int, default=3, help="number of fitness score collection")  # per genratn?
