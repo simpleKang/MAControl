@@ -139,37 +139,30 @@ class GA(object):
         self.binary_population = [[] for i in range(self.preserved_num)]
         for ind, individual in enumerate(self.binary_population):
             for arch in range(self.max_archetypes):
-                for c in range(self.ba_c):
-                    current_weight = int(round(self.new_population[ind][arch][c] * (2**self.bit - 1)))
-                    individual += dec2bin(current_weight)
-            for arch in range(self.max_archetypes):
-                for wr in range(self.ba_w + self.ba_r):
-                    current_weight = int(round(self.new_population[ind][arch][self.ba_c + wr] * (2**self.bit - 1)))
+                for c in range(self.ba_c + self.ba_w):
+                    current_weight = int(math.ceil(self.new_population[ind][arch][c] * 2**(self.bit-1)
+                                                   + 2**(self.bit-1) - 1))
                     individual += dec2bin(current_weight)
 
     # 解码操作,将二进制编码解码为权重形式
     def decode(self):
 
-        def bin2dec(binary_):
-            binary_ = [str(i) for i in binary_]
-            result = '0b' + ''.join(binary_)
+        def bin2dec(binary_array):
+            binary_array = [str(i) for i in binary_array]
+            result = '0b' + ''.join(binary_array)
             result = int(result, 2)
             return result
 
         self.new_population.clear()
         for ind in range(len(self.binary_population)):
             individual = list()
-            for bit in range(0, len(self.binary_population[ind]), self.bit):
-                binary = self.binary_population[ind][bit:bit+self.bit]
-                weight_value = bin2dec(binary) / (2**self.bit - 1)
+            for b in range(0, self.max_archetypes * (self.ba_c + self.ba_w)):
+                binary = self.binary_population[ind][(b*self.bit):((b+1)*self.bit)]
+                weight_value = (bin2dec(binary) - 2**(self.bit-1) + 1) / 2**(self.bit-1)
                 individual.append(weight_value)
 
-            individual_arch = [[] for i in range(self.max_archetypes)]
-            for arch in range(self.max_archetypes):
-                individual_arch[arch] += individual[self.ba_c*arch:self.ba_c*(arch+1)]
-                individual_arch[arch] += individual[self.ba_c*self.max_archetypes + (self.ba_w+self.ba_r)*arch:
-                                                    self.ba_c*self.max_archetypes + (self.ba_w+self.ba_r)*(arch+1)]
-
+            individual_arch = [individual[(self.ba_w+self.ba_c)*arch:
+                                          (self.ba_w+self.ba_c)*(arch+1)] for arch in range(self.max_archetypes)]
             self.new_population.append(individual_arch)
 
     # 进化完成后保存权重模型(可读性高的存储方式)
@@ -190,8 +183,8 @@ class GA(object):
                 f.write('Average Score: ' + str(round(score_sum[i][1]/self.collect_num, 5)) + '\n')
                 for arch in self.population[rank]:
                     f.write('Archetype: ')
-                    for ele in arch:
-                        f.write(str(round(ele, 3)) + ', ')
+                    for weight in arch:
+                        f.write(str(round(weight, 3)) + ', ')
                     f.write('\n')
                 f.write('\n' + '\n')
         pass
@@ -203,12 +196,12 @@ class GA(object):
 
         self.population = list()
         x, y = model.shape
-        if (x == self.pop_size*self.max_archetypes) and (y == self.ba_c + self.ba_w + self.ba_r):
+        if (x == self.pop_size*self.max_archetypes) and (y == self.ba_c + self.ba_w):
             for i in range(self.pop_size):
                 self.population.append(list())
                 for j in range(self.max_archetypes):
                     self.population[i].append(list())
-                    for k in range(self.ba_c + self.ba_w + self.ba_r):
+                    for k in range(self.ba_c + self.ba_w):
                         self.population[i][j].append(model[i * self.max_archetypes + j][k])
         else:
             raise Exception('Check parameters.')
@@ -220,6 +213,6 @@ class GA(object):
         with open(pardir + path + 'model_%d.txt' % gen, 'a') as f:
             for ind in self.population:
                 for arch in ind:
-                    for wei in arch:
-                        f.write(str(wei) + ' ')
+                    for weight in arch:
+                        f.write(str(weight) + ' ')
                     f.write('\n')
