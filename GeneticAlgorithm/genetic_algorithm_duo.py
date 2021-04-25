@@ -10,28 +10,28 @@ path = '/GeneticAlgorithm/model/' if os.name == 'posix' else '\\GeneticAlgorithm
 class GA(object):
     def __init__(self, arglist):
 
-        self.pop_size = arglist.pop_size
-        self.generation_num = arglist.generation_num
-        self.preserved_num = arglist.pop_size
         self.collect_num = arglist.collect_num
+
+        self.pop_size = arglist.pop_size
         self.max_archetypes = arglist.max_behavior_archetypes
         self.cr1 = arglist.crossover_rate_inner
         self.cr2 = arglist.crossover_rate_outer
         self.mr1 = arglist.mutation_rate_inner
-        self.mr2 = arglist.mutaiton_rate_outer
-        self.mutation_p = arglist.mutation_neighborhood  # how many bits per weight is mutated
-        self.bit = 5
+        self.mr2 = arglist.mutation_rate_outer
+        self.ba_c = 4  # amount of weight for quantitative perception
+        self.ba_w = 5  # amount of weight for directional perception
 
-        self.ba_c = 4
-        self.ba_w = 5
+        self.bit = 5  # how many bits per weight representation - each weight \in (-1,1]
+        self.mutation_p = arglist.mutation_neighborhood  # how many bits per weight is mutated
 
         if arglist.restore:
             self.load_model()
             print('Loading existing model.')
+
         else:
-            # 随机初始化种群
             self.population = [[] for i in range(self.pop_size)]
             for individual in self.population:
+                # 随机初始化种群 # shape: pop_size ✖ max_archetypes ✖ (self.ba_c+self.ba_w)
                 for arch in range(self.max_archetypes):
                     individual.append([])
                     for weight in range(self.ba_c+self.ba_w):
@@ -77,7 +77,7 @@ class GA(object):
         score_sum = sorted(score_sum, key=lambda x: x[1], reverse=True)
         self.score = np.zeros((self.pop_size, self.collect_num))
 
-        for i in range(self.preserved_num):
+        for i in range(self.pop_size):
             self.new_population.append(self.population[score_sum[i][0]])
 
     # 交叉操作
@@ -136,7 +136,7 @@ class GA(object):
                 binary.insert(0, 0)
             return binary
 
-        self.binary_population = [[] for i in range(self.preserved_num)]
+        self.binary_population = [[] for i in range(self.pop_size)]
         for ind, individual in enumerate(self.binary_population):
             for arch in range(self.max_archetypes):
                 for c in range(self.ba_c + self.ba_w):

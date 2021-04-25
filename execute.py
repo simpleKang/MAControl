@@ -146,8 +146,7 @@ def action(world, obs_n, step, ControllerSet, obstacles, behavior_archetypes):
 
 
 def augment_view(arglist, world, Controller, obs, step):
-    for i in range(arglist.uav_num):
-        pass
+    pass
 
 
 def get_score(arglist, gen, ind, num):
@@ -216,6 +215,7 @@ def get_score(arglist, gen, ind, num):
 
 
 def run_simulation(arglist, behavior_archetypes, gen, ind, num):
+    # environment -> controller -> step by step -> score
 
     with open(os.path.dirname(__file__) + path + 'para.txt', 'w') as f:
         f.write(str(arglist.uav_num) + ' ' + str(arglist.step_max) + ' ' + str(num))
@@ -233,7 +233,6 @@ def run_simulation(arglist, behavior_archetypes, gen, ind, num):
         open(os.path.dirname(__file__) + path + 'uav_%d_track.txt' % k, 'w')
 
     obs_n = env.reset()
-
     for step in range(arglist.step_max):
 
         # 选择动作
@@ -242,7 +241,6 @@ def run_simulation(arglist, behavior_archetypes, gen, ind, num):
         action_n = action_Un + action_Tn
 
         new_obs_n, rew_n, done_n, info_n = env.step(action_n)
-
         obs_n = new_obs_n
 
         # 保存每个小瓜子每个step的状态信息
@@ -251,14 +249,13 @@ def run_simulation(arglist, behavior_archetypes, gen, ind, num):
                 f.write(str(obs_n[k][0]) + ' ' + str(obs_n[k][1]) + ' ' +
                         str(obs_n[k][2]) + ' ' + str(obs_n[k][3]) + '\n')
 
-        # print('>>> Step ', step)
-
         # 画图展示
-        augment_view(arglist, world, Controllers[0], obs_n, step)
+        # augment_view(arglist, world, Controllers[0], obs_n, step)
         # env.render()
-        time.sleep(0.001)
+        # print('>>> Step ', step)
+        # time.sleep(0.001)
 
-    time.sleep(0.1)
+    # time.sleep(0.001)
     _score = get_score(arglist, gen, ind, num)
 
     return _score
@@ -267,8 +264,6 @@ def run_simulation(arglist, behavior_archetypes, gen, ind, num):
 if __name__ == '__main__':
 
     arglist = parse_args()
-    r_state = rs.RandomState(arglist.collect_num, arglist.uav_num)
-    T.init_state = r_state
 
     if arglist.evolve:
         ga = ga_duo.GA(arglist)
