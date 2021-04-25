@@ -214,11 +214,11 @@ def get_score(arglist, gen, ind, num):
     return _score
 
 
-def run_simulation(arglist, behavior_archetypes, gen, ind, num):
+def run_simulation(arglist, behavior_archetypes, gen, ind, c_num):
     # environment -> controller -> step by step -> score
 
     with open(os.path.dirname(__file__) + path + 'para.txt', 'w') as f:
-        f.write(str(arglist.uav_num) + ' ' + str(arglist.step_max) + ' ' + str(num))
+        f.write(str(arglist.uav_num) + ' ' + str(arglist.step_max) + ' ' + str(c_num))
 
     # Create environment
     env, world, obstacle_info = make_env(arglist)
@@ -256,7 +256,7 @@ def run_simulation(arglist, behavior_archetypes, gen, ind, num):
         # time.sleep(0.001)
 
     # time.sleep(0.001)
-    _score = get_score(arglist, gen, ind, num)
+    _score = get_score(arglist, gen, ind, c_num)
 
     return _score
 
@@ -268,8 +268,8 @@ if __name__ == '__main__':
     if arglist.evolve:
         ga = ga_duo.GA(arglist)
 
-        for gen in range(arglist.generation_num + 1):
-            for ind, individual in enumerate(ga.population):
+        for gen in range(arglist.generation_num):
+            for ind, individual in enumerate(ga.population):  # possibly ind > pop size
                 for num in range(arglist.collect_num):
 
                     start = time.time()
@@ -279,10 +279,7 @@ if __name__ == '__main__':
                           'time-consuming: ', round((end - start), 2), 'score: ', score)
                     ga.score[ind][num] = score
 
-            ga.save_pop(gen)
-
-            if gen < arglist.generation_num:
-                ga.evolve(gen)
+            ga.evolve(gen)
 
         print('All finished!')
 
