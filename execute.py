@@ -46,14 +46,14 @@ def parse_args():
     parser.add_argument("--pop-size", type=int, default=5, help="size of population")
     parser.add_argument("--generation-num", type=int, default=4, help="number of generation")
     parser.add_argument("--max-behavior-archetypes", type=int, default=1, help="number of behavior archetypes")
-    parser.add_argument("--collect-num", type=int, default=3, help="number of fitness score collection")  # per genratn?
+    parser.add_argument("--collect-num", type=int, default=3, help="number of fitness score collection")  # per genratn
 
     # Core parameters
     parser.add_argument("--crossover-rate-inner", type=float, default=0.1, help="crossover rate")
     parser.add_argument("--crossover-rate-outer", type=float, default=0.2, help="mutation rate")
     parser.add_argument("--mutation-rate-inner", type=float, default=0.7, help="mutation rate")
     parser.add_argument("--mutation-rate-outer", type=float, default=0.8, help="mutation rate")
-    parser.add_argument("--mutation-neighborhood", type=float, default=0.05, help="mutation neighborhood")  # ?
+    parser.add_argument("--mutation-neighborhood", type=float, default=0.05, help="mutation neighborhood")
 
     # Evolve or Test
     parser.add_argument("--evolve", action="store_false", default=True)

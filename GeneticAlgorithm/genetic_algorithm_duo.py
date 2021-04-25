@@ -19,7 +19,7 @@ class GA(object):
         self.cr2 = arglist.crossover_rate_outer
         self.mr1 = arglist.mutation_rate_inner
         self.mr2 = arglist.mutaiton_rate_outer
-        self.mutation_neighborhood = arglist.mutation_neighborhood  # ?
+        self.mutation_p = arglist.mutation_neighborhood  # how many bits per weight is mutated
         self.bit = 5
 
         self.ba_c = 4
@@ -80,43 +80,49 @@ class GA(object):
         for i in range(self.preserved_num):
             self.new_population.append(self.population[score_sum[i][0]])
 
-    # 交叉操作,交叉操作完成后
+    # 交叉操作
     def crossover(self):
 
         child = list()
         cross_num = math.ceil(self.pop_size * self.cr2)
-        cross_bit = math.ceil((self.ba_c + self.ba_w) * self.max_archetypes * self.cr1)
+        cross_w = math.ceil((self.ba_c + self.ba_w) * self.max_archetypes * self.cr1)
 
         for i in range(cross_num):
             parent = random.sample(range(0, len(self.binary_population)), 2)
             parent0 = self.binary_population[parent[0]]
             parent1 = self.binary_population[parent[1]]
 
-            points = random.sample(range(0, (self.max_archetypes * (self.ba_c + self.ba_w))), cross_bit)
+            points = random.sample(range(0, (self.max_archetypes * (self.ba_c + self.ba_w))), cross_w)
             points.sort()
 
+            child = parent0.copy()
             for ii in range(len(points)):
                 k = points[ii]
-                if ii == 0:
-                    child.append(parent0[0:k*self.bit])
-                elif ii == len(points):
-                    child.append(parent0[k*self.bit:points[ii+1]*self.bit])
-                else:
-                    child.append(parent0[k*self.bit:-1])
-                child.append(parent1[k*self.bit:(k+1)*self.bit])
+                child[k*self.bit:(k+1)*self.bit] = parent1[k*self.bit:(k+1)*self.bit]
 
         self.binary_population += child
 
     # 变异操作
     def mutate(self):
 
-        # 采用随机位变异
-        for individual in self.binary_population:
-            if random.random() < self.mutation_rate:
-                mun_bit = int(len(individual) * self.mutation_neighborhood)
-                each_bit = random.sample(range(0, len(individual)), mun_bit)
-                for bit in each_bit:
-                    individual[bit] = 0 if individual[bit] == 1 else 1
+        child = list()
+        mutate_num = math.ceil(self.pop_size * self.mr2)
+        mutate_w = math.ceil((self.ba_c + self.ba_w) * self.max_archetypes * self.mr1)
+
+        # 采用双层随机位变异
+        for i in range(mutate_num):
+            parent = random.sample(range(0, len(self.binary_population)), 1)
+            points = random.sample(range(0, (self.max_archetypes * (self.ba_c + self.ba_w))), mutate_w)
+
+            child = self.binary_population[parent].copy()
+            for ii in range(len(points)):
+                k = points[ii]
+                weight_k = child[k*self.bit:(k+1)*self.bit]
+                bits = random.sample(range(0, self.bit), self.mutation_p)
+                weight_k_new = [weight_k[u] if u in bits else 1-weight_k[u] for u in range(len(weight_k))]
+                child[k * self.bit:(k + 1) * self.bit] = weight_k_new
+
+        self.binary_population += child
 
     # 将新种群编码为二进制形式
     def encode(self):
