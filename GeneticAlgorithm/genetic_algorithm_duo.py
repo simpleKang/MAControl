@@ -55,78 +55,29 @@ class GA(object):
 
         self.decode()
 
-        if len(self.new_population) == self.pop_size:
-            print('Generation: ', gen, ' Evolution completed!')
-        else:
-            raise Exception('Evolution failed! Check the population.')
-
         self.population = self.new_population.copy()
 
         self.save_model(gen)
 
-    # 选出部分个体进入下一代
+        self.save_pop(gen)
+
+    # 选出部分个体进入下一代 from self.population
     def select(self):
+        # now we have population + score [both of evolved pop size]
+
         self.new_population.clear()
         self.binary_population.clear()
 
-        score_sum = list()
         score_sum_individual = np.sum(self.score, axis=1)  # sum over collect_num
-
-        for i in range(self.pop_size):
-            individual_score = [i, score_sum_individual[i]]
-            score_sum.append(individual_score)
+        score_sum = [[i, score_sum_individual[i]] for i in range(len(self.score))]
         score_sum = sorted(score_sum, key=lambda x: x[1], reverse=True)
-        self.score = np.zeros((self.pop_size, self.collect_num))
 
         for i in range(self.pop_size):
             self.new_population.append(self.population[score_sum[i][0]])
 
-    # 交叉操作
-    def crossover(self):
-
-        child = list()
-        cross_num = math.ceil(self.pop_size * self.cr2)
-        cross_w = math.ceil((self.ba_c + self.ba_w) * self.max_archetypes * self.cr1)
-
-        for i in range(cross_num):
-            parent = random.sample(range(0, len(self.binary_population)), 2)
-            parent0 = self.binary_population[parent[0]]
-            parent1 = self.binary_population[parent[1]]
-
-            points = random.sample(range(0, (self.max_archetypes * (self.ba_c + self.ba_w))), cross_w)
-            points.sort()
-
-            child = parent0.copy()
-            for ii in range(len(points)):
-                k = points[ii]
-                child[k*self.bit:(k+1)*self.bit] = parent1[k*self.bit:(k+1)*self.bit]
-
-        self.binary_population += child
-
-    # 变异操作
-    def mutate(self):
-
-        child = list()
-        mutate_num = math.ceil(self.pop_size * self.mr2)
-        mutate_w = math.ceil((self.ba_c + self.ba_w) * self.max_archetypes * self.mr1)
-
-        # 采用双层随机位变异
-        for i in range(mutate_num):
-            parent = random.sample(range(0, len(self.binary_population)), 1)
-            points = random.sample(range(0, (self.max_archetypes * (self.ba_c + self.ba_w))), mutate_w)
-
-            child = self.binary_population[parent].copy()
-            for ii in range(len(points)):
-                k = points[ii]
-                weight_k = child[k*self.bit:(k+1)*self.bit]
-                bits = random.sample(range(0, self.bit), self.mutation_p)
-                weight_k_new = [weight_k[u] if u in bits else 1-weight_k[u] for u in range(len(weight_k))]
-                child[k * self.bit:(k + 1) * self.bit] = weight_k_new
-
-        self.binary_population += child
-
     # 将新种群编码为二进制形式
     def encode(self):
+        # now we have new population [of pop size] + [empty] binary population
 
         def dec2bin(dec):
             binary = list()
@@ -145,8 +96,51 @@ class GA(object):
                                                    + 2**(self.bit-1) - 1))
                     individual += dec2bin(current_weight)
 
+    # 交叉操作
+    def crossover(self):
+        # now we have binary population [of pop size]
+
+        cross_num = math.ceil(self.pop_size * self.cr2)
+        cross_w = math.ceil((self.ba_c + self.ba_w) * self.max_archetypes * self.cr1)
+
+        for i in range(cross_num):
+            parent = random.sample(range(0, len(self.binary_population)), 2)
+            parent0 = self.binary_population[parent[0]]
+            parent1 = self.binary_population[parent[1]]
+
+            points = random.sample(range(0, (self.max_archetypes * (self.ba_c + self.ba_w))), cross_w)
+            points.sort()
+
+            child = parent0.copy()
+            for ii in range(len(points)):
+                k = points[ii]
+                child[k*self.bit:(k+1)*self.bit] = parent1[k*self.bit:(k+1)*self.bit]
+            self.binary_population += child
+
+    # 变异操作
+    def mutate(self):
+        # now we have binary population [of pop size + crossover results]
+
+        mutate_num = math.ceil(self.pop_size * self.mr2)
+        mutate_w = math.ceil((self.ba_c + self.ba_w) * self.max_archetypes * self.mr1)
+
+        # 采用双层随机位变异
+        for i in range(mutate_num):
+            parent = random.sample(range(0, len(self.binary_population)), 1)
+            points = random.sample(range(0, (self.max_archetypes * (self.ba_c + self.ba_w))), mutate_w)
+
+            child = self.binary_population[parent].copy()
+            for ii in range(len(points)):
+                k = points[ii]
+                weight_k = child[k*self.bit:(k+1)*self.bit]
+                bits = random.sample(range(0, self.bit), self.mutation_p)
+                weight_k_new = [weight_k[u] if u in bits else 1-weight_k[u] for u in range(len(weight_k))]
+                child[k * self.bit:(k + 1) * self.bit] = weight_k_new
+            self.binary_population += child
+
     # 解码操作,将二进制编码解码为权重形式
     def decode(self):
+        # now we have binary population [of evolved pop size]
 
         def bin2dec(binary_array):
             binary_array = [str(i) for i in binary_array]
@@ -154,19 +148,18 @@ class GA(object):
             result = int(result, 2)
             return result
 
-        self.new_population.clear()
+        self.population.clear()
         for ind in range(len(self.binary_population)):
             individual = list()
             for b in range(0, self.max_archetypes * (self.ba_c + self.ba_w)):
                 binary = self.binary_population[ind][(b*self.bit):((b+1)*self.bit)]
                 weight_value = (bin2dec(binary) - 2**(self.bit-1) + 1) / 2**(self.bit-1)
                 individual.append(weight_value)
+            for arch in range(self.max_archetypes):
+                individual_arch = individual[(self.ba_w+self.ba_c)*arch:(self.ba_w+self.ba_c)*(arch+1)]
+                self.population.append(individual_arch)
 
-            individual_arch = [individual[(self.ba_w+self.ba_c)*arch:
-                                          (self.ba_w+self.ba_c)*(arch+1)] for arch in range(self.max_archetypes)]
-            self.new_population.append(individual_arch)
-
-    # 进化完成后保存权重模型(可读性高的存储方式)
+    # 存储模型(可读性高)
     def save_pop(self, gen):
 
         score_sum = list()
