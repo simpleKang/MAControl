@@ -269,7 +269,7 @@ if __name__ == '__main__':
         ga = ga_duo.GA(arglist)
 
         for gen in range(arglist.generation_num):
-            for ind, individual in enumerate(ga.population):  # possibly ind > pop size
+            for ind, individual in enumerate(ga.population):  # of evolved pop size
                 for num in range(arglist.collect_num):
 
                     start = time.time()
@@ -279,8 +279,10 @@ if __name__ == '__main__':
                           'time-consuming: ', round((end - start), 2), 'score: ', score)
                     ga.score[ind][num] = score
 
-            ga.evolve(gen)
+            ga.evolve(gen)  # select -> crossover -> mutate
+            print('Generation: ', gen, ' Evolution completed!')
 
+        ga.select()  # into pop size
         print('All finished!')
 
     if arglist.test:

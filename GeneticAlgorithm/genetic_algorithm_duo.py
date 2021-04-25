@@ -20,6 +20,7 @@ class GA(object):
         self.mr2 = arglist.mutation_rate_outer
         self.ba_c = 4  # amount of weight for quantitative perception
         self.ba_w = 5  # amount of weight for directional perception
+        self.evolved_pop_size = self.pop_size + math.ceil(self.pop_size*self.cr2) + math.ceil(self.pop_size*self.mr2)
 
         self.bit = 5  # how many bits per weight representation - each weight \in (-1,1]
         self.mutation_p = arglist.mutation_neighborhood  # how many bits per weight is mutated
@@ -29,15 +30,15 @@ class GA(object):
             print('Loading existing model.')
 
         else:
-            self.population = [[] for i in range(self.pop_size)]
+            self.population = [[] for i in range(self.evolved_pop_size)]
             for individual in self.population:
-                # 随机初始化种群 # shape: pop_size ✖ max_archetypes ✖ (self.ba_c+self.ba_w)
+                # 随机初始化种群 # shape: evolved_pop_size ✖ max_archetypes ✖ (self.ba_c+self.ba_w)
                 for arch in range(self.max_archetypes):
                     individual.append([])
                     for weight in range(self.ba_c+self.ba_w):
                         individual[-1].append(np.random.random())
 
-        self.score = np.zeros((self.pop_size, self.collect_num))
+        self.score = np.zeros((self.evolved_pop_size, self.collect_num))
         self.new_population = list()
         self.binary_population = list()
         print('GA initiation complete')
