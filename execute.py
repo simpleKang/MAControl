@@ -39,27 +39,27 @@ def parse_args():
 
     # Environment
     parser.add_argument("--scenario", type=str, default="scenario5_visionOP", help="name of the scenario script")
-    parser.add_argument("--uav-num", type=int, default=7, help="number of uav")
-    parser.add_argument("--step-max", type=int, default=100, help="number of maximum steps")
+    parser.add_argument("--uav-num", type=int, default=20, help="number of uav")
+    parser.add_argument("--step-max", type=int, default=4000, help="number of maximum steps")
 
     # GA
-    parser.add_argument("--pop-size", type=int, default=5, help="size of population")
-    parser.add_argument("--generation-num", type=int, default=4, help="number of generation")
-    parser.add_argument("--max-behavior-archetypes", type=int, default=1, help="number of behavior archetypes")
-    parser.add_argument("--collect-num", type=int, default=3, help="number of fitness score collection")  # per genratn
+    parser.add_argument("--pop-size", type=int, default=10, help="size of population")
+    parser.add_argument("--generation-num", type=int, default=20, help="number of generation")
+    parser.add_argument("--max-behavior-archetypes", type=int, default=4, help="number of behavior archetypes")
+    parser.add_argument("--collect-num", type=int, default=10, help="number of fitness score collection")  # per genratn
 
     # Core parameters
-    parser.add_argument("--crossover-rate-inner", type=float, default=0.1, help="crossover rate")
-    parser.add_argument("--crossover-rate-outer", type=float, default=0.2, help="mutation rate")
-    parser.add_argument("--mutation-rate-inner", type=float, default=0.7, help="mutation rate")
-    parser.add_argument("--mutation-rate-outer", type=float, default=0.8, help="mutation rate")
-    parser.add_argument("--mutation-neighborhood", type=float, default=0.05, help="mutation neighborhood")
+    parser.add_argument("--crossover-rate-inner", type=float, default=0.5, help="crossover rate")
+    parser.add_argument("--crossover-rate-outer", type=float, default=0.5, help="mutation rate")
+    parser.add_argument("--mutation-rate-inner", type=float, default=0.5, help="mutation rate")
+    parser.add_argument("--mutation-rate-outer", type=float, default=0.5, help="mutation rate")
+    parser.add_argument("--mutation-neighborhood", type=float, default=2, help="mutation neighborhood")
 
     # Evolve or Test
     parser.add_argument("--evolve", action="store_false", default=True)
     parser.add_argument("--test", action="store_true", default=False)
     parser.add_argument("--restore", action="store_true", default=False)
-    parser.add_argument("--repeat-num", type=int, default=1, help="number of repeat runs")  # ?
+    parser.add_argument("--repeat-num", type=int, default=1, help="number of repeat runs")
 
     return parser.parse_args()
 
