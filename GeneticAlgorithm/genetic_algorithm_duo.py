@@ -47,6 +47,8 @@ class GA(object):
 
         self.select(gen)
 
+        self.save_model(gen)
+
         self.encode()
 
         self.crossover()
@@ -54,10 +56,6 @@ class GA(object):
         self.mutate()
 
         self.decode()
-
-        self.population = self.new_population.copy()
-
-        self.save_model(gen)
 
     # 选出部分个体进入下一代 from self.population
     def select(self, gen):
@@ -171,23 +169,6 @@ class GA(object):
                 individual_arch = individual[(self.ba_w+self.ba_c)*arch:(self.ba_w+self.ba_c)*(arch+1)]
                 self.population.append(individual_arch)
 
-    # 载入模型
-    def load_model(self):
-
-        model = np.loadtxt(pardir + path + 'model.txt')
-
-        self.population = list()
-        x, y = model.shape
-        if (x == self.pop_size*self.max_archetypes) and (y == self.ba_c + self.ba_w):
-            for i in range(self.pop_size):
-                self.population.append(list())
-                for j in range(self.max_archetypes):
-                    self.population[i].append(list())
-                    for k in range(self.ba_c + self.ba_w):
-                        self.population[i][j].append(model[i * self.max_archetypes + j][k])
-        else:
-            raise Exception('Check parameters.')
-
     # 存储模型(方便载入)
     def save_model(self, gen):
 
@@ -197,4 +178,21 @@ class GA(object):
                 for arch in ind:
                     for weight in arch:
                         f.write(str(weight) + ' ')
-                    f.write('\n')
+                    f.write('\n' + '\n')
+
+    # 载入模型
+    def load_model(self):
+
+        model = np.loadtxt(pardir + path + 'model_0.txt')  # some model file that really exists
+
+        self.population = list()
+        x, y = model.shape
+        if (x == self.evolved_pop_size*self.max_archetypes) and (y == self.ba_c + self.ba_w):
+            for i in range(self.evolved_pop_size):
+                self.population.append(list())
+                for j in range(self.max_archetypes):
+                    self.population[i].append(list())
+                    for k in range(self.ba_c + self.ba_w):
+                        self.population[i][j].append(model[i * self.max_archetypes + j][k])
+        else:
+            raise Exception('Check parameters.')
