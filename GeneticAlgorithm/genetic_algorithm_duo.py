@@ -45,7 +45,7 @@ class GA(object):
 
     def evolve(self, gen):
 
-        self.select()
+        self.select(gen)
 
         self.encode()
 
@@ -59,10 +59,8 @@ class GA(object):
 
         self.save_model(gen)
 
-        self.save_pop(gen)
-
     # 选出部分个体进入下一代 from self.population
-    def select(self):
+    def select(self, gen):
         # now we have population + score [both of evolved pop size]
 
         self.new_population.clear()
@@ -71,6 +69,20 @@ class GA(object):
         score_sum_individual = np.sum(self.score, axis=1)  # sum over collect_num
         score_sum = [[i, score_sum_individual[i]] for i in range(len(self.score))]
         score_sum = sorted(score_sum, key=lambda x: x[1], reverse=True)
+
+        # 存储模型(可读性高) save population after simulation (with scores) before evolution (selection)
+        open(pardir + path + '/weight_model_gen_%d.txt' % gen, 'w')
+        with open(pardir + path + '/weight_model_gen_%d.txt' % gen, 'a') as f:
+            for i in range(len(self.score)):
+                rank = score_sum[i][0]
+                f.write('Average Score: ' + str(round(score_sum[i][1]/self.collect_num, 5)) + '\n')
+                for arch in self.population[rank]:
+                    f.write('Archetype: ')
+                    for weight in arch:
+                        f.write(str(round(weight, 3)) + ', ')
+                    f.write('\n')
+                f.write('\n')
+        pass
 
         for i in range(self.pop_size):
             self.new_population.append(self.population[score_sum[i][0]])
@@ -158,30 +170,6 @@ class GA(object):
             for arch in range(self.max_archetypes):
                 individual_arch = individual[(self.ba_w+self.ba_c)*arch:(self.ba_w+self.ba_c)*(arch+1)]
                 self.population.append(individual_arch)
-
-    # 存储模型(可读性高)
-    def save_pop(self, gen):
-
-        score_sum = list()
-        score_sum_individual = np.sum(self.score, axis=1)
-
-        for i in range(self.pop_size):
-            individual_score = [i, score_sum_individual[i]]
-            score_sum.append(individual_score)
-        score_sum = sorted(score_sum, key=lambda x: x[1], reverse=True)
-
-        open(pardir + path + '/weight_model_gen_%d.txt' % gen, 'w')
-        with open(pardir + path + '/weight_model_gen_%d.txt' % gen, 'a') as f:
-            for i in range(self.pop_size):
-                rank = score_sum[i][0]
-                f.write('Average Score: ' + str(round(score_sum[i][1]/self.collect_num, 5)) + '\n')
-                for arch in self.population[rank]:
-                    f.write('Archetype: ')
-                    for weight in arch:
-                        f.write(str(round(weight, 3)) + ', ')
-                    f.write('\n')
-                f.write('\n' + '\n')
-        pass
 
     # 载入模型
     def load_model(self):
