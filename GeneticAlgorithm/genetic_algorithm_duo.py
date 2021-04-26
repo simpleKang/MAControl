@@ -19,7 +19,7 @@ class GA(object):
         self.mr1 = arglist.mutation_rate_inner
         self.mr2 = arglist.mutation_rate_outer
         self.ba_c = 4  # amount of weight for quantitative perception
-        self.ba_w = 5  # amount of weight for directional perception
+        self.ba_w = 6  # amount of weight for directional perception + random
         self.evolved_pop_size = self.pop_size + math.ceil(self.pop_size*self.cr2) + math.ceil(self.pop_size*self.mr2)
 
         self.bit = 5  # how many bits per weight representation - each weight \in (-1,1]
