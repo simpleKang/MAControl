@@ -22,7 +22,7 @@ import GeneticAlgorithm.genetic_algorithm_duo as ga_duo
 from GeneticAlgorithm.BehaviorArchetypes_vision import behavior_v
 
 import MAEnv.scenarios.TargetProfile as T
-import MAControl.Util.get_random_state as rs
+import MAControl.Util.coverrate_vision as cv
 
 import MAControl.Default.InnerController_PID as IC_P
 import MAControl.Default.MotionController_L1_TECS as MC_L
@@ -282,7 +282,7 @@ if __name__ == '__main__':
             ga.evolve(gen)  # select -> crossover -> mutate
             print('Generation: ', gen, ' Evolution completed!')
 
-        ga.select()  # into pop size
+        ga.select(arglist.generation_num)  # into pop size
         print('All finished!')
 
     if arglist.test:

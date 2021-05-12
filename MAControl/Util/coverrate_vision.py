@@ -7,10 +7,10 @@ import math
 def calculate_coverage(num, step, loop=0):
 
     curdir = os.path.dirname(__file__)
-    pardir = os.path.dirname(os.path.dirname(os.path.dirname(curdir)))
+    pardir = os.path.dirname(os.path.dirname(curdir))
 
     txt_name = '/cover_rate-%s-%s-%s.txt' % (str(num), str(step), str(loop))
-    open(pardir + '/MAControl-dqn/cover_rate_Folder' + txt_name, 'w')
+    open(pardir + '/cover_rate_Folder' + txt_name, 'w')
 
     cell = 200                     # 区域划分精度
     track = list()
