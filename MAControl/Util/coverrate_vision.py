@@ -4,40 +4,39 @@ import MAEnv.scenarios.TargetProfile as T
 import math
 
 
-def calculate_coverage(num, step, loop=0):
+def calculate_coverage(uav_num, step, loop=0):
 
     curdir = os.path.dirname(__file__)
     pardir = os.path.dirname(os.path.dirname(curdir))
 
-    txt_name = '/cover_rate-%s-%s-%s.txt' % (str(num), str(step), str(loop))
+    txt_name = '/cover_rate-%s-%s-%s.txt' % (str(uav_num), str(step), str(loop))
     open(pardir + '/cover_rate_Folder' + txt_name, 'w')
 
     cell = 200                     # 区域划分精度
     track = list()
     last_cover = list()
-    for i in range(num):
-        track.append(np.loadtxt(pardir + '/MAControl-dqn/track/agent_%d_track.txt' % i))
+    for i in range(uav_num):
+        track.append(np.loadtxt(pardir + '/track/agent_%d_track.txt' % i))
         last_cover.append([])
 
     area = np.zeros((cell, cell))
     area_width = T.edge*2          # 正方形区域实际边长
     scale = area_width/cell        # 离散度(比例尺)
-    iter_range = 0.25              # 迭代区域大小
 
-    for l in range(0, np.size(track[-1], 0), 5):
+    for lt in range(0, np.size(track[-1], 0), 5):
 
         new_last = list()
         angle_list = list()
 
-        for k in range(num):
+        for k in range(uav_num):
 
             new_last.append([])
 
             # 计算迭代区域的上下界
-            x = round((track[k][l][2]+T.edge)/scale)
-            y = round((track[k][l][3]+T.edge)/scale)
-            v = [track[k][l][0], track[k][l][1]]
-            angle1 = math.atan2(track[k][l][1], track[k][l][0])
+            x = round((track[k][lt][2]+T.edge)/scale)
+            y = round((track[k][lt][3]+T.edge)/scale)
+            v = [track[k][lt][0], track[k][lt][1]]
+            angle1 = math.atan2(track[k][lt][1], track[k][lt][0])
             angle_max = angle1 + math.pi/3
             angle_min = angle1 - math.pi / 3
             for j in range(40):
@@ -54,12 +53,13 @@ def calculate_coverage(num, step, loop=0):
                         break
                     if area[x_test][y_test] == 0:
                         area[x_test][y_test] = 1
-        print('>>> Round', loop, 'Total ', np.size(track[-1], 0), ' >>> step ', l)
+        print('>>> Round', loop, 'Total ', np.size(track[-1], 0), ' >>> step ', lt)
 
         cover_rate = np.sum(area)/cell/cell
         with open(pardir + '/MAControl-视觉/cover_rate_Folder' + txt_name, 'a') as c:
-            c.write(str(l) + ' ' + str(cover_rate) + '\n')
+            c.write(str(lt) + ' ' + str(cover_rate) + '\n')
     print('Finished!')
+
 
 if __name__ == '__main__':
 
