@@ -15,10 +15,8 @@ def calculate_coverage(uav_num, step, loop=0):
 
     cell = 200                     # 区域划分精度
     track = list()
-    last_cover = list()
     for i in range(uav_num):
         track.append(np.loadtxt(pardir + '/track/agent_%d_track.txt' % i))
-        last_cover.append([])
 
     area = np.zeros((cell, cell))
     area_width = T.edge*2          # 正方形区域实际边长
@@ -34,14 +32,14 @@ def calculate_coverage(uav_num, step, loop=0):
             x = round((track[k][lt][2]+T.edge)/scale)
             y = round((track[k][lt][3]+T.edge)/scale)
             angle1 = math.atan2(track[k][lt][1], track[k][lt][0])
-            angle_max = angle1 + math.pi/3
-            angle_min = angle1 - math.pi / 3
-            for j in range(40):
-                if (angle_min+j/25) <angle_max:
-                    angle_list.append(angle_min+j/25)
-                else:
-                    angle_list.append(angle_max)
-                    break
+
+            angle_max = math.fmod(angle1 + math.pi - gamma/2, math.pi)
+            angle_min = math.fmod(angle1 + gamma, math.pi)
+            if angle_min < angle_max:
+                angle_list = [angle_min + j/25*(angle_max - angle_min) for j in range(26)]
+            else:
+                angle_list = [angle_max + j/25*(angle_min + 2*math.pi - angle_min) for j in range(26)]
+
             for length in range(0, 51):  # 50/200 = 25%
                 for angle in angle_list:
                     x_test = int(round(x + length*math.cos(angle)))
