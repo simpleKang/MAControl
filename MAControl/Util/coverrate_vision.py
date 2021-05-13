@@ -2,6 +2,7 @@ import numpy as np
 import os
 import MAEnv.scenarios.TargetProfile as T
 import math
+gamma = T.blind_angle[0]
 
 
 def calculate_coverage(uav_num, step, loop=0):
@@ -23,19 +24,15 @@ def calculate_coverage(uav_num, step, loop=0):
     area_width = T.edge*2          # 正方形区域实际边长
     scale = area_width/cell        # 离散度(比例尺)
 
-    for lt in range(0, np.size(track[-1], 0), 5):
+    for lt in range(0, np.size(track[-1], 0), 5):  # np.size(A,0) 返回该二维矩阵的行数 # range(a,b,c) 类似 matlab [a:c:b)
 
-        new_last = list()
         angle_list = list()
 
         for k in range(uav_num):
 
-            new_last.append([])
-
             # 计算迭代区域的上下界
             x = round((track[k][lt][2]+T.edge)/scale)
             y = round((track[k][lt][3]+T.edge)/scale)
-            v = [track[k][lt][0], track[k][lt][1]]
             angle1 = math.atan2(track[k][lt][1], track[k][lt][0])
             angle_max = angle1 + math.pi/3
             angle_min = angle1 - math.pi / 3
@@ -45,28 +42,17 @@ def calculate_coverage(uav_num, step, loop=0):
                 else:
                     angle_list.append(angle_max)
                     break
-            for length in range(0,26):
+            for length in range(0, 51):  # 50/200 = 25%
                 for angle in angle_list:
                     x_test = int(round(x + length*math.cos(angle)))
                     y_test = int(round(y + length*math.sin(angle)))
-                    if x_test >= 200 or y_test >= 200:
+                    if x_test >= cell or y_test >= cell:
                         break
                     if area[x_test][y_test] == 0:
                         area[x_test][y_test] = 1
         print('>>> Round', loop, 'Total ', np.size(track[-1], 0), ' >>> step ', lt)
 
         cover_rate = np.sum(area)/cell/cell
-        with open(pardir + '/MAControl-视觉/cover_rate_Folder' + txt_name, 'a') as c:
+        with open(pardir + '/cover_rate_Folder' + txt_name, 'a') as c:
             c.write(str(lt) + ' ' + str(cover_rate) + '\n')
     print('Finished!')
-
-
-if __name__ == '__main__':
-
-    curdir_ = os.path.dirname(__file__)
-    pardir_ = os.path.dirname(os.path.dirname(curdir_))
-    para = np.loadtxt(pardir_ + '/track/para.txt')
-    num_ = int(para[0])
-    step_ = int(para[1])
-
-    calculate_coverage(10, step_)

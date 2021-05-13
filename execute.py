@@ -152,13 +152,13 @@ def augment_view(arglist, world, Controller, obs, step):
 def get_score(arglist, gen, ind, num):
 
     # 不使用特定评分，仅给出随机分数
-    _score = np.random.random()
+    # _score = np.random.random()
 
     # KSB 像素计算覆盖率
     # _score = calculate.coverrate_k(gen, ind, num)
 
     # KSB 像素计算覆盖率 - 视觉
-    # _score = cv.calculate_coverage(arglist.uav_num, arglist.step_max, num)
+    _score = cv.calculate_coverage(arglist.uav_num, arglist.step_max, num)
 
     # WZQ 完整计算覆盖率方式
     # _score = OCR.calculate_coverage(arglist.uav_num, arglist.step_max, num)
