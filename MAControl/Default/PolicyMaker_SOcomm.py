@@ -91,7 +91,7 @@ class PolicyMaker_SelfOrganization(PolicyMaker):
         if (_seen_targets.__len__() != 0) and (self.index < self.uav_num):
             PolicyMaker_SelfOrganization.pheromone[self.index] = 1
 
-        # TODO  尚未考虑视线遮挡 [p98-(5.5)]
+        # TO DO  尚未考虑视线遮挡 [p98-(5.5)]
 
         PolicyMaker_SelfOrganization.seen_uavs[self.index] = _seen_uavs
         PolicyMaker_SelfOrganization.seen_targets[self.index] = _seen_targets

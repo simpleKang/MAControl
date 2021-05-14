@@ -2,7 +2,7 @@ import numpy as np
 import os
 import MAEnv.scenarios.TargetProfile as T
 import math
-gamma = T.blind_angle[0]
+gamma = T.blind_angle[2]
 
 
 def calculate_coverage(uav_num, step, loop=0):
@@ -16,7 +16,7 @@ def calculate_coverage(uav_num, step, loop=0):
     cell = 200                     # 区域划分精度
     track = list()
     for i in range(uav_num):
-        track.append(np.loadtxt(pardir + '/track/agent_%d_track.txt' % i))
+        track.append(np.loadtxt(pardir + '/track/uav_%d_track.txt' % i))
 
     area = np.zeros((cell, cell))
     area_width = T.edge*2          # 正方形区域实际边长
@@ -48,9 +48,9 @@ def calculate_coverage(uav_num, step, loop=0):
                         break
                     if area[x_test][y_test] == 0:
                         area[x_test][y_test] = 1
-        print('>>> Round', loop, 'Total ', np.size(track[-1], 0), ' >>> step ', lt)
+        # print('>>> Round', loop, 'Total ', np.size(track[-1], 0), ' >>> step ', lt)
 
         cover_rate = np.sum(area)/cell/cell
         with open(pardir + '/cover_rate_Folder' + txt_name, 'a') as c:
             c.write(str(lt) + ' ' + str(cover_rate) + '\n')
-    print('Finished!')
+    # print('Finished!')

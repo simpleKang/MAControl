@@ -39,12 +39,12 @@ def parse_args():
 
     # Environment
     parser.add_argument("--scenario", type=str, default="scenario5_visionOP", help="name of the scenario script")
-    parser.add_argument("--uav-num", type=int, default=20, help="number of uav")
+    parser.add_argument("--uav-num", type=int, default=8, help="number of uav")
     parser.add_argument("--step-max", type=int, default=4000, help="number of maximum steps")
 
     # GA
-    parser.add_argument("--pop-size", type=int, default=10, help="size of population")
-    parser.add_argument("--generation-num", type=int, default=20, help="number of generation")
+    parser.add_argument("--pop-size", type=int, default=6, help="size of population")
+    parser.add_argument("--generation-num", type=int, default=4, help="number of generation")
     parser.add_argument("--max-behavior-archetypes", type=int, default=4, help="number of behavior archetypes")
     parser.add_argument("--collect-num", type=int, default=10, help="number of fitness score collection")  # per genratn
 

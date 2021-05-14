@@ -139,7 +139,7 @@ class GA(object):
             parent = random.sample(range(0, len(self.binary_population)), 1)
             points = random.sample(range(0, (self.max_archetypes * (self.ba_c + self.ba_w))), mutate_w)
 
-            child = self.binary_population[parent].copy()
+            child = self.binary_population[parent[0]].copy()
             for ii in range(len(points)):
                 k = points[ii]
                 weight_k = child[k*self.bit:(k+1)*self.bit]
