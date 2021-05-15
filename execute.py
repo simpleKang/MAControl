@@ -23,6 +23,7 @@ from GeneticAlgorithm.BehaviorArchetypes_vision import behavior_v
 
 import MAEnv.scenarios.TargetProfile as T
 import MAControl.Util.coverrate_vision as cv
+import MAControl.Util.target_p as tp
 
 import MAControl.Default.InnerController_PID as IC_P
 import MAControl.Default.MotionController_L1_TECS as MC_L
@@ -159,6 +160,9 @@ def get_score(arglist, gen, ind, num):
 
     # KSB 像素计算覆盖率 - 视觉
     _score = cv.calculate_coverage(arglist.uav_num, arglist.step_max, num)
+
+    # XJ 计算目标分布
+    _score = tp.target_distribute(arglist.uav_num, arglist.step_max, num)
 
     # WZQ 完整计算覆盖率方式
     # _score = OCR.calculate_coverage(arglist.uav_num, arglist.step_max, num)
