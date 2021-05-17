@@ -125,7 +125,7 @@ class GA(object):
             for ii in range(len(points)):
                 k = points[ii]
                 child[k*self.bit:(k+1)*self.bit] = parent1[k*self.bit:(k+1)*self.bit]
-            self.binary_population += child
+            self.binary_population += [child]
 
     # 变异操作
     def mutate(self):
@@ -146,7 +146,7 @@ class GA(object):
                 bits = random.sample(range(0, self.bit), self.mutation_p)
                 weight_k_new = [weight_k[u] if u in bits else 1-weight_k[u] for u in range(len(weight_k))]
                 child[k * self.bit:(k + 1) * self.bit] = weight_k_new
-            self.binary_population += child
+            self.binary_population += [child]
 
     # 解码操作,将二进制编码解码为权重形式
     def decode(self):
