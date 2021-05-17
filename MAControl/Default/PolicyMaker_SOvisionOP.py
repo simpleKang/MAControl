@@ -2,6 +2,8 @@ from MAControl.Base.PolicyMaker import PolicyMaker
 import numpy as np
 import random
 import math
+import os
+path = '/track/' if os.name == 'posix' else '\\track\\'
 
 
 class PolicyMaker_SO(PolicyMaker):
@@ -118,6 +120,14 @@ class PolicyMaker_SO(PolicyMaker):
         self.perception_quan = [p1, p2, p3, p4]
         self.perception_dir = [p5, p6, p7, p8, p9]
         # ↑↑↑ represented with inertial angle, not unit vector
+
+        # 保存小瓜子的 perception 信息
+        pardir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+        with open(pardir + path + 'uav_%d_perception.txt' % self.index, 'a') as f:
+            f.write(str(p1) + ' ' + str(p2) + ' ' + str(p3) + ' ' +
+                    str(p4) + ' ' + str(p5) + ' ' + str(p6) + ' ' +
+                    str(p7) + ' ' + str(p8) + ' ' + str(p9) + ' ' +
+                    str(gamma) + '\n')
 
     def rule_summation(self, archetype, obs_n):
 
