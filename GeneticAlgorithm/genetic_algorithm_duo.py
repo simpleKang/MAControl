@@ -165,9 +165,9 @@ class GA(object):
                 binary = self.binary_population[ind][(b*self.bit):((b+1)*self.bit)]
                 weight_value = (bin2dec(binary) - 2**(self.bit-1) + 1) / 2**(self.bit-1)
                 individual.append(weight_value)
-            for arch in range(self.max_archetypes):
-                individual_arch = individual[(self.ba_w+self.ba_c)*arch:(self.ba_w+self.ba_c)*(arch+1)]
-                self.population.append(individual_arch)
+            re = np.reshape(individual, (self.max_archetypes, self.ba_c + self.ba_w))
+            fe = [list(item) for item in re]
+            self.population.append(fe)
 
     # 存储模型(方便载入)
     def save_model(self, gen):
