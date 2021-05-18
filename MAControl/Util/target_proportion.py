@@ -29,4 +29,3 @@ def target_distribute(uav_num, step, loop=0):
         p4_sum = np.sum(p4_array)
         with open(pardir + '/track' + txt_name, 'a') as c:
             c.write(str(lt) + ' ' + str(p2_sum) + ' ' + str(p4_sum) + '\n')
-
