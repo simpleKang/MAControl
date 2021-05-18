@@ -32,3 +32,6 @@ def target_distribute(uav_num, step, loop=0):
         p4_sum = sum([sum(item) for item in p4_array]) / len(p4_array)
         with open(pardir + '/track' + txt_name, 'a') as c:
             c.write(str(lt) + ' ' + str(p2_sum) + ' ' + str(p4_sum) + '\n')
+
+        return p2_sum + p4_sum
+

@@ -54,3 +54,6 @@ def calculate_coverage(uav_num, step, loop=0):
         with open(pardir + '/scene_Folder' + txt_name, 'a') as c:
             c.write(str(lt) + ' ' + str(cover_rate) + '\n')
     # print('Finished!')
+
+    return cover_rate
+
