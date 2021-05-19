@@ -193,7 +193,7 @@ class Scenario(BaseScenario):
                         neighborhood[-1].append(other_ornt)
                     else:
                         neighborhood[-1].append(2)
-                        neighborhood[-1].append(float('nan'))
+                        neighborhood[-1].append(index - len(world.U_agents))  # index within targets
                 # ## # if not
                 else:
                     pass

@@ -36,16 +36,16 @@ class PolicyMaker_SO(PolicyMaker):
             elif math.isnan(n_view_list[i][0]):
                 pass
             elif n_view_list[i][3] == 1:
-                n_view_a.append(n_view_list[i][0:5])
+                n_view_a.append(n_view_list[i])
             else:
-                n_view_t.append(n_view_list[i][0:4])
+                n_view_t.append(n_view_list[i])
 
         self.p_views = p_views
         self.n_view_a = n_view_a
         self.n_view_t = n_view_t
 
         if n_view_t:
-            self.assigned = n_view_t[0]
+            self.assigned = int(n_view_t[0][4])
         # 从环境里拿到的 每个 n_view 的倒数第二位表明了性质 mate / target
         # 从环境里拿到的 每个 p_view 都只表现区域的主要性质
 
@@ -174,5 +174,5 @@ class PolicyMaker_SO(PolicyMaker):
                 s = fun.index(max(fun))
                 self.rule_summation(archetypes[s], obs_n)
 
-        opt = [opt_index, self.UD]
+        opt = [opt_index, self.UD, self.assigned]
         return opt
