@@ -13,11 +13,11 @@ UAV_color = np.array([0.47, 0.79, 0.79])
 UAV_H = 100
 UAV_Dam = 1
 UAV_w = 1000
-UAV_size = 3
+UAV_size = 4
 
 # target parameters
 num_targets = 4
-target_size = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
+target_size = [12, 12, 12, 12, 12, 12, 12, 12, 12, 12]
 target_pos = [[0,       0],
               [-0.8,  1.5],
               [1.0,  -1.2],
