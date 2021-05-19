@@ -76,8 +76,6 @@ class Scenario(BaseScenario):
         # write-o
         curdir_ = os.path.dirname(__file__)  # current directory
         pardir_ = os.path.dirname(os.path.dirname(curdir_))  # parent parent directory
-        para = np.loadtxt(pardir_ + '/track/para.txt')  # currently [10,3000]
-        # self.collect = int(para[2])  # so ... wtf?
 
         # make initial conditions
         self.reset_world(world)
@@ -196,7 +194,7 @@ class Scenario(BaseScenario):
                         neighborhood[-1].append(other_ornt)
                     else:
                         neighborhood[-1].append(2)
-                        neighborhood.append(float('nan'))
+                        neighborhood[-1].append(float('nan'))
                 # ## # if not
                 else:
                     pass
