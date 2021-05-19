@@ -2,8 +2,6 @@
 # 初步应用了 entity = agent + landmark 和 agent = uav + target 的区分，删去了许多参数，仍需进一步修改
 # (landmark = grid + square + ...  , target = fixed_target + movable_target)
 # Entites could NOT occupy the same space physically -?
-# rendered object is not contained in r=1 circle (a.k.a. is now scaled) so "block from sight" not quite straight forward
-# —— but entites too small would be quite hard to see —— so how to balance these two needs -?
 
 import numpy as np
 import portion as por
@@ -31,7 +29,7 @@ class Scenario(BaseScenario):
         world.U_agents = [Agent() for i in range(num_uav)]
         for i, uav in enumerate(world.U_agents):
             uav.name = 'uav %d' % i
-            uav.state.size = T.UAV_size * 0.01  # 10米
+            uav.state.size = T.UAV_size * 0.001
             uav.movable = True
             uav.UAV = True
             uav.H = T.UAV_H
@@ -43,7 +41,7 @@ class Scenario(BaseScenario):
         world.T_agents = [Agent() for i in range(num_targets)]
         for i, target in enumerate(world.T_agents):
             target.name = 'target %d' % i
-            target.state.size = T.target_size[i] * 0.01
+            target.state.size = T.target_size[i] * 0.001
             if not T.target_movable[i]:
                 target.movable = False
             target.Target = True
@@ -59,7 +57,7 @@ class Scenario(BaseScenario):
         world.grids = [Landmark() for i in range(num_grids)]
         for i, grid in enumerate(world.grids):
             grid.name = 'grid %d' % i
-            grid.state.size = T.grid_size*0.01
+            grid.state.size = T.grid_size*0.001
             grid.Landmark = True
             grid.obstacle = False
 
@@ -67,7 +65,7 @@ class Scenario(BaseScenario):
         world.squares = [Landmark() for i in range(num_square)]
         for i, square in enumerate(world.squares):
             square.name = 'square %d' % i
-            square.state.size = T.square_size*0.01
+            square.state.size = T.square_size*0.001
             square.Landmark = True
             square.obstacle = True
 
@@ -256,9 +254,9 @@ class Scenario(BaseScenario):
     def observation(self, agent, world):
         a1 = agent.state.p_acc[0]
         a2 = agent.state.p_acc[1]
-        vel_size = np.sqrt(np.square(agent.state.p_vel[0]) + np.square(agent.state.p_vel[1]))
-        vel_front_unit = agent.state.p_vel / vel_size
-        vel_right_unit = np.array([agent.state.p_vel[1], -1 * agent.state.p_vel[0]]) / vel_size
+        vel_len = np.sqrt(np.square(agent.state.p_vel[0]) + np.square(agent.state.p_vel[1]))
+        vel_front_unit = agent.state.p_vel / vel_len
+        vel_right_unit = np.array([agent.state.p_vel[1], -1 * agent.state.p_vel[0]]) / vel_len
         a_front = np.dot([a1, 0], vel_front_unit) + np.dot([0, a2], vel_front_unit)
         a_right = np.dot([a1, 0], vel_right_unit) + np.dot([0, a2], vel_right_unit)
         n_view = list(np.concatenate(self.neighbouring_view(agent, world)))

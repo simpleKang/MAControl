@@ -1,6 +1,7 @@
 import numpy as np
 import math
 import MAControl.Util.get_random_state as rs
+# 这里的 size 以【米】为单位 在 scenario 里边会乘上 0.001 从而以【千米】为单位
 
 # blind angle
 blind_angle = [math.pi/3, math.pi/3*2, math.pi, math.pi/3*4]
@@ -36,7 +37,7 @@ target_w = [2, 2, 5, 2, 3, 2, 2, 5, 2, 3]
 target_init = [0, 1, 0, 1, 0, 1, 0, 1, 0, 1]
 
 # edge of the battle field (a kind of non-obstacle)
-edge = 1.5
+edge = 2
 num_grids = 5
 grid_size = 0.5
 grid_pos = [[0, 0], [edge, edge], [-edge, edge], [-edge, -edge], [edge, -edge]]
