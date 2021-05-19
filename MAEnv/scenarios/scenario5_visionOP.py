@@ -236,12 +236,18 @@ class Scenario(BaseScenario):
                         if 'uav' in world.agents[k].name:
                             A1 = A1 | new
                             L = len(A1)
-                            a1_list = [A1[m].upper-A1[m].lower for m in range(L)]
+                            if A1.empty:
+                                a1_list = [0]
+                            else:
+                                a1_list = [A1[m].upper-A1[m].lower for m in range(L)]
                             a1 = sum(a1_list)
                         else:
                             A2 = A2 | new
                             L = len(A2)
-                            a2_list = [A2[m].upper - A2[m].lower for m in range(L)]
+                            if A2.empty:
+                                a2_list = [0]
+                            else:
+                                a2_list = [A2[m].upper - A2[m].lower for m in range(L)]
                             a2 = sum(a2_list)
                 elif a1/width > 0.5:
                     projection[i] = 1
