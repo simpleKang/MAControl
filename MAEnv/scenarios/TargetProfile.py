@@ -13,11 +13,11 @@ UAV_color = np.array([0.47, 0.79, 0.79])
 UAV_H = 100
 UAV_Dam = 1
 UAV_w = 1000
-UAV_size = 1
+UAV_size = 3
 
 # target parameters
 num_targets = 4
-target_size = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+target_size = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
 target_pos = [[0,       0],
               [-0.8,  1.5],
               [1.0,  -1.2],
@@ -37,9 +37,9 @@ target_w = [2, 2, 5, 2, 3, 2, 2, 5, 2, 3]
 target_init = [0, 1, 0, 1, 0, 1, 0, 1, 0, 1]
 
 # edge of the battle field (a kind of non-obstacle)
-edge = 2
+edge = 1
 num_grids = 5
-grid_size = 0.5
+grid_size = 20
 grid_pos = [[0, 0], [edge, edge], [-edge, edge], [-edge, -edge], [edge, -edge]]
 grid_color = np.array([0.25, 0.25, 0.25])
 grid_obstacle = False
@@ -52,7 +52,7 @@ grid_obstacle = False
 
 # square (a kind of obstacle)
 num_square = 0
-square_size = 5
+square_size = 50
 square_pos = [[0., 0.],
               [1., 1.],
               [1., -1.],
