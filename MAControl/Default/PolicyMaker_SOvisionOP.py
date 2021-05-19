@@ -18,6 +18,7 @@ class PolicyMaker_SO(PolicyMaker):
         self.perception_dir = []              # （指向性）perception
         self.uav_num = arglist.uav_num        # 小瓜子数量
         self.decision_frequency = 50          # 小瓜子决策周期
+        self.assigned = None                  # 小瓜子的最近可见目标 [ + memory ]
 
     def raw_input_extraction(self, obs):
 
@@ -43,6 +44,8 @@ class PolicyMaker_SO(PolicyMaker):
         self.n_view_a = n_view_a
         self.n_view_t = n_view_t
 
+        if n_view_t:
+            self.assigned = n_view_t[0]
         # 从环境里拿到的 每个 n_view 的倒数第二位表明了性质 mate / target
         # 从环境里拿到的 每个 p_view 都只表现区域的主要性质
 

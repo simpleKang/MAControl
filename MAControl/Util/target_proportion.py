@@ -34,4 +34,3 @@ def target_distribute(uav_num, step, loop=0):
             c.write(str(lt) + ' ' + str(p2_sum) + ' ' + str(p4_sum) + '\n')
 
         return p2_sum + p4_sum
-

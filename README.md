@@ -4,18 +4,15 @@
 
 # Rule Equations
 
-+ Rule1：Alignment
++ Rule1：NAO
 
-+ Rule3：Cohesion
++ Rule3：NAB
 
-+ Rule4：Separation + Rule9：Evasion
++ Rule4：NTB
 
-+ Rule2：Target Orbit
++ Rule2：PAB
 
-+ Rule8：Flat Attraction + Rule5: Weighted Target Attraction
++ Rule8：PTB
 
-+ Rule6：Flat Target Repulsion + Rule7：Weighted Target Repulsion
-
-+ Rule10：Obstacle Avoidance
-
++ Rule6：RANdom
     
