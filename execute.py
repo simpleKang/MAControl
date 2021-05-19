@@ -40,14 +40,14 @@ def parse_args():
 
     # Environment
     parser.add_argument("--scenario", type=str, default="scenario5_visionOP", help="name of the scenario script")
-    parser.add_argument("--uav-num", type=int, default=8, help="number of uav")
+    parser.add_argument("--uav-num", type=int, default=20, help="number of uav")
     parser.add_argument("--step-max", type=int, default=4000, help="number of maximum steps")
 
     # GA
-    parser.add_argument("--pop-size", type=int, default=6, help="size of population")
-    parser.add_argument("--generation-num", type=int, default=4, help="number of generation")
+    parser.add_argument("--pop-size", type=int, default=8, help="size of population")
+    parser.add_argument("--generation-num", type=int, default=10, help="number of generation")
     parser.add_argument("--max-behavior-archetypes", type=int, default=4, help="number of behavior archetypes")
-    parser.add_argument("--collect-num", type=int, default=10, help="number of fitness score collection")  # per genratn
+    parser.add_argument("--collect-num", type=int, default=8, help="number of fitness score collection")  # per genratn
 
     # Core parameters
     parser.add_argument("--crossover-rate-inner", type=float, default=0.5, help="crossover rate")
@@ -159,10 +159,10 @@ def get_score(arglist, gen, ind, num):
     # _score = calculate.coverrate_k(gen, ind, num)
 
     # KSB 像素计算覆盖率 - 视觉
-    # _score = cv.calculate_coverage(arglist.uav_num, arglist.step_max, num)
+    _score = cv.calculate_coverage(arglist.uav_num, arglist.step_max, num)
 
     # XJ 计算目标分布
-    _score = tp.target_distribute(arglist.uav_num, arglist.step_max, num)
+    # _score = tp.target_distribute(arglist.uav_num, arglist.step_max, num)
 
     # WZQ 完整计算覆盖率方式
     # _score = OCR.calculate_coverage(arglist.uav_num, arglist.step_max, num)

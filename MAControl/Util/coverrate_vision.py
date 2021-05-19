@@ -40,7 +40,7 @@ def calculate_coverage(uav_num, step, loop=0):
             else:
                 angle_list = [angle_max + j/25*(angle_min + 2*math.pi - angle_min) for j in range(26)]
 
-            for length in range(0, 51):  # 50/200 = 25%
+            for length in range(0, 21):  # 20/200 = 10%
                 for angle in angle_list:
                     x_test = int(round(x + length*math.cos(angle)))
                     y_test = int(round(y + length*math.sin(angle)))
