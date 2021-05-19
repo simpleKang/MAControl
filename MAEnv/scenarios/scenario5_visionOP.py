@@ -50,6 +50,7 @@ class Scenario(BaseScenario):
             target.H = T.target_H[i]
             target.Dam = T.target_Dam[i]
             target.w = T.target_w[i]
+            target.active = T.target_init[i]
 
         # agents summary
         world.agents = world.U_agents + world.T_agents
