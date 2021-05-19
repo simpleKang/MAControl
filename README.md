@@ -6,13 +6,13 @@
 
 + Rule1：NAO
 
-+ Rule3：NAB
++ Rule2：NAB
 
-+ Rule4：NTB
++ Rule3：NTB
 
-+ Rule2：PAB
++ Rule4：PAB
 
-+ Rule8：PTB
++ Rule5：PTB
 
 + Rule6：RANdom
     
