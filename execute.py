@@ -40,7 +40,7 @@ def parse_args():
 
     # Environment
     parser.add_argument("--scenario", type=str, default="scenario5_visionOP", help="name of the scenario script")
-    parser.add_argument("--uav-num", type=int, default=20, help="number of uav")
+    parser.add_argument("--uav-num", type=int, default=4, help="number of uav")
     parser.add_argument("--step-max", type=int, default=4000, help="number of maximum steps")
 
     # GA
@@ -102,6 +102,7 @@ def get_controller(env, world, arglist):
         control.append(MC_L.MotionController_L1_TECS("uav_%d" % i, env, world, i, arglist))
         control.append(IC_P.InnerController_PID("uav_%d" % i, env, world, i, arglist))
         control.append(False)  # Arrive-flag
+        control.append(None)   # Target-o
 
         uavController.append(control)
 
@@ -115,6 +116,7 @@ def get_controller(env, world, arglist):
         control.append(MC_L.MotionController_L1_TECS("target_%d" % i, env, world, i+arglist.uav_num, arglist))
         control.append(IC_P.InnerController_PID("target_%d" % i, env, world, i+arglist.uav_num, arglist))
         control.append(False)  # Arrive-flag
+        control.append(None)   # Target-o
 
         targetController.append(control)
 
@@ -142,6 +144,7 @@ def action(world, obs_n, step, ControllerSet, obstacles, behavior_archetypes):
             get_action(obs_n[i], acctEi, acclEi, step, finishedi)
 
         action_n.append(actioni)
+        ControllerSet[i][5] = list_i[2]
 
     return action_n
 
@@ -230,7 +233,7 @@ def run_simulation(arglist, behavior_archetypes, gen, ind, c_num):
     # Create Controller
     Controllers = get_controller(env, world, arglist)
 
-    open(os.path.dirname(__file__) + path + 'target_attacking.txt', 'w')
+    open(os.path.dirname(__file__) + path + 'target_lock.txt', 'w')
 
     # 为每个小瓜子创建状态文件
     for k in range(arglist.uav_num):
@@ -252,6 +255,14 @@ def run_simulation(arglist, behavior_archetypes, gen, ind, c_num):
             with open(os.path.dirname(__file__) + path + 'uav_%d_track.txt' % k, 'a') as f:
                 f.write(str(obs_n[k][0]) + ' ' + str(obs_n[k][1]) + ' ' +
                         str(obs_n[k][2]) + ' ' + str(obs_n[k][3]) + '\n')
+
+        # 保存每个小瓜子每个step的assigned信息
+        with open(os.path.dirname(__file__) + path + 'target_lock.txt', 'a') as f:
+            f.write(str(step) + ' ')
+            for k in range(arglist.uav_num):
+                assigned_k = Controllers[0][k][5]
+                f.write(str(k)+' '+str(assigned_k)+' ')
+            f.write('\n')
 
         # 画图展示
         # augment_view(arglist, world, Controllers[0], obs_n, step)
@@ -295,4 +306,3 @@ if __name__ == '__main__':
         for repeat in range(arglist.repeat_num):
             score = run_simulation(arglist, behavior_v, 0, 0, repeat)
             print('score ', score)
-
