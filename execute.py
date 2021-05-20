@@ -103,7 +103,7 @@ def get_controller(env, world, arglist):
         control.append(MC_L.MotionController_L1_TECS("uav_%d" % i, env, world, i, arglist))
         control.append(IC_P.InnerController_PID("uav_%d" % i, env, world, i, arglist))
         control.append(False)  # Arrive-flag
-        control.append(None)   # Target-o
+        control.append([])   # Target-o
 
         uavController.append(control)
 
@@ -117,7 +117,7 @@ def get_controller(env, world, arglist):
         control.append(MC_L.MotionController_L1_TECS("target_%d" % i, env, world, i+arglist.uav_num, arglist))
         control.append(IC_P.InnerController_PID("target_%d" % i, env, world, i+arglist.uav_num, arglist))
         control.append(False)  # Arrive-flag
-        control.append(None)   # Target-o
+        control.append([])   # Target-o
 
         targetController.append(control)
 
