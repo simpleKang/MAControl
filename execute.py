@@ -166,7 +166,8 @@ def get_score(arglist, gen, ind, num):
     _score = cv.calculate_coverage(arglist.uav_num, arglist.step_max, num)
 
     # XJ 计算目标分布
-    # _score = tp.target_distribute(arglist.uav_num, arglist.step_max, num)
+    # _score = tp.target_distribute(arglist.uav_num, arglist.step_max, num, 'B')
+    # _score = tp.target_distribute(arglist.uav_num, arglist.step_max, num, 'C')
 
     # WZQ 完整计算覆盖率方式
     # _score = OCR.calculate_coverage(arglist.uav_num, arglist.step_max, num)
@@ -258,15 +259,12 @@ def run_simulation(arglist, behavior_archetypes, gen, ind, c_num):
                         str(obs_n[k][2]) + ' ' + str(obs_n[k][3]) + '\n')
 
         # 保存每个小瓜子每次决策后的assigned信息
-        if step % arglist.step_per_decision == 0:
-            with open(os.path.dirname(__file__) + path + 'target_lock.txt', 'a') as f:
-                f.write(str(step) + ' ')
-                for k in range(arglist.uav_num):
-                    assigned_k = Controllers[0][k][5]
-                    f.write(str(k)+' '+str(assigned_k)+' ')
-                f.write('\n')
-        else:
-            pass
+        with open(os.path.dirname(__file__) + path + 'target_lock.txt', 'a') as f:
+            f.write(str(step) + ' ')
+            for k in range(arglist.uav_num):
+                assigned_k = Controllers[0][k][5]
+                f.write(str(assigned_k)+' ')
+            f.write('\n')
 
         # 画图展示
         # augment_view(arglist, world, Controllers[0], obs_n, step)

@@ -9,6 +9,7 @@ def calculate_coverage(uav_num, step, loop=0):
 
     curdir = os.path.dirname(__file__)
     pardir = os.path.dirname(os.path.dirname(curdir))
+    cover_rate = 0
 
     txt_name = '/cover_rate-%s-%s-%s.txt' % (str(uav_num), str(step), str(loop))
     open(pardir + '/scene_Folder' + txt_name, 'w')
@@ -56,4 +57,3 @@ def calculate_coverage(uav_num, step, loop=0):
     # print('Finished!')
 
     return cover_rate
-

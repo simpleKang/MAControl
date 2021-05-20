@@ -160,7 +160,8 @@ class PolicyMaker_SO(PolicyMaker):
             pass
         else:  # uav policy
             if not (step+1) % self.frequency == 0:
-                pass
+                self.raw_input_extraction(obs_n)
+                self.perception(obs_n)
             else:  # ↓↓ policy cycle ↓↓
                 opt_index = 1
 
