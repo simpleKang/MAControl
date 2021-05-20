@@ -40,8 +40,9 @@ def parse_args():
 
     # Environment
     parser.add_argument("--scenario", type=str, default="scenario5_visionOP", help="name of the scenario script")
-    parser.add_argument("--uav-num", type=int, default=4, help="number of uav")
+    parser.add_argument("--uav-num", type=int, default=20, help="number of uav")
     parser.add_argument("--step-max", type=int, default=4000, help="number of maximum steps")
+    parser.add_argument("--step-per-decision", type=int, default=50, help="frequency of decision")
 
     # GA
     parser.add_argument("--pop-size", type=int, default=8, help="size of population")
@@ -256,13 +257,16 @@ def run_simulation(arglist, behavior_archetypes, gen, ind, c_num):
                 f.write(str(obs_n[k][0]) + ' ' + str(obs_n[k][1]) + ' ' +
                         str(obs_n[k][2]) + ' ' + str(obs_n[k][3]) + '\n')
 
-        # 保存每个小瓜子每个step的assigned信息
-        with open(os.path.dirname(__file__) + path + 'target_lock.txt', 'a') as f:
-            f.write(str(step) + ' ')
-            for k in range(arglist.uav_num):
-                assigned_k = Controllers[0][k][5]
-                f.write(str(k)+' '+str(assigned_k)+' ')
-            f.write('\n')
+        # 保存每个小瓜子每次决策后的assigned信息
+        if step % arglist.step_per_decision == 0:
+            with open(os.path.dirname(__file__) + path + 'target_lock.txt', 'a') as f:
+                f.write(str(step) + ' ')
+                for k in range(arglist.uav_num):
+                    assigned_k = Controllers[0][k][5]
+                    f.write(str(k)+' '+str(assigned_k)+' ')
+                f.write('\n')
+        else:
+            pass
 
         # 画图展示
         # augment_view(arglist, world, Controllers[0], obs_n, step)

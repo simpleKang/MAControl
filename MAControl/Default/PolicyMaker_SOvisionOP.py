@@ -10,15 +10,15 @@ class PolicyMaker_SO(PolicyMaker):
 
     def __init__(self, name, env, world, agent_index, arglist):
         super(PolicyMaker_SO, self).__init__(name, env, world, agent_index, arglist)
-        self.UD = [0, 0]                      # 存储决策出的速度期望
-        self.n_view_a = []                    # 个体视野中 neighborhood (mate)
-        self.n_view_t = []                    # 个体视野中 neighborhood (target)
-        self.p_views = []                     # 个体视野中 projection + gamma
-        self.perception_quan = []             # （量化）perception
-        self.perception_dir = []              # （指向性）perception
-        self.uav_num = arglist.uav_num        # 小瓜子数量
-        self.decision_frequency = 50          # 小瓜子决策周期
-        self.assigned = None                  # 小瓜子的最近可见目标 [ + memory ]
+        self.UD = [0, 0]                              # 存储决策出的速度期望
+        self.n_view_a = []                            # 个体视野中 neighborhood (mate)
+        self.n_view_t = []                            # 个体视野中 neighborhood (target)
+        self.p_views = []                             # 个体视野中 projection + gamma
+        self.perception_quan = []                     # （量化）perception
+        self.perception_dir = []                      # （指向性）perception
+        self.uav_num = arglist.uav_num                # 小瓜子数量
+        self.frequency = arglist.step_per_decision    # 小瓜子决策周期
+        self.assigned = None                          # 小瓜子的最近可见目标 [ + memory ]
 
     def raw_input_extraction(self, obs):
 
@@ -159,7 +159,7 @@ class PolicyMaker_SO(PolicyMaker):
         if self.index >= self.uav_num:  # target policy
             pass
         else:  # uav policy
-            if not (step+1) % self.decision_frequency == 0:
+            if not (step+1) % self.frequency == 0:
                 pass
             else:  # ↓↓ policy cycle ↓↓
                 opt_index = 1
