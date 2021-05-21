@@ -5,7 +5,7 @@ import math
 from collections import Counter
 
 
-def target_distribute(uav_num, step, loop, scene):
+def target_distribute(uav_num, step, gen, ind, loop, scene):
 
     curdir = os.path.dirname(__file__)
     pardir = os.path.dirname(os.path.dirname(curdir))

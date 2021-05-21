@@ -5,7 +5,7 @@ import math
 gamma = T.blind_angle[2]
 
 
-def calculate_coverage(uav_num, step, loop=0):
+def calculate_coverage(uav_num, step, gen, ind, loop):
 
     curdir = os.path.dirname(__file__)
     pardir = os.path.dirname(os.path.dirname(curdir))

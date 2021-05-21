@@ -32,6 +32,7 @@ import MAControl.Default.PathPlanner_EdgeWaypoint as PP_G
 import MAControl.Default.PolicyMaker_SOvisionOP as PM_V
 
 path = '/track/' if os.name == 'posix' else '\\track\\'
+slash = '/' if os.name == 'posix' else '\\'
 
 
 def parse_args():
@@ -163,11 +164,11 @@ def get_score(arglist, gen, ind, num):
     # _score = calculate.coverrate_k(gen, ind, num)
 
     # KSB 像素计算覆盖率 - 视觉
-    _score = cv.calculate_coverage(arglist.uav_num, arglist.step_max, num)
+    _score = cv.calculate_coverage(arglist.uav_num, arglist.step_max, gen, ind, num)
 
     # XJ 计算目标分布
-    # _score = tp.target_distribute(arglist.uav_num, arglist.step_max, num, 'B')
-    # _score = tp.target_distribute(arglist.uav_num, arglist.step_max, num, 'C')
+    # _score = tp.target_distribute(arglist.uav_num, arglist.step_max, gen, ind, num, 'B')
+    # _score = tp.target_distribute(arglist.uav_num, arglist.step_max, gen, ind, num, 'C')
 
     # WZQ 完整计算覆盖率方式
     # _score = OCR.calculate_coverage(arglist.uav_num, arglist.step_max, num)
@@ -254,12 +255,16 @@ def run_simulation(arglist, behavior_archetypes, gen, ind, c_num):
 
         # 保存每个小瓜子每个step的状态信息
         for k in range(arglist.uav_num):
-            with open(os.path.dirname(__file__) + path + 'uav_%d_track.txt' % k, 'a') as f:
+            # with open(os.path.dirname(__file__) + path + 'uav_%d_track.txt' % k, 'a') as f:
+            with open(os.path.dirname(__file__) + path + 'gen=%d' % gen + slash + 'ind=%d' % ind + slash
+                      + 'num=%d' % num + slash + 'uav_%d_track.txt' % k, 'a') as f:
                 f.write(str(obs_n[k][0]) + ' ' + str(obs_n[k][1]) + ' ' +
                         str(obs_n[k][2]) + ' ' + str(obs_n[k][3]) + '\n')
 
         # 保存每个小瓜子每次决策后的assigned信息
-        with open(os.path.dirname(__file__) + path + 'target_lock.txt', 'a') as f:
+        # with open(os.path.dirname(__file__) + path + 'target_lock.txt', 'a') as f:
+        with open(os.path.dirname(__file__) + path + 'gen=%d' % gen + slash + 'ind=%d' % ind + slash
+                  + 'num=%d' % num + slash + 'target_lock.txt', 'a') as f:
             f.write(str(step) + ' ')
             for k in range(arglist.uav_num):
                 assigned_k = Controllers[0][k][5]
