@@ -18,7 +18,7 @@ class PolicyMaker_SO(PolicyMaker):
         self.perception_dir = []                      # （指向性）perception
         self.uav_num = arglist.uav_num                # 小瓜子数量
         self.frequency = arglist.step_per_decision    # 小瓜子决策周期
-        self.assigned = []                            # 小瓜子的最近可见目标 [ + memory ]
+        self.assigned = float('nan')                  # 小瓜子的最近可见目标 [ + memory ]
 
     def raw_input_extraction(self, obs):
 

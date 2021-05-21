@@ -30,10 +30,10 @@ def target_distribute(uav_num, step, loop, scene):
             p4_array[k].append(perception[k][lt][3])
 
         w_array = list()
-        c = Counter(assignment[lt][1:])
+        cc = Counter(assignment[lt][1:])
         for m in range(T.num_targets):
             # ## # ↓↓ credit: KSB ↓↓ # ## #
-            a_m = -1 * abs(c[m] - math.floor(uav_num/T.num_targets))
+            a_m = -1 * abs(cc[m] - math.floor(uav_num/T.num_targets))
             w_m = math.exp(a_m) / T.num_targets
             w_array.append(w_m)
         s = sum([-1*item*math.log(item) for item in w_array])
