@@ -84,9 +84,6 @@ def make_env(arglist):
         if landmark.obstacle:
             obstacle_info_.append([landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.size, k])
 
-    with open(os.path.dirname(__file__) + path + 'para.txt', 'w') as f:
-        f.write(str(arglist.uav_num) + ' ' + str(arglist.step_max))
-
     return env_, world_, obstacle_info_
 
 
@@ -227,20 +224,19 @@ def get_score(arglist, gen, ind, num):
 def run_simulation(arglist, behavior_archetypes, gen, ind, c_num):
     # environment -> controller -> step by step -> score
 
-    with open(os.path.dirname(__file__) + path + 'para.txt', 'w') as f:
-        f.write(str(arglist.uav_num) + ' ' + str(arglist.step_max) + ' ' + str(c_num))
-
     # Create environment
     env, world, obstacle_info = make_env(arglist)
 
     # Create Controller
     Controllers = get_controller(env, world, arglist)
 
-    open(os.path.dirname(__file__) + path + 'target_lock.txt', 'w')
+    PATH = path + 'gen=%d' % gen + slash + 'ind=%d' % ind + slash + 'num=%d' % num
+    os.makedirs(os.path.dirname(__file__) + PATH)
+    open(os.path.dirname(__file__) + PATH + '/target_lock.txt', 'w')
 
     # 为每个小瓜子创建状态文件
     for k in range(arglist.uav_num):
-        open(os.path.dirname(__file__) + path + 'uav_%d_track.txt' % k, 'w')
+        open(os.path.dirname(__file__) + PATH + '/uav_%d_track.txt' % k, 'w')
 
     obs_n = env.reset()
     for step in range(arglist.step_max):

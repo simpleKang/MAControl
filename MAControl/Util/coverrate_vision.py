@@ -11,21 +11,22 @@ def calculate_coverage(uav_num, step, gen, ind, loop):
     pardir = os.path.dirname(os.path.dirname(curdir))
     cover_rate = 0
 
-    txt_name = '/cover_rate-%s-%s-%s.txt' % (str(uav_num), str(step), str(loop))
+    txt_name = '/cover_rate-%s-%s-%s.txt' % (str(uav_num), str(step), str(gen))
     open(pardir + '/scene_Folder' + txt_name, 'w')
 
     cell = 200                     # 区域划分精度
     track = list()
     for i in range(uav_num):
-        track.append(np.loadtxt(pardir + '/track/uav_%d_track.txt' % i))
+        track.append(np.loadtxt(pardir + '/track/gen=%d/ind=%d/num=%d/uav_%d_track.txt' % (gen, ind, loop, i)))
 
     area = np.zeros((cell, cell))
     area_width = T.edge*2          # 正方形区域实际边长
     scale = area_width/cell        # 离散度(比例尺)
 
-    for lt in range(0, np.size(track[-1], 0), 5):  # np.size(A,0) 返回该二维矩阵的行数 # range(a,b,c) 类似 matlab [a:c:b)
+    with open(pardir + '/scene_Folder' + txt_name, 'a') as c:
+        c.write(str('ind') + ' ' + str(ind) + ' ' + str('loop') + ' ' + str(loop) + '\n' + '\n')
 
-        angle_list = list()
+    for lt in range(0, np.size(track[-1], 0), 5):  # np.size(A,0) 返回该二维矩阵的行数 # range(a,b,c) 类似 matlab [a:c:b)
 
         for k in range(uav_num):
 
@@ -55,5 +56,8 @@ def calculate_coverage(uav_num, step, gen, ind, loop):
         with open(pardir + '/scene_Folder' + txt_name, 'a') as c:
             c.write(str(lt) + ' ' + str(cover_rate) + '\n')
     # print('Finished!')
+
+    with open(pardir + '/scene_Folder' + txt_name, 'a') as c:
+        c.write('\n')
 
     return cover_rate
