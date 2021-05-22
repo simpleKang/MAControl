@@ -49,15 +49,17 @@ def target_distribute(uav_num, step, gen, ind, loop, scene):
         if scene == 'B':
             p2_sum = sum([sum(item) for item in p2_array]) / uav_num / len(p2_array[0])
             p4_sum = sum([sum(item) for item in p4_array]) / uav_num / len(p4_array[0])
-            with open(pardir + '/track' + txt_name, 'a') as c:
-                c.write(str(lt) + ' ' + str(p2_sum) + ' ' + str(p4_sum) + '\n')
             score = p2_sum + p4_sum
+            with open(pardir + '/scene_Folder' + txt_name, 'a') as c:
+                c.write(str(lt) + ' ' + str(p2_sum) + ' ' + str(p4_sum) + ' ' + str(score) + '\n')
 
         elif scene == 'C':
             score = sum(target_array) / len(target_array)
+            with open(pardir + '/scene_Folder' + txt_name, 'a') as c:
+                c.write(str(lt) + ' ' + str(score) + '\n')
 
-        with open(pardir + '/scene_Folder' + txt_name, 'a') as c:
-            c.write(str(lt) + ' ' + str(score) + '\n')
+        else:
+            pass
 
     with open(pardir + '/scene_Folder' + txt_name, 'a') as c:
         c.write('\n')
