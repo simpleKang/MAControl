@@ -11,17 +11,22 @@ def target_distribute(uav_num, step, gen, ind, loop, scene):
     pardir = os.path.dirname(os.path.dirname(curdir))
     score = 0
 
-    txt_name = '/target-info-%s-%s-%s-%s.txt' % (str(uav_num), str(step), str(loop), scene)
-    open(pardir + '/scene_Folder' + txt_name, 'w')
+    txt_name = '/target-info-%s-%s-%s-%s.txt' % (str(uav_num), str(step), str(gen), scene)
+    open(pardir + '/scene_Folder' + txt_name, 'a')
 
     perception = list()
     for i in range(uav_num):
-        perception.append(np.loadtxt(pardir + '/track/uav_%d_perception.txt' % i))
-    assignment = np.loadtxt(pardir + '/track/target_lock.txt')
+        perception.append(np.loadtxt(pardir + '/track/gen=%d/ind=%d/num=%d/uav_%d_track.txt' % (gen, ind, loop, i)))
+        # perception.append(np.loadtxt(pardir + '/track/uav_%d_perception.txt' % i))
+    assignment = np.loadtxt(pardir + '/track/gen=%d/ind=%d/num=%d/target_lock.txt' % (gen, ind, loop))
+    # assignment = np.loadtxt(pardir + '/track/target_lock.txt')
 
     p2_array = [[] for i in range(uav_num)]
     p4_array = [[] for i in range(uav_num)]
     target_array = []
+
+    with open(pardir + '/scene_Folder' + txt_name, 'a') as c:
+        c.write(str('ind') + ' ' + str(ind) + ' ' + str('loop') + ' ' + str(loop) + '\n' + '\n')
 
     for lt in range(0, np.size(perception[-1], 0), 5):  # np.size(A,0) 返回该二维矩阵的行数 # range(a,b,c) 类似 matlab [a:c:b)
 
@@ -50,7 +55,11 @@ def target_distribute(uav_num, step, gen, ind, loop, scene):
 
         elif scene == 'C':
             score = sum(target_array) / len(target_array)
-        else:
-            pass
+
+        with open(pardir + '/scene_Folder' + txt_name, 'a') as c:
+            c.write(str(lt) + ' ' + str(score) + '\n')
+
+    with open(pardir + '/scene_Folder' + txt_name, 'a') as c:
+        c.write('\n')
 
     return score
