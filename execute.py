@@ -16,7 +16,7 @@
 import argparse
 import time
 import os
-import numpy as np
+import shutil
 import GeneticAlgorithm.genetic_algorithm_duo as ga_duo
 # from GeneticAlgorithm.BehaviorArchetypes import behavior
 from GeneticAlgorithm.BehaviorArchetypes_vision import behavior_v
@@ -252,15 +252,13 @@ def run_simulation(arglist, behavior_archetypes, gen, ind, c_num):
         # 保存每个小瓜子每个step的状态信息 ('a' = 追加)
         for k in range(arglist.uav_num):
             # with open(os.path.dirname(__file__) + path + 'uav_%d_track.txt' % k, 'a') as f:
-            with open(os.path.dirname(__file__) + path + 'gen=%d' % gen + slash + 'ind=%d' % ind + slash
-                      + 'num=%d' % num + slash + 'uav_%d_track.txt' % k, 'a') as f:
+            with open(os.path.dirname(__file__) + PATH + '/uav_%d_track.txt' % k, 'a') as f:
                 f.write(str(obs_n[k][0]) + ' ' + str(obs_n[k][1]) + ' ' +
                         str(obs_n[k][2]) + ' ' + str(obs_n[k][3]) + '\n')
 
         # 保存每个小瓜子每个step的assigned信息 ('a' = 追加)
         # with open(os.path.dirname(__file__) + path + 'target_lock.txt', 'a') as f:
-        with open(os.path.dirname(__file__) + path + 'gen=%d' % gen + slash + 'ind=%d' % ind + slash
-                  + 'num=%d' % num + slash + 'target_lock.txt', 'a') as f:
+        with open(os.path.dirname(__file__) + PATH + '/target_lock.txt', 'a') as f:
             f.write(str(step) + ' ')
             for k in range(arglist.uav_num):
                 assigned_k = Controllers[0][k][5]
@@ -274,6 +272,10 @@ def run_simulation(arglist, behavior_archetypes, gen, ind, c_num):
         # time.sleep(0.001)
 
     # time.sleep(0.001)
+    for k in range(arglist.uav_num):
+        shutil.move(os.path.dirname(__file__) + path + 'uav_%d_perception.txt' % k,
+                    os.path.dirname(__file__) + PATH + '/uav_%d_perception.txt' % k)
+    # SCORE
     _score = get_score(arglist, gen, ind, c_num)
 
     return _score
