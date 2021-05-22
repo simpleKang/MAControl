@@ -178,7 +178,8 @@ class GA(object):
                 for arch in ind:
                     for weight in arch:
                         f.write(str(weight) + ' ')
-                    f.write('\n' + '\n')
+                    f.write('\n')
+                f.write('\n')
 
     # 载入模型
     def load_model(self):
