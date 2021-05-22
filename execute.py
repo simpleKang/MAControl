@@ -249,7 +249,7 @@ def run_simulation(arglist, behavior_archetypes, gen, ind, c_num):
         new_obs_n, rew_n, done_n, info_n = env.step(action_n)
         obs_n = new_obs_n
 
-        # 保存每个小瓜子每个step的状态信息
+        # 保存每个小瓜子每个step的状态信息 ('a' = 追加)
         for k in range(arglist.uav_num):
             # with open(os.path.dirname(__file__) + path + 'uav_%d_track.txt' % k, 'a') as f:
             with open(os.path.dirname(__file__) + path + 'gen=%d' % gen + slash + 'ind=%d' % ind + slash
@@ -257,7 +257,7 @@ def run_simulation(arglist, behavior_archetypes, gen, ind, c_num):
                 f.write(str(obs_n[k][0]) + ' ' + str(obs_n[k][1]) + ' ' +
                         str(obs_n[k][2]) + ' ' + str(obs_n[k][3]) + '\n')
 
-        # 保存每个小瓜子每次决策后的assigned信息
+        # 保存每个小瓜子每个step的assigned信息 ('a' = 追加)
         # with open(os.path.dirname(__file__) + path + 'target_lock.txt', 'a') as f:
         with open(os.path.dirname(__file__) + path + 'gen=%d' % gen + slash + 'ind=%d' % ind + slash
                   + 'num=%d' % num + slash + 'target_lock.txt', 'a') as f:
