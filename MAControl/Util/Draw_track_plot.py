@@ -4,19 +4,23 @@ import matplotlib.pyplot as plt
 import MAEnv.scenarios.TargetProfile as T
 
 
-plt.rcParams['figure.dpi'] = 200
+plt.rcParams['figure.dpi'] = 800
 
 curdir = os.path.dirname(__file__)
 pardir = os.path.dirname(os.path.dirname(curdir))
 
-para = np.loadtxt(pardir + '/track/para.txt')
-num = int(para[0])
+gen_num = 10
+ind_num = 16
+loop_num = 8
+uav_num = 5
 
 track = []
-for i in range(num):
-    track.append(np.loadtxt(pardir + '/track/uav_%d_track.txt' % i))
-
-# for k in range(-10, 1501, 25):
+for gen in range(gen_num):
+    for ind in range(ind_num):
+        for loop in range(loop_num):
+            for k in range(uav_num):
+                PATH = pardir + '/track/05-22-OK-A/gen=%d' % gen + '/ind=%d' % ind + '/num=%d' % loop
+                track.append(np.loadtxt(PATH + '/uav_%d_track.txt' % k))
 
 plt.figure(facecolor='w')
 line = plt.gca()
@@ -32,7 +36,7 @@ color = ['black', 'darkorange', 'forestgreen', 'slategrey', 'lightcoral', 'gold'
          'silver', 'darkgoldenrod', 'lime', 'slateblue', 'red', 'yellow', 'cyan', 'purple',
          'lightgrey', 'gold', 'turquoise', 'blueviolet', 'darksalmon', 'darkseagreen', 'deepskyblue', 'hotpink']
 
-for i in range(num):
+for i in range(len(track)):
     k = i % len(color)
     plt.scatter(track[i][0, 2], track[i][0, 3], c=color[k], marker='o')
     line.plot(track[i][:, 2], track[i][:, 3], color[k])
@@ -47,6 +51,6 @@ if T.num_targets:
 
 plt.xlabel('X / km')
 plt.ylabel('Y / km')
-plt.savefig('track.png')
+plt.savefig(pardir+'/track/-plot-/track.png')
 plt.show()
 

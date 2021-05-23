@@ -283,6 +283,9 @@ def run_simulation(arglist, behavior_archetypes, gen, ind, c_num):
 
 if __name__ == '__main__':
 
+    with open(os.path.dirname(__file__) + path + '/time.txt', 'a') as f:
+        f.write('start ' + str(time.strftime('%Y-%m-%d, %H:%M:%S')) + '\n')
+
     arglist = parse_args()
 
     if arglist.evolve:
@@ -304,6 +307,9 @@ if __name__ == '__main__':
 
         ga.select(arglist.generation_num)  # into pop size
         print('All finished!')
+
+    with open(os.path.dirname(__file__) + path + '/time.txt', 'a') as f:
+        f.write('end ' + str(time.strftime('%Y-%m-%d, %H:%M:%S')) + '\n')
 
     if arglist.test:
 
