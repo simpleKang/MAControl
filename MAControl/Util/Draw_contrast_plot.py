@@ -21,7 +21,7 @@ def draw_contrast_plot(data_num, name, up_, down_):
     per_down = np.zeros(int(lt/20))
 
     for le in range(int(lt/20)):
-        cur = np.array([coverage_set[k][le*20:(le+1)*20-1][1] for k in range(data_num)])
+        cur = np.array([np.array(coverage_set[k][le*20:(le+1)*20-1]).T[1] for k in range(data_num)])
         per_up[le] = np.percentile(cur, up_)
         per_median[le] = np.percentile(cur, 50)
         per_down[le] = np.percentile(cur, down_)
@@ -61,7 +61,7 @@ if __name__ == '__main__':
     k2_list = [i for i in range(17)]  # show
     plt.xticks(k1_list, k2_list)
     plt.xlim(0, 150)
-    plt.ylim(0, 1)
+    plt.ylim(0, 0.2)
 
     # # set 1-10000 group parameters
     # folder_1 = '1'
@@ -113,8 +113,8 @@ if __name__ == '__main__':
     # plt.ylim(0, 1.03)
 
     font = {'family': 'Times New Roman', 'weight': 'normal', 'size': 13}
-    plt.xlabel('Individual', font)
-    plt.ylabel('Coverage Rate', font)
+    # plt.xlabel('Individual', font)
+    # plt.ylabel('Coverage Rate', font)
     plt.legend(loc=4)
     plt.grid()
     curdir = os.path.dirname(__file__)

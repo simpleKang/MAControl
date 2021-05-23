@@ -24,7 +24,7 @@ def calculate_coverage(uav_num, step, gen, ind, loop):
     scale = area_width/cell        # 离散度(比例尺)
 
     with open(pardir + '/scene_Folder' + txt_name, 'a') as c:
-        c.write(str('ind') + ' ' + str(ind) + ' ' + str('loop') + ' ' + str(loop) + '\n' + '\n')
+        c.write(str('# ind') + ' ' + str(ind) + ' ' + str('loop') + ' ' + str(loop) + '\n' + '# ' + '\n')
 
     for lt in range(0, np.size(track[-1], 0), 5):  # np.size(A,0) 返回该二维矩阵的行数 # range(a,b,c) 类似 matlab [a:c:b)
 
@@ -58,6 +58,6 @@ def calculate_coverage(uav_num, step, gen, ind, loop):
     # print('Finished!')
 
     with open(pardir + '/scene_Folder' + txt_name, 'a') as c:
-        c.write('\n')
+        c.write('# ' + '\n')
 
     return cover_rate
