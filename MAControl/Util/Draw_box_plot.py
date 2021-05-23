@@ -8,23 +8,24 @@ def draw_box_plot(data_num, name):
 
     curdir = os.path.dirname(__file__)
     pardir = os.path.dirname(os.path.dirname(curdir))
+    path = '/track/' + name
 
     coverage_set = list()
 
     for i in range(data_num):
-        coverage_set.append(np.loadtxt(pardir + '/coverage-20-4000-%s/cover_rate-20-4000-%d.txt' % (str(name), i)))
+        coverage_set.append(np.loadtxt(pardir + path + '/cover_rate-5-100-%d.txt' % i, comments='#'))
 
-    step, _ = coverage_set[0].shape
+    lt, _ = coverage_set[0].shape
 
     box = list()
 
-    for k in range(int(step)):
+    for k in range(int(lt/20)):
 
         box.append([])
 
         for j in range(data_num):
 
-            box[-1].append(coverage_set[j][k][1])
+            box[-1].append(coverage_set[j][(k+1)*20-1][1])
 
     box = np.array(box).T
 
@@ -101,25 +102,30 @@ def calculate_median(dataset):
 if __name__ == '__main__':
 
     plt.rcParams['figure.dpi'] = 800
-    data_num_ = 30
+    data_num_ = 2
 
-    folder_co = 'controlled'
+    folder_co = '05-22-OK-A'
     control_box = draw_box_plot(data_num_, folder_co)
     co = control_box.boxplot(showfliers=False, patch_artist=True, showcaps=False, return_type='dict')
-    plt.xticks([0, 200, 400, 600, 800], [0, 1000, 2000, 3000, 4000])
+    k_list = [i*8 for i in range(17)]
+    plt.xticks(k_list, k_list)
 
-    folder_tr = 'experimental'
-    trained_box = draw_box_plot(data_num_, folder_tr)
-    tr = trained_box.boxplot(showfliers=False, patch_artist=True, showcaps=False, return_type='dict')
-    plt.xticks([0, 200, 400, 600, 800], [0, 1000, 2000, 3000, 4000])
+    # folder_tr = 'experimental'
+    # trained_box = draw_box_plot(data_num_, folder_tr)
+    # tr = trained_box.boxplot(showfliers=False, patch_artist=True, showcaps=False, return_type='dict')
+    # plt.xticks([0, 200, 400, 600, 800], [0, 1000, 2000, 3000, 4000])
 
-    folder_ra = 'random'
-    random_box = draw_box_plot(data_num_, folder_ra)
-    ra = random_box.boxplot(showfliers=False, patch_artist=True, showcaps=False, return_type='dict')
-    plt.xticks([0, 200, 400, 600, 800], [0, 1000, 2000, 3000, 4000])
+    # folder_ra = 'random'
+    # random_box = draw_box_plot(data_num_, folder_ra)
+    # ra = random_box.boxplot(showfliers=False, patch_artist=True, showcaps=False, return_type='dict')
+    # plt.xticks([0, 200, 400, 600, 800], [0, 1000, 2000, 3000, 4000])
 
     set_controlled_group_color(co)
-    set_experimental_group_color(tr)
-    set_random_group_color(ra)
+    # set_experimental_group_color(tr)
+    # set_random_group_color(ra)
 
+    plt.xlim((0, 150))
+    curdir = os.path.dirname(__file__)
+    pardir = os.path.dirname(os.path.dirname(curdir))
+    plt.savefig(pardir+'/track/-plot-/draw1.png')
     plt.show()
