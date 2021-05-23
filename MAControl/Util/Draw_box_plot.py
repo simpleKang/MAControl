@@ -107,8 +107,9 @@ if __name__ == '__main__':
     folder_co = '05-22-OK-A'
     control_box = draw_box_plot(data_num_, folder_co)
     co = control_box.boxplot(showfliers=False, patch_artist=True, showcaps=False, return_type='dict')
-    k_list = [i*8 for i in range(17)]
-    plt.xticks(k_list, k_list)
+    k1_list = [i*8 for i in range(17)]  # actual
+    k2_list = [i for i in range(17)]  # show
+    plt.xticks(k1_list, k2_list)
 
     # folder_tr = 'experimental'
     # trained_box = draw_box_plot(data_num_, folder_tr)
