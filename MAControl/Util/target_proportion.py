@@ -26,7 +26,7 @@ def target_distribute(uav_num, step, gen, ind, loop, scene):
     target_array = []
 
     with open(pardir + '/scene_Folder' + txt_name, 'a') as c:
-        c.write(str('ind') + ' ' + str(ind) + ' ' + str('loop') + ' ' + str(loop) + '\n' + '\n')
+        c.write(str('# ind') + ' ' + str(ind) + ' ' + str('loop') + ' ' + str(loop) + '\n' + '# ' + '\n')
 
     for lt in range(0, np.size(perception[-1], 0), 5):  # np.size(A,0) 返回该二维矩阵的行数 # range(a,b,c) 类似 matlab [a:c:b)
 
@@ -62,6 +62,6 @@ def target_distribute(uav_num, step, gen, ind, loop, scene):
             pass
 
     with open(pardir + '/scene_Folder' + txt_name, 'a') as c:
-        c.write('\n')
+        c.write('# ' + '\n')
 
     return score
