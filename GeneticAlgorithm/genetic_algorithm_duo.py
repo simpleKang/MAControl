@@ -23,7 +23,6 @@ class GA(object):
         self.evolved_pop_size = self.pop_size + math.ceil(self.pop_size*self.cr2) + math.ceil(self.pop_size*self.mr2)
 
         self.bit = 5  # how many bits per weight representation - each weight \in (-1,1]
-        self.mutation_p = arglist.mutation_neighborhood  # how many bits per weight is mutated
 
         if arglist.restore:
             self.load_model()
@@ -143,7 +142,8 @@ class GA(object):
             for ii in range(len(points)):
                 k = points[ii]
                 weight_k = child[k*self.bit:(k+1)*self.bit]
-                bits = random.sample(range(0, self.bit), self.mutation_p)
+                mutation_p = random.randint(1, self.bit)
+                bits = random.sample(range(0, self.bit), mutation_p)
                 weight_k_new = [weight_k[u] if u in bits else 1-weight_k[u] for u in range(len(weight_k))]
                 child[k * self.bit:(k + 1) * self.bit] = weight_k_new
             self.binary_population += [child]
