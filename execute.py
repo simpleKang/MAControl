@@ -290,10 +290,11 @@ if __name__ == '__main__':
         f.write('start ' + str(time.strftime('%Y-%m-%d, %H:%M:%S')) + '\n')
         f.write('uav-num ' + str(arglist.uav_num) + ' ' +
                 'step-max ' + str(arglist.step_max) + ' ' +
-                'step-per-decision ' + str(arglist.step_per_decision) + '\n' +
+                'frequency ' + str(arglist.step_per_decision) + '\n' +
+                'gen-num ' + str(arglist.generation_num) + ' ' +
                 'pop-size ' + str(arglist.pop_size) + ' ' +
-                'generation-num ' + str(arglist.generation_num) + ' ' +
-                'max-behavior-archetypes ' + str(arglist.max_behavior_archetypes) + ' ' +
+                'loop-num ' + str(arglist.collect_num) + ' ' +
+                'archetype-num ' + str(arglist.max_behavior_archetypes) + ' ' +
                 'fitness ' + str(arglist.fitness) + '\n')
 
     if arglist.evolve:
