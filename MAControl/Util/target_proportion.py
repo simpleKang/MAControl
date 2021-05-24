@@ -16,7 +16,8 @@ def target_distribute(uav_num, step, gen, ind, loop, scene):
 
     perception = list()
     for i in range(uav_num):
-        perception.append(np.loadtxt(pardir + '/track/gen=%d/ind=%d/num=%d/uav_%d_track.txt' % (gen, ind, loop, i)))
+        perception.append(np.loadtxt(pardir + '/track/gen=%d/ind=%d/num=%d' % (gen, ind, loop)
+                                            + '/uav_%d_perception.txt' % i))
         # perception.append(np.loadtxt(pardir + '/track/uav_%d_perception.txt' % i))
     assignment = np.loadtxt(pardir + '/track/gen=%d/ind=%d/num=%d/target_lock.txt' % (gen, ind, loop))
     # assignment = np.loadtxt(pardir + '/track/target_lock.txt')
