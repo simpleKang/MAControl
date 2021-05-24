@@ -304,11 +304,11 @@ if __name__ == '__main__':
             ga.evolve(gen)  # select -> crossover -> mutate
             print('Generation: ', gen, ' Evolution completed!')
 
+            with open(os.path.dirname(__file__) + path + '/time.txt', 'a') as f:
+                f.write('gen ' + str(gen) + ' ' + str(time.strftime('%Y-%m-%d, %H:%M:%S')) + '\n')
+
         ga.select(arglist.generation_num)  # into pop size
         print('All finished!')
-
-    with open(os.path.dirname(__file__) + path + '/time.txt', 'a') as f:
-        f.write('end ' + str(time.strftime('%Y-%m-%d, %H:%M:%S')) + '\n')
 
     if arglist.test:
 
