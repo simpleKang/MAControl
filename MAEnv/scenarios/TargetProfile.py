@@ -6,7 +6,7 @@ import MAControl.Util.get_random_state as rs
 # blind angle
 blind_angle = [math.pi/3, math.pi/3*2, math.pi, math.pi/3*4]
 # visual section
-num_section = [4, 8, 12]
+num_section = 10
 
 # UAV
 UAV_color = np.array([0.47, 0.79, 0.79])

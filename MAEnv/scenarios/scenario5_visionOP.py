@@ -207,7 +207,7 @@ class Scenario(BaseScenario):
         return neighborhood
 
     def projected_view(self, agent, world):
-        num = T.num_section[0]
+        num = T.num_section
         retina = self.retina(agent, world)[0]
         gamma = self.retina(agent, world)[1]
         G2 = self.retina(agent, world)[2]
