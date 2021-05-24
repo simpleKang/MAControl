@@ -14,6 +14,7 @@
 #          (((__) (__)))    长烟一空，皓月千里，浮光跃金，_ _ _ _ ，渔歌互答，_ _ _ _ ！
 
 import argparse
+import numpy as np
 import time
 import os
 import shutil
@@ -46,10 +47,11 @@ def parse_args():
     parser.add_argument("--step-per-decision", type=int, default=50, help="frequency of decision")
 
     # GA
+    parser.add_argument("--generation-num", type=int, default=8, help="number of generation")
     parser.add_argument("--pop-size", type=int, default=4, help="size of population")
-    parser.add_argument("--generation-num", type=int, default=4, help="number of generation")
     parser.add_argument("--max-behavior-archetypes", type=int, default=4, help="number of behavior archetypes")
-    parser.add_argument("--collect-num", type=int, default=4, help="number of fitness score collection")
+    parser.add_argument("--collect-num", type=int, default=4, help="number of fitness score collection")  # loop
+    parser.add_argument("--fitness", type=str, default='A', help="name of the fitness function")
 
     # Core parameters
     parser.add_argument("--crossover-rate-inner", type=float, default=0.1, help="crossover rate")
@@ -153,18 +155,18 @@ def augment_view(arglist, world, Controller, obs, step):
 
 def get_score(arglist, gen, ind, num):
 
-    # 不使用特定评分，仅给出随机分数
-    # _score = np.random.random()
-
     # KSB 像素计算覆盖率
     # _score = calculate.coverrate_k(gen, ind, num)
 
-    # KSB 像素计算覆盖率 - 视觉
-    _score = cv.calculate_coverage(arglist.uav_num, arglist.step_max, gen, ind, num)
-
-    # XJ 计算目标分布
-    # _score = tp.target_distribute(arglist.uav_num, arglist.step_max, gen, ind, num, 'B')
-    # _score = tp.target_distribute(arglist.uav_num, arglist.step_max, gen, ind, num, 'C')
+    if arglist.fitness == 'A':  # KSB 像素计算覆盖率 - 视觉
+        _score = cv.calculate_coverage(arglist.uav_num, arglist.step_max, gen, ind, num)
+    elif arglist.fitness == 'B':  # XJ 计算目标分布 perception
+        _score = tp.target_distribute(arglist.uav_num, arglist.step_max, gen, ind, num, 'B')
+    elif arglist.fitness == 'C':  # XJ 计算目标分布 assignment
+        _score = tp.target_distribute(arglist.uav_num, arglist.step_max, gen, ind, num, 'C')
+    else:  # 不使用特定评分，仅给出随机分数
+        _score = np.random.random()
+        print('Fitness - Random - ')
 
     # WZQ 完整计算覆盖率方式
     # _score = OCR.calculate_coverage(arglist.uav_num, arglist.step_max, num)
@@ -282,10 +284,17 @@ def run_simulation(arglist, behavior_archetypes, gen, ind, c_num):
 
 if __name__ == '__main__':
 
+    arglist = parse_args()
+
     with open(os.path.dirname(__file__) + path + '/time.txt', 'a') as f:
         f.write('start ' + str(time.strftime('%Y-%m-%d, %H:%M:%S')) + '\n')
-
-    arglist = parse_args()
+        f.write('uav-num ' + str(arglist.uav_num) + ' ' +
+                'step-max ' + str(arglist.step_max) + ' ' +
+                'step-per-decision ' + str(arglist.step_per_decision) + '\n' +
+                'pop-size ' + str(arglist.pop_size) + ' ' +
+                'generation-num ' + str(arglist.generation_num) + ' ' +
+                'max-behavior-archetypes ' + str(arglist.max_behavior_archetypes) + ' ' +
+                'fitness ' + str(arglist.fitness) + '\n')
 
     if arglist.evolve:
         ga = ga_duo.GA(arglist)
