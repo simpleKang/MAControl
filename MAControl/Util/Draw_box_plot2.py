@@ -13,7 +13,16 @@ def draw_box_plot(data_num, name):
     coverage_set = list()
 
     for i in range(data_num):
-        coverage_set.append(np.loadtxt(pardir + path + '/cover_rate-5-100-%d.txt' % i, comments='#'))
+        raw = np.loadtxt(pardir + path + '/cover_rate-20-1000-%d.txt' % i, comments='#')
+        for ind in range(8):
+            k_index = [(ind * 4 + loop) * 200 + 0 for loop in range(4)]
+            array = list()
+            array.append(raw[k_index[0]:k_index[0] + 200].T[0])
+            array.append(raw[k_index[0]:k_index[0] + 200].T[1])
+            array.append(raw[k_index[1]:k_index[1] + 200].T[1])
+            array.append(raw[k_index[2]:k_index[2] + 200].T[1])
+            array.append(raw[k_index[3]:k_index[3] + 200].T[1])
+            coverage_set.append(np.array(array).T)
 
     lt, _ = coverage_set[0].shape
 
@@ -102,7 +111,7 @@ def calculate_median(dataset):
 if __name__ == '__main__':
 
     plt.rcParams['figure.dpi'] = 800
-    data_num_ = 2
+    data_num_ = 8
 
     folder_co = 'Test1-OK-A'
     control_box = draw_box_plot(data_num_, folder_co)
