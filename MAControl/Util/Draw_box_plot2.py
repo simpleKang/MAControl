@@ -33,14 +33,15 @@ def raw_data(data_num, name):
 
 
 def set_group_color(f, gen):
+    k = gen * 40 + 20
 
     for whisker in f['whiskers']:
-        whisker.set(color=plt.get_cmap('Set3')(k), alpha=0.7, linewidth=0.5)
+        whisker.set(color=plt.get_cmap('ocean')(k), alpha=0.5, linewidth=0.5)
     for box in f['boxes']:
-        box.set(color=plt.get_cmap('Set3')(k), alpha=0.7, linewidth=0.3)
-        box.set(facecolor=plt.get_cmap('Set3')(k), alpha=0.7, linewidth=0.3)
+        box.set(color=plt.get_cmap('ocean')(k), alpha=0.5, linewidth=0.3)
+        box.set(facecolor=plt.get_cmap('ocean')(k), alpha=0.5, linewidth=0.3)
     for median in f['medians']:
-        median.set(color=plt.get_cmap('Set3')(k), alpha=0.95, linewidth=2)
+        median.set(color=plt.get_cmap('ocean')(k), alpha=0.9, linewidth=2)
 
 
 if __name__ == '__main__':
@@ -58,6 +59,8 @@ if __name__ == '__main__':
         control_box = get_box(data_num, folder_co, k)
         co[k] = control_box.boxplot(showfliers=False, patch_artist=True, showcaps=False, return_type='dict')
         set_group_color(co[k], k)
+        plt.text(165, k*0.06 + 0.1, 'generation ' + str(k), fontsize=10, weight='book',
+                 color=plt.get_cmap('ocean')(k*40+20))
 
     k1_list = [i*20 for i in range(11)]  # actual
     k2_list = [i*100 for i in range(11)]  # show
@@ -68,6 +71,7 @@ if __name__ == '__main__':
     plt.ylabel('Cover-Rate', font)
 
     plt.xlim((0, 200))
+    plt.ylim((0.07, 1))
     curdir = os.path.dirname(__file__)
     pardir = os.path.dirname(os.path.dirname(curdir))
     plt.savefig(pardir+'/track/-plot-/draw-o.png')
