@@ -34,35 +34,41 @@ def raw_data(data_num, name):
 
 def set_group_color(f, gen):
 
-    color = ['rosybrown', 'red', 'darkkhaki', 'olive', 'yellowgreen', 'olivedrab', 'turquoise', 'teal']
-    k1 = gen*2
-    k2 = gen*2+1
-
     for whisker in f['whiskers']:
-        whisker.set(color=color[k1], alpha=0.5)
+        whisker.set(color=plt.get_cmap('Set3')(k), alpha=0.7, linewidth=0.5)
     for box in f['boxes']:
-        box.set(color=color[k1], alpha=0.5)
-        box.set(facecolor=color[k1], alpha=0.5)
+        box.set(color=plt.get_cmap('Set3')(k), alpha=0.7, linewidth=0.3)
+        box.set(facecolor=plt.get_cmap('Set3')(k), alpha=0.7, linewidth=0.3)
     for median in f['medians']:
-        median.set(color=color[k2])
+        median.set(color=plt.get_cmap('Set3')(k), alpha=0.95, linewidth=2)
 
 
 if __name__ == '__main__':
 
     plt.rcParams['figure.dpi'] = 800
-    data_num_ = 8
-
+    data_num = 8
     folder_co = 'Test1-OK-A'
-    control_box = get_box(data_num_, folder_co, 0)
-    co = control_box.boxplot(showfliers=False, patch_artist=True, showcaps=False, return_type='dict')
+    # draw = [0, 1, 2, 3, 4, 5, 6, 7]
+    draw = [0, 1, 2, 3, 4]
+    # draw = [0]
+
+    co = [[] for k in range(data_num)]
+    for kk in range(len(draw)):
+        k = draw[kk]
+        control_box = get_box(data_num, folder_co, k)
+        co[k] = control_box.boxplot(showfliers=False, patch_artist=True, showcaps=False, return_type='dict')
+        set_group_color(co[k], k)
+
     k1_list = [i*20 for i in range(11)]  # actual
-    k2_list = [i*20 for i in range(11)]  # show
+    k2_list = [i*100 for i in range(11)]  # show
     plt.xticks(k1_list, k2_list)
 
-    set_group_color(co, 0)
+    font = {'family': 'Times New Roman', 'weight': 'normal', 'size': 13}
+    plt.xlabel('Step', font)
+    plt.ylabel('Cover-Rate', font)
 
-    plt.xlim((0, 202))
+    plt.xlim((0, 200))
     curdir = os.path.dirname(__file__)
     pardir = os.path.dirname(os.path.dirname(curdir))
-    plt.savefig(pardir+'/track/-plot-/draw1.png')
+    plt.savefig(pardir+'/track/-plot-/draw-o.png')
     plt.show()
