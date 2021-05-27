@@ -6,7 +6,7 @@ import pandas as pd
 
 def get_box(data_num, name):
     r = raw_data(data_num, name)
-    box = pd.DataFrame(r[0][0])
+    box = pd.DataFrame(r[0])
 
     return box
 
@@ -21,15 +21,13 @@ def raw_data(data_num, name):
 
     for i in range(data_num):
         raw = np.loadtxt(pardir + path + '/cover_rate-20-1000-%d.txt' % i, comments='#')
+        gen_list = list()
         for ind in range(8):
-            k_index = [(ind * 4 + loop) * 200 + 0 for loop in range(4)]
-            array = list()
-            array.append(raw[k_index[0]:k_index[0] + 200].T[0])
-            array.append(raw[k_index[0]:k_index[0] + 200].T[1])
-            array.append(raw[k_index[1]:k_index[1] + 200].T[1])
-            array.append(raw[k_index[2]:k_index[2] + 200].T[1])
-            array.append(raw[k_index[3]:k_index[3] + 200].T[1])
-            coverage_set.append(np.array(array).T)
+            for loop in range(4):
+                k_index = (ind * 4 + loop) * 200 + 0
+                array = raw[k_index:k_index + 200].T[1]
+                gen_list.append(list(array))
+        coverage_set.append(gen_list)
 
     return coverage_set
 
