@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
-def get_box(data_num, name):
+def get_box(data_num, name, gen):
     r = raw_data(data_num, name)
-    box = pd.DataFrame(r[0])
+    box = pd.DataFrame(r[gen])
 
     return box
 
@@ -32,15 +32,19 @@ def raw_data(data_num, name):
     return coverage_set
 
 
-def set_controlled_group_color(f, b_color='pink', me_color='crimson'):
+def set_group_color(f, gen):
+
+    color = ['rosybrown', 'red', 'darkkhaki', 'olive', 'yellowgreen', 'olivedrab', 'turquoise', 'teal']
+    k1 = gen*2
+    k2 = gen*2+1
 
     for whisker in f['whiskers']:
-        whisker.set(color=b_color, alpha=0.5)
+        whisker.set(color=color[k1], alpha=0.5)
     for box in f['boxes']:
-        box.set(color=b_color, alpha=0.5)
-        box.set(facecolor=b_color, alpha=0.5)
+        box.set(color=color[k1], alpha=0.5)
+        box.set(facecolor=color[k1], alpha=0.5)
     for median in f['medians']:
-        median.set(color=me_color)
+        median.set(color=color[k2])
 
 
 if __name__ == '__main__':
@@ -49,15 +53,15 @@ if __name__ == '__main__':
     data_num_ = 8
 
     folder_co = 'Test1-OK-A'
-    control_box = get_box(data_num_, folder_co)
+    control_box = get_box(data_num_, folder_co, 0)
     co = control_box.boxplot(showfliers=False, patch_artist=True, showcaps=False, return_type='dict')
-    k1_list = [i*8 for i in range(17)]  # actual
-    k2_list = [i for i in range(17)]  # show
+    k1_list = [i*20 for i in range(11)]  # actual
+    k2_list = [i*20 for i in range(11)]  # show
     plt.xticks(k1_list, k2_list)
 
-    set_controlled_group_color(co)
+    set_group_color(co, 0)
 
-    plt.xlim((0, 150))
+    plt.xlim((0, 202))
     curdir = os.path.dirname(__file__)
     pardir = os.path.dirname(os.path.dirname(curdir))
     plt.savefig(pardir+'/track/-plot-/draw1.png')
