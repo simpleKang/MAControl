@@ -15,7 +15,7 @@ def raw_data(data_num, name):
 
     curdir = os.path.dirname(__file__)
     pardir = os.path.dirname(os.path.dirname(curdir))
-    path = '/track/0527-output/' + name
+    path = '/track/' + name
 
     coverage_set = list()
 
@@ -46,9 +46,9 @@ def set_group_color(f, gen):
 
 if __name__ == '__main__':
 
-    plt.rcParams['figure.dpi'] = 800
+    plt.rcParams['figure.dpi'] = 1600
     data_num = 8
-    folder_co = 'Test1-OK-A'
+    folder_co = 'Test1-OK-A-Partial'
     # draw = [0, 1, 2, 3, 4, 5, 6, 7]
     draw = [0, 1, 2, 3, 4]
     # draw = [0]
@@ -59,7 +59,7 @@ if __name__ == '__main__':
         control_box = get_box(data_num, folder_co, k)
         co[k] = control_box.boxplot(showfliers=False, patch_artist=True, showcaps=False, return_type='dict')
         set_group_color(co[k], k)
-        plt.text(165, k*0.06 + 0.1, 'generation ' + str(k), fontsize=10, weight='book',
+        plt.text(161, k*0.06 + 0.1, 'generation ' + str(k), fontsize=10, weight='book',
                  color=plt.get_cmap('ocean')(k*40+20))
 
     k1_list = [i*20 for i in range(11)]  # actual
@@ -74,5 +74,5 @@ if __name__ == '__main__':
     plt.ylim((0.07, 1))
     curdir = os.path.dirname(__file__)
     pardir = os.path.dirname(os.path.dirname(curdir))
-    plt.savefig(pardir+'/track/-plot-/draw-o.png')
+    plt.savefig(pardir+'/track/-plot-/draw-k3.png')
     plt.show()
