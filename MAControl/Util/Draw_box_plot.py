@@ -4,7 +4,14 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
-def draw_box_plot(data_num, name):
+def get_box(data_num, name, gen):
+    r = raw_data(data_num, name)
+    box = pd.DataFrame(r[gen])
+
+    return box
+
+
+def raw_data(data_num, name):
 
     curdir = os.path.dirname(__file__)
     pardir = os.path.dirname(os.path.dirname(curdir))
@@ -13,120 +20,59 @@ def draw_box_plot(data_num, name):
     coverage_set = list()
 
     for i in range(data_num):
-        coverage_set.append(np.loadtxt(pardir + path + '/cover_rate-5-100-%d.txt' % i, comments='#'))
+        raw = np.loadtxt(pardir + path + '/cover_rate-20-1000-%d.txt' % i, comments='#')
+        gen_list = list()
+        for ind in range(8):
+            for loop in range(4):
+                k_index = (ind * 4 + loop) * 200 + 0
+                array = raw[k_index:k_index + 200].T[1]
+                gen_list.append(list(array))
+        coverage_set.append(gen_list)
 
-    lt, _ = coverage_set[0].shape
-
-    box = list()
-
-    for k in range(int(lt/20)):
-
-        box.append([])
-
-        for j in range(data_num):
-
-            box[-1].append(coverage_set[j][(k+1)*20-1][1])
-
-    box = np.array(box).T
-
-    box_ = pd.DataFrame(box)
-
-    return box_
+    return coverage_set
 
 
-def set_controlled_group_color(f, b_color='pink', me_color='crimson'):
+def set_group_color(f, gen):
+    k = gen * 40 + 20
 
     for whisker in f['whiskers']:
-        whisker.set(color=b_color, alpha=0.5)
+        whisker.set(color=plt.get_cmap('ocean')(k), alpha=0.5, linewidth=0.5)
     for box in f['boxes']:
-        box.set(color=b_color, alpha=0.5)
-        box.set(facecolor=b_color, alpha=0.5)
+        box.set(color=plt.get_cmap('ocean')(k), alpha=0.5, linewidth=0.3)
+        box.set(facecolor=plt.get_cmap('ocean')(k), alpha=0.5, linewidth=0.3)
     for median in f['medians']:
-        median.set(color=me_color)
-
-
-def set_experimental_group_color(f, b_color='lightgreen', me_color='seagreen'):
-
-    for whisker in f['whiskers']:
-        whisker.set(color=b_color, alpha=0.3)
-    for box in f['boxes']:
-        box.set(color=b_color, alpha=0.3)
-        box.set(facecolor=b_color, alpha=0.3)
-    for median in f['medians']:
-        median.set(color=me_color)
-
-
-def set_random_group_color(f, b_color='cornflowerblue', me_color='blue'):
-
-    for whisker in f['whiskers']:
-        whisker.set(color=b_color, alpha=0.3)
-    for box in f['boxes']:
-        box.set(color=b_color, alpha=0.3)
-        box.set(facecolor=b_color, alpha=0.3)
-    for median in f['medians']:
-        median.set(color=me_color)
-
-
-def calculate_median(dataset):
-
-    # 需要在根目录下放置Data文件夹,并在其内放好数据
-
-    curdir = os.path.dirname(__file__)
-    pardir = os.path.dirname(os.path.dirname(curdir))
-    coverage_set = list()
-
-    for i in range(dataset):
-        coverage_set.append(np.loadtxt(pardir + '/Data/cover_rate-20-4000-%d.txt' % i))
-
-    open(pardir + '/median.txt', 'w')
-
-    shape, _ = coverage_set[0].shape
-
-    for j in range(shape):
-
-        median_cur = list()
-
-        for k in range(dataset):
-            median_cur.append(coverage_set[k][j][1])
-
-        median_cur = np.array([median_cur])
-
-        median = np.median(median_cur)
-
-        with open(pardir + '/median.txt', 'a') as c:
-            c.write(str(median) + '\n')
-
-    print('Finished')
+        median.set(color=plt.get_cmap('ocean')(k), alpha=0.9, linewidth=2)
 
 
 if __name__ == '__main__':
 
-    plt.rcParams['figure.dpi'] = 800
-    data_num_ = 2
+    plt.rcParams['figure.dpi'] = 1600
+    data_num = 8
+    folder_co = 'Test1-OK-A-Partial'
+    # draw = [0, 1, 2, 3, 4, 5, 6, 7]
+    draw = [0, 1, 2, 3, 4]
+    # draw = [0]
 
-    folder_co = '05-22-OK-A'
-    control_box = draw_box_plot(data_num_, folder_co)
-    co = control_box.boxplot(showfliers=False, patch_artist=True, showcaps=False, return_type='dict')
-    k1_list = [i*8 for i in range(17)]  # actual
-    k2_list = [i for i in range(17)]  # show
+    co = [[] for k in range(data_num)]
+    for kk in range(len(draw)):
+        k = draw[kk]
+        control_box = get_box(data_num, folder_co, k)
+        co[k] = control_box.boxplot(showfliers=False, patch_artist=True, showcaps=False, return_type='dict')
+        set_group_color(co[k], k)
+        plt.text(161, k*0.06 + 0.1, 'generation ' + str(k), fontsize=10, weight='book',
+                 color=plt.get_cmap('ocean')(k*40+20))
+
+    k1_list = [i*20 for i in range(11)]  # actual
+    k2_list = [i*100 for i in range(11)]  # show
     plt.xticks(k1_list, k2_list)
 
-    # folder_tr = 'experimental'
-    # trained_box = draw_box_plot(data_num_, folder_tr)
-    # tr = trained_box.boxplot(showfliers=False, patch_artist=True, showcaps=False, return_type='dict')
-    # plt.xticks([0, 200, 400, 600, 800], [0, 1000, 2000, 3000, 4000])
+    font = {'family': 'Times New Roman', 'weight': 'normal', 'size': 13}
+    plt.xlabel('Step', font)
+    plt.ylabel('Cover-Rate', font)
 
-    # folder_ra = 'random'
-    # random_box = draw_box_plot(data_num_, folder_ra)
-    # ra = random_box.boxplot(showfliers=False, patch_artist=True, showcaps=False, return_type='dict')
-    # plt.xticks([0, 200, 400, 600, 800], [0, 1000, 2000, 3000, 4000])
-
-    set_controlled_group_color(co)
-    # set_experimental_group_color(tr)
-    # set_random_group_color(ra)
-
-    plt.xlim((0, 150))
+    plt.xlim((0, 200))
+    plt.ylim((0.07, 1))
     curdir = os.path.dirname(__file__)
     pardir = os.path.dirname(os.path.dirname(curdir))
-    plt.savefig(pardir+'/track/-plot-/draw1.png')
+    plt.savefig(pardir+'/track/-plot-/draw-k3.png')
     plt.show()
