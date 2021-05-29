@@ -6,10 +6,10 @@ import pandas as pd
 
 def get_box(data_num, tc):
 
-    r1 = raw_data(data_num, 'Test1-OK-A-Partial')
-    r2 = raw_data(data_num, 'Test2-OK-A-Partial')
-    r3 = raw_data(data_num, 'Test3-OK-A-Partial')
-    r4 = raw_data(data_num, 'Test4-OK-A-Partial')
+    r1 = raw_data(data_num, 'TestN2-OK-A-Partial', 10)
+    r2 = raw_data(data_num, 'TestN1-OK-A-Partial', 15)
+    r3 = raw_data(data_num, 'Test1-OK-A-Partial',  20)
+    r4 = raw_data(data_num, 'TestN3-OK-A-Partial', 25)
 
     g = 5
 
@@ -22,13 +22,13 @@ def get_box(data_num, tc):
     rr4 = np.array([[r4[i][j][199] for j in range(32)] for i in range(g)]).T.reshape((4, 8*g), order='F') if tc == 4 \
         else np.zeros((4, 8*g))
 
-    r = np.concatenate((rr3, rr2, rr1, rr4), axis=1)
+    r = np.concatenate((rr1, rr2, rr3, rr4), axis=1)
     box = pd.DataFrame(r)
 
     return box
 
 
-def raw_data(data_num, name):
+def raw_data(data_num, name, uav_num):
 
     curdir = os.path.dirname(__file__)
     pardir = os.path.dirname(os.path.dirname(curdir))
@@ -37,7 +37,7 @@ def raw_data(data_num, name):
     coverage_set = list()
 
     for i in range(data_num):
-        raw = np.loadtxt(pardir + path + '/cover_rate-20-1000-%d.txt' % i, comments='#')
+        raw = np.loadtxt(pardir + path + '/cover_rate-' + str(uav_num) + '-1000-%d.txt' % i, comments='#')
         gen_list = list()
         for ind in range(8):
             for loop in range(4):
@@ -52,12 +52,12 @@ def raw_data(data_num, name):
 def set_group_color(f, k):
 
     for whisker in f['whiskers']:
-        whisker.set(color=plt.get_cmap('Dark2')(k), alpha=0.5, linewidth=0.3)
+        whisker.set(color=plt.get_cmap('tab10')(k), alpha=0.5, linewidth=0.3)
     for box in f['boxes']:
-        box.set(color=plt.get_cmap('Dark2')(k), alpha=0.5, linewidth=0.3)
-        box.set(facecolor=plt.get_cmap('Dark2')(k), alpha=0.5, linewidth=0.3)
+        box.set(color=plt.get_cmap('tab10')(k), alpha=0.5, linewidth=0.3)
+        box.set(facecolor=plt.get_cmap('tab10')(k), alpha=0.5, linewidth=0.3)
     for median in f['medians']:
-        median.set(color=plt.get_cmap('Dark2')(k), alpha=0.9, linewidth=2)
+        median.set(color=plt.get_cmap('tab10')(k), alpha=0.9, linewidth=2)
 
 
 if __name__ == '__main__':
@@ -72,8 +72,9 @@ if __name__ == '__main__':
         set_group_color(co[k], k)
 
     k1_list = [i*20 for i in range(9)]   # actual
-    k2_list = ['', r'$\gamma = \frac{1}{3}\pi$', '', r'$\gamma = \frac{2}{3}\pi$',
-               '', r'$\gamma = \pi$', '', r'$\gamma = \frac{4}{3}\pi$', '']  # show
+    # k2_list = ['', r'$\gamma = \frac{1}{3}\pi$', '', r'$\gamma = \frac{2}{3}\pi$',
+    #           '', r'$\gamma = \pi$', '', r'$\gamma = \frac{4}{3}\pi$', '']  # show
+    k2_list = ['', r'$N_A = 10$', '', r'$N_A = 15$', '', r'$N_A = 20$', '', r'$N_A = 25$', '']  # show
     plt.xticks(k1_list, k2_list)
 
     font = {'family': 'Times New Roman', 'weight': 'normal', 'size': 13}
@@ -83,5 +84,5 @@ if __name__ == '__main__':
     plt.ylim((0.6, 1))
     curdir = os.path.dirname(__file__)
     pardir = os.path.dirname(os.path.dirname(curdir))
-    plt.savefig(pardir+'/track/-plot-/draw-gamma.png')
+    plt.savefig(pardir+'/track/-plot-/draw-uav.png')
     plt.show()
