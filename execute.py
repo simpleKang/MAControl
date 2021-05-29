@@ -61,9 +61,9 @@ def parse_args():
 
     # Evolve or Test
     parser.add_argument("--evolve", action="store_false", default=True)
-    parser.add_argument("--test", action="store_true", default=False)
     parser.add_argument("--restore", action="store_true", default=False)
-    parser.add_argument("--repeat-num", type=int, default=1, help="number of repeat runs")
+    parser.add_argument("--test", action="store_true", default=False)
+    parser.add_argument("--repeat-num", type=int, default=4, help="number of repeat runs")  # loop
 
     return parser.parse_args()
 
@@ -322,7 +322,7 @@ if __name__ == '__main__':
 
     if arglist.test:
 
-        print('Test with specific behavior archetypes.')
+        print('Test with singleton behavior weights.')
         for repeat in range(arglist.repeat_num):
             score = run_simulation(arglist, behavior_v, 0, 0, repeat)
             print('score ', score)

@@ -1,19 +1,13 @@
-# behavior_v = [C1  C2  W1  W3  W4]
+# behavior_v = [c1 c2 c3 c4  w1 w2 w3 w4 w5 w6]
 
-# W1: Alignment
-# W2: Target Orbit
-# W3: Cohesion
-# W4: Separation
-# W5: Take turns when losing sight of target
-# W6: Flat Target Repulsion
-# W7: (deleted)
-# W8: Flat Target Attraction
-# W9: Evasion
+# Rule1：Neighbouring Agent Orientation
+# Rule2：Neighbouring Agent Bearing
+# Rule3：Neighbouring Target Bearing
+# Rule4：Projected Agent Bearing
+# Rule5：Projected Target Bearing
+# Rule6：Random Orientation
 
 behavior_v = list()
-# behavior_v = [     C1     C2     W1     W3     W4]
 
-# rule 1+3+4+9
-behavior_v.append([0.880, 0.880, 1.000, 1.000, 0.500])
-
-
+# singleton weights                      w1     w2     w3     w4     w5     w6
+behavior_v.append([0.1, 0.1, 0.1, 0.1, 0.500, 0.500, 0.500, 0.500, 0.500, 0.500])
