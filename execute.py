@@ -324,5 +324,6 @@ if __name__ == '__main__':
 
         print('Test with singleton behavior weights.')
         for repeat in range(arglist.repeat_num):
-            score = run_simulation(arglist, behavior_v, 0, 0, repeat)
+            ind = behavior_v[0] if arglist.fitness == 'A' else behavior_v[2]
+            score = run_simulation(arglist, ind, 0, 0, repeat)
             print('score ', score)
