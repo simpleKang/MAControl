@@ -231,7 +231,7 @@ def run_simulation(arglist, behavior_archetypes, gen, ind, c_num):
     # Create Controller
     Controllers = get_controller(env, world, arglist)
 
-    PATH = path + 'gen=%d' % gen + slash + 'ind=%d' % ind + slash + 'num=%d' % num
+    PATH = path + 'gen=%d' % gen + slash + 'ind=%d' % ind + slash + 'num=%d' % c_num
     os.makedirs(os.path.dirname(__file__) + PATH)
     open(os.path.dirname(__file__) + PATH + '/target_lock.txt', 'w')
 
@@ -324,6 +324,6 @@ if __name__ == '__main__':
 
         print('Test with singleton behavior weights.')
         for repeat in range(arglist.repeat_num):
-            ind = behavior_v[0] if arglist.fitness == 'A' else behavior_v[2]
+            ind = [behavior_v[0]] if arglist.fitness == 'A' else [behavior_v[2]]
             score = run_simulation(arglist, ind, 0, 0, repeat)
             print('score ', score)
