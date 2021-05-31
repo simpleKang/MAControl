@@ -48,9 +48,7 @@ if __name__ == '__main__':
     plt.rcParams['figure.dpi'] = 1600
     data_num = 8
     folder_co = 'Test1-OK-A-Partial'
-    # draw = [0, 1, 2, 3, 4, 5, 6, 7]
     draw = [0, 1, 2, 3, 4]
-    # draw = [0]
 
     co = [[] for k in range(data_num)]
     for kk in range(len(draw)):
@@ -60,6 +58,11 @@ if __name__ == '__main__':
         color_str = plt.get_cmap('ocean')(k * 40 + 20)
         set_group_color(co[k], color_str)
         plt.text(161, k*0.06 + 0.1, 'generation ' + str(k), fontsize=10, weight='book', color=color_str)
+
+    control_box = get_box(1, 'A-RPCBF-A', 0)
+    co.append(control_box.boxplot(showfliers=False, patch_artist=True, showcaps=False, return_type='dict'))
+    set_group_color(co[-1], 'red')
+    plt.text(131, 0.5, 'RoleProjControlBirdFlock', fontsize=10, weight='book', color='red')
 
     k1_list = [i*20 for i in range(11)]  # actual
     k2_list = [i*100 for i in range(11)]  # show
