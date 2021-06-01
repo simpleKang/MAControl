@@ -11,7 +11,7 @@ def calculate_coverage(uav_num, step, gen, ind, loop):
     pardir = os.path.dirname(os.path.dirname(curdir))
     cover_rate = 0
 
-    txt_name = '/cover_rate-%s-%s-%s.txt' % (str(uav_num), str(step), str(gen))
+    txt_name = '/cover-rate-%s-%s-%s.txt' % (str(uav_num), str(step), str(gen))
     open(pardir + '/scene_Folder' + txt_name, 'a')  # ### ('a' = 追加, 'w' = 覆盖)
 
     cell = 200                     # 区域划分精度

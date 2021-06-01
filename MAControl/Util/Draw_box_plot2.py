@@ -20,7 +20,7 @@ def raw_data(data_num, name):
     coverage_set = list()
 
     for i in range(data_num):
-        raw = np.loadtxt(pardir + path + '/cover_rate-20-1000-%d.txt' % i, comments='#')
+        raw = np.loadtxt(pardir + path + '/cover-rate-20-1000-%d.txt' % i, comments='#')
         gen_list = list()
         for ind in range(8):
             for loop in range(4):
