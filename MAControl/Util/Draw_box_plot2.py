@@ -63,7 +63,7 @@ if __name__ == '__main__':
     control_box = get_box(1, 'A-RPCBF-A', 0)
     co.append(control_box.boxplot(showfliers=False, patch_artist=True, showcaps=False, return_type='dict'))
     set_group_color(co[-1], 'red')
-    plt.text(128, 0.5, 'RoleProjControlBirdFlock', fontsize=10, weight='book', color='red')  # A 0.5 # B 0.047 # C 0.92
+    plt.text(128, 0.5, 'RoleProjControlBirdFlock', fontsize=10, weight='book', color='r')  # A 0.5 # B 0.047 # C 0.92
 
     k1_list = [i*20 for i in range(11)]  # actual
     k2_list = [i*100 for i in range(11)]  # show

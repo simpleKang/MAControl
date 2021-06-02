@@ -1,5 +1,7 @@
 import numpy as np
+import math
 import os
+from collections import Counter
 import matplotlib.pyplot as plt
 import pandas as pd
 
@@ -13,14 +15,20 @@ def get_box(data_num, tc):
 
     g = 5
 
-    rr1 = np.array([[r1[i][j][199] for j in range(32)] for i in range(g)]).T.reshape((4, 8*g), order='F') if tc == 1 \
-        else np.zeros((4, 8*g))
-    rr2 = np.array([[r2[i][j][199] for j in range(32)] for i in range(g)]).T.reshape((4, 8*g), order='F') if tc == 2 \
-        else np.zeros((4, 8*g))
-    rr3 = np.array([[r3[i][j][199] for j in range(32)] for i in range(g)]).T.reshape((4, 8*g), order='F') if tc == 3 \
-        else np.zeros((4, 8*g))
-    rr4 = np.array([[r4[i][j][199] for j in range(32)] for i in range(g)]).T.reshape((4, 8*g), order='F') if tc == 4 \
-        else np.zeros((4, 8*g))
+    rr1 = [math.floor(r1[i][j][k] * 200) / 200 for k in range(200) for j in range(32) for i in range(g)]
+    rr2 = [math.floor(r2[i][j][k] * 200) / 200 for k in range(200) for j in range(32) for i in range(g)]
+    rr3 = [math.floor(r3[i][j][k] * 200) / 200 for k in range(200) for j in range(32) for i in range(g)]
+    rr4 = [math.floor(r4[i][j][k] * 200) / 200 for k in range(200) for j in range(32) for i in range(g)]
+
+    ct1 = Counter(rr1)
+    ct2 = Counter(rr2)
+    ct3 = Counter(rr3)
+    ct4 = Counter(rr4)
+
+    kr1 = [ct1[0.6+i*0.01] for i in range(41)]
+    kr2 = [ct2[0.6+i*0.01] for i in range(41)]
+    kr3 = [ct3[0.6+i*0.01] for i in range(41)]
+    kr4 = [ct4[0.6+i*0.01] for i in range(41)]
 
     r = np.concatenate((rr1, rr2, rr3, rr4), axis=1)
     box = pd.DataFrame(r)
@@ -84,5 +92,5 @@ if __name__ == '__main__':
     plt.ylim((0.6, 1))
     curdir = os.path.dirname(__file__)
     pardir = os.path.dirname(os.path.dirname(curdir))
-    plt.savefig(pardir+'/track/-plot-/draw-uav.png')
+    plt.savefig(pardir+'/track/-plot-/draw-test.png')
     plt.show()
