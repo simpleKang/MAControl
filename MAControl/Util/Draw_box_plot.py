@@ -1,9 +1,7 @@
 import numpy as np
 import math
 import os
-from collections import Counter
 import matplotlib.pyplot as plt
-import pandas as pd
 
 
 def get_box(data_num, tc):
@@ -20,18 +18,9 @@ def get_box(data_num, tc):
     rr3 = [math.floor(r3[i][j][k] * 200) / 200 for k in range(200) for j in range(32) for i in range(g)]
     rr4 = [math.floor(r4[i][j][k] * 200) / 200 for k in range(200) for j in range(32) for i in range(g)]
 
-    ct1 = Counter(rr1)
-    ct2 = Counter(rr2)
-    ct3 = Counter(rr3)
-    ct4 = Counter(rr4)
+    rr = [rr1, rr2, rr3, rr4]
 
-    kr1 = [ct1[0.6+i*0.01] for i in range(41)]
-    kr2 = [ct2[0.6+i*0.01] for i in range(41)]
-    kr3 = [ct3[0.6+i*0.01] for i in range(41)]
-    kr4 = [ct4[0.6+i*0.01] for i in range(41)]
-
-    r = np.concatenate((rr1, rr2, rr3, rr4), axis=1)
-    box = pd.DataFrame(r)
+    box = np.array(rr[tc])
 
     return box
 
@@ -57,40 +46,30 @@ def raw_data(data_num, name, uav_num):
     return coverage_set
 
 
-def set_group_color(f, k):
-
-    for whisker in f['whiskers']:
-        whisker.set(color=plt.get_cmap('tab10')(k), alpha=0.5, linewidth=0.3)
-    for box in f['boxes']:
-        box.set(color=plt.get_cmap('tab10')(k), alpha=0.5, linewidth=0.3)
-        box.set(facecolor=plt.get_cmap('tab10')(k), alpha=0.5, linewidth=0.3)
-    for median in f['medians']:
-        median.set(color=plt.get_cmap('tab10')(k), alpha=0.9, linewidth=2)
-
-
 if __name__ == '__main__':
 
-    plt.rcParams['figure.dpi'] = 1600
+    plt.rcParams['figure.dpi'] = 800
+
     data_num = 8
+    str_list = [r'$N_A = 10$', r'$N_A = 15$', r'$N_A = 20$', r'$N_A = 25$']
+    k_list = [r'$\frac{1}{3}\pi$', r'$\frac{2}{3}\pi$', r'$\pi$', r'$\frac{4}{3}\pi$']
+    kr_list = [r'$\gamma = $' + item for item in k_list]
 
-    co = [[] for k in range(4)]
     for k in range(4):
-        control_box = get_box(data_num, k+1)
-        co[k] = control_box.boxplot(showfliers=False, patch_artist=True, showcaps=False, return_type='dict')
-        set_group_color(co[k], k)
+        data_box = get_box(data_num, k)
+        color_str = plt.get_cmap('BuGn')(k * 40 + 20)
+        plt.hist(data_box, bins=100, facecolor=color_str, edgecolor='black', alpha=0.3, label=str_list[k])
 
-    k1_list = [i*20 for i in range(9)]   # actual
-    # k2_list = ['', r'$\gamma = \frac{1}{3}\pi$', '', r'$\gamma = \frac{2}{3}\pi$',
-    #           '', r'$\gamma = \pi$', '', r'$\gamma = \frac{4}{3}\pi$', '']  # show
-    k2_list = ['', r'$N_A = 10$', '', r'$N_A = 15$', '', r'$N_A = 20$', '', r'$N_A = 25$', '']  # show
-    plt.xticks(k1_list, k2_list)
+    k1_list = [i/10 for i in range(11)]
+    plt.xticks(k1_list, k1_list)
 
     font = {'family': 'Times New Roman', 'weight': 'normal', 'size': 13}
-    plt.ylabel('Cover-Rate', font)
+    plt.xlabel('Cover-Rate', font)
+    plt.xlim((0.0, 1.0))
+    plt.legend()
 
-    plt.xlim((0, 160))
-    plt.ylim((0.6, 1))
     curdir = os.path.dirname(__file__)
     pardir = os.path.dirname(os.path.dirname(curdir))
     plt.savefig(pardir+'/track/-plot-/draw-test.png')
+    print('ok')
     plt.show()
