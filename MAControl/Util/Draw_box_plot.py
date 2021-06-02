@@ -13,10 +13,10 @@ def get_box(data_num, tc):
 
     g = 5
 
-    rr1 = [math.floor(r1[i][j][k] * 200) / 200 for k in range(200) for j in range(32) for i in range(g)]
-    rr2 = [math.floor(r2[i][j][k] * 200) / 200 for k in range(200) for j in range(32) for i in range(g)]
-    rr3 = [math.floor(r3[i][j][k] * 200) / 200 for k in range(200) for j in range(32) for i in range(g)]
-    rr4 = [math.floor(r4[i][j][k] * 200) / 200 for k in range(200) for j in range(32) for i in range(g)]
+    rr1 = [math.floor(r1[i][j][m] * 200) / 200 for m in range(200) for j in range(32) for i in range(g)]
+    rr2 = [math.floor(r2[i][j][m] * 200) / 200 for m in range(200) for j in range(32) for i in range(g)]
+    rr3 = [math.floor(r3[i][j][m] * 200) / 200 for m in range(200) for j in range(32) for i in range(g)]
+    rr4 = [math.floor(r4[i][j][m] * 200) / 200 for m in range(200) for j in range(32) for i in range(g)]
 
     rr = [rr1, rr2, rr3, rr4]
 
@@ -51,13 +51,13 @@ if __name__ == '__main__':
     plt.rcParams['figure.dpi'] = 800
 
     data_num = 8
-    str_list = [r'$N_A = 10$', r'$N_A = 15$', r'$N_A = 20$', r'$N_A = 25$']
+    str_list = [r'$N_A = 10$', r'$N_A = 15$', r'$N_A = 20$', r'$N_A = 25$']  # NA 100
     k_list = [r'$\frac{1}{3}\pi$', r'$\frac{2}{3}\pi$', r'$\pi$', r'$\frac{4}{3}\pi$']
-    kr_list = [r'$\gamma = $' + item for item in k_list]
+    kr_list = [r'$\gamma = $' + item for item in k_list]  # gamma 50
 
     for k in range(4):
         data_box = get_box(data_num, k)
-        color_str = plt.get_cmap('BuGn')(k * 40 + 20)
+        color_str = plt.get_cmap('Dark2')(k)
         plt.hist(data_box, bins=100, facecolor=color_str, edgecolor='black', alpha=0.3, label=str_list[k])
 
     k1_list = [i/10 for i in range(11)]
