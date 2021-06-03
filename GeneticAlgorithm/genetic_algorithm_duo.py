@@ -4,7 +4,7 @@ import random
 import os
 
 pardir = os.path.dirname(os.path.dirname(__file__))
-path = '/GeneticAlgorithm/model/' if os.name == 'posix' else '\\GeneticAlgorithm\\model\\'
+path = '/track/' if os.name == 'posix' else '\\track\\'
 
 
 class GA(object):

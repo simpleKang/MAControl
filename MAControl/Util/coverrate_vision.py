@@ -3,6 +3,7 @@ import os
 import MAEnv.scenarios.TargetProfile as T
 import math
 gamma = T.blind_angle[T.angle_case]
+scene_save = '/track'
 
 
 def calculate_coverage(uav_num, step, gen, ind, loop):
@@ -12,7 +13,7 @@ def calculate_coverage(uav_num, step, gen, ind, loop):
     cover_rate = 0
 
     txt_name = '/cover-rate-%s-%s-%s.txt' % (str(uav_num), str(step), str(gen))
-    open(pardir + '/scene_Folder' + txt_name, 'a')  # ### ('a' = 追加, 'w' = 覆盖)
+    open(pardir + scene_save + txt_name, 'a')  # ### ('a' = 追加, 'w' = 覆盖)
 
     cell = 200                     # 区域划分精度
     track = list()
@@ -23,7 +24,7 @@ def calculate_coverage(uav_num, step, gen, ind, loop):
     area_width = T.edge*2          # 正方形区域实际边长
     scale = area_width/cell        # 离散度(比例尺)
 
-    with open(pardir + '/scene_Folder' + txt_name, 'a') as c:
+    with open(pardir + scene_save + txt_name, 'a') as c:
         c.write(str('# ind') + ' ' + str(ind) + ' ' + str('loop') + ' ' + str(loop) + '\n' + '# ' + '\n')
 
     for lt in range(0, np.size(track[-1], 0), 5):  # np.size(A,0) 返回该二维矩阵的行数 # range(a,b,c) 类似 matlab [a:c:b)
@@ -53,11 +54,11 @@ def calculate_coverage(uav_num, step, gen, ind, loop):
         # print('>>> Round', loop, 'Total ', np.size(track[-1], 0), ' >>> step ', lt)
 
         cover_rate = np.sum(area)/cell/cell
-        with open(pardir + '/scene_Folder' + txt_name, 'a') as c:
+        with open(pardir + scene_save + txt_name, 'a') as c:
             c.write(str(lt) + ' ' + str(cover_rate) + '\n')
     # print('Finished!')
 
-    with open(pardir + '/scene_Folder' + txt_name, 'a') as c:
+    with open(pardir + scene_save + txt_name, 'a') as c:
         c.write('# ' + '\n')
 
     return cover_rate

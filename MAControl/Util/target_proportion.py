@@ -3,6 +3,7 @@ import os
 import MAEnv.scenarios.TargetProfile as T
 import math
 from collections import Counter
+scene_save = '/track'
 
 
 def target_distribute(uav_num, step, gen, ind, loop, scene):
@@ -12,7 +13,7 @@ def target_distribute(uav_num, step, gen, ind, loop, scene):
     score = 0
 
     txt_name = '/target-info-%s-%s-%s-%s.txt' % (str(uav_num), str(step), str(gen), scene)
-    open(pardir + '/scene_Folder' + txt_name, 'a')
+    open(pardir + scene_save + txt_name, 'a')
 
     perception = list()
     for i in range(uav_num):
@@ -26,7 +27,7 @@ def target_distribute(uav_num, step, gen, ind, loop, scene):
     p4_array = [[] for i in range(uav_num)]
     target_array = []
 
-    with open(pardir + '/scene_Folder' + txt_name, 'a') as c:
+    with open(pardir + scene_save + txt_name, 'a') as c:
         c.write(str('# ind') + ' ' + str(ind) + ' ' + str('loop') + ' ' + str(loop) + '\n' + '# ' + '\n')
 
     for lt in range(0, np.size(perception[-1], 0), 5):  # np.size(A,0) 返回该二维矩阵的行数 # range(a,b,c) 类似 matlab [a:c:b)
@@ -51,18 +52,18 @@ def target_distribute(uav_num, step, gen, ind, loop, scene):
             # p2_sum = sum([sum(item) for item in p2_array]) / uav_num / len(p2_array[0])
             p4_sum = sum([sum(item) for item in p4_array]) / uav_num / len(p4_array[0])
             score = p4_sum  # + p2_sum
-            with open(pardir + '/scene_Folder' + txt_name, 'a') as c:
+            with open(pardir + scene_save + txt_name, 'a') as c:
                 c.write(str(lt) + ' ' + str(p4_sum) + ' ' + str(score) + '\n')  # + ' ' + str(p2_sum)
 
         elif scene == 'C':
             score = sum(target_array) / len(target_array)
-            with open(pardir + '/scene_Folder' + txt_name, 'a') as c:
+            with open(pardir + scene_save + txt_name, 'a') as c:
                 c.write(str(lt) + ' ' + str(score) + '\n')
 
         else:
             pass
 
-    with open(pardir + '/scene_Folder' + txt_name, 'a') as c:
+    with open(pardir + scene_save + txt_name, 'a') as c:
         c.write('# ' + '\n')
 
     return score
