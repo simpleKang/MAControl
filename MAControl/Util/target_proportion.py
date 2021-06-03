@@ -46,7 +46,7 @@ def target_distribute(uav_num, step, gen, ind, loop, scene):
         s = sum([-1*item*math.log(item) for item in w_array])
         r = math.floor(uav_num/T.num_targets)/uav_num
         thr = (s*s)/(s*s+r*r)
-        target_array.append(thr * math.exp(1-lt/1000))
+        target_array.append(thr)
 
         if scene == 'B':
             # p2_sum = sum([sum(item) for item in p2_array])
