@@ -126,7 +126,7 @@ class Scenario(BaseScenario):
         self_ornt = math.atan2(selfvel[1], selfvel[0])  # orientation = ORNT
 
         # 视场参数
-        gamma = T.blind_angle[2]  # 整个盲区角
+        gamma = T.blind_angle[T.angle_case]  # 整个盲区角
         G1 = math.fmod(self_ornt + math.pi - gamma/2, math.pi)  # so that -math.pi <= G1 <= math.pi
         G2 = math.fmod(G1 + gamma, math.pi)
 

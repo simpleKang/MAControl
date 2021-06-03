@@ -5,6 +5,7 @@ import MAControl.Util.get_random_state as rs
 
 # blind angle
 blind_angle = [math.pi/3, math.pi/3*2, math.pi, math.pi/3*4]
+angle_case = 2
 # visual section
 num_section = 10
 

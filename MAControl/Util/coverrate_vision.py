@@ -2,7 +2,7 @@ import numpy as np
 import os
 import MAEnv.scenarios.TargetProfile as T
 import math
-gamma = T.blind_angle[2]
+gamma = T.blind_angle[T.angle_case]
 
 
 def calculate_coverage(uav_num, step, gen, ind, loop):
