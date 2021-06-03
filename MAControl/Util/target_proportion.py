@@ -37,7 +37,9 @@ def target_distribute(uav_num, step, gen, ind, loop, scene):
             p4_array[k].append(perception[k][lt][3] * math.exp(1-lt/1000))
 
         w_array = list()
-        cc = Counter(assignment[lt][1:])
+        ck = assignment[lt][1:]
+        cc = Counter(ck)
+        lk = [0 if math.isnan(item) else 1 for item in ck]
         for m in range(T.num_targets):
             # ## # ↓↓ credit: KSB ↓↓ # ## #
             a_m = -1 * abs(cc[m] - math.floor(uav_num/T.num_targets))
@@ -46,7 +48,7 @@ def target_distribute(uav_num, step, gen, ind, loop, scene):
         s = sum([-1*item*math.log(item) for item in w_array])
         r = math.floor(uav_num/T.num_targets)/uav_num
         thr = (s*s)/(s*s+r*r)
-        target_array.append(thr)
+        target_array.append(thr*sum(lk)/len(lk))
 
         if scene == 'B':
             # p2_sum = sum([sum(item) for item in p2_array])
