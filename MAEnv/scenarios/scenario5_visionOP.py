@@ -85,15 +85,8 @@ class Scenario(BaseScenario):
         uav_count = 0
         for i, agent in enumerate(world.agents):
             if agent.UAV:
-                # agent.state.p_pos = np.array([-1.2, -0.4+i*0.2])
-                # agent.state.p_pos = np.array([-1.3, 0.])
-                agent.state.p_pos = np.random.uniform(-1.0, 1.0, world.dim_p)
-
-                # agent.state.p_vel = np.array([0.01, 0.00])  # 10 米/秒
-                agent.state.p_vel = np.random.uniform(-0.01, 0.01, world.dim_p)
-
-                # agent.state.p_pos, agent.state.p_vel = T.init_state.get_state(self.collect, uav_count)
-
+                agent.state.p_pos = np.array([np.random.rand()*2.0-1.0, np.random.rand()*0.1-1.0])
+                agent.state.p_vel = np.array([np.random.rand()*0.02-0.01, np.random.rand()*0.02])
                 agent.state.p_acc = np.array([0, 0])
                 agent.color = T.UAV_color
                 uav_count += 1
