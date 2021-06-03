@@ -19,7 +19,7 @@ for gen in range(gen_num):
     for ind in range(ind_num):
         for loop in range(loop_num):
             for k in range(uav_num):
-                PATH = pardir + '/track/05-22-OK-A/gen=%d' % gen + '/ind=%d' % ind + '/num=%d' % loop
+                PATH = pardir + '/track/gen=%d' % gen + '/ind=%d' % ind + '/num=%d' % loop
                 track.append(np.loadtxt(PATH + '/uav_%d_track.txt' % k))
 
 plt.figure(facecolor='w')
