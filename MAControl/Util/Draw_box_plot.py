@@ -33,11 +33,11 @@ def raw_data(data_num, name, uav_num, stype):
 
     coverage_set = list()
 
-    str1 = '/cover_rate-' if stype == 'A' else '/target-info-'
+    str1 = '/cover-rate-' if stype == 'A' else '/target-info-'
     str2 = '' if stype == 'A' else '-' + str(stype)
 
     for i in range(data_num):
-        raw = np.loadtxt(pardir + path + str1 + str(uav_num) + '-1000-%d.txt' % i + str2, comments='#')
+        raw = np.loadtxt(pardir + path + str1 + str(uav_num) + '-1000-%d' % i + str2 + '.txt', comments='#')
         gen_list = list()
         for ind in range(8):
             for loop in range(4):

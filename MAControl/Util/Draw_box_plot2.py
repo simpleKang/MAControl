@@ -4,23 +4,25 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
-def get_box(data_num, name, gen):
-    r = raw_data(data_num, name)
+def get_box(data_num, name, gen, uav_num, stype):
+    r = raw_data(data_num, name, uav_num, stype)
     box = pd.DataFrame(r[gen])
 
     return box
 
 
-def raw_data(data_num, name):
+def raw_data(data_num, name, uav_num, stype):
 
     curdir = os.path.dirname(__file__)
     pardir = os.path.dirname(os.path.dirname(curdir))
     path = '/track/' + name
 
     coverage_set = list()
+    str1 = '/cover-rate-' if stype == 'A' else '/target-info-'
+    str2 = '' if stype == 'A' else '-' + str(stype)
 
     for i in range(data_num):
-        raw = np.loadtxt(pardir + path + '/cover-rate-20-1000-%d.txt' % i, comments='#')
+        raw = np.loadtxt(pardir + path + str1 + str(uav_num) + '-1000-%d' % i + str2 + '.txt', comments='#')
         gen_list = list()
         for ind in range(8):
             for loop in range(4):
@@ -45,22 +47,26 @@ def set_group_color(f, color_s):
 
 if __name__ == '__main__':
 
-    plt.rcParams['figure.dpi'] = 1600
+    plt.rcParams['figure.dpi'] = 160
     data_num = 8
-    folder_co = 'Test1-OK-A-Partial'
+
+    folder_ok = 'Pecp1-OK-B-Partial'
+    folder_co = 'B-RPCBF-B'
+    sr = 'B'  # 'A'  #  'C'
+    un = 20
     draw = [0, 1, 2, 3, 4]
 
     co = [[] for k in range(data_num)]
     for kk in range(len(draw)):
         k = draw[kk]
-        control_box = get_box(data_num, folder_co, k)
+        control_box = get_box(data_num, folder_ok, k, un, sr)
         co[k] = control_box.boxplot(showfliers=False, patch_artist=True, showcaps=False, return_type='dict')
-        color_str = plt.get_cmap('ocean')(k * 40 + 20)
+        color_str = plt.get_cmap('ocean')(kk * 40 + 20)
         set_group_color(co[k], color_str)
-        plt.text(161, k*0.06 + 0.1, 'generation ' + str(k), fontsize=10, weight='book', color=color_str)
-        # A k*0.06 + 0.1 # B k*0.004 + 0.027 # C k*0.04 + 0.22
+        plt.text(161, kk*0.06 + 0.1, 'generation ' + str(kk), fontsize=10, weight='book', color=color_str)
+        # A kk*0.06 + 0.1 # B kk*0.004 + 0.027 # C kk*0.04 + 0.22
 
-    control_box = get_box(1, 'A-RPCBF-A', 0)
+    control_box = get_box(1, folder_co, 0, un, sr)
     co.append(control_box.boxplot(showfliers=False, patch_artist=True, showcaps=False, return_type='dict'))
     set_group_color(co[-1], 'red')
     plt.text(128, 0.5, 'RoleProjControlBirdFlock', fontsize=10, weight='book', color='r')  # A 0.5 # B 0.047 # C 0.92
@@ -71,7 +77,7 @@ if __name__ == '__main__':
 
     font = {'family': 'Times New Roman', 'weight': 'normal', 'size': 13}
     plt.xlabel('Step', font)
-    plt.ylabel('Cover-Rate', font)
+    plt.ylabel('Cover-Rate', font)  # A 'Cover-Rate' # B 'Perception-Ratio' # C 'Assignment-Score'
 
     plt.xlim((0, 200))
     plt.ylim((0.07, 1))  # A (0.07, 1) # B (-0.002, 0.055) # C (0.2, 1)
