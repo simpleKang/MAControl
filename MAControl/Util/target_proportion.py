@@ -33,8 +33,8 @@ def target_distribute(uav_num, step, gen, ind, loop, scene):
     for lt in range(0, np.size(perception[-1], 0), 5):  # np.size(A,0) 返回该二维矩阵的行数 # range(a,b,c) 类似 matlab [a:c:b)
 
         for k in range(uav_num):
-            # p2_array[k].append(1-perception[k][lt][1])
-            p4_array[k].append(perception[k][lt][3])
+            # p2_array[k].append(1-perception[k][lt][1] * math.exp(1-lt/1000))
+            p4_array[k].append(perception[k][lt][3] * math.exp(1-lt/1000))
 
         w_array = list()
         cc = Counter(assignment[lt][1:])
@@ -46,11 +46,11 @@ def target_distribute(uav_num, step, gen, ind, loop, scene):
         s = sum([-1*item*math.log(item) for item in w_array])
         r = math.floor(uav_num/T.num_targets)/uav_num
         thr = (s*s)/(s*s+r*r)
-        target_array.append(thr)
+        target_array.append(thr * math.exp(1-lt/1000))
 
         if scene == 'B':
-            # p2_sum = sum([sum(item) for item in p2_array]) / uav_num / len(p2_array[0])
-            p4_sum = sum([sum(item) for item in p4_array]) / uav_num / len(p4_array[0])
+            # p2_sum = sum([sum(item) for item in p2_array])
+            p4_sum = sum([sum(item) for item in p4_array])
             score = p4_sum  # + p2_sum
             with open(pardir + scene_save + txt_name, 'a') as c:
                 c.write(str(lt) + ' ' + str(p4_sum) + ' ' + str(score) + '\n')  # + ' ' + str(p2_sum)
