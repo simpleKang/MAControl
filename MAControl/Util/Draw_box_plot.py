@@ -6,10 +6,10 @@ import matplotlib.pyplot as plt
 
 def get_box(data_num, tc):
 
-    r1 = raw_data(data_num, 'TestN2-OK-A-Partial', 10)
-    r2 = raw_data(data_num, 'TestN1-OK-A-Partial', 15)
-    r3 = raw_data(data_num, 'Test1-OK-A-Partial',  20)
-    r4 = raw_data(data_num, 'TestN3-OK-A-Partial', 25)
+    r1 = raw_data(data_num, 'TestN2-OK-A-Partial', 10, 'A')
+    r2 = raw_data(data_num, 'TestN1-OK-A-Partial', 15, 'A')
+    r3 = raw_data(data_num, 'Test1-OK-A-Partial',  20, 'A')
+    r4 = raw_data(data_num, 'TestN3-OK-A-Partial', 25, 'A')
 
     g = 5
 
@@ -25,7 +25,7 @@ def get_box(data_num, tc):
     return box
 
 
-def raw_data(data_num, name, uav_num):
+def raw_data(data_num, name, uav_num, stype):
 
     curdir = os.path.dirname(__file__)
     pardir = os.path.dirname(os.path.dirname(curdir))
@@ -33,8 +33,11 @@ def raw_data(data_num, name, uav_num):
 
     coverage_set = list()
 
+    str1 = '/cover_rate-' if stype == 'A' else '/target-info-'
+    str2 = '' if stype == 'A' else '-' + str(stype)
+
     for i in range(data_num):
-        raw = np.loadtxt(pardir + path + '/cover_rate-' + str(uav_num) + '-1000-%d.txt' % i, comments='#')
+        raw = np.loadtxt(pardir + path + str1 + str(uav_num) + '-1000-%d.txt' % i + str2, comments='#')
         gen_list = list()
         for ind in range(8):
             for loop in range(4):
@@ -48,23 +51,34 @@ def raw_data(data_num, name, uav_num):
 
 if __name__ == '__main__':
 
-    plt.rcParams['figure.dpi'] = 800
-
+    plt.rcParams['figure.dpi'] = 160
     data_num = 8
-    str_list = [r'$N_A = 10$', r'$N_A = 15$', r'$N_A = 20$', r'$N_A = 25$']  # NA 100
-    k_list = [r'$\frac{1}{3}\pi$', r'$\frac{2}{3}\pi$', r'$\pi$', r'$\frac{4}{3}\pi$']
-    kr_list = [r'$\gamma = $' + item for item in k_list]  # gamma 50
+    tr = 'NA'  # 'G'
+    sr = 'A'  # 'B'  #  'C'
+
+    if tr == 'NA':
+        str_list = [r'$N_A = 10$', r'$N_A = 15$', r'$N_A = 20$', r'$N_A = 25$']
+        b_num = 100
+    else:
+        k_list = [r'$\frac{1}{3}\pi$', r'$\frac{2}{3}\pi$', r'$\pi$', r'$\frac{4}{3}\pi$']
+        str_list = [r'$\gamma = $' + item for item in k_list]
+        b_num = 50
 
     for k in range(4):
         data_box = get_box(data_num, k)
         color_str = plt.get_cmap('Dark2')(k)
-        plt.hist(data_box, bins=100, facecolor=color_str, edgecolor='black', alpha=0.3, label=str_list[k])
+        plt.hist(data_box, bins=b_num, facecolor=color_str, edgecolor='black', alpha=0.3, label=str_list[k])
 
     k1_list = [i/10 for i in range(11)]
     plt.xticks(k1_list, k1_list)
 
     font = {'family': 'Times New Roman', 'weight': 'normal', 'size': 13}
-    plt.xlabel('Cover-Rate', font)
+    if sr == 'A':
+        plt.xlabel('Cover-Rate', font)
+    elif sr == 'B':
+        plt.xlabel('Perception-Ratio', font)
+    else:
+        plt.xlabel('Assignment-Score', font)
     plt.xlim((0.0, 1.0))
     plt.legend()
 
