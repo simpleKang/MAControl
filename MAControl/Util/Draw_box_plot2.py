@@ -50,11 +50,12 @@ if __name__ == '__main__':
     plt.rcParams['figure.dpi'] = 160
     data_num = 8
 
-    folder_ok = 'Pecp1-OK-B-Partial'
-    folder_co = 'B-RPCBF-B'
-    sr = 'B'  # 'A'  #  'C'
-    un = 20
-    draw = [0, 1, 2, 3, 4]
+    folder_ok = 'A8-pi-E-Par'
+    folder_co = 'A8-pi-T'
+    sr = 'A'  # 'B'  #  'C'
+    lr = 'Cover-Rate'  # B 'Perception-Ratio' # C 'Assignment-Score'
+    un = 8
+    draw = [2, 3, 4, 5, 6]
 
     co = [[] for k in range(data_num)]
     for kk in range(len(draw)):
@@ -63,13 +64,12 @@ if __name__ == '__main__':
         co[k] = control_box.boxplot(showfliers=False, patch_artist=True, showcaps=False, return_type='dict')
         color_str = plt.get_cmap('ocean')(kk * 40 + 20)
         set_group_color(co[k], color_str)
-        plt.text(161, kk*0.06 + 0.1, 'generation ' + str(kk), fontsize=10, weight='book', color=color_str)
-        # A kk*0.06 + 0.1 # B kk*0.004 + 0.027 # C kk*0.04 + 0.22
+        plt.text(161, kk*0.06 + 0.05, 'generation ' + str(kk), fontsize=10, weight='book', color=color_str)
 
     control_box = get_box(1, folder_co, 0, un, sr)
     co.append(control_box.boxplot(showfliers=False, patch_artist=True, showcaps=False, return_type='dict'))
     set_group_color(co[-1], 'red')
-    plt.text(128, 0.5, 'RoleProjControlBirdFlock', fontsize=10, weight='book', color='r')  # A 0.5 # B 0.047 # C 0.92
+    plt.text(136, 0.35, 'RoleProjControlBirdFlock', fontsize=10, weight='book', color='r')
 
     k1_list = [i*20 for i in range(11)]  # actual
     k2_list = [i*100 for i in range(11)]  # show
@@ -77,11 +77,11 @@ if __name__ == '__main__':
 
     font = {'family': 'Times New Roman', 'weight': 'normal', 'size': 13}
     plt.xlabel('Step', font)
-    plt.ylabel('Cover-Rate', font)  # A 'Cover-Rate' # B 'Perception-Ratio' # C 'Assignment-Score'
+    plt.ylabel(lr, font)
 
     plt.xlim((0, 200))
-    plt.ylim((0.07, 1))  # A (0.07, 1) # B (-0.002, 0.055) # C (0.2, 1)
+    plt.ylim((0.03, 1))
     curdir = os.path.dirname(__file__)
     pardir = os.path.dirname(os.path.dirname(curdir))
-    plt.savefig(pardir+'/track/-plot-/draw-test.png')
+    plt.savefig(pardir+'/track/-plot-/draw-test-'+sr+'.png')
     plt.show()
