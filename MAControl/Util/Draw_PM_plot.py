@@ -1,26 +1,37 @@
 import numpy as np
+import math
 import os
 import matplotlib.pyplot as plt
 import MAEnv.scenarios.TargetProfile as T
 
 
-plt.rcParams['figure.dpi'] = 800
+plt.rcParams['figure.dpi'] = 200
 
 curdir = os.path.dirname(__file__)
 pardir = os.path.dirname(os.path.dirname(curdir))
 
-gen_num = 10
-ind_num = 16
-loop_num = 8
-uav_num = 5
+uav_num = 16
 
 track = []
-for gen in range(gen_num):
-    for ind in range(ind_num):
-        for loop in range(loop_num):
-            for k in range(uav_num):
-                PATH = pardir + '/track/gen=%d' % gen + '/ind=%d' % ind + '/num=%d' % loop
-                track.append(np.loadtxt(PATH + '/uav_%d_track.txt' % k))
+for k in range(uav_num):
+    PATH = pardir + '/track/test'
+    track.append(np.loadtxt(PATH + '/uav_%d_track.txt' % k))
+
+step_n = len(track[0])
+EDK = list()
+d_ref = 2*1.0/math.sqrt(uav_num)
+RDK = [[] for i in range(step_n)]
+EVK = [[] for i in range(step_n)]
+RVK = [[] for i in range(step_n)]
+POK = [[] for i in range(step_n)]
+
+for lt in range(len(track[0])):
+    edk = list()
+    for i in range(uav_num):
+        for j in range(uav_num):
+            dist2_ij = (track[lt][i][2]-track[lt][j][2])**2 + (track[lt][i][3]-track[lt][j][3])**2
+            edk.append(abs(math.sqrt(dist2_ij)-d_ref))
+    EDK.append(sum(edk)/uav_num/uav_num/d_ref)
 
 plt.figure(facecolor='w')
 line = plt.gca()
