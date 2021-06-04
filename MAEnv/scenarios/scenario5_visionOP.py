@@ -221,7 +221,8 @@ class Scenario(BaseScenario):
                     item = retina[k]
                     ptem = por.open(item[0], item[1]) if item[0] < item[1] else \
                         por.open(item[0], math.pi) | por.open(-math.pi, item[1])
-                    if (ptem & SS).empty:
+                    check = ptem & SS
+                    if check.lower == por.empty().lower or check.upper == por.empty().upper:
                         pass
                     else:
                         new = (A1 | A2 | (ptem & SS)).difference(A1 | A2)
