@@ -28,6 +28,7 @@ def raw_data(data_num, name, uav_num, stype):
             for loop in range(4):
                 k_index = (ind * 4 + loop) * 200 + 0
                 array = raw[k_index:k_index + 200].T[1]
+                array = array / 100 if stype == 'B' else array
                 gen_list.append(list(array))
         coverage_set.append(gen_list)
 
@@ -52,8 +53,8 @@ if __name__ == '__main__':
 
     folder_ok = 'A8-pi-E-Par'
     folder_co = 'A8-pi-T'
-    sr = 'A'  # 'B'  #  'C'
-    lr = 'Cover-Rate'  # B 'Perception-Ratio' # C 'Assignment-Score'
+    sr = 'A'  # 'A' # 'B' # 'C'
+    lr = 'Cover-Rate'  # A 'Cover-Rate' # B 'Perception-Ratio' # C 'Assignment-Score'
     un = 8
     draw = [2, 3, 4, 5, 6]
 
