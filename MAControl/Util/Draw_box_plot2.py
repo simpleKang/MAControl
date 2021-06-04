@@ -48,7 +48,7 @@ def set_group_color(f, color_s):
 
 if __name__ == '__main__':
 
-    plt.rcParams['figure.dpi'] = 160
+    plt.rcParams['figure.dpi'] = 200
     data_num = 8
 
     folder_ok = 'A8-pi-E-Par'

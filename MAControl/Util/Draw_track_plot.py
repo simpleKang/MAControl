@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import MAEnv.scenarios.TargetProfile as T
 
 
-plt.rcParams['figure.dpi'] = 800
+plt.rcParams['figure.dpi'] = 200
 
 curdir = os.path.dirname(__file__)
 pardir = os.path.dirname(os.path.dirname(curdir))

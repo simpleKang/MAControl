@@ -31,7 +31,7 @@ def draw_contrast_plot(data_num, name, up_, down_):
 
 if __name__ == '__main__':
 
-    plt.rcParams['figure.dpi'] = 800
+    plt.rcParams['figure.dpi'] = 200
     plt.figure()
     line = plt.gca()
 

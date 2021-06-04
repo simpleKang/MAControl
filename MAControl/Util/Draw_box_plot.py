@@ -51,7 +51,7 @@ def raw_data(data_num, name, uav_num, stype):
 
 if __name__ == '__main__':
 
-    plt.rcParams['figure.dpi'] = 160
+    plt.rcParams['figure.dpi'] = 200
     data_num = 8
     tr = 'NA'  # 'G'
     sr = 'A'  # 'B'  #  'C'

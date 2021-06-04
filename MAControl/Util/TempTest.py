@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import MAControl.Util.SignIsSame as sis
 
 
-# plt.rcParams['figure.dpi'] = 800
+# plt.rcParams['figure.dpi'] = 200
 # curdir = os.path.dirname(__file__)
 # pardir = os.path.dirname(os.path.dirname(curdir))
 # data = np.loadtxt(pardir + '/cost.txt')
@@ -35,6 +35,7 @@ print('para', para)
 
 # uav_pos = np.array([1, 1])
 # tar_pos = np.array([1, 2])
+
 
 def parse_args():
     parser = argparse.ArgumentParser("Control Experiments for Multi-Agent Environments")
