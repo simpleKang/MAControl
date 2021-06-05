@@ -1,4 +1,5 @@
 import numpy as np
+import math
 import os
 import matplotlib.pyplot as plt
 from collections import Counter
@@ -25,8 +26,22 @@ assign_p = [raw3[k][1:] for k in key_p]
 count_p = list()
 for m in range(len(key_p)):
     cc = Counter(assign_p[m])
-    count_p.append([cc[0], cc[1], cc[2], cc[3]])
-    count_p[-1].append(15-cc[0]-cc[1]-cc[2]-cc[3])
+    count_p.append([cc[0], cc[1], cc[2], cc[3], cc[4]])
+    count_p[-1].append(15-cc[0]-cc[1]-cc[2]-cc[3]-cc[4])
+
+w_p = list()
+s_p = list()
+sc_p = list()
+sct_p = list()
+# N_A = 15 # N_T = 5 # R_T = 3
+for m in range(len(key_p)):
+    w = [math.exp(-1*abs(count_p[m][j]-3))/5 for j in range(5)]
+    s = sum([-1*wj*math.log(wj) for wj in w])
+    sc = (s*s)/(s*s+0.04)
+    w_p.append(w)
+    s_p.append(s)
+    sc_p.append(sc)
+    sct_p.append(sum(sc_p)/len(sc_p))
 
 gen_list = list()
 for ind in range(8):
@@ -40,8 +55,10 @@ X = [i*5 for i in range(200)]
 ax = fig.add_subplot(111)
 # for count in range(32):
 #    ax.plot(X, gen_list[count], label='count '+str(count))
-ax.plot(X, gen_list[23], label='count '+str(23))
+# ax.plot(X, gen_list[23], label='count '+str(23))
 ax.plot(X, raw2.T[1], label='score')
+ax.scatter(key_p, sc_p, label='sc', color='r', marker='*', s=100)
+ax.scatter(key_p, sct_p, label='sct', color='m', marker='+', s=50)
 
 ax.legend()
 plt.savefig(pardir+'/track/-plot-/CC.png')
