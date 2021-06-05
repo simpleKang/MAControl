@@ -4,12 +4,12 @@ import os
 import matplotlib.pyplot as plt
 
 
-def get_box(data_num, tc):
+def get_box(tc):
 
-    r1 = raw_data(data_num, 'TestN2-OK-A-Partial', 10, 'A')
-    r2 = raw_data(data_num, 'TestN1-OK-A-Partial', 15, 'A')
-    r3 = raw_data(data_num, 'Test1-OK-A-Partial',  20, 'A')
-    r4 = raw_data(data_num, 'TestN3-OK-A-Partial', 25, 'A')
+    r1 = raw_data('A8-pi-E-Par',      8, 'A', [2, 3, 4, 5, 6])
+    r2 = raw_data('A12-pi-E-Par',    12, 'A', [2, 3, 4, 5, 6])
+    r3 = raw_data('A16-pi-E(r)-Par', 16, 'A', [0, 1, 2, 3, 4])
+    r4 = raw_data('A20-pi-E-Par',    20, 'A', [0, 1, 2, 3, 4])
 
     g = 5
 
@@ -25,7 +25,7 @@ def get_box(data_num, tc):
     return box
 
 
-def raw_data(data_num, name, uav_num, stype):
+def raw_data(name, uav_num, stype, gens):
 
     curdir = os.path.dirname(__file__)
     pardir = os.path.dirname(os.path.dirname(curdir))
@@ -36,7 +36,8 @@ def raw_data(data_num, name, uav_num, stype):
     str1 = '/cover-rate-' if stype == 'A' else '/target-info-'
     str2 = '' if stype == 'A' else '-' + str(stype)
 
-    for i in range(data_num):
+    for u in range(len(gens)):
+        i = gens[u]
         raw = np.loadtxt(pardir + path + str1 + str(uav_num) + '-1000-%d' % i + str2 + '.txt', comments='#')
         gen_list = list()
         for ind in range(8):
@@ -52,12 +53,12 @@ def raw_data(data_num, name, uav_num, stype):
 if __name__ == '__main__':
 
     plt.rcParams['figure.dpi'] = 200
-    data_num = 8
-    tr = 'NA'  # 'G'
-    sr = 'A'  # 'B'  #  'C'
+    tr = 'NA'  # 'NA' # 'G'
+    sr = 'A'  # 'A' # 'B' # 'C'
+    lr = 'Cover-Rate'  # A 'Cover-Rate' # B 'Perception-Ratio' # C 'Assignment-Score'
 
     if tr == 'NA':
-        str_list = [r'$N_A = 10$', r'$N_A = 15$', r'$N_A = 20$', r'$N_A = 25$']
+        str_list = [r'$N_A = 8$', r'$N_A = 12$', r'$N_A = 16$', r'$N_A = 20$']
         b_num = 100
     else:
         k_list = [r'$\frac{1}{3}\pi$', r'$\frac{2}{3}\pi$', r'$\pi$', r'$\frac{4}{3}\pi$']
@@ -65,7 +66,7 @@ if __name__ == '__main__':
         b_num = 50
 
     for k in range(4):
-        data_box = get_box(data_num, k)
+        data_box = get_box(k)
         color_str = plt.get_cmap('Dark2')(k)
         plt.hist(data_box, bins=b_num, facecolor=color_str, edgecolor='black', alpha=0.3, label=str_list[k])
 
@@ -73,12 +74,7 @@ if __name__ == '__main__':
     plt.xticks(k1_list, k1_list)
 
     font = {'family': 'Times New Roman', 'weight': 'normal', 'size': 13}
-    if sr == 'A':
-        plt.xlabel('Cover-Rate', font)
-    elif sr == 'B':
-        plt.xlabel('Perception-Ratio', font)
-    else:
-        plt.xlabel('Assignment-Score', font)
+    plt.xlabel(lr, font)
     plt.xlim((0.0, 1.0))
     plt.legend()
 
