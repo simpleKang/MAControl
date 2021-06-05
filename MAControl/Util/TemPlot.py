@@ -13,7 +13,9 @@ raw = np.loadtxt(pardir + path + 'target-info-15-1000-4-C.txt', comments='#')
 raw2 = np.loadtxt(pardir + path + 'score.txt', comments='#')
 raw3 = np.loadtxt(pardir + path + 'assign.txt')
 
-key_p = [0, 50, 100, 150, 200, 400, 600, 800]
+key_p = [5*i for i in range(200)]
+key_pp = [0, 50, 100, 150, 200, 250, 300, 350, 400, 450,
+          500, 550, 600, 650, 700, 750, 800, 850, 900, 950]
 assign_p = [raw3[k][1:] for k in key_p]
 # 0   # 1 0 nan 3 0 3 nan 1 nan 0 3 3 nan 3 0
 # 50  # 1 3  0  3 1 3  0  1  3  0 3 3 nan 3 0
@@ -43,6 +45,10 @@ for m in range(len(key_p)):
     sc_p.append(sc)
     sct_p.append(sum(sc_p)/len(sc_p))
 
+index_pp = [int(step/5) for step in key_pp]
+sc_plot = [sc_p[i] for i in index_pp]
+sct_plot = [sct_p[i] for i in index_pp]
+
 gen_list = list()
 for ind in range(8):
     for loop in range(4):
@@ -56,9 +62,9 @@ ax = fig.add_subplot(111)
 # for count in range(32):
 #    ax.plot(X, gen_list[count], label='count '+str(count))
 # ax.plot(X, gen_list[23], label='count '+str(23))
-ax.plot(X, raw2.T[1], label='score')
-ax.scatter(key_p, sc_p, label='sc', color='r', marker='*', s=100)
-ax.scatter(key_p, sct_p, label='sct', color='m', marker='+', s=50)
+ax.plot(X, raw2.T[1], label='score c')
+ax.scatter(key_pp, sc_plot, label='sc (raw)', color='r', marker='*', s=100)
+ax.scatter(key_pp, sct_plot, label='sc (smooth)', color='m', marker='1', s=100)
 
 ax.legend()
 plt.savefig(pardir+'/track/-plot-/CC.png')
