@@ -44,6 +44,7 @@ def raw_data(name, uav_num, stype, gens):
             for loop in range(4):
                 k_index = (ind * 4 + loop) * 200 + 0
                 array = raw[k_index:k_index + 200].T[1]
+                array = array / 100 if stype == 'B' else array
                 gen_list.append(list(array))
         coverage_set.append(gen_list)
 
