@@ -8,6 +8,16 @@ def get_box(data_num, name, gen, uav_num, stype):
     r = raw_data(data_num, name, uav_num, stype)
     box = pd.DataFrame(r[gen])
 
+    for g in range(5):
+        for ind in range(8):
+            ak = list()
+            for loop in range(4):
+                ak.append(r[g][ind*4+loop][-1])
+            mean = np.round(np.array(ak).mean(), 5)
+            std = np.round(np.array(ak).std(ddof=1), 5)
+            print('g', g, 'ind', ind, 'ak', mean, std)
+        print('\n')
+
     return box
 
 
