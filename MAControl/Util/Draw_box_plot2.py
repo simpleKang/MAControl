@@ -8,14 +8,17 @@ def get_box(data_num, name, gen, uav_num, stype):
     r = raw_data(data_num, name, uav_num, stype)
     box = pd.DataFrame(r[gen])
 
+    g_list = [[] for g in range(5)]
     for g in range(5):
         for ind in range(8):
             ak = list()
             for loop in range(4):
                 ak.append(r[g][ind*4+loop][-1])
-            mean = np.round(np.array(ak).mean(), 5)
-            std = np.round(np.array(ak).std(ddof=1), 5)
+            mean = np.round(np.array(ak).mean(), 3)
+            std = np.round(np.array(ak).std(ddof=1), 3)
             print('g', g, 'ind', ind, 'ak', mean, std)
+            g_list[g].append([mean, std])
+        g_list[g] = sorted(g_list[g], key=lambda x: x[0], reverse=True)
         print('\n')
 
     return box
