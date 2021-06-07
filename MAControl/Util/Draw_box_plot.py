@@ -64,7 +64,7 @@ if __name__ == '__main__':
     else:
         k_list = [r'$\frac{1}{3}\pi$', r'$\frac{2}{3}\pi$', r'$\pi$', r'$\frac{4}{3}\pi$']
         str_list = [r'$\gamma = $' + item for item in k_list]
-        b_num = 50
+        b_num = 80
 
     for k in range(4):
         data_box = get_box(k)
