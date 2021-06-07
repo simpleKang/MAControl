@@ -84,5 +84,5 @@ if __name__ == '__main__':
     plt.ylim((0.03, 1))
     curdir = os.path.dirname(__file__)
     pardir = os.path.dirname(os.path.dirname(curdir))
-    plt.savefig(pardir+'/track/-plot-/draw-test-'+sr+'.png')
+    plt.savefig(pardir+'/track/-plot-/draw  '+folder_co+'.png')
     plt.show()

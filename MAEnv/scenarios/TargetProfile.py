@@ -4,7 +4,7 @@ import MAControl.Util.get_random_state as rs
 # 这里的 size 以【米】为单位 在 scenario 里边会乘上 0.001 从而以【千米】为单位
 
 # blind angle
-blind_angle = [math.pi/3, math.pi/3*2, math.pi, math.pi/3*4]
+blind_angle = [math.pi/3, 2*math.pi/3, math.pi, 4*math.pi/3]
 angle_case = 2
 # visual section
 num_section = 10
