@@ -8,9 +8,12 @@ def get_box(data_num, name, gen, uav_num, stype):
     r = raw_data(data_num, name, uav_num, stype)
     box = pd.DataFrame(r[gen])
 
+    g_num = 5 if len(r) >= 5 else 1
+    ind_num = 8 if len(r) >= 5 else 1
+
     g_list = [[] for g in range(5)]
-    for g in range(5):
-        for ind in range(8):
+    for g in range(g_num):
+        for ind in range(ind_num):
             ak = list()
             for loop in range(4):
                 ak.append(r[g][ind*4+loop][-1])
