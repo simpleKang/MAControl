@@ -168,7 +168,7 @@ if __name__ == '__main__':
                 res.append(agent.attacking_to)
             for t in range(len(world.targets)):
                 res2.append(res.count(t))
-            with open(os.path.dirname(__file__) + '/MAControl/Test_Auction/check.txt', 'a') as f:
+            with open(os.path.dirname(__file__) + '/MAControl/PTMA+I+CBAA+CC/check.txt', 'a') as f:
                 f.write(str(res2) + '\n')
 
             # for displaying
