@@ -27,15 +27,17 @@ class Scenario(BaseScenario):
             agent.size = 0.01  # 10米
         # add landmarks
         world.targets = [Landmark() for i in range(num_targets)]
-        VALUE = [2, 10, 5]
-        DEFENCE = [5, 1, 2]
+        VALUE = [7, 3, 9]
+        A_DEFENCE = [3, 4, 2]
+        B_DEFENCE = [2, 0, 3]
         for i, landmark in enumerate(world.targets):
             landmark.name = 'target %d' % i
             landmark.collide = False
             landmark.movable = False
             landmark.value = VALUE[target_type[i]-1]
             landmark.size = T.target_size[i] * 0.01
-            landmark.defence = DEFENCE[target_type[i]-1]
+            landmark.a_defence = A_DEFENCE[target_type[i]-1]
+            landmark.b_defence = B_DEFENCE[target_type[i] - 1]
             landmark.attacking = False
             landmark.type = target_type[i]
         world.obstacles = [Landmark() for i in range(num_obstacles)]

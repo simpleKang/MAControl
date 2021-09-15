@@ -9,8 +9,8 @@ import MAControl.PTMA_CBAA.PolicyMaker_Probability as PM_A
 import logging
 import os
 
-# 运行 execute.py 需要补足参数，如 execute_all.py 中所示
-logging.basicConfig(filename='\\Users\\xj\\PycharmProjects\\Result-A\\result1.log', level=logging.INFO)
+# 运行 execute_Probability.py 需要补足参数，如 execute_all_P1/P2/P3/P4_unit/Q.py 中所示
+logging.basicConfig(filename='\\Users\\xj\\PycharmProjects\\Result-A\\P1_unit.log', level=logging.INFO)
 logging.info('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
 logging.info(time.strftime('%Y-%m-%d, %H:%M:%S'))
 logging.info('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
@@ -22,7 +22,7 @@ def parse_args():
     parser = argparse.ArgumentParser("Control Experiments for Multi-Agent Environments")
     parser.add_argument("--scenario", type=str, default="scenario_paper", help="name of the scenario script")
     parser.add_argument("--step-max", type=int, default=3000, help="maximum steps")
-    parser.add_argument("--episode-max", type=int, default=50, help="maximum episodes")
+    parser.add_argument("--episode-max", type=int, default=30, help="maximum episodes")
     parser.add_argument("--p1", action='append', type=float, dest='p1', default=[], help="P: Line one")
     parser.add_argument("--p2", action='append', type=float, dest='p2', default=[], help="P: Line Two")
     parser.add_argument("--p3", action='append', type=float, dest='p3', default=[], help="P: Line Three")
