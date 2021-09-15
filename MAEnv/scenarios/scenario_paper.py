@@ -108,7 +108,6 @@ class Scenario(BaseScenario):
                 X_JB[task[0]] += 1
                 T_JB[task[0]] += task[2]
             else:
-                print('none')
                 pass
 
         E_JA = []

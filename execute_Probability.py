@@ -4,13 +4,13 @@ import argparse
 import time
 import MAControl.PTMA_CBAA.InnerController_PID as IC_P
 import MAControl.PTMA_CBAA.MotionController_L1_TECS as MC_L
-import MAControl.PTMA_CBAA.PathPlanner_CBAA as PP_S
+import MAControl.PTMA_CBAA.PathPlanner_Shared as PP_S
 import MAControl.PTMA_CBAA.PolicyMaker_Probability as PM_A
 import logging
 import os
 
 # 运行 execute_Probability.py 需要补足参数，如 execute_all_P1/P2/P3/P4_unit/Q.py 中所示
-logging.basicConfig(filename='\\Users\\xj\\PycharmProjects\\Result-A\\P1_unit.log', level=logging.INFO)
+logging.basicConfig(filename='\\Users\\xj\\PycharmProjects\\Result-A\\P1234_unit.log', level=logging.INFO)
 logging.info('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
 logging.info(time.strftime('%Y-%m-%d, %H:%M:%S'))
 logging.info('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
@@ -144,15 +144,6 @@ if __name__ == '__main__':
             new_obs_n, rew_n, done_n, info_n = env.step(action_n)
             step += 1
             obs_n = new_obs_n
-
-            res = []
-            res2 = []
-            for a, agent in enumerate(world.agents):
-                res.append(agent.attacking_to)
-            for t in range(len(world.targets)):
-                res2.append(res.count(t))
-            with open(os.path.dirname(__file__) + '/MAControl/PTMA_CBAA/check.txt', 'a') as f:
-                f.write(str(res2) + '\n')
 
             # for displaying
             augment_view(env, world, NewController)

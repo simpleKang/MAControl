@@ -2,10 +2,10 @@ from MAControl.Base.PathPlanner import PathPlanner
 import MAControl.Util.CreateWaypoint as CW
 
 
-class PathPlanner_CBAA(PathPlanner):
+class PathPlanner_Shared(PathPlanner):
 
     def __init__(self, name, env, world, agent_index, arglist):
-        super(PathPlanner_CBAA, self).__init__(name, env, world, agent_index, arglist)
+        super(PathPlanner_Shared, self).__init__(name, env, world, agent_index, arglist)
         self.waypoint_list = []             # 256×3的航点列表，第3列为航点状态 [0: 无航点] [1: 未飞] [2: pointA] [3: pointB] [4: 已到达]
         self.pointAi = (0, 0)               # A点坐标
         self.pointBi = (0, 0)               # B点坐标
