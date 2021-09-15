@@ -5,6 +5,7 @@ import random
 from MAEnv.core import World, Agent, Landmark
 from MAEnv.scenario import BaseScenario
 import MAEnv.scenarios.TargetProfile as T
+import math
 
 
 class Scenario(BaseScenario):
@@ -37,7 +38,7 @@ class Scenario(BaseScenario):
             landmark.value = VALUE[target_type[i]-1]
             landmark.size = T.target_size[i] * 0.01
             landmark.a_defence = A_DEFENCE[target_type[i]-1]
-            landmark.b_defence = B_DEFENCE[target_type[i] - 1]
+            landmark.b_defence = B_DEFENCE[target_type[i]-1]
             landmark.attacking = False
             landmark.type = target_type[i]
         world.obstacles = [Landmark() for i in range(num_obstacles)]
@@ -92,32 +93,51 @@ class Scenario(BaseScenario):
         return rew, min_dists, occupied_landmarks
 
     def result(self, world):
-        # TARGET-UAV分配情况
-        res = []
+        # TARGET-UAV 分配情况 TASK-TIME
+        X_JA = [0 for j in range(len(world.targets))]
+        X_JB = [0 for j in range(len(world.targets))]
+        T_JA = [0 for j in range(len(world.targets))]
+        T_JB = [0 for j in range(len(world.targets))]
         for a, agent in enumerate(world.agents):
-            res.append(agent.attacking_to)  # 长度为UAV数量，每个元素是所攻击的目标（未攻击则为-1）
-        res2 = []
-        res3 = []
-        for t in range(len(world.targets)):
-            res2.append(res.count(t))  # 长度为TARGET数量，每个元素是分配给这个目标的UAV个数 (L)
-            res3.append(world.targets[t].defence)  # 长度为TARGET数量，每个元素是这个目标需要的UAV个数 (d)
-        res4 = list(np.array(res2)-np.array(res3))  # 长度为TARGET数量，每个元素是(L-d)
-        res5 = []   # 长度为TARGET数量，每个元素是根据差值计算出的奖励值
-        for r in res4:
-            if r >= 0:
-                res5.append(1/(r+1))
+            task = [agent.attacking_to, agent.attacking_type, agent.attacking_time]
+            # 长度为UAV数量，每个元素是 [所攻击的目标，任务类型(A/B)，转入攻击的时刻(step) ]
+            if task[1] == 'A':
+                X_JA[task[0]] += 1
+                T_JA[task[0]] += task[2]
+            elif task[1] == 'B':
+                X_JB[task[0]] += 1
+                T_JB[task[0]] += task[2]
             else:
-                res5.append(0)
-        return res5
+                print('none')
+                pass
+
+        E_JA = []
+        E_JB = []
+        W = []
+        for j in range(len(world.targets)):
+            T_JA[j] = T_JA[j] / X_JA[j] if not X_JA[j] == 0 else 0
+            T_JB[j] = T_JB[j] / X_JB[j] if not X_JB[j] == 0 else 0
+            E_JA.append(world.targets[j].a_defence)
+            E_JB.append(world.targets[j].b_defence)
+            W.append(world.targets[j].value)
+
+        F = []
+        for j in range(len(world.targets)):
+            delta = 1
+            if X_JA[j] < E_JA[j]:
+                delta = 0
+            else:
+                if T_JA[j] > T_JB[j]:
+                    delta = math.exp(0.1*T_JB[j]-0.1*T_JA[j])  # dt=0.1
+                else:
+                    pass
+            r = abs(X_JA[j] - E_JA[j]) * abs(X_JB[j] - E_JB[j])
+            F.append(delta*W[j]/math.exp(r))
+        return F
 
     def reward(self, agent, world):
-        # 根据TARGET-UAV分配情况，计算整体评价
-        # 目前只考虑了效益，尚未考虑代价
-        rew = 0
-        res5 = self.result(world)
-        for t, target in enumerate(world.targets):
-            rew += target.value * res5[t]
-        return rew
+        F_list = self.result(world)
+        return sum(F_list)
 
     def observation(self, agent, world):
         a1 = agent.state.p_acc[0]
