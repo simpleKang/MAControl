@@ -2,15 +2,15 @@
 
 import argparse
 import time
-import MAControl.Test_Auction.InnerController_PID as IC_P
-import MAControl.Test_Auction.MotionController_L1_TECS as MC_L
-import MAControl.Test_Auction.PathPlanner_CBAA as PP_S
-import MAControl.Test_Auction.PolicyMaker_Probability as PM_A
+import MAControl.PTMA_CBAA.InnerController_PID as IC_P
+import MAControl.PTMA_CBAA.MotionController_L1_TECS as MC_L
+import MAControl.PTMA_CBAA.PathPlanner_CBAA as PP_S
+import MAControl.PTMA_CBAA.PolicyMaker_Probability as PM_A
 import logging
 import os
 
 # 运行 execute.py 需要补足参数，如 execute_all.py 中所示
-logging.basicConfig(filename='/home/samantha/gitr/logs/PQ/result_P1Q.log', level=logging.INFO)
+logging.basicConfig(filename='\\Users\\xj\\PycharmProjects\\Result-A\\result1.log', level=logging.INFO)
 logging.info('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
 logging.info(time.strftime('%Y-%m-%d, %H:%M:%S'))
 logging.info('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
@@ -151,7 +151,7 @@ if __name__ == '__main__':
                 res.append(agent.attacking_to)
             for t in range(len(world.targets)):
                 res2.append(res.count(t))
-            with open(os.path.dirname(__file__) + '/MAControl/PTMA+I+CBAA+CC/check.txt', 'a') as f:
+            with open(os.path.dirname(__file__) + '/MAControl/PTMA_CBAA/check.txt', 'a') as f:
                 f.write(str(res2) + '\n')
 
             # for displaying
