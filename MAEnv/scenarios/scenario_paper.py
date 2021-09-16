@@ -127,7 +127,8 @@ class Scenario(BaseScenario):
                 delta = 0
             else:
                 if T_JA[j] > T_JB[j]:
-                    delta = math.exp(0.1*T_JB[j]-0.1*T_JA[j])  # dt=0.1
+                    ddt = 0.1*T_JB[j]-0.1*T_JA[j]  # dt=0.1
+                    delta = math.exp(ddt/400)   # 至多罚一个自然对数(e^1)
                 else:
                     pass
             ra = abs(X_JA[j] - E_JA[j])+1
