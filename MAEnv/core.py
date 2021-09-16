@@ -50,8 +50,8 @@ class Entity(object):
         # attacking
         self.attacking = False
         self.attacking_to = -1  # true target index
-        self.attacking_type = '0'  # 'A' or 'B'
         self.attacking_time = 0  # decision step index
+        self.attacking_type = '0'  # 'A' or 'B'
 
     @property
     def mass(self):

@@ -59,7 +59,7 @@ def get_controller(env, world, arglist):
         control.append(IC_P.InnerController_PID("agent_%d" % i, env, world, i, arglist))
         control.append(False)  # Arriveflag
         control.append(False)  # Isattacking
-        control.append(-1)  # which target is it attacking
+        control.append([-1, 0, '0'])  # which target, when to attack, in which type task
         ControllerSet.append(control)
 
     return ControllerSet
@@ -78,7 +78,9 @@ def update_action(env, world, obs_n, step, NewController):
         list_i = NewController[i][0]. \
             make_policy(WorldTarget, obs_n, step)
 
-        NewController[i][6] = list_i[1][2]
+        NewController[i][6][0] = list_i[1][2]
+        NewController[i][6][1] = list_i[1][5]
+        NewController[i][6][2] = list_i[1][4]
 
         pointAi, pointBi, finishedi, NewController[i][5] = NewController[i][1].\
             planpath(list_i, obs_n[i], NewController[i][4], step)
@@ -94,9 +96,11 @@ def update_action(env, world, obs_n, step, NewController):
     return action_n
 
 
-def augment_view(env, world, NewController):
+def write_to_env(env, world, NewController):
     for i in range(env.n):
-        world.agents[i].attacking_to = NewController[i][6]
+        world.agents[i].attacking_to = NewController[i][6][0]
+        world.agents[i].attacking_time = NewController[i][6][1]
+        world.agents[i].attacking_type = NewController[i][6][2]
         if NewController[i][5]:
             world.agents[i].attacking = True
 
@@ -141,11 +145,11 @@ if __name__ == '__main__':
             obs_n = new_obs_n
 
             # for displaying
-            augment_view(env, world, NewController)
             # env.render()  # could be commented out
 
             # for recording
             if step == arglist.step_max:
+                write_to_env(env, world, NewController)
                 print('>>>>>>>>>>> Episode', episode)
                 pairing = []
                 for i in range(env.n):

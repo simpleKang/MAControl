@@ -44,12 +44,10 @@ class PathPlanner_Shared(PathPlanner):
             arrive_flag = self.complete_replace(para_list[1])
 
         elif para_list[0] == 10:
-            # 攻击状态切换只能进来一次哦～～
-            # self.attack_replace(para_list[1])
             self.pointAi = (obs[2], obs[3])
             self.pointBi = (para_list[1][0], para_list[1][1])
             self.is_attacking = True
-                # raise Exception('Target coord is changed again! This should not happen!!!')
+            # raise Exception('Target coord is changed again! This should not happen!!!')
 
         else:
             raise Exception('Unknown operation index. Please check your code.')
@@ -99,7 +97,7 @@ class PathPlanner_Shared(PathPlanner):
                                 self.waypoint_list[self.current_wplist][self.pointB_index][1])
                 self.pointBi = (self.waypoint_list[self.current_wplist][self.pointB_index][0],
                                 self.waypoint_list[self.current_wplist][self.pointB_index][1])
-                #self.pointB_index += 1
+                # self.pointB_index += 1
             # 当当前列表走完之后重新再走一遍列表
             elif self.cycle_index < self.total_cycle:
                 for i in range(self.pointB_index + 1):

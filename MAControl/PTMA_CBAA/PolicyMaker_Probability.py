@@ -31,10 +31,11 @@ class PolicyMaker_Probability(PolicyMaker):
         self.InAttacking = False
         self.result = []  # 缺省 or 一整条目标信息
         self.attack_type = '0'
+        self.attack_time = 0
         self.seen_targets = []
         self.close_area = []
         self.rank = 0
-        self.mission_success = 0
+        self.assigned = 0  # 是/否决定了去向
 
         # 以下为一些阶段的初始设定步数
         # >> 未来步数点可修改，从而可以主动停留在某一阶段/步
@@ -312,8 +313,9 @@ class PolicyMaker_Probability(PolicyMaker):
                         PolicyMaker_Probability.Attacked_T.append(self.result[-1])
                     self.x = self.result[0]
                     self.y = self.result[1]
-                    self.mission_success = 1
+                    self.assigned = 1
                     self.attack_type = 'A'
+                    self.attack_time = step
                 elif self.rank < DEMANDED_UAV_NUM[0] + DEMANDED_UAV_NUM[1]:
                     print('Step ', step, 'UAV', self.index, 'to attack', 'target', self.result[-1], 'B-type')
                     self.opt_index = 10
@@ -323,8 +325,9 @@ class PolicyMaker_Probability(PolicyMaker):
                         PolicyMaker_Probability.Attacked_T.append(self.result[-1])
                     self.x = self.result[0]
                     self.y = self.result[1]
-                    self.mission_success = 1
+                    self.assigned = 1
                     self.attack_type = 'B'
+                    self.attack_time = step
                 else:
                     print('Step ', step, 'UAV', self.index, 'not to attack')
 
@@ -339,5 +342,5 @@ class PolicyMaker_Probability(PolicyMaker):
             else:
                 raise Exception('Wrong Wrong Wrong')
 
-        out = self.result[-1] if self.result else self.result
-        return self.opt_index, [self.x, self.y, out, self.mission_success]  # self.result指目标的整条属性
+        fate = self.result[-1] if self.result else self.result  # self.result指目标的整条属性 or 缺省
+        return self.opt_index, [self.x, self.y, fate, self.assigned, self.attack_type, self.attack_time]
