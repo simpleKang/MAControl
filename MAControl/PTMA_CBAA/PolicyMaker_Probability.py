@@ -16,9 +16,11 @@ class PolicyMaker_Probability(PolicyMaker):
 
     SEEN_TARGETS = []
     KNOWN_TARGETS = []
-    RESULT = []
+    RESULT = []  # 只是把 "目标序号" 和 "任务类别" 写在这里
     Prices = []
+    # 以上都和 ACTIVE_U 同长度，也就是 Occupied_U 的用处
     Occupied_U = []
+
     Attacked_T = []
 
     def __init__(self, name, env, world, agent_index, arglist):
@@ -27,7 +29,8 @@ class PolicyMaker_Probability(PolicyMaker):
         self.x = 0
         self.y = 0
         self.InAttacking = False
-        self.result = -1
+        self.result = []  # 缺省 or 一整条目标信息
+        self.attack_type = '0'
         self.seen_targets = []
         self.close_area = []
         self.rank = 0
@@ -87,21 +90,21 @@ class PolicyMaker_Probability(PolicyMaker):
                 if truetype == 1:
                     gtype = np.random.choice([1, 2, 3], 1, p=self.arglist.p1)
                     if gtype == 2:
-                        _seen_targets[-1][-4:-1] = [10, 1, 2]
+                        _seen_targets[-1][-5:-1] = [3, 4, 0, 2]
                     elif gtype == 3:
-                        _seen_targets[-1][-4:-1] = [5, 2, 3]
+                        _seen_targets[-1][-5:-1] = [9, 2, 3, 3]
                 elif truetype == 2:
                     gtype = np.random.choice([1, 2, 3], 1, p=self.arglist.p2)
                     if gtype == 3:
-                        _seen_targets[-1][-4:-1] = [5, 2, 3]
+                        _seen_targets[-1][-5:-1] = [9, 2, 3, 3]
                     elif gtype == 1:
-                        _seen_targets[-1][-4:-1] = [2, 5, 1]
+                        _seen_targets[-1][-5:-1] = [7, 3, 2, 1]
                 elif truetype == 3:
                     gtype = np.random.choice([1, 2, 3], 1, p=self.arglist.p3)
                     if gtype == 1:
-                        _seen_targets[-1][-4:-1] = [2, 5, 1]
+                        _seen_targets[-1][-5:-1] = [7, 3, 2, 1]
                     elif gtype == 2:
-                        _seen_targets[-1][-4:-1] = [10, 1, 2]
+                        _seen_targets[-1][-5:-1] = [3, 4, 0, 2]
                 # 在 _seen_targets 中，真序号是准确的（唯一标识），类型可能有误（相应的价值和防御能力都有误）
 
         # UPDATE self.seen_targets
@@ -205,13 +208,12 @@ class PolicyMaker_Probability(PolicyMaker):
 
             if step < self.Step0:
                 # print('UAV', self.index, 'searching')
-                self.close_area = self.find_mate(obs_n)
                 self.add_new_target(obs_n[self.index], WorldTarget)
                 self.opt_index = 0
 
             elif step == self.Step0:
                 # print('UAV', self.index, 'resort, then store for communication')
-                self.seen_targets = sorted(self.seen_targets, key=lambda x: x[4], reverse=True)
+                self.seen_targets = sorted(self.seen_targets, key=lambda x: x[2], reverse=True)
                 for i, target in enumerate(self.seen_targets):
                     if target[-1] in PolicyMaker_Probability.Attacked_T:
                         self.seen_targets.remove(target)  # 搜索到全部目标 but 只将尚未打击的目标作为待作用对象
@@ -220,7 +222,7 @@ class PolicyMaker_Probability(PolicyMaker):
             elif step == self.Step1:
                 # print('UAV', self.index, 'communicate locally, extend target knowledge')
                 known_targets = []
-                target_indexes = []
+                known_target_indexes = []
                 ACTIVE_U = list(set([i for i in range(self.arglist.numU)]) - set(PolicyMaker_Probability.Occupied_U))
                 self.close_area = self.find_mate(obs_n)
                 for i in self.close_area:
@@ -228,25 +230,25 @@ class PolicyMaker_Probability(PolicyMaker):
                         ii = ACTIVE_U.index(i)  # close_area 与 ACTIVE_U 的交集，其元素在 ACTIVE_U 中的编号
                         if PolicyMaker_Probability.SEEN_TARGETS[ii]:
                             for target in PolicyMaker_Probability.SEEN_TARGETS[ii]:
-                                if target[-1] not in target_indexes:
+                                if target[-1] not in known_target_indexes:
                                     known_targets.append(target)
-                                    target_indexes.append(target[-1])
+                                    known_target_indexes.append(target[-1])
                                 else:
                                     pass
                         else:
                             pass
                     else:
                         pass
-                # print('targets', known_targets, target_indexes)
-                known_targets = sorted(known_targets, key=lambda x: x[4], reverse=True)
+                # print('targets', known_targets, known_target_indexes)
+                known_targets = sorted(known_targets, key=lambda x: x[2], reverse=True)
                 PolicyMaker_Probability.KNOWN_TARGETS.append(known_targets)
                 # 这里是个体所知的目标们 是出价的依据
                 if known_targets:
                     self.result = known_targets[0]
-                    PolicyMaker_Probability.RESULT.append(self.result[-1])
+                    PolicyMaker_Probability.RESULT.append([self.result[-1], '1'])
                     # 这里是个体的预选择 是决策的基础
                 else:
-                    PolicyMaker_Probability.RESULT.append([])
+                    PolicyMaker_Probability.RESULT.append([self.index, '0'])
 
             elif self.Step2 <= step < self.Step3:
                 # print('UAV', self.index, 'bid price(s) for all seen + communicated targets')
@@ -267,9 +269,9 @@ class PolicyMaker_Probability(PolicyMaker):
                 N_Prices = []
                 ACTIVE_U = list(set([i for i in range(self.arglist.numU)]) - set(PolicyMaker_Probability.Occupied_U))
                 si = ACTIVE_U.index(self.index)
-                ti = PolicyMaker_Probability.RESULT[si]
+                ti = PolicyMaker_Probability.RESULT[si][0]
                 self.close_area = self.find_mate(obs_n)
-                if not ti == []:
+                if PolicyMaker_Probability.RESULT[si][1] == '1':
                     for i in self.close_area:
                         if i in ACTIVE_U:
                             ii = ACTIVE_U.index(i)  # close_area 与 ACTIVE_U 的交集，其元素在 ACTIVE_U 中的编号
@@ -282,40 +284,49 @@ class PolicyMaker_Probability(PolicyMaker):
                     if self_price:
                         self.rank = NN_Prices.index(self_price)
                     else:
-                        self.rank = 'NA'
+                        self.rank = 1000
                 else:
-                    self.rank = 'NA'
+                    self.rank = 1000
 
             elif step == self.Step4:
                 # 根据当前目标的类型估计，重新讨论目标的类型（含有随机性），进而确定需要的UAV个数
-                DEMANDED_UAV_NUM = 0
-                if self.result == -1:
-                    DEMANDED_UAV_NUM = 0
-                else:
-                    if self.result[5] == 5:
-                        DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=self.arglist.q1)[0]
-                    elif self.result[5] == 1:
-                        DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=self.arglist.q2)[0]
-                    elif self.result[5] == 2:
-                        DEMANDED_UAV_NUM = np.random.choice([5, 1, 2], 1, p=self.arglist.q3)[0]
-                # 活跃 UAV 本地确认自己是否具有攻击资格，符合条件的 UAV 即将进入攻击阶段
-                if self.rank == 'NA':
+                DEMANDED = 0
+                if not self.result:
                     pass
-                    print('UAV', self.index, 'not to attack')
                 else:
-                    if self.rank < DEMANDED_UAV_NUM:
-                        print('UAV', self.index, 'to attack', 'target', self.result[-1])
-                        self.opt_index = 10
-                        self.InAttacking = True
-                        PolicyMaker_Probability.Occupied_U.append(self.index)
-                        if np.random.random() < 0.7:
-                            PolicyMaker_Probability.Attacked_T.append(self.result[-1])
-                        self.x = self.result[0]
-                        self.y = self.result[1]
-                        self.mission_success = 1
-                    else:
-                        pass
-                        print('UAV', self.index, 'not to attack')
+                    if self.result[3] == 3:
+                        DEMANDED = np.random.choice([1, 2, 3], 1, p=self.arglist.q1)[0]
+                    elif self.result[3] == 4:
+                        DEMANDED = np.random.choice([1, 2, 3], 1, p=self.arglist.q2)[0]
+                    elif self.result[3] == 2:
+                        DEMANDED = np.random.choice([1, 2, 3], 1, p=self.arglist.q3)[0]
+                AK = [[0, 0], [3, 2], [4, 0], [2, 3]]
+                DEMANDED_UAV_NUM = AK[DEMANDED]
+                # 活跃 UAV 本地确认自己是否具有攻击资格，符合条件的 UAV 即将进入攻击阶段
+                if self.rank < DEMANDED_UAV_NUM[0]:
+                    print('Step ', step, 'UAV', self.index, 'to attack', 'target', self.result[-1], 'A-type')
+                    self.opt_index = 10
+                    self.InAttacking = True
+                    PolicyMaker_Probability.Occupied_U.append(self.index)
+                    if np.random.random() < 0.2:
+                        PolicyMaker_Probability.Attacked_T.append(self.result[-1])
+                    self.x = self.result[0]
+                    self.y = self.result[1]
+                    self.mission_success = 1
+                    self.attack_type = 'A'
+                elif self.rank < DEMANDED_UAV_NUM[0] + DEMANDED_UAV_NUM[1]:
+                    print('Step ', step, 'UAV', self.index, 'to attack', 'target', self.result[-1], 'B-type')
+                    self.opt_index = 10
+                    self.InAttacking = True
+                    PolicyMaker_Probability.Occupied_U.append(self.index)
+                    if np.random.random() < 0.5:
+                        PolicyMaker_Probability.Attacked_T.append(self.result[-1])
+                    self.x = self.result[0]
+                    self.y = self.result[1]
+                    self.mission_success = 1
+                    self.attack_type = 'B'
+                else:
+                    print('Step ', step, 'UAV', self.index, 'not to attack')
 
             elif step == self.Step5:
                 # print('UAV', self.index, 'recycling')
@@ -328,7 +339,5 @@ class PolicyMaker_Probability(PolicyMaker):
             else:
                 raise Exception('Wrong Wrong Wrong')
 
-        if self.result == -1:
-            return self.opt_index, [self.x, self.y, self.result, self.mission_success]
-        else:
-            return self.opt_index, [self.x, self.y, self.result[-1], self.mission_success]  # self.result指目标的整条属性
+        out = self.result[-1] if self.result else self.result
+        return self.opt_index, [self.x, self.y, out, self.mission_success]  # self.result指目标的整条属性

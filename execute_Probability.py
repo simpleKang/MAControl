@@ -69,8 +69,8 @@ def update_action(env, world, obs_n, step, NewController):
 
     WorldTarget = []
     for i, landmark in enumerate(world.targets):
-        WorldTarget.append([landmark.state.p_pos[0], landmark.state.p_pos[1], 0,
-                            0, landmark.value, landmark.defence, landmark.type, i])
+        WorldTarget.append([landmark.state.p_pos[0], landmark.state.p_pos[1], landmark.value,
+                            landmark.a_defence, landmark.b_defence, landmark.type, i])
     # print(step)
     action_n = []
     for i in range(env.n):
@@ -90,11 +90,6 @@ def update_action(env, world, obs_n, step, NewController):
             get_action(obs_n[i], acctEi, acclEi, step, finishedi)
 
         action_n.append(actioni)
-
-    if step == 3000:
-        print(
-            "gg"
-        )
 
     return action_n
 
@@ -137,7 +132,7 @@ if __name__ == '__main__':
         while step <= arglist.step_max:
 
             # get action
-            print('>>> step ', step)
+            # print('>>> step ', step)
             action_n = update_action(env, world, obs_n, step, NewController)
 
             # environment step
@@ -163,5 +158,6 @@ if __name__ == '__main__':
                 if episode == 1:
                     logging.info('EPISODE | PAIRING                                               REWARD          TIME')
                 logging.info([episode]+pairing+[rew_n[0][0]]+[timing])
+                print('\n')
                 if episode == arglist.episode_max:
                     logging.info('\n')
