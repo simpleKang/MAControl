@@ -130,8 +130,9 @@ class Scenario(BaseScenario):
                     delta = math.exp(0.1*T_JB[j]-0.1*T_JA[j])  # dt=0.1
                 else:
                     pass
-            r = abs(X_JA[j] - E_JA[j]) * abs(X_JB[j] - E_JB[j])
-            F.append(delta*W[j]/math.exp(r))
+            ra = abs(X_JA[j] - E_JA[j])+1
+            rb = abs(X_JB[j] - E_JB[j])+1
+            F.append(delta*W[j]/ra/rb)
         return F
 
     def reward(self, agent, world):

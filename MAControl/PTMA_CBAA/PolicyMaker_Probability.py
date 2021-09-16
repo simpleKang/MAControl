@@ -309,7 +309,7 @@ class PolicyMaker_Probability(PolicyMaker):
                     self.opt_index = 10
                     self.InAttacking = True
                     PolicyMaker_Probability.Occupied_U.append(self.index)
-                    if np.random.random() < 0.2:
+                    if np.random.random() < 0.4:
                         PolicyMaker_Probability.Attacked_T.append(self.result[-1])
                     self.x = self.result[0]
                     self.y = self.result[1]
@@ -321,7 +321,7 @@ class PolicyMaker_Probability(PolicyMaker):
                     self.opt_index = 10
                     self.InAttacking = True
                     PolicyMaker_Probability.Occupied_U.append(self.index)
-                    if np.random.random() < 0.5:
+                    if np.random.random() < 0.6:
                         PolicyMaker_Probability.Attacked_T.append(self.result[-1])
                     self.x = self.result[0]
                     self.y = self.result[1]
