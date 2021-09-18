@@ -11,16 +11,8 @@ import random
 import numpy.matlib
 import scipy.stats as stats
 
-class PolicyMaker_Auction(PolicyMaker):
 
-    #                                       (Step2<=)&(<Step3)
-    # 搜索目标[阶段] | 排序目标[步] | 选择目标[步] | 出价[阶段] | 统计价格[步] | 分道扬镳[步] | 重置[步] >>>> 搜索目标[阶段] ....
-    #  <Step0         ==Step0       ==Step1         ^         ==Step3      ==Step4      ==Step5
-    #                                                                        |
-    #                                                                        |
-    #                                                    InAttacking == True |
-    #                                                                        |
-    #                                                                     攻击[阶段]
+class PolicyMaker_Auction(PolicyMaker):
 
     def __init__(self, name, env, world, agent_index, arglist):
         super(PolicyMaker_Auction, self).__init__(name, env, world, agent_index, arglist)
@@ -48,7 +40,7 @@ class PolicyMaker_Auction(PolicyMaker):
         self.mission_success = 0
         self.over = 0
 
-        #高斯分布时sigma = self.proportion * mu
+        # 高斯分布时sigma = self.proportion * mu
         self.proportion = 1
 
         self.random_value = 0
@@ -121,33 +113,6 @@ class PolicyMaker_Auction(PolicyMaker):
                     elif gtype == 2:
                         seen_target[-1][-4:-1] = [10, 1, 2]
 
-
-                            # seen_target = []
-        # for target in WorldTarget:
-        #     targetpos = np.array(target[0:2])
-        #     if point_in_rec(selfview1, selfview2, selfview3, selfview4, targetpos):
-        #         seen_target.append(target)
-        #         truetype = target[-2]
-        #         if truetype == 1:
-        #             gtype = np.random.choice([1, 2, 3], 1, p=self.arglist.p1)
-        #             if gtype == 2:
-        #                 seen_target[-1][-4:-1] = [10, 1, 2]
-        #             elif gtype == 3:
-        #                 seen_target[-1][-4:-1] = [5, 2, 3]
-        #         elif truetype == 2:
-        #             gtype = np.random.choice([1, 2, 3], 1, p=self.arglist.p2)
-        #             if gtype == 3:
-        #                 seen_target[-1][-4:-1] = [5, 2, 3]
-        #             elif gtype == 1:
-        #                 seen_target[-1][-4:-1] = [2, 5, 1]
-        #         elif truetype == 3:
-        #             gtype = np.random.choice([1, 2, 3], 1, p=self.arglist.p3)
-        #             if gtype == 1:
-        #                 seen_target[-1][-4:-1] = [2, 5, 1]
-        #             elif gtype == 2:
-        #                 seen_target[-1][-4:-1] = [10, 1, 2]
-                # 在seen_target中，真序号是准确的（唯一标识），类型可能有误（相应的价值和防御能力都有误）
-
         # 更新自身任务矩阵
         for i in range(len(seen_target)):
             if not self.self_task[seen_target[i][-1]]:
@@ -165,7 +130,7 @@ class PolicyMaker_Auction(PolicyMaker):
                 if len(NewController[self.close_area[num]][0].targetbid[index_tar]) != 0:
                     if self.targetbid[index_tar]:
                         if NewController[self.close_area[num]][0].targetbid[index_tar][0]:
-                           if NewController[self.close_area[num]][0].targetbid[index_tar][0] <= self.targetbid[index_tar][0]:
+                            if NewController[self.close_area[num]][0].targetbid[index_tar][0] <= self.targetbid[index_tar][0]:
                                 for i in range(len(NewController[self.close_area[num]][0].targetbid[index_tar])):
                                     list1.append(NewController[self.close_area[num]][0].targetbid[index_tar][i])
                                 list1.extend(self.targetbid[index_tar])
@@ -210,12 +175,6 @@ class PolicyMaker_Auction(PolicyMaker):
                                         self.targetbid[index_tar].append([0,0,0])
                                 if not self.self_task[index_tar]:
                                     self.self_task[index_tar].append(0)
-                                # with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
-                                #     f.write(str(index_tar)+str('list3>>>>>>>>>>>>>>>>>>>>>') + '\n'+str(list3) + '\n'+
-                                #             str('list2>>>>>>>>>>>>>>>>>>>>>') +str(list2) + '\n'+
-                                #             str('list1>>>>>>>>>>>>>>>>>>>>>') + str(list1) + '\n' +
-                                #             str('other>>>>>>>>>>>>>>>>>>>>>') + str(NewController[self.close_area[num]][0].targetbid[index_tar]) + '\n' +
-                                #             str(self.close_area[num]) + 'targetbid>>>>>>>>>>>>>>>>>>>>>' + str(self.targetbid) + '\n')
                            else:
                                for i in range(len(NewController[self.close_area[num]][0].targetbid[index_tar])):
                                    list1.append(NewController[self.close_area[num]][0].targetbid[index_tar][i])
@@ -267,9 +226,6 @@ class PolicyMaker_Auction(PolicyMaker):
                             self.self_task[index_tar].append(0)
 
         #将targetbid中的所有相同编号的变成一个
-        # with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
-        #     f.write('>>>>>>>>>>>>>>>>>>' + '\n' +
-        #             str(self.targetbid) + '\n')
         list5 = []
         for i in range(len(self.targetbid)):
             for j in range(len(self.targetbid[i])):
@@ -306,21 +262,6 @@ class PolicyMaker_Auction(PolicyMaker):
                 list4.remove(unit_list3)
 
 
-            # for ii in range(len(list4)):
-            #     if unit_list3[0] == list4[ii][0] and unit_list3[0] != 0 and unit_list3[1] != list4[ii][1]:
-            #         if unit_list3[-3] < list4[ii][-3]:
-            #             aa = unit_list3[-2]
-            #             self.targetbid[aa].remove(unit_list3[0:-2])
-            #             self.targetbid[aa].append([0, 0, 0])
-            #         elif unit_list3[-3] > list4[ii][-3]:
-            #              aa = list4[ii][-2]
-            #              self.targetbid[aa].remove(list4[0:-2])
-            #              self.targetbid[aa].append([0, 0, 0])
-        # with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
-        #     f.write('>>>>>>>>>>>>>>>>>>' + '\n' +
-        #             str(self.targetbid) + '\n' + str(list5) + '\n' + str(list4) + '\n')
-
-
     def bidding(self, obs, WorldTarget):
 
         # Pr = U - C (Pr为最终出价, U为收益, C为成本)
@@ -330,14 +271,6 @@ class PolicyMaker_Auction(PolicyMaker):
         e1 = 0.5      # 我方小飞机优势系数
         e2 = 0.5      # 敌方目标战术价值系数  e1 + e2 = 1 (0 <= e1, e2 <= 1)
         pt = 0.8      # 小飞机单发杀伤概率
-
-        #已发现目标的战术价值
-        # W = []
-        # for num in range(len(self.self_task)):
-        #     if self.self_task[num]:
-        #         W.append(WorldTarget[num][-4])
-        #     else:
-        #         W.append(0)
 
         # 已发现目标的战术价值并使用了高斯分布求均值
         # mu 为p(真实） sigma为self.proportion * mu
@@ -424,7 +357,6 @@ class PolicyMaker_Auction(PolicyMaker):
                     self.add_new_target(obs_n[self.index], WorldTarget, NewController)
                     self.opt_index = 0
 
-                #elif ((step % 2) == 0 and self.mission_success == 0) or ((step % 2) == 1 and max(self.self_task) == [0] and self.mission_success == 0):
                 elif step % 10 == 0:
                     if max(self.self_task) == [0]:
                         self.opt_index = 0
@@ -457,11 +389,6 @@ class PolicyMaker_Auction(PolicyMaker):
                                     signal = index_kkk
                             if signal == 666 and self.self_task[self.self_bid[i][0]] == 1:
                                 print("9999999999")
-                            # with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
-                            #     f.write('kkk:' + str(kkk) + '\n'
-                            #             'index:' + str(self.index) + '\n'
-                            #             'self.task:' + str(self.self_task) + '\n'
-                            #             + str(i) + 'self_bid' + str(self.self_bid))
 
                             if not kkk and self.self_bid[i][1]>0:
                                 a = self.self_bid[i]
@@ -511,11 +438,6 @@ class PolicyMaker_Auction(PolicyMaker):
                                                 self.self_task[self.self_bid[i][0]][0] = 1
                                                 temporary = list_temporary[cycle]
                                                 self.memory_friendID[self.self_bid[i][0]].append(temporary)
-                                                # with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
-                                                #     f.write('bid_one:' + str(self.targetbid_last_time[self.self_bid[i][0]]) + '\n' +
-                                                #         'list_temporary' + str(list_temporary) + '\n' +
-                                                #         str(self.memory_friendID) + '\n'+
-                                                #             '牛逼牛牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼' + '\n')
                                                 break
                                             self.self_task[self.self_bid[i][0]][0] = 0
                                     else:
@@ -523,11 +445,6 @@ class PolicyMaker_Auction(PolicyMaker):
                                             if self.self_task[j]:
                                                 self.self_task[j][0] = 0
                                         self.self_task[self.self_bid[i][0]][0] = 1
-                                        # with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
-                                            # f.write('bid_one:' + str(self.targetbid_last_time[self.self_bid[i][0]]) + '\n' +
-                                            #             'list_temporary' + str(list_temporary) + '\n' +
-                                            #         str(self.memory_friendID) + '\n'+
-                                            #     '牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼牛逼' + '\n')
 
                                     break
 
@@ -539,8 +456,6 @@ class PolicyMaker_Auction(PolicyMaker):
                                         if self.self_task[j]:
                                             self.self_task[j][0] = 0
                                     self.self_task[self.self_bid[i][0]][0] = 1
-                                    # with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
-                                    #     f.write(str(self.self_bid[i][0]) + str('更新区域') +str(signal+1) + '\n')
                                     break
                                 else:
                                     if self.self_task[self.self_bid[i][0]]:
@@ -566,16 +481,5 @@ class PolicyMaker_Auction(PolicyMaker):
 
                     if self.opt_index == 10 and max(self.self_task) == [0]:
                         self.opt_index = 1
-
-                    # print(self_bid)
-        #             with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
-        #                 f.write(str(self.step_now) + '\n' + str(self.self_bid) + '\n')
-        #         # print(self.index)
-        #         # print(self.self_task)
-        #         # print(self.targetbid)
-        # with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
-        #     f.write(str(step) + '\n' + str(self.index) + '\n' + str(self.self_task) + '\n'
-        #             + str(self.targetbid) + '\n' + str(self.self_bid) + '\n'
-        #             + str(self.close_area) + '\n')
 
         return [self.opt_index, [self.x, self.y, self.result, self.mission_success]]
