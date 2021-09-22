@@ -168,7 +168,7 @@ class PolicyMaker_Probability(PolicyMaker):
         e1 = 0.5      # 我方小飞机优势系数
         e2 = 0.5      # 敌方目标战术价值系数  e1 + e2 = 1 (0 <= e1, e2 <= 1)
         pt = 0.8      # 小飞机单发杀伤概率
-        W = target[4]    # 目标的战术价值
+        W = target[2]    # 目标的战术价值
         sigma1 = 0.5  # 距离优势系数
         sigma2 = 0.5  # 角度优势系数
         D = 0.6       # 小飞机能够攻击目标的最大距离
@@ -179,10 +179,10 @@ class PolicyMaker_Probability(PolicyMaker):
         pt_ = 0.6     # 目标的单发杀伤概率
 
         # 计算中间变量
-        delta_lla = np.array(target[2:4]) - np.array(obs[2:4])
-        dis = math.sqrt(0.01*delta_lla[0]**2 + 0.01*delta_lla[1]**2)
-        v_dir = obs[3]
-        t_dir = math.atan2(delta_lla[1], delta_lla[0])
+        delta_pos = np.array(target[0:2]) - np.array(obs[2:4])
+        dis = math.sqrt(delta_pos[0]**2 + delta_pos[1]**2)
+        v_dir = math.atan2(obs[1], obs[0])
+        t_dir = math.atan2(delta_pos[1], delta_pos[0])
         angle = abs(v_dir - t_dir)
         Fd = math.exp(1 - dis / D)
         Fq = math.exp(1 - angle/math.pi)
