@@ -4,9 +4,7 @@
 from MAControl.Base.PolicyMaker import PolicyMaker
 import numpy as np
 from MAControl.Util.PointInRec import point_in_rec
-from MAControl.Util.Constrain import constrain
 import math
-import os
 import random
 
 
@@ -44,7 +42,7 @@ class PolicyMaker_Auction(PolicyMaker):
         self.targetbid = [[] for t in range(len(world.targets))]
         self.self_bid = []
 
-    def find_mate_communication(self, obs_n, r=0.5):
+    def find_mate(self, obs_n, r=0.5):
         selfpos = np.array(obs_n[self.index][2:4])
         close_area = []
         for i in range(len(obs_n)):
@@ -107,7 +105,9 @@ class PolicyMaker_Auction(PolicyMaker):
         # 更新自身任务矩阵
         for i in range(len(seen_target)):
             if not self.self_target[seen_target[i][-1]]:
+                # noinspection PyTypeChecker
                 self.self_target[seen_target[i][-1]].append(0)
+                # noinspection PyTypeChecker
                 self.targetbid[seen_target[i][-1]].append(self.step_now)
                 for nn in range(int(seen_target[i][3])+int(seen_target[i][4])):
                     self.targetbid[seen_target[i][-1]].append([0, 0, 0])
@@ -309,11 +309,12 @@ class PolicyMaker_Auction(PolicyMaker):
 
         if self.over == 0:
 
-            dis = np.sqrt((WorldTarget[self.self_target.index(max(self.self_target))][0] - obs_n[self.index][2])**2
-                          + (WorldTarget[self.self_target.index(max(self.self_target))][1] - obs_n[self.index][3])**2)
+            delta_pos = WorldTarget[self.self_target.index(max(self.self_target))][0:2] - obs_n[self.index][2:4]
+            dis = math.sqrt(delta_pos[0] ** 2 + delta_pos[1] ** 2)
 
             if dis <= 0.1 and max(self.self_target) == [1]:
                 self.mission_success = 1
+
             if self.mission_success and self.opt_index == 10:
                 kkkkk = []
                 a = self.self_target.index(max(self.self_target))
@@ -328,87 +329,95 @@ class PolicyMaker_Auction(PolicyMaker):
                 self.step_now = step
 
                 if step < self.Step0:
-                    self.close_area = self.find_mate_communication(obs_n).copy()
+                    self.close_area = self.find_mate(obs_n).copy()
                     self.add_new_target(obs_n[self.index], WorldTarget, NewController)
                     self.opt_index = 0
 
                 elif step % 10 == 0:
                     if max(self.self_target) == [0]:
                         self.opt_index = 0
+                    self.self_bid = self.bidding(obs_n[self.index], WorldTarget)  # 在此赋值
 
-                    self.self_bid = self.bidding(obs_n[self.index], WorldTarget)
                 else:
                     if max(self.self_target) == [0]:
                         self.opt_index = 0
-                    self.close_area = self.find_mate_communication(obs_n).copy()
+                    self.close_area = self.find_mate(obs_n).copy()
                     self.add_new_target(obs_n[self.index], WorldTarget, NewController)
-                    with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
-                        f.write(str(self.targetbid) + '\n')
-                    for i in range(len(self.self_bid)):
+                    for i in range(len(self.self_bid)):  # 长度是len(WorldTarget)
                         # 比较self出价与竞标价格
                         if self.targetbid[self.self_bid[i][0]]:
                             kkk = self.targetbid[self.self_bid[i][0]].copy()
                             kkk_mirror = []
-                            for index_mirror in range(len(kkk)):
-                                kkk_mirror.append(kkk[index_mirror])
-                            for index_t in range(len(kkk_mirror)-1):
-                                if kkk_mirror[index_t+1][1] == 0:
-                                    kkk.remove(kkk_mirror[index_t+1])
+                            for unit in range(len(kkk)):
+                                kkk_mirror.append(kkk[unit])
+                            for vnit in range(len(kkk_mirror)-1):
+                                if kkk_mirror[vnit+1][1] == 0:
+                                    kkk.remove(kkk_mirror[vnit+1])
                             kkk.remove(self.targetbid[self.self_bid[i][0]][0])
 
                             # 查看self.targetbid中的index_tar是否已经有self.index
                             signal = 666
                             # 本个体是否已经在targetbid中，若不在，则signal=666
-                            for index_kkk in range(len(kkk)):
-                                if kkk[index_kkk][0] == self.index:
-                                    signal = index_kkk
+                            for unit in range(len(kkk)):
+                                if kkk[unit][0] == self.index:
+                                    signal = unit
 
-                            if not kkk and self.self_bid[i][1]>0:
+                            if not kkk and self.self_bid[i][1] > 0:
                                 a = self.self_bid[i]
                                 self.targetbid[self.self_bid[i][0]][1] = [self.index, a[1], self.step_now]
                                 for j in range(len(self.self_target)):
                                     if self.self_target[j]:
                                         self.self_target[j][0] = 0
-                                self.self_target[self.self_bid[i][0]][0] = 1
+                                # noinspection PyTypeChecker
+                                self.self_target[a[0]][0] = 1
                                 break
+
                             elif kkk:
-                                if kkk[kkk.index(min(kkk, key=lambda kkk: kkk[1]))][1] < self.self_bid[i][1] and signal == 666:
-                                    with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
-                                        f.write(str(min(kkk, key=lambda kkk: kkk[1])) + str('------') +str(self.self_bid[i][1]) + '\n')
+                                min1_kkk = min(kkk, key=lambda x: x[1])
+                                if kkk[kkk.index(min1_kkk)][1] < self.self_bid[i][1] and signal == 666:
                                     a = self.self_bid[i]
-                                    self.targetbid[self.self_bid[i][0]][kkk.index(min(kkk, key=lambda kkk: kkk[1])) + 1] = [self.index, a[1],
-                                                                                                    self.step_now]
+                                    self.targetbid[a[0]][kkk.index(min1_kkk) + 1] = [self.index, a[1], self.step_now]
                                     for j in range(len(self.self_target)):
                                         if self.self_target[j]:
                                             self.self_target[j][0] = 0
-                                    self.self_target[self.self_bid[i][0]][0] = 1
+                                    # noinspection PyTypeChecker
+                                    self.self_target[a[0]][0] = 1
                                     break
+
                                 elif signal != 666:
                                     a = self.self_bid[i]
-                                    self.targetbid[self.self_bid[i][0]][signal+1] = [self.index, a[1], self.step_now]
+                                    self.targetbid[a[0]][signal+1] = [self.index, a[1], self.step_now]
                                     for j in range(len(self.self_target)):
                                         if self.self_target[j]:
                                             self.self_target[j][0] = 0
-                                    self.self_target[self.self_bid[i][0]][0] = 1
-                                    with open(os.path.dirname(__file__) + '/check.txt', 'a') as f:
-                                        f.write(str(self.self_bid[i][0]) + str('更新区域') +str(signal+1) + '\n')
+                                    # noinspection PyTypeChecker
+                                    self.self_target[a[0]][0] = 1
                                     break
+
                                 else:
                                     if self.self_target[self.self_bid[i][0]]:
+                                        # noinspection PyTypeChecker
                                         self.self_target[self.self_bid[i][0]][0] = 0
                                     else:
+                                        # noinspection PyTypeChecker
                                         self.self_target[self.self_bid[i][0]].append(0)
 
                             else:
                                 if self.self_target[self.self_bid[i][0]]:
+                                    # noinspection PyTypeChecker
                                     self.self_target[self.self_bid[i][0]][0] = 0
                                 else:
+                                    # noinspection PyTypeChecker
                                     self.self_target[self.self_bid[i][0]].append(0)
+
+                        else:
+                            pass
+
                     self.InAttacking = True
                     if max(self.self_target) == [1]:
-                        self.x = WorldTarget[self.self_target.index(max(self.self_target))][0]
-                        self.y = WorldTarget[self.self_target.index(max(self.self_target))][1]
-                        self.result = WorldTarget[self.self_target.index(max(self.self_target))][7]
+                        self.x = WorldTarget[self.self_target.index([1])][0]
+                        self.y = WorldTarget[self.self_target.index([1])][1]
+                        self.result = WorldTarget[self.self_target.index([1])][7]
                         self.opt_index = 10
 
                     else:
