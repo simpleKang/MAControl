@@ -92,16 +92,17 @@ class PolicyMaker_Probability(PolicyMaker):
 
         # 更新自身任务矩阵【需要结合 make_policy 里的上下文协同理解】
         for i in range(len(seen_target)):
-            if not self.self_target[seen_target[i][-1]]:
+            si = seen_target[i][-1]
+            if not self.self_target[si]:
                 # noinspection PyTypeChecker
-                self.self_target[seen_target[i][-1]].append(0)  # 在空的情况下，首先填个0
+                self.self_target[si].append(0)  # 在空的情况下，首先填个0
                 # noinspection PyTypeChecker
-                self.targetbid[seen_target[i][-1]].append(self.step_now)
+                self.targetbid[si].append(self.step_now)
                 for nn in range(int(seen_target[i][3])+int(seen_target[i][4])):
-                    self.targetbid[seen_target[i][-1]].append([0, 0, 0])
+                    self.targetbid[si].append([0, 0, 0])  # 在空的情况下，填进 step_now 然后 [0,0,0]
 
         for num in range(len(self.close_area)):
-            for index_tar in range(len(WorldTarget)):
+            for index_tar in range(len(WorldTarget)):  # 双循环 for mate & for tar
                 list1 = list()
                 ggg = NewController[self.close_area[num]][0].targetbid[index_tar]
                 gg = len(ggg)  # possibly da+db+1
@@ -300,8 +301,8 @@ class PolicyMaker_Probability(PolicyMaker):
             delta_pos = WorldTarget[self.self_target.index(max(self.self_target))][0:2] - obs_n[self.index][2:4]
             dis = math.sqrt(delta_pos[0] ** 2 + delta_pos[1] ** 2)
 
-            if dis <= 0.1 and max(self.self_target) == [1]:
-                self.assigned = 1   # 双条件 ·离近咯 ·[1] in self.self_target
+            self.assigned = 1 if dis <= 0.1 and max(self.self_target) == [1] else self.assigned
+            # 双条件 ·离近咯 ·[1] in self.self_target
 
             if self.assigned and self.opt_index == 10:  # 上面的双条件，还有个10型opt
                 kkkkk = [[] for tar in range(len(WorldTarget))]
@@ -320,26 +321,24 @@ class PolicyMaker_Probability(PolicyMaker):
                     self.opt_index = 0
 
                 elif step % 10 == 0:
-                    if max(self.self_target) == [0]:
-                        self.opt_index = 0
+                    self.opt_index = 0 if max(self.self_target) == [0] else self.opt_index
                     self.self_bid = self.bidding(obs_n[self.index], WorldTarget)  # 在此赋值
 
-                else:
-                    if max(self.self_target) == [0]:
-                        self.opt_index = 0
+                else:  # step>=Step0 且不是10的倍数
+                    self.opt_index = 0 if max(self.self_target) == [0] else self.opt_index
                     self.close_area = self.find_mate(obs_n).copy()
                     self.add_new_target(obs_n[self.index], WorldTarget, NewController)
+
                     for i in range(len(self.self_bid)):  # 长度是len(WorldTarget)
+                        a = self.self_bid[i]
                         # 比较self出价与竞标价格
-                        if self.targetbid[self.self_bid[i][0]]:
-                            kkk = self.targetbid[self.self_bid[i][0]].copy()
-                            kkk_mirror = []
-                            for unit in range(len(kkk)):
-                                kkk_mirror.append(kkk[unit])
+                        if self.targetbid[a[0]]:  # 按照顺序一个一个看下来(如果非空)
+                            kkk = self.targetbid[a[0]].copy()
+                            kkk_mirror = [kkk[unit] for unit in range(len(kkk))]
                             for vnit in range(len(kkk_mirror)-1):
-                                if kkk_mirror[vnit+1][1] == 0:
+                                if kkk_mirror[vnit+1][1] == 0:  # 在那个三元组里的中间如果是0，就整个扔掉
                                     kkk.remove(kkk_mirror[vnit+1])
-                            kkk.remove(self.targetbid[self.self_bid[i][0]][0])
+                            kkk.remove(self.targetbid[a[0]][0])  # remove time
 
                             # 查看self.targetbid中的index_tar是否已经有self.index
                             signal = 666
@@ -348,9 +347,8 @@ class PolicyMaker_Probability(PolicyMaker):
                                 if kkk[unit][0] == self.index:
                                     signal = unit
 
-                            if not kkk and self.self_bid[i][1] > 0:
-                                a = self.self_bid[i]
-                                self.targetbid[self.self_bid[i][0]][1] = [self.index, a[1], self.step_now]
+                            if not kkk and a[1] > 0:  # 双条件，kkk==[] 且 bid值是有的
+                                self.targetbid[a[0]][1] = [self.index, a[1], self.step_now]
                                 for j in range(len(self.self_target)):
                                     if self.self_target[j]:
                                         self.self_target[j][0] = 0
@@ -358,10 +356,10 @@ class PolicyMaker_Probability(PolicyMaker):
                                 self.self_target[a[0]][0] = 1
                                 break
 
-                            elif kkk:
+                            elif kkk:  # 左条件被破坏了
                                 min1_kkk = min(kkk, key=lambda x: x[1])
-                                if kkk[kkk.index(min1_kkk)][1] < self.self_bid[i][1] and signal == 666:
-                                    a = self.self_bid[i]
+                                # 内圈：双条件，self里边的大，且，signal是666
+                                if kkk[kkk.index(min1_kkk)][1] < a[1] and signal == 666:
                                     self.targetbid[a[0]][kkk.index(min1_kkk) + 1] = [self.index, a[1], self.step_now]
                                     for j in range(len(self.self_target)):
                                         if self.self_target[j]:
@@ -370,8 +368,7 @@ class PolicyMaker_Probability(PolicyMaker):
                                     self.self_target[a[0]][0] = 1
                                     break
 
-                                elif signal != 666:
-                                    a = self.self_bid[i]
+                                elif signal != 666:  # 内圈：右条件破坏了
                                     self.targetbid[a[0]][signal+1] = [self.index, a[1], self.step_now]
                                     for j in range(len(self.self_target)):
                                         if self.self_target[j]:
@@ -380,37 +377,35 @@ class PolicyMaker_Probability(PolicyMaker):
                                     self.self_target[a[0]][0] = 1
                                     break
 
-                                else:
-                                    if self.self_target[self.self_bid[i][0]]:
+                                else:  # 内圈：signal是666，但是self里边的小于等于另一边
+                                    if self.self_target[a[0]]:
                                         # noinspection PyTypeChecker
-                                        self.self_target[self.self_bid[i][0]][0] = 0
+                                        self.self_target[a[0]][0] = 0
                                     else:
                                         # noinspection PyTypeChecker
-                                        self.self_target[self.self_bid[i][0]].append(0)
+                                        self.self_target[a[0]].append(0)
 
-                            else:
-                                if self.self_target[self.self_bid[i][0]]:
+                            else:  # kkk==[] 但是bid值是没有的
+                                if self.self_target[a[0]]:
                                     # noinspection PyTypeChecker
-                                    self.self_target[self.self_bid[i][0]][0] = 0
+                                    self.self_target[a[0]][0] = 0
                                 else:
                                     # noinspection PyTypeChecker
-                                    self.self_target[self.self_bid[i][0]].append(0)
+                                    self.self_target[a[0]].append(0)
 
                         else:
                             pass
 
-                    self.InAttacking = True
                     if max(self.self_target) == [1]:
                         self.x = WorldTarget[self.self_target.index([1])][0]
                         self.y = WorldTarget[self.self_target.index([1])][1]
                         self.result = WorldTarget[self.self_target.index([1])][7]
                         self.opt_index = 10
-
+                        self.InAttacking = True
                     else:
                         self.InAttacking = False
 
-                    if self.opt_index == 10 and max(self.self_target) == [0]:
-                        self.opt_index = 1
+                    self.opt_index = 1 if self.opt_index == 10 and max(self.self_target) == [0] else self.opt_index
 
         else:
             pass
