@@ -8,35 +8,23 @@ import math
 import random
 
 
-class PolicyMaker_Auction(PolicyMaker):
+class PolicyMaker_Probability(PolicyMaker):
 
     def __init__(self, name, env, world, agent_index, arglist):
-        super(PolicyMaker_Auction, self).__init__(name, env, world, agent_index, arglist)
+        super(PolicyMaker_Probability, self).__init__(name, env, world, agent_index, arglist)
         self.opt_index = 0
         self.x = 0
         self.y = 0
         self.InAttacking = False
-        self.result = -1
-        self.step_now = 0
-
-        # 以下为一些阶段的初始设定步数
-        # >> 未来步数点可修改，从而可以主动停留在某一阶段/步
-        # >> 进入攻击阶段之后就跳出这部分逻辑而无所谓这些数值
-        # >> 进入重置步的时候将所有步数点推到未来避免进入 >Step5 的无定义情况
-        self.Step0 = 500
-        self.Step1 = 501
-        self.Step2 = 502
-        self.Step3 = 520
-        self.Step4 = 521
-        self.Step5 = 522
-
-        self.swarm_size = 0
+        self.result = []  # 缺省 or 一整条目标信息
+        self.attack_type = '0'
+        self.attack_time = 0
         self.close_area = []
-        self.task_sum = 1
-        self.mission_success = 0
+        self.assigned = 0  # 是/否决定了去向
+        
+        self.step_now = 0
+        self.Step0 = 500  # 决策起始点
         self.over = 0
-
-        self.random_value = 0
 
         self.self_target = [[] for t in range(len(world.targets))]
         self.targetbid = [[] for t in range(len(world.targets))]
@@ -102,11 +90,11 @@ class PolicyMaker_Auction(PolicyMaker):
                         seen_target[-1][-5:-1] = [3, 4, 0, 2]
                 # 在 seen_target 中，真序号是准确的（唯一标识），类型可能有误（相应的价值和防御能力都有误）
 
-        # 更新自身任务矩阵
+        # 更新自身任务矩阵【需要结合 make_policy 里的上下文协同理解】
         for i in range(len(seen_target)):
             if not self.self_target[seen_target[i][-1]]:
                 # noinspection PyTypeChecker
-                self.self_target[seen_target[i][-1]].append(0)
+                self.self_target[seen_target[i][-1]].append(0)  # 在空的情况下，首先填个0
                 # noinspection PyTypeChecker
                 self.targetbid[seen_target[i][-1]].append(self.step_now)
                 for nn in range(int(seen_target[i][3])+int(seen_target[i][4])):
@@ -256,7 +244,7 @@ class PolicyMaker_Auction(PolicyMaker):
         pt = 0.8      # 小飞机单发杀伤概率
 
         W = []
-        for num in range(len(self.self_target)):  # 这肯定就是WorldTarget 即使有的项是[]
+        for num in range(len(self.self_target)):  # 这肯定就是len(WorldTarget) 即使有的项是[]
             if self.self_target[num]:
                 W.append(WorldTarget[num][2])
             else:
@@ -313,16 +301,14 @@ class PolicyMaker_Auction(PolicyMaker):
             dis = math.sqrt(delta_pos[0] ** 2 + delta_pos[1] ** 2)
 
             if dis <= 0.1 and max(self.self_target) == [1]:
-                self.mission_success = 1
+                self.assigned = 1   # 双条件 ·离近咯 ·[1] in self.self_target
 
-            if self.mission_success and self.opt_index == 10:
-                kkkkk = []
-                a = self.self_target.index(max(self.self_target))
-                for tar in range(len(WorldTarget)):
-                    kkkkk.append([])
+            if self.assigned and self.opt_index == 10:  # 上面的双条件，还有个10型opt
+                kkkkk = [[] for tar in range(len(WorldTarget))]
+                a = self.self_target.index([1])
                 kkkkk[a].append(10000000)
                 kkkkk[a].append([self.index, random.randint(100000000, 1000000000000), 1000000])
-                self.targetbid = kkkkk.copy()
+                self.targetbid = kkkkk.copy()  # 只有·a这里是上述取值 ·其他地方是[]
                 self.over = 1
 
             else:
@@ -426,4 +412,7 @@ class PolicyMaker_Auction(PolicyMaker):
                     if self.opt_index == 10 and max(self.self_target) == [0]:
                         self.opt_index = 1
 
-        return [self.opt_index, [self.x, self.y, self.result, self.mission_success]]
+        else:
+            pass
+
+        return [self.opt_index, [self.x, self.y, self.result, self.assigned]]
