@@ -16,11 +16,12 @@ class PolicyMaker_Probability(PolicyMaker):
         self.x = 0
         self.y = 0
         self.InAttacking = False
-        self.result = []  # 缺省 or 一整条目标信息
+        self.result = []  # 缺省 or 目标序号
         self.attack_type = '0'
         self.attack_time = 0
         self.close_area = []
-        self.assigned = 0  # 是/否决定了去向
+        self.assigned = 0  # 是/否决定了去向且已抵达
+        self.print = False
         
         self.step_now = 0
         self.Step0 = 500  # 决策起始点
@@ -306,11 +307,15 @@ class PolicyMaker_Probability(PolicyMaker):
 
             if self.assigned and self.opt_index == 10:  # 上面的双条件，还有个10型opt
                 kkkkk = [[] for tar in range(len(WorldTarget))]
-                a = self.self_target.index([1])
-                kkkkk[a].append(10000000)
-                kkkkk[a].append([self.index, random.randint(100000000, 1000000000000), 1000000])
-                self.targetbid = kkkkk.copy()  # 只有·a这里是上述取值 ·其他地方是[]
+                aa = self.self_target.index([1])
+                kkkkk[aa].append(10000000)
+                kkkkk[aa].append([self.index, random.randint(100000000, 1000000000000), 1000000])
+                self.targetbid = kkkkk.copy()  # 只有·aa这里是上述取值 ·其他地方是[]
                 self.over = 1
+                if not self.print:
+                    print('Step ', self.attack_time, 'UAV', self.index, 'to attack',
+                          'target', self.result, self.attack_type, '-type')
+                    self.print = True
 
             else:
                 self.step_now = step
@@ -330,7 +335,7 @@ class PolicyMaker_Probability(PolicyMaker):
                     self.add_new_target(obs_n[self.index], WorldTarget, NewController)
 
                     for i in range(len(self.self_bid)):  # 长度是len(WorldTarget)
-                        a = self.self_bid[i]
+                        a = self.self_bid[i]   # 是根据·bid降序排列的·index
                         # 比较self出价与竞标价格
                         if self.targetbid[a[0]]:  # 按照顺序一个一个看下来(如果非空)
                             kkk = self.targetbid[a[0]].copy()
@@ -348,7 +353,7 @@ class PolicyMaker_Probability(PolicyMaker):
                                     signal = unit
 
                             if not kkk and a[1] > 0:  # 双条件，kkk==[] 且 bid值是有的
-                                self.targetbid[a[0]][1] = [self.index, a[1], self.step_now]
+                                self.targetbid[a[0]][1] = [self.index, a[1], self.step_now]  # # 把a[1]给[a[0]][1]
                                 for j in range(len(self.self_target)):
                                     if self.self_target[j]:
                                         self.self_target[j][0] = 0
@@ -359,8 +364,8 @@ class PolicyMaker_Probability(PolicyMaker):
                             elif kkk:  # 左条件被破坏了
                                 min1_kkk = min(kkk, key=lambda x: x[1])
                                 # 内圈：双条件，self里边的大，且，signal是666
-                                if kkk[kkk.index(min1_kkk)][1] < a[1] and signal == 666:
-                                    self.targetbid[a[0]][kkk.index(min1_kkk) + 1] = [self.index, a[1], self.step_now]
+                                if min1_kkk[1] < a[1] and signal == 666:  # # 把a[1]给[a[0]][kkk.index(min1_kkk)+1]
+                                    self.targetbid[a[0]][kkk.index(min1_kkk)+1] = [self.index, a[1], self.step_now]
                                     for j in range(len(self.self_target)):
                                         if self.self_target[j]:
                                             self.self_target[j][0] = 0
@@ -368,7 +373,7 @@ class PolicyMaker_Probability(PolicyMaker):
                                     self.self_target[a[0]][0] = 1
                                     break
 
-                                elif signal != 666:  # 内圈：右条件破坏了
+                                elif signal != 666:  # 内圈：右条件破坏了 # # 把a[1]给[a[0]][signal+1]
                                     self.targetbid[a[0]][signal+1] = [self.index, a[1], self.step_now]
                                     for j in range(len(self.self_target)):
                                         if self.self_target[j]:
@@ -399,8 +404,10 @@ class PolicyMaker_Probability(PolicyMaker):
                     if max(self.self_target) == [1]:
                         self.x = WorldTarget[self.self_target.index([1])][0]
                         self.y = WorldTarget[self.self_target.index([1])][1]
-                        self.result = WorldTarget[self.self_target.index([1])][7]
+                        self.result = WorldTarget[self.self_target.index([1])][-1]
                         self.opt_index = 10
+                        self.attack_type = 'A' if 1 == 1 else 'B'  # TODO
+                        self.attack_time = step
                         self.InAttacking = True
                     else:
                         self.InAttacking = False
@@ -410,4 +417,4 @@ class PolicyMaker_Probability(PolicyMaker):
         else:
             pass
 
-        return [self.opt_index, [self.x, self.y, self.result, self.assigned]]
+        return self.opt_index, [self.x, self.y, self.result, self.assigned, self.attack_type, self.attack_time]
