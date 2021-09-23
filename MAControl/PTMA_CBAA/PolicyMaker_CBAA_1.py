@@ -105,9 +105,9 @@ class PolicyMaker_Probability(PolicyMaker):
         for num in range(len(self.close_area)):
             for index_tar in range(len(WorldTarget)):  # 双循环 for mate & for tar
                 ggg = NewController[self.close_area[num]][0].targetbid[index_tar]
+                sgg = self.targetbid[index_tar]
                 # 如果友方个体目标参数处的出价不为空
                 if ggg:
-                    sgg = self.targetbid[index_tar]
                     if sgg:
                         if ggg[0]:
                             list1 = [ggg[i] for i in range(len(ggg))]
@@ -179,28 +179,21 @@ class PolicyMaker_Probability(PolicyMaker):
                 list5.append(a)
 
         list4 = []
-        for unit_list5 in list5:
-            signal = 0
-            if not list4:
-                list4.append(unit_list5)
-            for unit_list4 in list4:
-                if unit_list5[0] == unit_list4[0] and unit_list5[2] != unit_list4[2] \
-                        and len(unit_list4) == 5 and len(unit_list5) == 5:  # 5? 怎么出来的5?
-                    if unit_list5[2] > unit_list4[2]:
-                        aa = unit_list4[-2]  # type
-                        self.targetbid[aa].remove(unit_list4[0:3])
+        for unit5 in list5:
+            list4.append(unit5)
+            for unit4 in list4:  # [0]=bid_i_j, [1]=i, [2]=[j]
+                if unit5[0] == unit4[0] and unit5[2] != unit4[2] and len(unit4) == len(unit5) == 5:
+                    if unit5[2] > unit4[2]:
+                        aa = unit4[-2]  # i
+                        self.targetbid[aa].remove(unit4[0:3])
                         self.targetbid[aa].append([0, 0, 0])
-                        signal = 1
-                        list4.remove(unit_list4)
+                        list4.remove(unit4)
                     else:
-                        aa = unit_list5[-2]
-                        self.targetbid[aa].remove(unit_list5[0:3])
+                        aa = unit5[-2]
+                        self.targetbid[aa].remove(unit5[0:3])
                         self.targetbid[aa].append([0, 0, 0])
-                        signal = 2
-                    break
-            list4.append(unit_list5)
-            if signal == 2:
-                list4.remove(unit_list5)
+                        list4.remove(unit5)
+                    break  # break from for-loop
 
     def bidding(self, obs, WorldTarget):
 
