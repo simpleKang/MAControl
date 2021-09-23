@@ -16,7 +16,7 @@ class PolicyMaker_Probability(PolicyMaker):
         self.x = 0
         self.y = 0
         self.InAttacking = False
-        self.result = []  # 缺省 or 目标序号
+        self.result = []  # 缺省 or 一整条目标信息
         self.attack_type = '0'
         self.attack_time = 0
         self.close_area = []
@@ -274,7 +274,7 @@ class PolicyMaker_Probability(PolicyMaker):
                 self.over = 1
                 if not self.print:
                     print('Step ', self.attack_time, 'UAV', self.index, 'to attack',
-                          'target', self.result, self.attack_type, '-type')
+                          'target', self.result[-1], self.attack_type, '-type')
                     self.print = True
 
             else:
@@ -319,6 +319,8 @@ class PolicyMaker_Probability(PolicyMaker):
                                         self.self_target[j][0] = 0
                                 # noinspection PyTypeChecker
                                 self.self_target[a[0]][0] = 1
+                                self.result = WorldTarget[self.self_target.index([1])]
+                                self.attack_type = 'A' if 1 < self.result[3] else 'B'
                                 break
 
                             elif kkk:  # 左条件被破坏了
@@ -331,6 +333,8 @@ class PolicyMaker_Probability(PolicyMaker):
                                             self.self_target[j][0] = 0
                                     # noinspection PyTypeChecker
                                     self.self_target[a[0]][0] = 1
+                                    self.result = WorldTarget[self.self_target.index([1])]
+                                    self.attack_type = 'A' if kkk.index(min1_kkk)+1 < self.result[3] else 'B'
                                     break
 
                                 elif signal != 666:  # 内圈：右条件破坏了 # # 把a[1]给[a[0]][signal+1]
@@ -340,6 +344,8 @@ class PolicyMaker_Probability(PolicyMaker):
                                             self.self_target[j][0] = 0
                                     # noinspection PyTypeChecker
                                     self.self_target[a[0]][0] = 1
+                                    self.result = WorldTarget[self.self_target.index([1])]
+                                    self.attack_type = 'A' if signal+1 < self.result[3] else 'B'
                                     break
 
                                 else:  # 内圈：signal是666，但是self里边的小于等于另一边
@@ -362,11 +368,9 @@ class PolicyMaker_Probability(PolicyMaker):
                             pass
 
                     if max(self.self_target) == [1]:
-                        self.x = WorldTarget[self.self_target.index([1])][0]
-                        self.y = WorldTarget[self.self_target.index([1])][1]
-                        self.result = WorldTarget[self.self_target.index([1])][-1]
+                        self.x = self.result[0]
+                        self.y = self.result[1]
                         self.opt_index = 10
-                        self.attack_type = 'A' if 1 == 1 else 'B'  # TODO
                         self.attack_time = step
                         self.InAttacking = True
                     else:
@@ -377,4 +381,5 @@ class PolicyMaker_Probability(PolicyMaker):
         else:
             pass
 
-        return self.opt_index, [self.x, self.y, self.result, self.assigned, self.attack_type, self.attack_time]
+        fate = self.result[-1] if self.result else self.result  # self.result指目标的整条属性 or 缺省
+        return self.opt_index, [self.x, self.y, fate, self.assigned, self.attack_type, self.attack_time]
