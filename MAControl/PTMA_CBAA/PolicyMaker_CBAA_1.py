@@ -91,7 +91,7 @@ class PolicyMaker_Probability(PolicyMaker):
                         seen_target[-1][-5:-1] = [3, 4, 0, 2]
                 # 在 seen_target 中，真序号是准确的（唯一标识），类型可能有误（相应的价值和防御能力都有误）
 
-        # 更新自身任务矩阵【需要结合 make_policy 里的上下文协同理解】
+        # 更新自身任务矩阵
         for i in range(len(seen_target)):
             si = seen_target[i][-1]
             if not self.self_target[si]:
@@ -100,66 +100,31 @@ class PolicyMaker_Probability(PolicyMaker):
                 # noinspection PyTypeChecker
                 self.targetbid[si].append(self.step_now)
                 for nn in range(int(seen_target[i][3])+int(seen_target[i][4])):
-                    self.targetbid[si].append([0, 0, 0])  # 在空的情况下，填进 step_now 然后 [0,0,0]
+                    self.targetbid[si].append([0, 0, 0])  # 在空的情况下，填进 step_now 然后 [0, 0, 0]
 
         for num in range(len(self.close_area)):
             for index_tar in range(len(WorldTarget)):  # 双循环 for mate & for tar
-                list1 = list()
                 ggg = NewController[self.close_area[num]][0].targetbid[index_tar]
-                gg = len(ggg)  # possibly da+db+1
                 # 如果友方个体目标参数处的出价不为空
-                if gg != 0:
-                    if self.targetbid[index_tar]:
+                if ggg:
+                    sgg = self.targetbid[index_tar]
+                    if sgg:
                         if ggg[0]:
-                            if ggg[0] <= self.targetbid[index_tar][0]:  # 时间 (self 不早于 mate )
-                                for i in range(len(ggg)):
-                                    list1.append(ggg[i])
-                                list1.extend(self.targetbid[index_tar])
-                                list1.remove(ggg[0])  # remove time from mate
-                                list1.remove(self.targetbid[index_tar][0])  # remove time from self
+                            list1 = [ggg[i] for i in range(len(ggg))]
+                            list1.extend(sgg)
+                            list1.remove(ggg[0])  # remove time from mate
+                            list1.remove(sgg[0])  # remove time from self
+                            list1.sort(reverse=True, key=lambda x: x[1])
+                            if ggg[0] <= sgg[0]:  # 时间 (self 不早于 mate)
                                 a = len(list1)  # 除零前
                                 while [0, 0, 0] in list1:
                                     list1.remove([0, 0, 0])
                                 b = len(list1)  # 除零后
-                                list1.sort(reverse=True, key=lambda x: x[1])
                                 list2 = []
                                 for unit_list1 in list1:
                                     if unit_list1 not in list2:
                                         list2.append(unit_list1)  # 不重复
-                                list3 = []
-                                for unit_list2 in list2:
-                                    if not list3:
-                                        list3.append(unit_list2)  # 空的时候直接加
-                                    else:
-                                        key = 0
-                                        for unit in range(len(list3)):
-                                            if unit_list2[0] == list3[unit][0]:
-                                                key = 1
-                                        if key == 0:  # 如果key仍然是0就加
-                                            list3.append(unit_list2)
-                                        for unit in range(len(list3)):
-                                            if unit_list2[0] == list3[unit][0] and unit_list2[2] > list3[unit][2]:
-                                                list3.remove(list3[unit])
-                                                list3.append(unit_list2)
-                                for di in range(a-b):
-                                    list3.append([0, 0, 0])
-                                list3.sort(reverse=True, key=lambda x: x[1])
-                                kk = gg - 1  # possibly da+db
-                                self.targetbid[index_tar] = []  # reset
-                                self.targetbid[index_tar].append(ggg[0])   # add time
-                                for ii in range(kk):
-                                    if ii < len(list3):
-                                        self.targetbid[index_tar].append(list3[ii])
-                                    else:
-                                        self.targetbid[index_tar].append([0, 0, 0])
-                                if not self.self_target[index_tar]:
-                                    self.self_target[index_tar].append(0)
                             else:  # 时间 (self 早于 mate)
-                                for i in range(gg):
-                                    list1.append(ggg[i])
-                                list1.extend(self.targetbid[index_tar])
-                                list1.remove(ggg[0])
-                                list1.remove(self.targetbid[index_tar][0])
                                 list2 = []
                                 for unit_list1 in list1:
                                     if unit_list1 not in list2:
@@ -168,39 +133,40 @@ class PolicyMaker_Probability(PolicyMaker):
                                 while [0, 0, 0] in list2:
                                     list2.remove([0, 0, 0])
                                 b = len(list2)  # 除零后
-                                list3 = []
-                                for unit_list2 in list2:
-                                    if not list3:
+                            list3 = []
+                            for unit_list2 in list2:
+                                if not list3:
+                                    list3.append(unit_list2)
+                                else:
+                                    key = 0
+                                    for unit in range(len(list3)):
+                                        if unit_list2[0] == list3[unit][0]:
+                                            key = 1
+                                    if key == 0:
                                         list3.append(unit_list2)
-                                    else:
-                                        key = 0
-                                        for unit in range(len(list3)):
-                                            if unit_list2[0] == list3[unit][0]:
-                                                key = 1
-                                        if key == 0:
+                                    for unit in range(len(list3)):
+                                        if unit_list2[0] == list3[unit][0] and unit_list2[2] > list3[unit][2]:
+                                            list3.remove(list3[unit])
                                             list3.append(unit_list2)
-                                        for unit in range(len(list3)):
-                                            if unit_list2[0] == list3[unit][0] and unit_list2[2] > list3[unit][2]:
-                                                list3.remove(list3[unit])
-                                                list3.append(unit_list2)
-                                for di in range(a - b):
-                                    list3.append([0, 0, 0])
-                                list3.sort(reverse=True)  # ? no key?
-                                kk = len(self.targetbid[index_tar]) - 1  # possibly da+db
-                                time_k = self.targetbid[index_tar][0]  # time
-                                self.targetbid[index_tar] = [time_k]
-                                for ii in range(kk):
-                                    if ii < len(list3):
-                                        self.targetbid[index_tar].append(list3[ii])
-                                    else:
-                                        self.targetbid[index_tar].append([0, 0, 0])
-                                if not self.self_target[index_tar]:
-                                    self.self_target[index_tar].append(0)
+                            for di in range(a - b):
+                                list3.append([0, 0, 0])
+                            list3.sort(reverse=True, key=lambda x: x[1])
+                            kk = len(ggg) - 1 if ggg[0] <= sgg[0] else len(sgg) - 1  # possibly da+db
+                            time_k = ggg[0] if ggg[0] <= sgg[0] else sgg[0]
+                            self.targetbid[index_tar] = [time_k]  # reset & add time
+                            for ii in range(kk):
+                                if ii < len(list3):
+                                    self.targetbid[index_tar].append(list3[ii])
+                                else:
+                                    self.targetbid[index_tar].append([0, 0, 0])
+                            if not self.self_target[index_tar]:
+                                self.self_target[index_tar].append(0)
                     else:
-                        for i in range(len(ggg)):
-                            self.targetbid[index_tar].append(ggg[i])
+                        self.targetbid[index_tar] = [ggg[i] for i in range(len(ggg))]
                         if not self.self_target[index_tar]:  # 0、[] >>> false # [0] >>> true
                             self.self_target[index_tar].append(0)
+                else:
+                    pass
 
         # 将targetbid中的所有相同编号的变成一个
         list5 = []
@@ -211,6 +177,7 @@ class PolicyMaker_Probability(PolicyMaker):
                 u = u.replace(']', '')
                 a = list(eval(u))
                 list5.append(a)
+
         list4 = []
         for unit_list5 in list5:
             signal = 0
