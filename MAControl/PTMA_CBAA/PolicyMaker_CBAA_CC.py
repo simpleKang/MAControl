@@ -369,6 +369,7 @@ class PolicyMaker_Probability(PolicyMaker):
                                                 # noinspection PyTypeChecker
                                                 self.self_target[a[0]][0] = 1
                                                 self.result = WorldTarget[self.self_target.index([1])]
+                                                self.attack_type = 'A' if random.random() < 0.5 else 'B'
                                                 self.memory_friendID[a[0]].append(u0)
                                                 break
                                             # noinspection PyTypeChecker
@@ -380,6 +381,7 @@ class PolicyMaker_Probability(PolicyMaker):
                                         # noinspection PyTypeChecker
                                         self.self_target[a[0]][0] = 1
                                         self.result = WorldTarget[self.self_target.index([1])]
+                                        self.attack_type = 'A' if random.random() < 0.5 else 'B'
 
                                     break
 
@@ -422,6 +424,8 @@ class PolicyMaker_Probability(PolicyMaker):
                     else:
                         self.InAttacking = False
                         self.result = []
+                        self.attack_type = '0'
+                        self.attack_time = 0
 
                     self.opt_index = 1 if self.opt_index == 10 and max(self.self_target) == [0] else self.opt_index
 
