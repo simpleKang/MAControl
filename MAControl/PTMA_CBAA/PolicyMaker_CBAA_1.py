@@ -27,8 +27,8 @@ class PolicyMaker_Probability(PolicyMaker):
         self.Step0 = 500  # 决策起始点
         self.over = 0
 
-        self.self_target = [[] for t in range(len(world.targets))]
-        self.targetbid = [[] for t in range(len(world.targets))]
+        self.self_target = [[] for _ in range(len(world.targets))]
+        self.targetbid = [[] for _ in range(len(world.targets))]
         self.self_bid = []
 
     def find_mate(self, obs_n, r=0.5):
@@ -266,7 +266,7 @@ class PolicyMaker_Probability(PolicyMaker):
             # 双条件 ·离近咯 ·[1] in self.self_target
 
             if self.assigned and self.opt_index == 10:  # 上面的双条件，还有个10型opt
-                kkkkk = [[] for tar in range(len(WorldTarget))]
+                kkkkk = [[] for _ in range(len(WorldTarget))]
                 aa = self.self_target.index([1])
                 kkkkk[aa].append(10000000)
                 kkkkk[aa].append([self.index, random.randint(100000000, 1000000000000), 1000000])

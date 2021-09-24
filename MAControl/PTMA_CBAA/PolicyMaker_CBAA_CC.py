@@ -27,9 +27,14 @@ class PolicyMaker_Probability(PolicyMaker):
         self.Step0 = 500  # 决策起始点
         self.over = 0
 
-        self.self_target = [[] for t in range(len(world.targets))]
-        self.targetbid = [[] for t in range(len(world.targets))]
+        self.self_target = [[] for _ in range(len(world.targets))]
+        self.targetbid = [[] for _ in range(len(world.targets))]
         self.self_bid = []
+
+        # 高斯用在CBAA上，记忆的友方ID不会导致本个体让出当前目标
+        self.memory_friendID = [[] for _ in range(len(world.targets))]
+        self.gaussian = [0.3015, 0.3355, 0.3565, 0.3711, 0.3820, 0.3905, 0.3974, 0.4031]
+        self.targetbid_old = []
 
     def find_mate(self, obs_n, r=0.5):
         selfpos = np.array(obs_n[self.index][2:4])
@@ -257,6 +262,8 @@ class PolicyMaker_Probability(PolicyMaker):
 
     def make_policy(self, WorldTarget, obs_n, step, NewController):
 
+        self.targetbid_old = self.targetbid.copy()
+
         if self.over == 0:
 
             delta_pos = WorldTarget[self.self_target.index(max(self.self_target))][0:2] - obs_n[self.index][2:4]
@@ -266,7 +273,7 @@ class PolicyMaker_Probability(PolicyMaker):
             # 双条件 ·离近咯 ·[1] in self.self_target
 
             if self.assigned and self.opt_index == 10:  # 上面的双条件，还有个10型opt
-                kkkkk = [[] for tar in range(len(WorldTarget))]
+                kkkkk = [[] for _ in range(len(WorldTarget))]
                 aa = self.self_target.index([1])
                 kkkkk[aa].append(10000000)
                 kkkkk[aa].append([self.index, random.randint(100000000, 1000000000000), 1000000])
@@ -323,7 +330,7 @@ class PolicyMaker_Probability(PolicyMaker):
                                 self.attack_type = 'A' if 1 < self.result[3] else 'B'
                                 break
 
-                            elif kkk:  # 左条件被破坏了
+                            elif kkk and self.self_target[i]:  # 双条件，kkk!==[] 且 target值是有的
                                 min1_kkk = min(kkk, key=lambda x: x[1])
                                 # 内圈：双条件，self里边的大，且，signal是666
                                 if min1_kkk[1] < a[1] and signal == 666:  # # 把a[1]给[a[0]][kkk.index(min1_kkk)+1]
@@ -337,6 +344,45 @@ class PolicyMaker_Probability(PolicyMaker):
                                     self.attack_type = 'A' if kkk.index(min1_kkk)+1 < self.result[3] else 'B'
                                     break
 
+                                # 内圈：双条件，[1] in self.self_target，且，signal是666
+                                elif self.self_target[a[0]][0] == 1 and signal == 666:
+                                    list0 = []
+                                    beckon = 0
+                                    stbid_a0_copy = self.targetbid[a[0]].copy()
+                                    stbid_a0_copy.remove(stbid_a0_copy[0])  # remove time
+
+                                    # 将上一步中的目标报价与这步中的目标报价进行比较，获得其中新添加的个体ID
+                                    for bid_one in stbid_a0_copy:
+                                        if bid_one[1] != 0 and bid_one not in self.targetbid_old[a[0]]:
+                                            list0.append(bid_one[0])
+                                    # 当前目标报价的个体ID是否在记忆中覆盖的友方ID中
+                                    for bid_two in stbid_a0_copy:
+                                        if bid_two[0] in self.memory_friendID[a[0]]:
+                                            beckon = 1
+
+                                    if beckon == 0:
+                                        for u0 in list0:
+                                            if random.random() < self.gaussian[(len(obs_n)*2-20) % 10]:
+                                                for j in range(len(self.self_target)):
+                                                    if self.self_target[j]:
+                                                        self.self_target[j][0] = 0
+                                                # noinspection PyTypeChecker
+                                                self.self_target[a[0]][0] = 1
+                                                self.result = WorldTarget[self.self_target.index([1])]
+                                                self.memory_friendID[a[0]].append(u0)
+                                                break
+                                            # noinspection PyTypeChecker
+                                            self.self_target[a[0]][0] = 0
+                                    else:
+                                        for j in range(len(self.self_target)):
+                                            if self.self_target[j]:
+                                                self.self_target[j][0] = 0
+                                        # noinspection PyTypeChecker
+                                        self.self_target[a[0]][0] = 1
+                                        self.result = WorldTarget[self.self_target.index([1])]
+
+                                    break
+
                                 elif signal != 666:  # 内圈：右条件破坏了 # # 把a[1]给[a[0]][signal+1]
                                     self.targetbid[a[0]][signal+1] = [self.index, a[1], self.step_now]
                                     for j in range(len(self.self_target)):
@@ -348,7 +394,7 @@ class PolicyMaker_Probability(PolicyMaker):
                                     self.attack_type = 'A' if signal+1 < self.result[3] else 'B'
                                     break
 
-                                else:  # 内圈：signal是666，但是self里边的小于等于另一边
+                                else:  # 内圈：signal是666，但任意左条件都不满足
                                     if self.self_target[a[0]]:
                                         # noinspection PyTypeChecker
                                         self.self_target[a[0]][0] = 0
@@ -356,7 +402,7 @@ class PolicyMaker_Probability(PolicyMaker):
                                         # noinspection PyTypeChecker
                                         self.self_target[a[0]].append(0)
 
-                            else:  # kkk==[] 但是bid值是没有的
+                            else:  # 余下所有情形
                                 if self.self_target[a[0]]:
                                     # noinspection PyTypeChecker
                                     self.self_target[a[0]][0] = 0
@@ -375,6 +421,7 @@ class PolicyMaker_Probability(PolicyMaker):
                         self.InAttacking = True
                     else:
                         self.InAttacking = False
+                        self.result = []
 
                     self.opt_index = 1 if self.opt_index == 10 and max(self.self_target) == [0] else self.opt_index
 
