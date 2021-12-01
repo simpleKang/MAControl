@@ -39,6 +39,7 @@ class PolicyMaker_Probability(PolicyMaker):
         self.Step3 = 518
         self.Step4 = 519
         self.Step5 = 520
+        self.CommState = 'G'  # G=GOOD B=BAD
 
     def find_mate(self, obs_n, r=0.5):
         selfpos = np.array(obs_n[self.index][2:4])
@@ -138,18 +139,18 @@ class PolicyMaker_Probability(PolicyMaker):
         # Pr = U - C (Pr为最终出价, U为收益, C为成本)
 
         # 收益U的相关参数
-        e1 = 0.5      # 我方小飞机优势系数
-        e2 = 0.5      # 敌方目标战术价值系数  e1 + e2 = 1 (0 <= e1, e2 <= 1)
-        pt = 0.8      # 小飞机单发杀伤概率
-        W = target[2]    # 目标的战术价值
-        sigma1 = 0.5  # 距离优势系数
-        sigma2 = 0.5  # 角度优势系数
-        D = 0.6       # 小飞机能够攻击目标的最大距离
+        e1 = 0.5       # 我方小飞机优势系数
+        e2 = 0.5       # 敌方目标战术价值系数  e1 + e2 = 1 (0 <= e1, e2 <= 1)
+        pt = 0.8       # 小飞机单发杀伤概率
+        W = target[2]  # 目标的战术价值
+        sigma1 = 0.5   # 距离优势系数
+        sigma2 = 0.5   # 角度优势系数
+        D = 0.6        # 小飞机能够攻击目标的最大距离
 
         # 成本C的相关参数
-        s = 0.5       # 小飞机的代价系数
-        T = 0.5       # 敌方目标对小飞机的威胁程度
-        pt_ = 0.6     # 目标的单发杀伤概率
+        s = 0.5        # 小飞机的代价系数
+        T = 0.5        # 敌方目标对小飞机的威胁程度
+        pt_ = 0.6      # 目标的单发杀伤概率
 
         # 计算中间变量
         delta_pos = np.array(target[0:2]) - np.array(obs[2:4])
@@ -171,6 +172,28 @@ class PolicyMaker_Probability(PolicyMaker):
         Pr = U - C
 
         return Pr
+
+    def communication_model(self, randn, staten):
+        rc = True   # return switch of comm net | used for both 'GE' and 'B' models
+        kc = False  # whether to change current comm state | effective only for 'GE' model
+
+        if self.arglist.comm == 'B':
+            rc = True if randn < self.arglist.p else False
+        elif self.arglist.comm == 'GE' and self.CommState == 'G':
+            kc = staten > self.arglist.pGG
+            rc = True if randn < self.arglist.pG else False
+        elif self.arglist.comm == 'GE' and self.CommState == 'B':
+            kc = staten > self.arglist.pBB
+            rc = True if randn < self.arglist.pB else False
+        else:
+            pass
+
+        if self.arglist.comm == 'GE' and kc:
+            self.CommState = 'B' if self.CommState == 'G' else 'G'
+        else:
+            pass
+
+        return rc
 
     def make_policy(self, WorldTarget, obs_n, step):
 
