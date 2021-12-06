@@ -30,6 +30,12 @@ def parse_args():
     parser.add_argument("--q2", action='append', type=float, dest='q2', default=[], help="Q: Line Two")
     parser.add_argument("--q3", action='append', type=float, dest='q3', default=[], help="Q: Line Three")
     parser.add_argument("--numU", type=int, default=5, help="how many UAVs")
+    parser.add_argument("--comm", type=str, default="B", help="which communication model")
+    parser.add_argument("--p", type=float, dest='p', default=0.7, help="Bernoulli Model Comm Level")
+    parser.add_argument("--pG", type=float, dest='pG', default=0.9, help="G.E. Model Good State")
+    parser.add_argument("--pB", type=float, dest='pB', default=0.1, help="G.E. Model Bad State")
+    parser.add_argument("--pGG", type=float, dest='pGG', default=0.5, help="G.E. Model Good to Good Rate")
+    parser.add_argument("--pBB", type=float, dest='pBB', default=0.5, help="G.E. Model Bad to Bad Rate")
     parser.add_argument("--typeT", action='append', type=int, dest='typeT', default=[], help="target types")
 
     return parser.parse_args()
@@ -128,6 +134,7 @@ if __name__ == '__main__':
         PM_A.PolicyMaker_Probability.Prices = []
         PM_A.PolicyMaker_Probability.Occupied_U = []
         PM_A.PolicyMaker_Probability.Attacked_T = []
+        PM_A.PolicyMaker_Probability.Yield = True
 
         obs_n = env.reset()
         episode += 1

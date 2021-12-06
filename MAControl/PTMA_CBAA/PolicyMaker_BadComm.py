@@ -14,6 +14,7 @@ class PolicyMaker_Probability(PolicyMaker):
     Occupied_U = []
 
     Attacked_T = []
+    Yield = True
 
     def __init__(self, name, env, world, agent_index, arglist):
         super(PolicyMaker_Probability, self).__init__(name, env, world, agent_index, arglist)
@@ -40,6 +41,8 @@ class PolicyMaker_Probability(PolicyMaker):
         self.Step4 = 519
         self.Step5 = 520
         self.CommState = 'G'  # G=GOOD B=BAD
+        self.max_yield = 5
+        self.co_yield = 0
 
     def find_mate(self, obs_n, r=0.5):
         selfpos = np.array(obs_n[self.index][2:4])
@@ -116,15 +119,6 @@ class PolicyMaker_Probability(PolicyMaker):
             self.Step5 = self.Step0 + 20
 
         if operate_index == 2:
-            #  finish searching immediately, start resorting at next step
-            self.Step0 = step + 1
-            self.Step1 = self.Step0 + 1
-            self.Step2 = self.Step0 + 2
-            self.Step3 = self.Step0 + 18
-            self.Step4 = self.Step0 + 19
-            self.Step5 = self.Step0 + 20
-
-        if operate_index == 3:
             # wait [waitstep] more steps
             self.Step0 += waitstep
             self.Step1 += waitstep
@@ -214,7 +208,35 @@ class PolicyMaker_Probability(PolicyMaker):
                 for i, target in enumerate(self.seen_targets):
                     if target[-1] in PolicyMaker_Probability.Attacked_T:
                         self.seen_targets.remove(target)  # 搜索到全部目标 but 只将尚未打击的目标作为待作用对象
-                PolicyMaker_Probability.SEEN_TARGETS.append(self.seen_targets)  # All -- Occupied = Active
+                rn = np.random.random()
+                sn = np.random.random()
+                if self.communication_model(rn, sn):
+                    PolicyMaker_Probability.SEEN_TARGETS.append(self.seen_targets)  # All -- Occupied = Active
+                else:
+                    PolicyMaker_Probability.SEEN_TARGETS.append(['BROKEN', 'B', 'R', 'O', 'K', 'E', 'N'])
+                check = [1 if 'BROKEN' in item else 0 for item in PolicyMaker_Probability.SEEN_TARGETS]
+                rate = sum(check)/len(check)
+                bar = self.arglist.numU - len(PolicyMaker_Probability.Occupied_U)
+                if PolicyMaker_Probability.Yield:
+                    self.operate_step(0, step)
+                    self.co_yield += 1
+                    if len(check) % bar == 0:
+                        if rate > 0.25 and self.co_yield < self.max_yield:
+                            PolicyMaker_Probability.Yield = True
+                        else:
+                            PolicyMaker_Probability.Yield = False
+                            K = [[] if 'BROKEN' in item else item for item in PolicyMaker_Probability.SEEN_TARGETS]
+                            KK = [[] for _ in range(bar)]
+                            for n in range(bar):
+                                for q in range(self.co_yield):
+                                    KK[n] = K[n] + K[n+bar*q]
+                            KK = [[list(t) for t in set(tuple(_) for _ in item)] for item in KK]
+                            KK = [sorted(item, key=lambda x: x[2], reverse=True) for item in KK]
+                            PolicyMaker_Probability.SEEN_TARGETS = KK
+                    else:
+                        pass
+                else:
+                    pass
 
             elif step == self.Step1:
                 # print('UAV', self.index, 'communicate locally, extend target knowledge')
