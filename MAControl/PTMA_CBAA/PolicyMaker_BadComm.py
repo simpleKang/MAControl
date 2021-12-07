@@ -14,7 +14,7 @@ class PolicyMaker_Probability(PolicyMaker):
     Occupied_U = []
 
     Attacked_T = []
-    Yield = True
+    Yield = [True, True]
 
     def __init__(self, name, env, world, agent_index, arglist):
         super(PolicyMaker_Probability, self).__init__(name, env, world, agent_index, arglist)
@@ -217,14 +217,14 @@ class PolicyMaker_Probability(PolicyMaker):
                 check = [1 if 'BROKEN' in item else 0 for item in PolicyMaker_Probability.SEEN_TARGETS]
                 rate = sum(check)/len(check)
                 bar = self.arglist.numU - len(PolicyMaker_Probability.Occupied_U)
-                if PolicyMaker_Probability.Yield:
+                if PolicyMaker_Probability.Yield[0]:
                     self.operate_step(0, step)
                     self.co_yield += 1
                     if len(check) % bar == 0:
                         if rate > 0.25 and self.co_yield < self.max_yield:
-                            PolicyMaker_Probability.Yield = True
+                            PolicyMaker_Probability.Yield[0] = True
                         else:
-                            PolicyMaker_Probability.Yield = False
+                            PolicyMaker_Probability.Yield[0] = False
                             K = [[] if 'BROKEN' in item else item for item in PolicyMaker_Probability.SEEN_TARGETS]
                             KK = [[] for _ in range(bar)]
                             for n in range(bar):
@@ -356,6 +356,7 @@ class PolicyMaker_Probability(PolicyMaker):
                 PolicyMaker_Probability.KNOWN_TARGETS = []
                 PolicyMaker_Probability.RESULT = []
                 PolicyMaker_Probability.Prices = []
+                PolicyMaker_Probability.Yield = [True, True]
 
             else:
                 raise Exception('Wrong Wrong Wrong')
