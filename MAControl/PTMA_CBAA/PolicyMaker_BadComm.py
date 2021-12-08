@@ -261,20 +261,20 @@ class PolicyMaker_Probability(PolicyMaker):
                         pass
                 # print('targets', known_targets, known_target_indexes)
                 known_targets = sorted(known_targets, key=lambda x: x[2], reverse=True)
-                if known_targets:
-                    self.result = known_targets[0]
-                    PolicyMaker_Probability.RESULT.append([self.result[-1], '1'])
-                    # 这里是个体的预选择 是决策的基础
-                else:
-                    PolicyMaker_Probability.RESULT.append([self.index, '0'])
                 if PolicyMaker_Probability.Yield[1]:
+                    if known_targets:
+                        self.result = known_targets[0]
+                        PolicyMaker_Probability.RESULT.append([self.result[-1], '1'])
+                        # 这里是个体的预选择 是决策的基础
+                    else:
+                        PolicyMaker_Probability.RESULT.append([self.index, '0'])
                     rn = np.random.random()
                     sn = np.random.random()
                     if self.communication_model(rn, sn):
                         PolicyMaker_Probability.KNOWN_TARGETS.append(known_targets)
                         # 这里是个体所知的目标们 是出价的依据
                     else:
-                        PolicyMaker_Probability.KNOWN_TARGETS.append(['B', 'B', 'R', 'O', 'K', 'E', 'N'])
+                        PolicyMaker_Probability.KNOWN_TARGETS.append(['B', 'BROKEN', 'R', 'O', 'K', 'E', 'N'])
                     check = [1 if 'BROKEN' in item else 0 for item in PolicyMaker_Probability.KNOWN_TARGETS]
                     rate = sum(check) / len(check)
                     bar = self.arglist.numU - len(PolicyMaker_Probability.Occupied_U)
@@ -294,6 +294,7 @@ class PolicyMaker_Probability(PolicyMaker):
                             MM = [[list(t) for t in set(tuple(_) for _ in item)] for item in MM]
                             MM = [sorted(item, key=lambda x: x[2], reverse=True) for item in MM]
                             PolicyMaker_Probability.KNOWN_TARGETS = MM
+                            PolicyMaker_Probability.RESULT = PolicyMaker_Probability.RESULT[0:bar]
                     else:
                         pass
                 else:
