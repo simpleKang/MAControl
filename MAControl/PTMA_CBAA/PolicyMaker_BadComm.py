@@ -42,7 +42,7 @@ class PolicyMaker_Probability(PolicyMaker):
         self.Step5 = 520
         self.CommState = 'G'  # G=GOOD B=BAD
         self.max_yield = 5
-        self.co_yield = 0
+        self.co_yield = [0, 0]
 
     def find_mate(self, obs_n, r=0.5):
         selfpos = np.array(obs_n[self.index][2:4])
@@ -208,27 +208,28 @@ class PolicyMaker_Probability(PolicyMaker):
                 for i, target in enumerate(self.seen_targets):
                     if target[-1] in PolicyMaker_Probability.Attacked_T:
                         self.seen_targets.remove(target)  # 搜索到全部目标 but 只将尚未打击的目标作为待作用对象
-                rn = np.random.random()
-                sn = np.random.random()
-                if self.communication_model(rn, sn):
-                    PolicyMaker_Probability.SEEN_TARGETS.append(self.seen_targets)  # All -- Occupied = Active
-                else:
-                    PolicyMaker_Probability.SEEN_TARGETS.append(['BROKEN', 'B', 'R', 'O', 'K', 'E', 'N'])
-                check = [1 if 'BROKEN' in item else 0 for item in PolicyMaker_Probability.SEEN_TARGETS]
-                rate = sum(check)/len(check)
-                bar = self.arglist.numU - len(PolicyMaker_Probability.Occupied_U)
                 if PolicyMaker_Probability.Yield[0]:
+                    rn = np.random.random()
+                    sn = np.random.random()
+                    if self.communication_model(rn, sn):
+                        PolicyMaker_Probability.SEEN_TARGETS.append(self.seen_targets)  # All -- Occupied = Active
+                    else:
+                        PolicyMaker_Probability.SEEN_TARGETS.append(['BROKEN', 'B', 'R', 'O', 'K', 'E', 'N'])
+                    check = [1 if 'BROKEN' in item else 0 for item in PolicyMaker_Probability.SEEN_TARGETS]
+                    rate = sum(check) / len(check)
+                    bar = self.arglist.numU - len(PolicyMaker_Probability.Occupied_U)
+                    # True # therefore act ↑ and yield ↓
                     self.operate_step(0, step)
-                    self.co_yield += 1
+                    self.co_yield[0] += 1
                     if len(check) % bar == 0:
-                        if rate > 0.25 and self.co_yield < self.max_yield:
+                        if rate > 0.25 and self.co_yield[0] < self.max_yield:
                             PolicyMaker_Probability.Yield[0] = True
                         else:
                             PolicyMaker_Probability.Yield[0] = False
                             K = [[] if 'BROKEN' in item else item for item in PolicyMaker_Probability.SEEN_TARGETS]
                             KK = [[] for _ in range(bar)]
                             for n in range(bar):
-                                for q in range(self.co_yield):
+                                for q in range(self.co_yield[0]):
                                     KK[n] = K[n] + K[n+bar*q]
                             KK = [[list(t) for t in set(tuple(_) for _ in item)] for item in KK]
                             KK = [sorted(item, key=lambda x: x[2], reverse=True) for item in KK]
@@ -260,14 +261,43 @@ class PolicyMaker_Probability(PolicyMaker):
                         pass
                 # print('targets', known_targets, known_target_indexes)
                 known_targets = sorted(known_targets, key=lambda x: x[2], reverse=True)
-                PolicyMaker_Probability.KNOWN_TARGETS.append(known_targets)
-                # 这里是个体所知的目标们 是出价的依据
                 if known_targets:
                     self.result = known_targets[0]
                     PolicyMaker_Probability.RESULT.append([self.result[-1], '1'])
                     # 这里是个体的预选择 是决策的基础
                 else:
                     PolicyMaker_Probability.RESULT.append([self.index, '0'])
+                if PolicyMaker_Probability.Yield[1]:
+                    rn = np.random.random()
+                    sn = np.random.random()
+                    if self.communication_model(rn, sn):
+                        PolicyMaker_Probability.KNOWN_TARGETS.append(known_targets)
+                        # 这里是个体所知的目标们 是出价的依据
+                    else:
+                        PolicyMaker_Probability.KNOWN_TARGETS.append(['B', 'B', 'R', 'O', 'K', 'E', 'N'])
+                    check = [1 if 'BROKEN' in item else 0 for item in PolicyMaker_Probability.KNOWN_TARGETS]
+                    rate = sum(check) / len(check)
+                    bar = self.arglist.numU - len(PolicyMaker_Probability.Occupied_U)
+                    # True # therefore act ↑ and yield ↓
+                    self.operate_step(0, step)
+                    self.co_yield[1] += 1
+                    if len(check) % bar == 0:
+                        if rate > 0.25 and self.co_yield[1] < self.max_yield:
+                            PolicyMaker_Probability.Yield[1] = True
+                        else:
+                            PolicyMaker_Probability.Yield[1] = False
+                            M = [[] if 'BROKEN' in item else item for item in PolicyMaker_Probability.KNOWN_TARGETS]
+                            MM = [[] for _ in range(bar)]
+                            for n in range(bar):
+                                for q in range(self.co_yield[1]):
+                                    MM[n] = M[n] + M[n+bar*q]
+                            MM = [[list(t) for t in set(tuple(_) for _ in item)] for item in MM]
+                            MM = [sorted(item, key=lambda x: x[2], reverse=True) for item in MM]
+                            PolicyMaker_Probability.KNOWN_TARGETS = MM
+                    else:
+                        pass
+                else:
+                    pass
 
             elif self.Step2 <= step < self.Step3:
                 # print('UAV', self.index, 'bid price(s) for all seen + communicated targets')
