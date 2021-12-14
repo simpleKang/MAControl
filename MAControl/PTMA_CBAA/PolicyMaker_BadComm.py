@@ -42,7 +42,8 @@ class PolicyMaker_Probability(PolicyMaker):
         self.Step5 = 520
         self.CommState = 'G'  # G=GOOD B=BAD
         self.max_yield = [7, 5]
-        self.co_yield = [0, 0, 0]
+        self.co_yield = [0, 0, 0, 0]
+        self.Ratio = [0.7, 0.5]
 
     def find_mate(self, obs_n, r=0.5):
         selfpos = np.array(obs_n[self.index][2:4])
@@ -327,7 +328,7 @@ class PolicyMaker_Probability(PolicyMaker):
                 si = ACTIVE_U.index(self.index)
                 ti = PolicyMaker_Probability.RESULT[si][0]
                 self.close_area = self.find_mate(obs_n)
-                if self.co_yield[2] < self.co_yield[0] + self.co_yield[1]:
+                if self.co_yield[2] < self.Ratio[0] * (self.co_yield[0] + self.co_yield[1]):
                     self.operate_step(0, step)
                     self.co_yield[2] += 1
                     rn = np.random.random()
@@ -365,33 +366,40 @@ class PolicyMaker_Probability(PolicyMaker):
                         DEMANDED = 3
                 AK = [[0, 0], [3, 2], [4, 0], [2, 3]]
                 DEMANDED_UAV_NUM = AK[DEMANDED]
-                # 活跃 UAV 本地确认自己是否具有攻击资格，符合条件的 UAV 即将进入攻击阶段
-                if self.rank < DEMANDED_UAV_NUM[0]:
-                    print('Step ', step, 'UAV', self.index, 'to attack', 'target', self.result[-1], 'A-type')
-                    self.opt_index = 10
-                    self.InAttacking = True
-                    PolicyMaker_Probability.Occupied_U.append(self.index)
-                    if np.random.random() < 0.4:
-                        PolicyMaker_Probability.Attacked_T.append(self.result[-1])
-                    self.x = self.result[0]
-                    self.y = self.result[1]
-                    self.assigned = 1
-                    self.attack_type = 'A'
-                    self.attack_time = step
-                elif self.rank < DEMANDED_UAV_NUM[0] + DEMANDED_UAV_NUM[1]:
-                    print('Step ', step, 'UAV', self.index, 'to attack', 'target', self.result[-1], 'B-type')
-                    self.opt_index = 10
-                    self.InAttacking = True
-                    PolicyMaker_Probability.Occupied_U.append(self.index)
-                    if np.random.random() < 0.6:
-                        PolicyMaker_Probability.Attacked_T.append(self.result[-1])
-                    self.x = self.result[0]
-                    self.y = self.result[1]
-                    self.assigned = 1
-                    self.attack_type = 'B'
-                    self.attack_time = step
+                if self.co_yield[3] < self.Ratio[1] * (self.co_yield[0] + self.co_yield[1]):
+                    self.operate_step(0, step)
+                    self.co_yield[3] += 1
+                    rn = np.random.random()
+                    sn = np.random.random()
+                    # 活跃 UAV 本地确认自己是否具有攻击资格，符合条件的 UAV 即将进入攻击阶段
+                    if self.communication_model(rn, sn) and self.rank < DEMANDED_UAV_NUM[0]:
+                        print('Step ', step, 'UAV', self.index, 'to attack', 'target', self.result[-1], 'A-type')
+                        self.opt_index = 10
+                        self.InAttacking = True
+                        PolicyMaker_Probability.Occupied_U.append(self.index)
+                        if np.random.random() < 0.4:
+                            PolicyMaker_Probability.Attacked_T.append(self.result[-1])
+                        self.x = self.result[0]
+                        self.y = self.result[1]
+                        self.assigned = 1
+                        self.attack_type = 'A'
+                        self.attack_time = step
+                    elif self.communication_model(rn, sn) and self.rank < DEMANDED_UAV_NUM[0] + DEMANDED_UAV_NUM[1]:
+                        print('Step ', step, 'UAV', self.index, 'to attack', 'target', self.result[-1], 'B-type')
+                        self.opt_index = 10
+                        self.InAttacking = True
+                        PolicyMaker_Probability.Occupied_U.append(self.index)
+                        if np.random.random() < 0.6:
+                            PolicyMaker_Probability.Attacked_T.append(self.result[-1])
+                        self.x = self.result[0]
+                        self.y = self.result[1]
+                        self.assigned = 1
+                        self.attack_type = 'B'
+                        self.attack_time = step
+                    else:
+                        pass
                 else:
-                    print('Step ', step, 'UAV', self.index, 'not to attack')
+                    pass
 
             elif step == self.Step5:
                 # print('UAV', self.index, 'recycling')
@@ -401,7 +409,7 @@ class PolicyMaker_Probability(PolicyMaker):
                 PolicyMaker_Probability.RESULT = []
                 PolicyMaker_Probability.Prices = []
                 PolicyMaker_Probability.Yield = [True, True]
-                self.co_yield = [0, 0, 0]
+                self.co_yield = [0, 0, 0, 0]
                 self.rank = 1000
 
             else:
