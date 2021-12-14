@@ -27,7 +27,7 @@ class PolicyMaker_Probability(PolicyMaker):
         self.attack_time = 0
         self.seen_targets = []
         self.close_area = []
-        self.rank = 0
+        self.rank = 1000
         self.assigned = 0  # 是/否决定了去向
 
         # 以下为一些阶段的初始设定步数
@@ -41,8 +41,8 @@ class PolicyMaker_Probability(PolicyMaker):
         self.Step4 = 519
         self.Step5 = 520
         self.CommState = 'G'  # G=GOOD B=BAD
-        self.max_yield = 5
-        self.co_yield = [0, 0]
+        self.max_yield = [7, 5]
+        self.co_yield = [0, 0, 0]
 
     def find_mate(self, obs_n, r=0.5):
         selfpos = np.array(obs_n[self.index][2:4])
@@ -222,7 +222,7 @@ class PolicyMaker_Probability(PolicyMaker):
                     self.operate_step(0, step)
                     self.co_yield[0] += 1
                     if len(check) % bar == 0:
-                        if rate > 0.25 and self.co_yield[0] < self.max_yield:
+                        if rate > 0.25 and self.co_yield[0] < self.max_yield[0]:
                             PolicyMaker_Probability.Yield[0] = True
                         else:
                             PolicyMaker_Probability.Yield[0] = False
@@ -282,7 +282,7 @@ class PolicyMaker_Probability(PolicyMaker):
                     self.operate_step(0, step)
                     self.co_yield[1] += 1
                     if len(check) % bar == 0:
-                        if rate > 0.25 and self.co_yield[1] < self.max_yield:
+                        if rate > 0.25 and self.co_yield[1] < self.max_yield[1]:
                             PolicyMaker_Probability.Yield[1] = True
                         else:
                             PolicyMaker_Probability.Yield[1] = False
@@ -306,12 +306,18 @@ class PolicyMaker_Probability(PolicyMaker):
                 ACTIVE_U = list(set([i for i in range(self.arglist.numU)]) - set(PolicyMaker_Probability.Occupied_U))
                 si = ACTIVE_U.index(self.index)
                 for target in PolicyMaker_Probability.KNOWN_TARGETS[si]:
-                    bid = self.bidding(obs_n[self.index], target)
-                    old_bid = PolicyMaker_Probability.Prices[-1][target[-1]]
-                    if old_bid:
-                        PolicyMaker_Probability.Prices[-1][target[-1]] = 0.5*old_bid + 0.5*bid
+                    rn = np.random.random()
+                    sn = np.random.random()
+                    if self.communication_model(rn, sn):
+                        bid = self.bidding(obs_n[self.index], target)
+                        old_bid = PolicyMaker_Probability.Prices[-1][target[-1]]
+                        if old_bid:
+                            PolicyMaker_Probability.Prices[-1][target[-1]] = 0.5*old_bid + 0.5*bid
+                        else:
+                            PolicyMaker_Probability.Prices[-1][target[-1]] = bid
                     else:
-                        PolicyMaker_Probability.Prices[-1][target[-1]] = bid
+                        pass
+                # 通信不完美：在此前考虑通信范围的基础上，增添关于通信质量的模拟 # 决策弥补：仍然是多(10+)步充分竞价
                 # Prices 最终是 len_ACTIVE_U * len_target
 
             elif step == self.Step3:
@@ -321,25 +327,32 @@ class PolicyMaker_Probability(PolicyMaker):
                 si = ACTIVE_U.index(self.index)
                 ti = PolicyMaker_Probability.RESULT[si][0]
                 self.close_area = self.find_mate(obs_n)
-                if PolicyMaker_Probability.RESULT[si][1] == '1':
-                    for i in self.close_area:
-                        if i in ACTIVE_U:
-                            ii = ACTIVE_U.index(i)  # close_area 与 ACTIVE_U 的交集，其元素在 ACTIVE_U 中的编号
-                            N_Prices.append(PolicyMaker_Probability.Prices[ii][ti])
+                if self.co_yield[2] < self.co_yield[0] + self.co_yield[1]:
+                    self.operate_step(0, step)
+                    self.co_yield[2] += 1
+                    rn = np.random.random()
+                    sn = np.random.random()
+                    if self.communication_model(rn, sn) and PolicyMaker_Probability.RESULT[si][1] == '1':
+                        for i in self.close_area:
+                            if i in ACTIVE_U:
+                                ii = ACTIVE_U.index(i)  # close_area 与 ACTIVE_U 的交集，其元素在 ACTIVE_U 中的编号
+                                N_Prices.append(PolicyMaker_Probability.Prices[ii][ti])
+                            else:
+                                pass
+                        NN_Prices = [item for item in N_Prices if item != []]  # 相互能通信到的个体未必看见了同一个目标
+                        NN_Prices = sorted(NN_Prices, reverse=True)  # 上述代码去除了所有 [] 只留下 float
+                        self_price = PolicyMaker_Probability.Prices[si][ti]
+                        if self_price:
+                            self.rank = NN_Prices.index(self_price)
                         else:
                             pass
-                    NN_Prices = [item for item in N_Prices if item != []]  # 相互能通信到的个体未必看见了同一个目标
-                    NN_Prices = sorted(NN_Prices, reverse=True)  # 上述代码去除了所有 [] 只留下 float
-                    self_price = PolicyMaker_Probability.Prices[si][ti]
-                    if self_price:
-                        self.rank = NN_Prices.index(self_price)
                     else:
-                        self.rank = 1000
+                        pass
                 else:
-                    self.rank = 1000
+                    pass
 
             elif step == self.Step4:
-                # 根据当前目标的类型估计，重新讨论目标的类型（含有随机性），进而确定需要的UAV个数
+                # 根据当前目标的类型估计，确定需要的UAV个数
                 DEMANDED = 0
                 if not self.result:
                     pass
@@ -388,6 +401,8 @@ class PolicyMaker_Probability(PolicyMaker):
                 PolicyMaker_Probability.RESULT = []
                 PolicyMaker_Probability.Prices = []
                 PolicyMaker_Probability.Yield = [True, True]
+                self.co_yield = [0, 0, 0]
+                self.rank = 1000
 
             else:
                 raise Exception('Wrong Wrong Wrong')
