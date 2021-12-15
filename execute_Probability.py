@@ -5,12 +5,12 @@ import time
 import MAControl.PTMA_CBAA.InnerController_PID as IC_P
 import MAControl.PTMA_CBAA.MotionController_L1_TECS as MC_L
 import MAControl.PTMA_CBAA.PathPlanner_Shared as PP_S
-import MAControl.PTMA_CBAA.PolicyMaker_Probability as PM_A
+import MAControl.PTMA_CBAA.PolicyMaker_BadComm as PM_A
 import logging
 import os
 
 # 运行 execute_Probability.py 需要补足参数，如 execute_all_P1/P2/P3/P4_unit/Q.py 中所示
-logging.basicConfig(filename='\\Users\\xj\\PycharmProjects\\Result-A\\P1234_Q.log', level=logging.INFO)
+logging.basicConfig(filename='\\Users\\xj\\PycharmProjects\\Result-A\\comm.log', level=logging.INFO)
 logging.info('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
 logging.info(time.strftime('%Y-%m-%d, %H:%M:%S'))
 logging.info('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
@@ -31,6 +31,7 @@ def parse_args():
     parser.add_argument("--q3", action='append', type=float, dest='q3', default=[], help="Q: Line Three")
     parser.add_argument("--numU", type=int, default=5, help="how many UAVs")
     parser.add_argument("--comm", type=str, default="B", help="which communication model")
+    parser.add_argument("--thr", type=float, default=0.25, help="comm quality threshold")
     parser.add_argument("--p", type=float, dest='p', default=0.7, help="Bernoulli Model Comm Level")
     parser.add_argument("--pG", type=float, dest='pG', default=0.9, help="G.E. Model Good State")
     parser.add_argument("--pB", type=float, dest='pB', default=0.1, help="G.E. Model Bad State")

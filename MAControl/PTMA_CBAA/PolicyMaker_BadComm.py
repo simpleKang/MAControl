@@ -223,7 +223,7 @@ class PolicyMaker_Probability(PolicyMaker):
                     self.operate_step(0, step)
                     self.co_yield[0] += 1
                     if len(check) % bar == 0:
-                        if rate > 0.25 and self.co_yield[0] < self.max_yield[0]:
+                        if rate > self.arglist.thr and self.co_yield[0] < self.max_yield[0]:
                             PolicyMaker_Probability.Yield[0] = True
                         else:
                             PolicyMaker_Probability.Yield[0] = False
@@ -283,7 +283,7 @@ class PolicyMaker_Probability(PolicyMaker):
                     self.operate_step(0, step)
                     self.co_yield[1] += 1
                     if len(check) % bar == 0:
-                        if rate > 0.25 and self.co_yield[1] < self.max_yield[1]:
+                        if rate > self.arglist.thr and self.co_yield[1] < self.max_yield[1]:
                             PolicyMaker_Probability.Yield[1] = True
                         else:
                             PolicyMaker_Probability.Yield[1] = False
