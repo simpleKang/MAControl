@@ -41,7 +41,7 @@ class PolicyMaker_Probability(PolicyMaker):
         self.Step4 = 519
         self.Step5 = 520
         self.CommState = 'G'  # G=GOOD B=BAD
-        self.max_yield = [7, 5]
+        self.max_yield = [20, 20]
         self.co_yield = [0, 0, 0, 0]
         self.Ratio = [0.7, 0.5]
 
