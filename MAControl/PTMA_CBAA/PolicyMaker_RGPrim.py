@@ -262,13 +262,13 @@ class PolicyMaker_Probability(PolicyMaker):
                 # Prices 最终是 len_ACTIVE_U * len_target
 
             elif step == self.Step3:
-                # print('UAV', self.index, 'extract bids, sort and determine own rank')
-                N_Prices = []
+                # print('UAV', self.index, 'extract bids, sort and determine each rank')
                 ACTIVE_U = list(set([i for i in range(self.arglist.numU)]) - set(PolicyMaker_Probability.Occupied_U))
+                self.close_area = self.find_mate(obs_n)
                 si = ACTIVE_U.index(self.index)
                 ti = PolicyMaker_Probability.RESULT[si][0]
-                self.close_area = self.find_mate(obs_n)
                 if PolicyMaker_Probability.RESULT[si][1] == '1':
+                    N_Prices = []
                     for i in self.close_area:
                         if i in ACTIVE_U:
                             ii = ACTIVE_U.index(i)  # close_area 与 ACTIVE_U 的交集，其元素在 ACTIVE_U 中的编号
