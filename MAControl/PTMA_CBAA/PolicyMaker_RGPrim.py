@@ -248,16 +248,17 @@ class PolicyMaker_Probability(PolicyMaker):
 
             elif self.Step2 <= step < self.Step3:
                 # print('UAV', self.index, 'bid price(s) for all seen + communicated targets')
-                PolicyMaker_Probability.Prices.append([[] for i in range(len(WorldTarget))])
                 ACTIVE_U = list(set([i for i in range(self.arglist.numU)]) - set(PolicyMaker_Probability.Occupied_U))
+                if len(PolicyMaker_Probability.Prices) < len(ACTIVE_U):
+                    PolicyMaker_Probability.Prices.append([[] for i in range(len(WorldTarget))])
                 si = ACTIVE_U.index(self.index)
                 for target in PolicyMaker_Probability.KNOWN_TARGETS[si]:
                     bid = self.bidding(obs_n[self.index], target)
-                    old_bid = PolicyMaker_Probability.Prices[-1][target[-1]]
+                    old_bid = PolicyMaker_Probability.Prices[si][target[-1]]
                     if old_bid:
-                        PolicyMaker_Probability.Prices[-1][target[-1]] = 0.5*old_bid + 0.5*bid
+                        PolicyMaker_Probability.Prices[si][target[-1]] = 0.5*old_bid + 0.5*bid
                     else:
-                        PolicyMaker_Probability.Prices[-1][target[-1]] = bid
+                        PolicyMaker_Probability.Prices[si][target[-1]] = bid
                 # Prices 最终是 len_ACTIVE_U * len_target
 
             elif step == self.Step3:
