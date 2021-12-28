@@ -20,6 +20,7 @@ class PolicyMaker_Probability(PolicyMaker):
     Prices = []
     # 以上都和 ACTIVE_U 同长度，也就是 Occupied_U 的用处
     Occupied_U = []
+    RANK = []
 
     Attacked_T = []
 
@@ -34,7 +35,6 @@ class PolicyMaker_Probability(PolicyMaker):
         self.attack_time = 0
         self.seen_targets = []
         self.close_area = []
-        self.rank = 1000
         self.assigned = 0  # 是/否决定了去向
 
         # 以下为一些阶段的初始设定步数
@@ -266,7 +266,9 @@ class PolicyMaker_Probability(PolicyMaker):
                 ACTIVE_U = list(set([i for i in range(self.arglist.numU)]) - set(PolicyMaker_Probability.Occupied_U))
                 self.close_area = self.find_mate(obs_n)
                 if self.index == max(ACTIVE_U):
-                    for si in ACTIVE_U:
+                    PolicyMaker_Probability.Rank = []
+                    for ui in ACTIVE_U:
+                        si = ACTIVE_U.index(ui)
                         ti = PolicyMaker_Probability.RESULT[si][0]
                         if PolicyMaker_Probability.RESULT[si][1] == '1':
                             N_Prices = []
@@ -280,15 +282,18 @@ class PolicyMaker_Probability(PolicyMaker):
                             NN_Prices = sorted(NN_Prices, reverse=True)  # 上述代码去除了所有 [] 只留下 float
                             self_price = PolicyMaker_Probability.Prices[si][ti]
                             if self_price:
-                                self.rank = NN_Prices.index(self_price)
+                                PolicyMaker_Probability.Rank.append(NN_Prices.index(self_price))
                             else:
-                                self.rank = 1000
+                                PolicyMaker_Probability.Rank.append(1000)
                         else:
-                            self.rank = 1000
+                            PolicyMaker_Probability.Rank.append(1000)
                 else:
                     pass
 
             elif step == self.Step4:
+                ACTIVE_U = list(set([i for i in range(self.arglist.numU)]) - set(PolicyMaker_Probability.Occupied_U))
+                si = ACTIVE_U.index(self.index)
+                self_rank = PolicyMaker_Probability.Rank[si]
                 # 根据当前目标的类型估计，确定需要的UAV个数
                 DEMANDED = 0
                 if not self.result:
@@ -303,7 +308,7 @@ class PolicyMaker_Probability(PolicyMaker):
                 AK = [[0, 0], [3, 2], [4, 0], [2, 3]]
                 DEMANDED_UAV_NUM = AK[DEMANDED]
                 # 活跃 UAV 本地确认自己是否具有攻击资格，符合条件的 UAV 即将进入攻击阶段
-                if self.rank < DEMANDED_UAV_NUM[0]:
+                if self_rank < DEMANDED_UAV_NUM[0]:
                     print('Step ', step, 'UAV', self.index, 'to attack', 'target', self.result[-1], 'A-type')
                     self.opt_index = 10
                     self.InAttacking = True
@@ -315,7 +320,7 @@ class PolicyMaker_Probability(PolicyMaker):
                     self.assigned = 1
                     self.attack_type = 'A'
                     self.attack_time = step
-                elif self.rank < DEMANDED_UAV_NUM[0] + DEMANDED_UAV_NUM[1]:
+                elif self_rank < DEMANDED_UAV_NUM[0] + DEMANDED_UAV_NUM[1]:
                     print('Step ', step, 'UAV', self.index, 'to attack', 'target', self.result[-1], 'B-type')
                     self.opt_index = 10
                     self.InAttacking = True
@@ -337,7 +342,7 @@ class PolicyMaker_Probability(PolicyMaker):
                 PolicyMaker_Probability.KNOWN_TARGETS = []
                 PolicyMaker_Probability.RESULT = []
                 PolicyMaker_Probability.Prices = []
-                self.rank = 1000
+                PolicyMaker_Probability.Rank = []
 
             else:
                 raise Exception('Wrong Wrong Wrong')

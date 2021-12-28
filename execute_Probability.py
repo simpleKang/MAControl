@@ -136,6 +136,7 @@ if __name__ == '__main__':
         PM_A.PolicyMaker_Probability.Occupied_U = []
         PM_A.PolicyMaker_Probability.Attacked_T = []
         PM_A.PolicyMaker_Probability.Yield = [True, True]
+        PM_A.PolicyMaker_Probability.Rank = []
 
         obs_n = env.reset()
         episode += 1
