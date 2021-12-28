@@ -265,25 +265,28 @@ class PolicyMaker_Probability(PolicyMaker):
                 # print('UAV', self.index, 'extract bids, sort and determine each rank')
                 ACTIVE_U = list(set([i for i in range(self.arglist.numU)]) - set(PolicyMaker_Probability.Occupied_U))
                 self.close_area = self.find_mate(obs_n)
-                si = ACTIVE_U.index(self.index)
-                ti = PolicyMaker_Probability.RESULT[si][0]
-                if PolicyMaker_Probability.RESULT[si][1] == '1':
-                    N_Prices = []
-                    for i in self.close_area:
-                        if i in ACTIVE_U:
-                            ii = ACTIVE_U.index(i)  # close_area 与 ACTIVE_U 的交集，其元素在 ACTIVE_U 中的编号
-                            N_Prices.append(PolicyMaker_Probability.Prices[ii][ti])
+                if self.index == max(ACTIVE_U):
+                    for si in ACTIVE_U:
+                        ti = PolicyMaker_Probability.RESULT[si][0]
+                        if PolicyMaker_Probability.RESULT[si][1] == '1':
+                            N_Prices = []
+                            for i in self.close_area:
+                                if i in ACTIVE_U:
+                                    ii = ACTIVE_U.index(i)  # close_area 与 ACTIVE_U 的交集，其元素在 ACTIVE_U 中的编号
+                                    N_Prices.append(PolicyMaker_Probability.Prices[ii][ti])
+                                else:
+                                    pass
+                            NN_Prices = [item for item in N_Prices if item != []]  # 相互能通信到的个体未必看见了同一个目标
+                            NN_Prices = sorted(NN_Prices, reverse=True)  # 上述代码去除了所有 [] 只留下 float
+                            self_price = PolicyMaker_Probability.Prices[si][ti]
+                            if self_price:
+                                self.rank = NN_Prices.index(self_price)
+                            else:
+                                self.rank = 1000
                         else:
-                            pass
-                    NN_Prices = [item for item in N_Prices if item != []]  # 相互能通信到的个体未必看见了同一个目标
-                    NN_Prices = sorted(NN_Prices, reverse=True)  # 上述代码去除了所有 [] 只留下 float
-                    self_price = PolicyMaker_Probability.Prices[si][ti]
-                    if self_price:
-                        self.rank = NN_Prices.index(self_price)
-                    else:
-                        self.rank = 1000
+                            self.rank = 1000
                 else:
-                    self.rank = 1000
+                    pass
 
             elif step == self.Step4:
                 # 根据当前目标的类型估计，确定需要的UAV个数
