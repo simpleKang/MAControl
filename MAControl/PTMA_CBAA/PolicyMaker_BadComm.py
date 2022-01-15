@@ -310,10 +310,9 @@ class PolicyMaker_Probability(PolicyMaker):
                 for target in PolicyMaker_Probability.KNOWN_TARGETS[si]:
                     rn = np.random.random()
                     sn = np.random.random()
-                    if self.communication_model(rn, sn):
+                    if self.communication_model(rn, sn) and si < PolicyMaker_Probability.Prices.__len__():
                         bid = self.bidding(obs_n[self.index], target)
-                        old_bid = PolicyMaker_Probability.Prices[si][target[-1]] \
-                            if si < PolicyMaker_Probability.Prices.__len__() else 0
+                        old_bid = PolicyMaker_Probability.Prices[si][target[-1]]
                         if old_bid:
                             PolicyMaker_Probability.Prices[si][target[-1]] = 0.5*old_bid + 0.5*bid
                         else:
