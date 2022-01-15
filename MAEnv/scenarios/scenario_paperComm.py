@@ -123,14 +123,14 @@ class Scenario(BaseScenario):
         F = []
         for j in range(len(world.targets)):
             delta = 1
-            if X_JA[j] < E_JA[j]:
-                delta = 0
-            else:
-                if T_JA[j] > T_JB[j]:
-                    ddt = 0.1*T_JB[j]-0.1*T_JA[j]  # dt=0.1
-                    delta = math.exp(ddt/400)   # 至多罚一个自然对数(e^1)
-                else:
-                    pass
+            # if X_JA[j] < E_JA[j]:
+            #     delta = 0
+            # else:
+            #     if T_JA[j] > T_JB[j]:
+            #         ddt = 0.1*T_JB[j]-0.1*T_JA[j]  # dt=0.1
+            #         delta = math.exp(ddt/400)   # 至多罚一个自然对数(e^1)
+            #     else:
+            #         pass
             ra = abs(X_JA[j] - E_JA[j])+1
             rb = abs(X_JB[j] - E_JB[j])+1
             F.append(delta*W[j]/ra/rb)
