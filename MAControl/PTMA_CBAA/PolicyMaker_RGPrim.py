@@ -266,10 +266,10 @@ class PolicyMaker_Probability(PolicyMaker):
                 si = ACTIVE_U.index(self.index)
                 for target in PolicyMaker_Probability.KNOWN_TARGETS[si]:
                     bid = self.bidding(obs_n[self.index], target)
-                    old_bid = PolicyMaker_Probability.Prices[si][target[-1]]
                     rn = np.random.random()
                     sn = np.random.random()
                     if self.communication_model(rn, sn) and si < PolicyMaker_Probability.Prices.__len__():
+                        old_bid = PolicyMaker_Probability.Prices[si][target[-1]]
                         if old_bid:
                             PolicyMaker_Probability.Prices[si][target[-1]] = 0.5 * old_bid + 0.5 * bid
                         else:
@@ -299,7 +299,10 @@ class PolicyMaker_Probability(PolicyMaker):
                                     pass
                             NN_Prices = [item for item in N_Prices if item != []]  # 相互能通信到的个体未必看见了同一个目标
                             NN_Prices = sorted(NN_Prices, reverse=True)  # 上述代码去除了所有 [] 只留下 float
-                            self_price = PolicyMaker_Probability.Prices[si][ti]
+                            if si < PolicyMaker_Probability.Prices.__len__():
+                                self_price = PolicyMaker_Probability.Prices[si][ti]
+                            else:
+                                self_price = 0
                             if self_price:
                                 PolicyMaker_Probability.Rank.append(NN_Prices.index(self_price))
                             else:
