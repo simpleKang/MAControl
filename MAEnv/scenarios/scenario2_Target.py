@@ -12,8 +12,10 @@ class Scenario(BaseScenario):
         # set any world properties first
         world.damping = 0  # 取消第一种阻尼计算方式
         world.damping2 = 10  # 调整第二种阻尼计算方式的参数
+        world.edge = T.edge   # 确定边界
+
         # set nums
-        num_agents = 10
+        num_agents = 5
         num_targets = T.num_targets
         num_obstacles = 0
         num_grids = 5
@@ -62,7 +64,9 @@ class Scenario(BaseScenario):
     def reset_world(self, world):
 
         for i, agent in enumerate(world.agents):
-            agent.state.p_pos = np.random.uniform(-0.9, -0.8, world.dim_p)
+            # agent.state.p_pos = np.random.uniform(-0.9, -0.8, world.dim_p)
+            # agent.state.p_pos = np.array([-0.01+0.002*i, 0])
+            agent.state.p_pos = np.array([-0.1+0.2*i, 0])
             agent.state.p_vel = np.array([0, 0.05])  # 50 米/秒
             agent.state.p_acc = np.array([0, 0])
             agent.color = T.agent_color

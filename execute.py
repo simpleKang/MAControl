@@ -6,7 +6,31 @@ import MAControl.Test_Auction.InnerController_PID as IC_P
 import MAControl.Test_Auction.MotionController_L1_TECS as MC_L
 import MAControl.Test_Auction.PathPlanner_Simple as PP_S
 import MAControl.Test_Auction.PolicyMaker_Auction as PM_A
+import rospy
+from aiframe.msg import simulationMessageList
+from aiframe.msg import vectorlist
+from aiframe.msg import simulationMessage
 
+
+class ros_core:
+    def __init__(self):
+        rospy.init_node('MPC', anonymous=True)
+        self.rate = rospy.Rate(10)
+        self.subVehicleMessage = rospy.Subscriber("MAEControlCommand", vectorlist)
+        self.pubVehicleMessage = rospy.Publisher("MAEVehicleMessage", simulationMessageList, queue_size=10)
+
+    def messagePub(self, data, N):
+        pubMessage = simulationMessageList()
+
+        for i in range(N):
+            msg = simulationMessage()
+            pubMessage.simulationMessageList.append(msg)
+            pubMessage.simulationMessageList[i].local_x = data[i][3]*1000
+            pubMessage.simulationMessageList[i].local_y = data[i][2]*1000
+            pubMessage.simulationMessageList[i].local_vx = data[i][1]
+            pubMessage.simulationMessageList[i].local_vy = data[i][0]
+
+        self.pubVehicleMessage.publish(pubMessage)
 
 def parse_args():
     parser = argparse.ArgumentParser("Control Experiments for Multi-Agent Environments")
@@ -34,7 +58,7 @@ def get_controller(env, world, arglist):
     for i in range(env.n):
         control = []
         control.append(PM_A.PolicyMaker_Auction("agent_%d" % i, env, world, i, arglist))
-        control.append(PP_S.PathPlanner_Simple("agent_%d" % i, env, world, i, arglist))
+        control.append(PP_S.PathPlanner_EdgeWaypoint("agent_%d" % i, env, world, i, arglist))
         control.append(MC_L.MotionController_L1_TECS("agent_%d" % i, env, world, i, arglist))
         control.append(IC_P.InnerController_PID("agent_%d" % i, env, world, i, arglist))
         control.append(False)  # Arriveflag
@@ -60,7 +84,7 @@ def update_action(env, world, obs_n, step, NewController):
         list_i = NewController[i][0]. \
             make_policy(WorldTarget, obs_n, step)
 
-        pointAi, pointBi, finishedi, NewController[i][5] = NewController[i][1].\
+        pointAi, pointBi, finishedi, NewController[i][5], tmp = NewController[i][1].\
             planpath(list_i, obs_n[i], NewController[i][4], step)
 
         acctEi, acclEi, NewController[i][4] = NewController[i][2]. \
@@ -81,6 +105,7 @@ def augment_view(env, world, NewController):
 
 
 if __name__ == '__main__':
+
     arglist = parse_args()
 
     # Create environment
@@ -93,20 +118,24 @@ if __name__ == '__main__':
     step = 0
     start = time.time()
 
-    while True:
+    while not rospy.is_shutdown():
+        print(time.time())
 
         # get action
         print('>>>> step', step)
+
         action_n = update_action(env, world, obs_n, step, NewController)
 
         # environment step
         new_obs_n, rew_n, done_n, info_n = env.step(action_n)
         step += 1
         obs_n = new_obs_n
-
         # for displaying
         # time.sleep(0.01)
         augment_view(env, world, NewController)
         env.render()
         # print('>>>> step', step)
 
+        for i in range(len(world.agents)):
+            if obs_n[i][3] > 0.8:
+                exit()
