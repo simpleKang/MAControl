@@ -17,7 +17,7 @@ class Scenario(BaseScenario):
         # set nums
         num_agents = 5
         num_targets = T.num_targets
-        num_obstacles = 0
+        num_obstacles = 6
         num_grids = 5
         # add agents
         world.agents = [Agent() for i in range(num_agents)]
@@ -66,8 +66,8 @@ class Scenario(BaseScenario):
         for i, agent in enumerate(world.agents):
             # agent.state.p_pos = np.random.uniform(-0.9, -0.8, world.dim_p)
             # agent.state.p_pos = np.array([-0.01+0.002*i, 0])
-            agent.state.p_pos = np.array([-0.1+0.2*i, 0])
-            agent.state.p_vel = np.array([0, 0.05])  # 50 米/秒
+            agent.state.p_pos = np.array([0, -1+0.5*i])
+            agent.state.p_vel = np.array([0.05, 0])  # 50 米/秒
             agent.state.p_acc = np.array([0, 0])
             agent.color = T.agent_color
 
@@ -77,9 +77,12 @@ class Scenario(BaseScenario):
             if i < len(world.targets):
                 landmark.color = np.random.uniform(0, 1, 3)
                 landmark.state.p_pos = np.array(T.target_pos[i])
-            else:
+            elif i < (len(world.targets) + len(world.obstacles)):
                 landmark.color = T.grid_color
-                landmark.state.p_pos = np.array(T.grid_pos[i-len(world.targets)])
+                landmark.state.p_pos = np.array(T.obstacle_pos[i-len(world.targets)])
+            elif i < (len(world.targets) + len(world.obstacles) + len(world.grids)):
+                landmark.color = T.grid_color
+                landmark.state.p_pos = np.array(T.grid_pos[i - len(world.targets) - len(world.obstacles)])
 
     def benchmark_data(self, agent, world):
         # returns data for benchmarking purposes

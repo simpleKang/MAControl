@@ -218,8 +218,10 @@ class MultiAgentEnv(gym.Env):
             self.render_geoms_xform = []
             for entity in self.world.entities:
                 if 'grid' in entity.name:
-                    preset = [[-2, -2], [-2, 2], [2, 2], [2, -2]]
+                    preset = [[-10, -10], [-10, 10], [10, 10], [10, -10]]
                     geom = rendering.make_polygon(list(np.array(preset) * entity.size))
+                elif 'obstacle' in entity.name:
+                    geom = rendering.make_circle(0.5, 30)
                 elif 'agent' in entity.name:
                     geom = rendering.make_uav89(entity.size)
                 else:
@@ -243,7 +245,7 @@ class MultiAgentEnv(gym.Env):
         for i in range(len(self.viewers)):
             from MAEnv import rendering
             # update bounds to center around agent
-            cam_range = 2
+            cam_range = 10
             if self.shared_viewer:
                 pos = np.zeros(self.world.dim_p)
             else:

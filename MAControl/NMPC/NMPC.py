@@ -1,17 +1,14 @@
 import os
 import casadi as ca
 import numpy as np
-from acados_template import AcadosOcp, AcadosOcpSolver, AcadosModel, AcadosOcpOptions, acados_sim
-import random
-import math
+from acados_template import AcadosOcp, AcadosOcpSolver, AcadosModel
 import sys
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpathes
 
 open(os.path.dirname(__file__) + 'track.txt', 'w')
 
 T = 4.0
-dt = 0.1
+dt = 0.2
 numObstacles = 6
 
 # 给出障碍物距离计算公式， 此处先假定障碍物在（10,10,3）
@@ -84,12 +81,12 @@ obstaclePositionList.append(obstacleR)
 # obstaclePositionList.append(obstacleR)
 
 class NMPC:
-    def __init__(self):
+    def __init__(self, num_agent, T, dt):
         self.model = AcadosModel()
         self.ocp = AcadosOcp()
         self.T = T
         self.dt = dt
-        self.N = 5
+        self.N = num_agent
         self.numObstacles = numObstacles
         self.max_neig = 3
         self.maxA = np.sqrt(4/3)
@@ -125,22 +122,13 @@ class NMPC:
                 minDist2 = ca.SX(1e9)
                 minIndex = 0
                 for k in range(self.N):
-                    # if dist2ToSort[k] < minDist2 and dist2ToSort[k] < self.communciationRange**2:
-                    # if dist2ToSort[k] < minDist2:
                     minIndex = ca.if_else(ca.logic_and(dist2ToSort[k] < minDist2, toSort[k]),
                                           k, minIndex)
                     minDist2 = ca.if_else(ca.logic_and(dist2ToSort[k] < minDist2, toSort[k]),
                                           dist2ToSort[k], minDist2)
-                    # minIndex = ca.if_else(dist2ToSort[k] < minDist2, k, minIndex)
-                    # minDist2 = ca.if_else(dist2ToSort[k] < minDist2, dist2ToSort[k], minDist2)
                 for l in range(self.N):
-                    # if minIndex == l:
-                    #     toSort[l] = 0
                     toSort[l] = ca.if_else(minIndex == l, 0, toSort[l])
-                # minIndex = k
-                # minDist2 = dist2ToSort[k]
                 self.neighborIndex[j, i] = minIndex
-                #--------------------------------------------------------------------------------------------------
 
         # 对应matlab中swarming_model_max_neig.m的损失函数部分____________________________________________________
         self.distReference = 0.8
@@ -167,23 +155,11 @@ class NMPC:
                 pos_rel[0] = ca.conditional(neighborX, pos_rel_cell, pos_rel_default[0], False)
                 pos_rel[1] = ca.conditional(neighborY, pos_rel_cell, pos_rel_default[1], False)
                 pos_rel[2] = ca.conditional(neighborZ, pos_rel_cell, pos_rel_default[2], False)
-
-                # a = self.position[3 * i]-self.position[3 * self.neighborIndex[i, j]]
-                # ca.conditional()
-                # neighborPosition = [self.position[3 * self.neighborIndex[i, j]], self.position[3 * self.neighborIndex[i, j] + 1],
-                #                     self.position[3 * self.neighborIndex[i, j] + 2]]
-                # dist = self.calculateArrayLength([self.position[3 * i]-self.position[3 * self.neighborIndex[i, j]],
-                #                                   self.position[3 * i + 1]-self.position[3 * self.neighborIndex[i, j] + 1],
-                #                                   self.position[3 * i + 2]-self.position[3 * self.neighborIndex[i, j] + 2]])
-                tmp = pos_rel*pos_rel
                 self.sym_sep[i*self.max_neig+j] = (pos_rel[0]*pos_rel[0]+pos_rel[1]*pos_rel[1]+pos_rel[2]*pos_rel[2]-self.distReference**2)/self.max_neig
             self.sym_dir[i] = 1-(self.uReference[0]*selfVelocity[0]+self.uReference[1]*selfVelocity[1]
                                  +self.uReference[2]*selfVelocity[2])**2/self.calculateArrayLength(selfVelocity)
             a = self.calculateArrayLength(selfVelocity)
             self.sym_nav[i] = self.calculateArrayLength(selfVelocity) - self.vReference**2
-            #--------------------------------------------------------------------------------------------------------------
-
-
 
     # 定义计算模长函数
     def calculateArrayLength(self, array):
@@ -195,7 +171,7 @@ class NMPC:
     def getVehicleStates(self, data):
         self.initStates = data
 
-    def initModel(self):
+    def initModel(self, x0):
         # 对应matlab中cl_init.m中的参数设置
         self.model.name = "swarm"
         self.ocp.solver_options.tf = self.T
@@ -232,84 +208,44 @@ class NMPC:
         self.ocp.cost.yref = np.zeros(self.max_neig*self.N+self.N+self.N+3*self.N)
         self.ocp.cost.yref_e = np.zeros(self.max_neig*self.N+self.N+self.N)
 
-
-        dt = 0.2 # 时间步长
-        # dynamic = [0.5*self.acceleration*dt*dt, self.acceleration*dt]
-        # f = ca.Function('f', [self.x, self.acceleration], [ca.vcat(dynamic)], ['state', 'control_input'], ['rhs'])
-        # self.f = ca.Function("function", [self.x, self.acceleration], [ca.vcat(dynamic)], ["position", "acceleration"], ["dynamic"])
-        # dynamic = [0.5*self.acceleration*dt*dt, self.acceleration*dt]
-        # self.f = ca.Function("function", [self.x, self.acceleration], [ca.vcat(dynamic)], ["position", "acceleration"], ["dynamic"])
-        # self.ocp.solver_options.integrator_type = "ERK"
-        # self.model.f_expl_expr = self.f(self.x, self.acceleration)
         self.model.f_expl_expr = ca.vertcat(self.velocity, self.acceleration)
         self.ocp.solver_options.integrator_type = "IRK"
         self.model.f_impl_expr = ca.vertcat(self.velocity, self.acceleration) - self.xdot
 
         # todo 转python
 
-        # self.ocp.constraints.x0 = self.initStates
-        x0 = np.array([1] * 30)
-        # self.ocp.constraints.x0 = np.array([
-        #     0.221993171089739,
-        #     0.870732306177376,
-        #     - 1.54328084466057,
-        #     0.918610907937922,
-        #     0.488411188794829,
-        #     - 1.13825613709735,
-        #     0.765907856480316,
-        #     0.518417987872943,
-        #     - 1.45319949842378,
-        #     0.187721228661252,
-        #     0.0807412687648749,
-        #     - 1.01155970380103,
-        #     0.441309222895953,
-        #     0.158309867712651,
-        #     - 0.870062968798721,
-        #     0,
-        #     0,
-        #     0,
-        #     0,
-        #     0,
-        #     0,
-        #     0,
-        #     0,
-        #     0,
-        #     0,
-        #     0,
-        #     0,
-        #     0,
-        #     0,
-        #     0])
-        self.ocp.constraints.x0 = np.array([0.2,
-               1,
-               -2.5,
-               -0.5,
-               0.2,
-               -2.5,
-               -0.1,
-               -0.5,
-               -2.5,
-               0.2,
-               0.2,
-               -2.5,
-               -0.5,
-               1,
-               -2.5,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0])
+        self.ocp.constraints.x0 = x0
+        # x0 = np.array([1] * 30)
+        # self.ocp.constraints.x0 = np.array([0.2,
+        #        1,
+        #        -2.5,
+        #        -0.5,
+        #        0.2,
+        #        -2.5,
+        #        -0.1,
+        #        -0.5,
+        #        -2.5,
+        #        0.2,
+        #        0.2,
+        #        -2.5,
+        #        -0.5,
+        #        1,
+        #        -2.5,
+        #         0,
+        #         0,
+        #         0,
+        #         0,
+        #         0,
+        #         0,
+        #         0,
+        #         0,
+        #         0,
+        #         0,
+        #         0,
+        #         0,
+        #         0,
+        #         0,
+        #         0])
         # 对应matlab中swarming_model_max_neig.m的约束部分____________________________________________________
         self.agentDist = ca.SX.zeros(int(self.N * (self.N - 1) / 2), 1)
         # 给出个体间距计算方法
@@ -416,106 +352,140 @@ def plotTrajectory(numAgent, data, obstacle):
     plt.savefig('track.png')
     plt.show()
 
-example = NMPC()
-example.initModel()
 
-# initx = np.array([1]*30)
-initx = np.array([0.2,
-               1,
-               -2.5,
-               -0.5,
-               0.2,
-               -2.5,
-               -0.1,
-               -0.5,
-               -2.5,
-               0.2,
-               0.2,
-               -2.5,
-               -0.5,
-               1,
-               -2.5,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0])
-u_init = np.array([0] * 15)
-x_init = initx
-x_init = np.stack(x_init)
+if __name__ == '__main__':
 
+    # initx = np.array([1]*30)
+    initx = np.array([1.264159998732038, -0.8916011767763817, -2.5, 1.2539152395810407, -0.3085129002509677, -2.5,
+                      1.2688904234780618, -0.00316691427353433, -2.5, 1.2555256553382745, 0.31782030957973084, -2.5,
+                      1.2643282271126681, 0.8942179961509248, -2.5, 0.039925713048763994, 0.0022601337274828523, 0,
+                      0.039699735413837166, 0.0048800290520242, 0, 0.04000247645216936, -0.00024145288295886365, 0,
+                      0.03980800556772525, -0.003728883269117943, 0, 0.03995350776085171, -0.002067290982718784, 0])
+    # initx = np.array([0,
+    #                -1,
+    #                -2.5,
+    #                0,
+    #                -0.5,
+    #                -2.5,
+    #                0,
+    #                0,
+    #                -2.5,
+    #                0,
+    #                0.5,
+    #                -2.5,
+    #                0,
+    #                1,
+    #                -2.5,
+    #                 0.05,
+    #                 0,
+    #                 0,
+    #                 0.05,
+    #                 0,
+    #                 0,
+    #                 0.05,
+    #                 0,
+    #                 0,
+    #                 0.05,
+    #                 0,
+    #                 0,
+    #                 0.05,
+    #                 0,
+    #                 0])
+    u_init = np.array([0] * 15)
+    x_init = initx
+    x_init = np.stack(x_init)
 
-timeStep = [i for i in range(int(T/dt) + 1)]
-tmp = []
-for i in range(15):
-    tmp.append(timeStep)
-tmp1 = np.array(tmp)
-tmp2 = []
-tmpArray = [1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0]
-for i in range(int(T/dt) + 1):
-    tmp2.append(tmpArray)
-tmp3 = 0.5*dt*np.array(tmp2).transpose()
-# b = 0.5*0.1*ca.repmat([1, 0, 0], 5, 41)
-c = []
-for i in range(int(T/dt) + 1):
-    c.append(initx[0:15])
-c = np.array(c).transpose()
-posTraj = c + tmp3*tmp1
-x_traj_init = np.append(posTraj, tmp3*10, axis=0)
+    example = NMPC(5, T, dt)
+    example.initModel(initx)
 
-u_traj_init = np.zeros((15, int(T/dt)))
-x_history = []
-for step in range(12000):
+    timeStep = [i for i in range(int(T/dt) + 1)]
+    tmp = []
+    for i in range(15):
+        tmp.append(timeStep)
+    tmp1 = np.array(tmp)
+    tmp2 = []
+    tmpArray = [1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0]
     for i in range(int(T/dt) + 1):
-        example.solver.set(i, "x", x_traj_init[:, i])
-    for i in range(int(T/dt)):
-        example.solver.set(i, "u", u_traj_init[:, i])
+        tmp2.append(tmpArray)
+    tmp3 = 0.5*dt*np.array(tmp2).transpose()
+    # b = 0.5*0.1*ca.repmat([1, 0, 0], 5, 41)
+    c = []
+    for i in range(int(T/dt) + 1):
+        c.append(initx[0:15])
+    c = np.array(c).transpose()
+    posTraj = c + tmp3*tmp1
+    x_traj_init = np.append(posTraj, tmp3*10, axis=0)
 
-    # example.solver.set(0, "x", x_init)
-    # example.solver.set(0, "u", u_init)
-    example.solver.set(0, 'lbx', x_init)
-    example.solver.set(0, 'ubx', x_init)
-    x_history.append(x_init.copy())
-    # self.acadosOcpSolver.set(0, 'x', x_init)
-    # self.acadosOcpSolver.set(0, 'u', u_init)
-    example.solver.solve()
+    u_traj_init = np.zeros((15, int(T/dt)))
+    x_history = []
 
-    uOptAcados = np.ndarray((int(T/dt), 15))
-    xOptAcados = np.ndarray((int(T/dt) + 1, 30))
-    for i in range(int(T/dt)):
-        xOptAcados[i, :] = example.solver.get(i, "x")
-        uOptAcados[i, :] = example.solver.get(i, "u")
-    xOptAcados[int(T/dt), :] = example.solver.get(int(T/dt), "x")
-    x_traj_init = xOptAcados[1:]
-    x_traj_init = np.append(x_traj_init, [xOptAcados[-1, :]], axis=0)
-    x_traj_init = x_traj_init.transpose()
-    u_traj_init = uOptAcados[1:]
-    u_traj_init = np.append(u_traj_init, [uOptAcados[-1, :]], axis=0)
-    u_traj_init = u_traj_init.transpose()
+    # x_traj_init = np.array([[ 2.20519551e+00,  2.39492302e+00,  2.57214974e+00,  2.73276355e+00,   2.87290699e+00,  2.98793143e+00,  3.07213898e+00,  3.11853523e+00,   3.11853523e+00],
+    #                         [-8.24367144e-01 -8.12495195e-01 -8.04784988e-01 -8.00603471e-01,  -7.98703662e-01 -7.97951005e-01 -7.97479514e-01 -7.97260327e-01,  -7.97260327e-01],
+    #                         [-2.50000000e+00 -2.50000000e+00 -2.50000000e+00 -2.50000000e+00,  -2.50000000e+00 -2.50000000e+00 -2.50000000e+00 -2.50000000e+00,  -2.50000000e+00],
+    #                         [ 2.09455470e+00  2.26600537e+00  2.42847096e+00  2.57718083e+00,   2.70815444e+00  2.81664308e+00  2.89686358e+00  2.94171361e+00,   2.94171361e+00],
+    #                         [-1.85298190e-01 -1.60248069e-01 -1.37487364e-01 -1.18535732e-01,  -1.03839867e-01 -9.33966575e-02 -8.68633488e-02 -8.38916511e-02,  -8.38916511e-02],
+    #                         [-2.50000000e+00 -2.50000000e+00 -2.50000000e+00 -2.50000000e+00,  -2.50000000e+00 -2.50000000e+00 -2.50000000e+00 -2.50000000e+00,  -2.50000000e+00],
+    #                         [ 2.29810388e+00  2.50366159e+00  2.69376345e+00  2.86495477e+00,   3.01347916e+00  3.1346595...)
+    # u_traj_init = np.array([[ 7.87203129e-03  1.49952687e-04 -4.25219112e-04 -5.23859229e-04,  -5.36898171e-04 -5.57103755e-04 -6.06791183e-04 -6.06791183e-04],
+    #                         [-1.55390986e-02 -1.61842424e-02 -1.03005744e-02 -4.11299285e-03,  -2.15172970e-04  1.14813334e-03  1.29441438e-03  1.29441438e-03],
+    #                         [ 0.00000000e+00  0.00000000e+00  0.00000000e+00  0.00000000e+00,   0.00000000e+00  0.00000000e+00  0.00000000e+00  0.00000000e+00],
+    #                         [ 3.28399708e-02  2.23229333e-02  2.36072370e-02  2.59858510e-02,   2.92261558e-02  3.32831834e-02  3.81438303e-02  3.81438303e-02],
+    #                         [-7.38070352e-03 -1.80523621e-02 -2.12291970e-02 -2.30951334e-02,  -2.38615639e-02 -2.42688865e-02 -2.44745835e-02 -2.44745835e-02],
+    #                         [ 0.00000000e+00  0.00000000e+00  0.00000000e+00  0.00000000e+00,   0.00000000e+00  0.00000000e+00  0.00000000e+00  0.00000000e+00],
+    #                         [-1.50954492e-02 -2.02846622e-02 -2.25427248e-02 -2.55210433e-02,  -2.94590465e-02 -3.42423514e-02 -3.97863616e-02 -3.97863616e-02],
+    #                         [-0.0203674,   0.00018348,  0.00855485,  0.01141708,  0.01096817,  0.00901214,  0.00741071,  0.00741071],
+    #                         [0., 0., 0., 0., 0., 0., 0., 0.],
+    #                         [0.0127516,  0.00550233, 0.00525449, 0.00542417, 0.00572963, 0.00625038, 0.00696034, 0.00696034],
+    #                         [0.01379611, 0.01612874, 0.01590964, 0.01480092, 0.01299751, 0.01155868, 0.01062865, 0.01062865],
+    #                         [0., 0., 0., 0., 0., 0., 0., 0.],
+    #                         [8.82350542e-03  1.03775001e-03  3.47087920e-04  1.00110393e-04,
+    #                          -2.94254595e-05 - 1.03229594e-04 - 1.46921628e-04 - 1.46921628e-04],
+    #                         [1.31595556e-02  1.43779405e-02  1.05773763e-02  6.03089607e-03, 2.46810274e-03
+    #                          6.01260857e-04 - 4.61123576e-05 - 4.61123576e-05],
+    #                         [0. 0. 0. 0. 0. 0. 0. 0.]
+    #                         ])
 
-    x_init[0:15] = x_init[0:15] + dt*x_init[15:] + 0.5*uOptAcados[0, :]*dt**2
-    x_init[15:] = x_init[15:] + uOptAcados[0, :]*dt
+    for step in range(12000):
+        for i in range(int(T/dt) + 1):
+            example.solver.set(i, "x", x_traj_init[:, i])
+        for i in range(int(T/dt)):
+            example.solver.set(i, "u", u_traj_init[:, i])
 
-    if x_init[0] > 10:
-        break
+        # example.solver.set(0, "x", x_init)
+        # example.solver.set(0, "u", u_init)
+        example.solver.set(0, 'lbx', x_init)
+        example.solver.set(0, 'ubx', x_init)
+        x_history.append(x_init.copy())
+        # self.acadosOcpSolver.set(0, 'x', x_init)
+        # self.acadosOcpSolver.set(0, 'u', u_init)
+        example.solver.solve()
 
-    for k in range(len(x_init)):
+        uOptAcados = np.ndarray((int(T/dt), 15))
+        xOptAcados = np.ndarray((int(T/dt) + 1, 30))
+        for i in range(int(T/dt)):
+            xOptAcados[i, :] = example.solver.get(i, "x")
+            uOptAcados[i, :] = example.solver.get(i, "u")
+        xOptAcados[int(T/dt), :] = example.solver.get(int(T/dt), "x")
+        x_traj_init = xOptAcados[1:]
+        x_traj_init = np.append(x_traj_init, [xOptAcados[-1, :]], axis=0)
+        x_traj_init = x_traj_init.transpose()
+        u_traj_init = uOptAcados[1:]
+        u_traj_init = np.append(u_traj_init, [uOptAcados[-1, :]], axis=0)
+        u_traj_init = u_traj_init.transpose()
+
+        x_init[0:15] = x_init[0:15] + dt*x_init[15:] + 0.5*uOptAcados[0, :]*dt**2
+        x_init[15:] = x_init[15:] + uOptAcados[0, :]*dt
+
+        if x_init[0] > 10:
+            break
+
+        for k in range(len(x_init)):
+            with open(os.path.dirname(__file__) + 'track.txt', 'a') as f:
+                f.write(str(x_init[k]) + ' ')
         with open(os.path.dirname(__file__) + 'track.txt', 'a') as f:
-            f.write(str(x_init[k]) + ' ')
-    with open(os.path.dirname(__file__) + 'track.txt', 'a') as f:
-        f.write('\n')
+            f.write('\n')
 
-plotTrajectory(5, x_history, obstaclePosition)
+    plotTrajectory(5, x_history, obstaclePosition)
 
 
 

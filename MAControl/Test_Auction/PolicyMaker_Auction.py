@@ -226,7 +226,7 @@ class PolicyMaker_Auction(PolicyMaker):
         else:
 
             if step < self.Step0:
-                print('UAV', self.index, 'searching')
+                # print('UAV', self.index, 'searching')
                 self.close_area = self.find_mate(obs_n)
                 self.add_new_target(obs_n[self.index], WorldTarget)
                 self.opt_index = 0

@@ -41,7 +41,7 @@ class Entity(object):
         # color
         self.color = None
         # max speed and accel
-        self.max_speed = None
+        self.max_speed = 0.05
         self.accel = None
         # state
         self.state = EntityState()
@@ -103,9 +103,9 @@ class World(object):
         # color dimensionality
         self.dim_color = 3
         # simulation timestep
-        self.dt = 0.1
+        self.dt = 0.2
         # physical damping
-        self.damping = 0.25
+        self.damping = 0
         self.damping2 = 0
         # contact response parameters
         self.contact_force = 1e+2
@@ -127,7 +127,7 @@ class World(object):
         return [agent for agent in self.agents if agent.action_callback is not None]
 
     # update state of the world
-    def  step(self):
+    def step(self):
         # set actions for scripted agents 
         for agent in self.scripted_agents:
             agent.action = agent.action_callback(agent, self)
@@ -172,9 +172,10 @@ class World(object):
         for i,entity in enumerate(self.entities):
             if not entity.movable: continue
             entity.state.p_vel = entity.state.p_vel * (1 - self.damping)
+            old_vel = entity.state.p_vel
             if (p_force[i] is not None):
                 speed = np.sqrt(np.square(entity.state.p_vel[0]) + np.square(entity.state.p_vel[1]))
-                q_force_i = p_force[i] / entity.mass - speed * entity.state.p_vel * self.damping2
+                q_force_i = p_force[i] / entity.mass - speed * entity.state.p_vel * 0
                 entity.state.p_acc = q_force_i
                 entity.state.p_vel += q_force_i * self.dt
             if entity.max_speed is not None:
@@ -182,7 +183,7 @@ class World(object):
                 if speed > entity.max_speed:
                     entity.state.p_vel = entity.state.p_vel / np.sqrt(np.square(entity.state.p_vel[0]) +
                                                                   np.square(entity.state.p_vel[1])) * entity.max_speed
-            entity.state.p_pos += entity.state.p_vel * self.dt
+            entity.state.p_pos += 0.5*(old_vel+entity.state.p_vel) * self.dt
 
     def update_agent_state(self, agent):
         # set communication state (directly for now)
